@@ -20,15 +20,39 @@ export function marcado(s) {
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 }
 
-/* Prosa de uma seção de aula: uma lista de parágrafos, em que um item que é
-   ele próprio uma lista vira <ul>. É deliberadamente pobre — não é Markdown,
-   e não precisa ser: o conteúdo real virá de um banco na Etapa 2, e inventar
-   um dialeto agora só criaria uma migração. */
+/* Prosa de uma seção de aula. Três formas de bloco, e nada além:
+
+     'texto'                     → parágrafo, com `código` e **negrito**
+     ['a', 'b']                  → lista
+     { codigo: 'css', texto: … } → bloco de código
+
+   O bloco de código entrou quando o primeiro curso PRÁTICO foi escrito. Em
+   `web-fundamentos`, que é conceitual, crase no meio da frase bastava; em
+   `html-css` não há como ensinar um seletor sem mostrá-lo em três linhas com a
+   indentação preservada. Foi o conteúdo que pediu, não a arquitetura que
+   previu — e por isso a forma continua sendo só o que o conteúdo usa.
+
+   Ele reaproveita `.cod-bloco`, o mesmo componente dos exercícios: código tem
+   a mesma aparência onde quer que apareça no portal.
+
+   Deliberadamente não é Markdown. O conteúdo real virá de um banco na Etapa 2,
+   e inventar um dialeto agora só criaria uma migração. */
 export function prosa(corpo) {
   if (!corpo || !corpo.length) return '';
-  return corpo.map((bloco) => (Array.isArray(bloco)
-    ? '<ul class="prosa-lista">' + bloco.map((i) => '<li>' + marcado(i) + '</li>').join('') + '</ul>'
-    : '<p>' + marcado(bloco) + '</p>')).join('');
+  return corpo.map((bloco) => {
+    if (Array.isArray(bloco)) {
+      return '<ul class="prosa-lista">' + bloco.map((i) => '<li>' + marcado(i) + '</li>').join('') + '</ul>';
+    }
+    if (bloco && typeof bloco === 'object' && bloco.texto !== undefined) {
+      // `esc` e não `marcado`: dentro de um bloco de código, crase é crase e
+      // asterisco é asterisco — marcá-los comeria o próprio código
+      return '<div class="cod-bloco prosa-cod">' +
+        (bloco.codigo ? '<div class="cod-barra"><span class="cod-ling">' + esc(bloco.codigo) + '</span></div>' : '') +
+        '<pre class="cod"><code>' + esc(bloco.texto) + '</code></pre>' +
+      '</div>';
+    }
+    return '<p>' + marcado(bloco) + '</p>';
+  }).join('');
 }
 
 /* Embaralhamento com semente: a ordem de apresentação não pode mudar a cada
