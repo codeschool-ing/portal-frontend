@@ -203,6 +203,22 @@ de passar por cima da imagem.
 delas é código, que não se quebra por conforto. O teto dele sai da posição da
 seta, como descrito adiante.
 
+A largura das duas colunas foi **medida, não chutada**. A linha mais longa que
+existe nos exemplos tem 74 caracteres; IBM Plex Mono a 12,64px avança 7,601px
+por caractere — 562px, mais 36px de recuo, 598px. Daí `--cod:604px`: pouco mais
+do que a linha, não a tela inteira. A nota tem `--nota:440px` de teto e
+`--nota-min:300px` de piso, e é ela quem encolhe quando falta espaço, porque o
+código não pode.
+
+**Uma coluna é o padrão; duas são a exceção.** Empilhado — nota logo acima do
+trecho que ela comenta — funciona em qualquer largura, e é assim que o celular
+lê. O lado a lado só entra em `min-width:1580px`, e esse número também sai da
+conta: as duas colunas mais o vão pedem `604 + 300 + 30 = 934px`, e o teto do
+exemplo (`(100vw - trilho + leitura) / 2 - 76`) só alcança 934 quando a tela
+passa de 1580. Antes, o padrão era duas colunas com um corte para empilhar, e
+o resultado era um intervalo em que a coluna de código nascia estreita demais e
+ganhava barra de rolagem própria.
+
 **Nada passa de `--amplo`.** O teste percorre as 89 seções escritas dos três
 cursos, uma a uma, e mede cada filho da tela de aula — é caro, uma navegação
 por seção, e é o único jeito de a regra valer para o conteúdo que existe e não
@@ -802,8 +818,26 @@ outro. Um teste confere que os sete campos que o LinkedIn espera estão lá e qu
 o código na URL é o mesmo impresso no documento — uma URL malformada só daria
 sinal no site do LinkedIn.
 
-Certificado de **exemplo não compartilha**: no lugar dos botões, a frase que
-explica por quê.
+Certificado de **exemplo não compartilha**. A frase que dizia isso saiu de
+dentro do modal — ela explicava, mas roubava a faixa inteira para explicar algo
+que ninguém tinha perguntado. O botão ficou, **desabilitado**, com o motivo no
+`title` e no `aria-label`. Das três saídas possíveis — esconder o botão, deixá-lo
+funcionando, desabilitá-lo com motivo — só a última não mente: esconder faz
+parecer que a função não existe, e funcionar publicaria uma credencial que
+ninguém tirou.
+
+## O certificado no celular
+
+O modal do certificado extrapolava a tela nos dois eixos a 390px, e a causa não
+era o certificado: era o `.modal`, que é `display:grid; place-items:center` com
+a faixa em `auto`. Numa faixa `auto`, `width:min(1040px,100%)` resolve contra o
+`max-content` do próprio filho — a conta se morde e não limita nada. A faixa
+virou `minmax(0,1fr)`, que é o `0` de piso que faltava, e o alinhamento vertical
+saiu do `place-items` para `margin:auto 0` na pilha, para o documento poder
+rolar quando o certificado for mais alto do que a tela em vez de estourar por
+cima e por baixo. Abaixo de 640px o documento também aperta: menos recuo, menos
+corpo de letra, e o rodapé em duas linhas. Um teste mede a folha dentro de um
+390×844 e reprova se ela passar da largura ou sobrar por baixo.
 
 ## Duas fileiras que rolam, e uma cor que separa
 

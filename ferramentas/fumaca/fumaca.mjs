@@ -432,9 +432,29 @@ const partes = await p.locator('.exemplo-cod').count();
 ok('exemplo anotado, um trecho por nota', partes >= 5, partes + ' trechos');
 ok('a saída do exemplo aparece', await p.locator('.exemplo-saida').isVisible());
 
+/* DUAS FORMAS, E A ESCOLHA É POR LARGURA DISPONÍVEL.
+
+   Empilhado é o padrão: a nota ANTES do trecho, as duas em uma coluna só. As
+   duas colunas só aparecem quando as DUAS cabem — o código sem rolar e a nota
+   ainda legível —, o que dá 1580px de janela. Onde não cabem, o que sobraria é
+   código picotado ao lado de nota espremida, pior que empilhado em qualquer
+   tela. */
+ok('em 1440px o bloco fica empilhado', await p.evaluate(() => {
+  const n = document.querySelector('.exemplo-nota').getBoundingClientRect();
+  const c = document.querySelector('.exemplo-cod').getBoundingClientRect();
+  return n.bottom <= c.top + 2;                      // um em cima do outro
+}));
+ok('e a nota vem antes do trecho dela', await p.evaluate(() => {
+  const g = document.querySelector('.exemplo-grade');
+  return g.children[0].classList.contains('exemplo-nota');
+}));
+
+await p.setViewportSize({ width: 1920, height: 950 });
+await p.waitForTimeout(250);
+
 /* A FORMA DO GO BY EXAMPLE: a explicação à ESQUERDA, o programa à direita, e
    cada nota na altura do trecho que ela comenta. */
-ok('a nota fica à esquerda do código', await p.evaluate(() => {
+ok('em 1920px a nota fica à esquerda do código', await p.evaluate(() => {
   const n = document.querySelector('.exemplo-nota').getBoundingClientRect();
   const c = document.querySelector('.exemplo-cod').getBoundingClientRect();
   return n.right <= c.left + 2;
@@ -453,6 +473,21 @@ ok('o código é contínuo, sem costura entre os trechos', await p.evaluate(() =
   return cods.slice(1).every((c, i) =>
     Math.abs(c.getBoundingClientRect().top - cods[i].getBoundingClientRect().bottom) < 1);
 }));
+
+/* A LARGURA DA COLUNA DE CÓDIGO SAI DA MEDIDA DO CONTEÚDO: a linha mais longa
+   dos exemplos tem 74 caracteres, que a .79rem da IBM Plex Mono dão 562px;
+   com os 36px de recuo, 598. A coluna tem 604 — pouco mais, de propósito. */
+const colunaCod = await p.evaluate(() => {
+  const c = document.querySelector('.exemplo-cod');
+  return { larg: Math.round(c.getBoundingClientRect().width),
+    sobra: Math.round(c.getBoundingClientRect().width - c.scrollWidth) };
+});
+ok('a coluna de código cabe a linha mais longa, com folga',
+  colunaCod.larg >= 598 && colunaCod.sobra >= 0,
+  colunaCod.larg + 'px, ' + colunaCod.sobra + 'px de sobra');
+
+await p.setViewportSize({ width: 1440, height: 900 });
+await p.waitForTimeout(250);
 
 /* O realce usa as três cores da marca. O teste procura pelo menos duas
    famílias diferentes num exemplo que tem palavra-chave e literal. */
@@ -764,6 +799,32 @@ ok('Esc fecha o certificado', (await p.locator('.modal-cert').count()) === 0);
 ok('e o fundo volta a rolar', await p.evaluate(() =>
   getComputedStyle(document.documentElement).overflow !== 'hidden'));
 
+/* No celular o certificado extrapolava nos DOIS eixos. A culpa não era dele: o
+   `.modal` é grade com faixa `auto`, e ali `width:min(1040px,100%)` resolve
+   contra o `max-content` do próprio filho — a conta se morde e não limita nada.
+   A faixa virou `minmax(0,1fr)`; o teste mede a folha, não a regra. */
+await p.setViewportSize({ width: 390, height: 844 });
+await p.waitForTimeout(120);
+await p.locator('.cert').first().click();
+await p.waitForSelector('.modal-cert');
+const certCel = await p.evaluate(() => {
+  const f = document.querySelector('.modal-cert .cert-folha').getBoundingClientRect();
+  return {
+    larg: Math.round(f.width), esq: Math.round(f.left),
+    passa: Math.round(f.right - window.innerWidth),
+    embaixo: Math.round(f.bottom - document.documentElement.clientHeight),
+    rolaH: document.documentElement.scrollWidth - window.innerWidth,
+  };
+});
+ok('a 390px o certificado cabe na largura', certCel.passa <= 0 && certCel.esq >= 0,
+  certCel.larg + 'px começando em ' + certCel.esq);
+ok('e cabe na altura', certCel.embaixo <= 0, certCel.embaixo + 'px de sobra por baixo');
+ok('e a página não rola na horizontal', certCel.rolaH <= 1, certCel.rolaH + 'px');
+await p.keyboard.press('Escape');
+await p.waitForTimeout(160);
+await p.setViewportSize({ width: 1440, height: 900 });
+await p.waitForTimeout(120);
+
 /* Agora um certificado DE VERDADE: curso concluído e prova aprovada. É a
    única forma de ver os botões do LinkedIn, e é a que importa conferir —
    uma URL de compartilhamento malformada só aparece no site do LinkedIn. */
@@ -871,7 +932,7 @@ console.log('\n== 20. o exemplo cabe entre as setas ==');
 /* O exemplo escapa da coluna de leitura para o código não virar barra de
    rolagem, e as setas de navegação moram no vão. Os dois disputam o mesmo
    espaço, e o teto do exemplo é calculado a partir da posição da seta. */
-for (const larg of [1440, 1680, 1920]) {
+for (const larg of [1280, 1440, 1580, 1700, 1920, 2400]) {
   await p.setViewportSize({ width: larg, height: 950 });
   await p.goto(BASE + PAGINA + '#/curso/javascript/aula/0/arrow', { waitUntil: 'networkidle' });
   await p.waitForSelector('.exemplo');
@@ -879,15 +940,26 @@ for (const larg of [1440, 1680, 1920]) {
     const r = (s) => { const e = document.querySelector(s); return e && e.getBoundingClientRect(); };
     const ex = r('.exemplo'); const esq = r('.lado-esq'); const dir = r('.lado-dir');
     const cod = document.querySelector('.exemplo-cod');
+    /* abaixo de 1400px as setas voltam para o rodapé: elas continuam no DOM,
+       mas não disputam mais o vão, e medir distância até elas não diz nada */
+    const noVao = !!esq && getComputedStyle(document.querySelector('.lado-esq')).position === 'fixed';
     return {
       larg: Math.round(ex.width),
-      folga: Math.min(esq ? ex.left - esq.right : 999, dir ? dir.left - ex.right : 999),
+      noVao,
+      folga: noVao ? Math.min(ex.left - esq.right, dir.left - ex.right) : null,
       rola: cod.scrollWidth > cod.clientWidth + 1,
+      pagina: document.documentElement.scrollWidth - window.innerWidth,
     };
   });
-  ok('a ' + larg + 'px o exemplo não encosta na seta', m.folga >= 8,
-    m.larg + 'px de largura, ' + Math.round(m.folga) + 'px de folga');
+  if (m.noVao) {
+    ok('a ' + larg + 'px o exemplo não encosta na seta', m.folga >= 8,
+      m.larg + 'px de largura, ' + Math.round(m.folga) + 'px de folga');
+  } else {
+    ok('a ' + larg + 'px as setas estão no rodapé, sem disputar o vão', true,
+      m.larg + 'px de largura');
+  }
   ok('a ' + larg + 'px o código não vira barra de rolagem', !m.rola);
+  ok('a ' + larg + 'px a página não rola na horizontal', m.pagina <= 1, m.pagina + 'px');
 }
 await p.setViewportSize({ width: 1440, height: 900 });
 

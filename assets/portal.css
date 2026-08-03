@@ -80,7 +80,25 @@ html[data-tema="claro"]{color-scheme:light}
 .portal{
   --trilho:380px;
   --leitura:820px;
-  --amplo:min(1180px, calc(100vw - var(--trilho) - 2 * var(--pad-x)));
+  /* O bloco de código anotado tem duas colunas, e a da direita NÃO se quebra
+     por conforto: ou o programa cabe, ou aparece barra de rolagem. Então a
+     largura dela sai da MEDIDA do conteúdo, não de um palpite.
+
+       IBM Plex Mono a .79rem avança 7,6px por caractere (medido no navegador)
+       a linha mais longa dos exemplos tem 74 caracteres → 562px
+       mais os 36px de recuo do bloco                    → 598px
+
+     `--cod` é 604: pouco mais que isso, e a folga são os seis pixels que
+     evitam a barra aparecer por causa de um caractere. `--nota` é o conforto
+     da coluna de texto; `--nota-min`, o mínimo abaixo do qual ela deixa de ser
+     legível e as duas colunas param de valer a pena. */
+  --cod:604px;
+  --nota:440px;
+  --nota-min:300px;
+  --amplo:min(
+    calc(var(--cod) + var(--nota) + 30px),
+    calc(100vw - var(--trilho) - 2 * var(--pad-x))
+  );
   display:grid;
   /* 380 e não 272: com 272 quase todo nome de aula quebrava em duas ou três
      linhas, e uma lista de treze itens quebrados vira parede. Os 50px que
@@ -964,7 +982,22 @@ body.com-busca{overflow:hidden}
 .cert{cursor:zoom-in}
 .cert:focus-visible{outline:2px solid var(--phosphor);outline-offset:3px}
 
-.modal-pilha{display:flex;flex-direction:column;gap:14px;width:min(1040px,100%)}
+/* A GRADE DO MODAL PRECISA DE UMA COLUNA DEFINIDA.
+
+   O `.modal` do base.css é `display:grid;place-items:center`, e uma trilha
+   `auto` se dimensiona pelo max-content do que está dentro. Aí o `100%` do
+   filho resolve contra ESSA largura — que é a que ele mesmo pediu — e não
+   limita nada: no celular o certificado ficava 408px de largura dentro de uma
+   tela de 390 e era cortado dos dois lados.
+
+   `minmax(0,1fr)` torna a trilha definida, e o `100%` volta a significar "a
+   célula". A vitrine nunca viu isso porque o conteúdo dela é texto, que
+   encolhe; o certificado tem largura mínima própria. */
+.modal{grid-template-columns:minmax(0,1fr);align-items:start;overflow-y:auto}
+.modal-pilha{
+  display:flex;flex-direction:column;gap:14px;
+  width:min(1040px,100%);margin:auto 0;
+}
 .modal-acoes{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px}
 .modal-cert .modal-caixa{width:100%;background:none;border:0;box-shadow:none;overflow:visible}
 /* dentro do modal o certificado é o conteúdo inteiro: sem cursor de lupa,
@@ -972,10 +1005,27 @@ body.com-busca{overflow:hidden}
 .modal-cert .cert{cursor:default;padding:14px}
 .modal-cert .cert-folha{min-height:min(62vh,480px);padding:46px 56px 30px;gap:30px}
 .modal-cert .cert-marca{font-size:1rem}
+/* `5vw` na fonte + `min-height` em `vh` fazem o documento crescer junto com a
+   tela; no celular os dois empurravam o certificado para fora dela. Aqui a
+   ampliação inteira volta ao tamanho do cartão da lista — ampliar num aparelho
+   onde ele já ocupa a largura toda não tem o que ampliar. */
 .modal-cert .cert-aluno{font-size:clamp(2.1rem,5vw,3.4rem)}
 .modal-cert .cert-curso{font-size:1.6rem}
 .modal-cert .cert-frase{font-size:.78rem}
 .modal-cert .cert-meta,.modal-cert .cert-pe{font-size:.8rem}
+
+@media(max-width:640px){
+  .modal{padding:12px}
+  .modal-cert .cert{padding:8px}
+  .modal-cert .cert-folha{min-height:0;padding:20px 18px 14px;gap:16px}
+  .modal-cert .cert-marca{font-size:.78rem}
+  .modal-cert .cert-aluno{font-size:1.5rem}
+  .modal-cert .cert-curso{font-size:1rem}
+  .modal-cert .cert-frase{font-size:.66rem}
+  .modal-cert .cert-meta,.modal-cert .cert-pe{font-size:.66rem}
+  /* a linha do rodapé empilha em vez de espremer data e código na mesma linha */
+  .cert-pe{flex-direction:column;gap:4px}
+}
 .cert-share{gap:8px}
 .cert-share svg{width:15px;height:15px}
 
@@ -1108,10 +1158,7 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
    `100%` dentro do `calc` da margem resolve contra a coluna (820px), então a
    margem negativa é exatamente a metade do que ele cresceu para cada lado. O
    bloco fica centrado no mesmo eixo do texto, sem invólucro a mais. */
-.exemplo{
-  width:var(--amplo);
-  margin:24px 0 24px calc((100% - var(--amplo)) / 2);
-}
+.exemplo{margin:24px 0}
 
 /* O TETO SOBE PARA A POSIÇÃO DA SETA onde há setas laterais.
 
@@ -1128,25 +1175,38 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
    A regra vem DEPOIS da base, e não dentro do bloco das setas lá em cima: com
    a mesma especificidade quem vem por último vence, e lá em cima ela perdia
    em silêncio. */
-@media(min-width:1400px){
+/* Só com duas colunas o bloco escapa da coluna de leitura — e o teto continua
+   saindo da posição da seta de navegação, que mora no vão ao lado. `100%`
+   dentro do `calc` da margem resolve contra a coluna de leitura, então a
+   margem negativa é metade do que ele cresceu para cada lado. */
+@media(min-width:1580px){
   .portal{
     --amplo:min(
-      1180px,
+      calc(var(--cod) + var(--nota) + 30px),
       calc((100vw - var(--trilho) + var(--leitura)) / 2 - 76px)
     );
+  }
+  .exemplo{
+    width:var(--amplo);
+    margin-left:calc((100% - var(--amplo)) / 2);
   }
 }
 .exemplo-barra{display:flex;justify-content:flex-end;margin-bottom:5px}
 .exemplo-arq{font-size:.64rem;letter-spacing:.06em}
 
-.exemplo-grade{
-  display:grid;
-  /* o código leva a fatia maior: a nota quebra linha, o programa não */
-  grid-template-columns:minmax(0,0.82fr) minmax(0,1.18fr);
-  column-gap:30px;row-gap:0;
-}
+/* UMA COLUNA É O PADRÃO, e duas são a exceção.
+
+   Foi assim que a regra se inverteu: as duas colunas só valem quando as DUAS
+   cabem — o código sem rolar e a nota ainda legível. Onde não cabem, o que
+   sobra é um código picotado ao lado de uma nota espremida, que é pior que a
+   forma empilhada em qualquer tela.
+
+   Empilhado, a nota vem ANTES do trecho: ler a explicação e então o código é a
+   ordem que funciona sem o alinhamento lateral para amarrar os dois. É a forma
+   que o celular sempre teve. */
+.exemplo-grade{display:grid;grid-template-columns:minmax(0,1fr);row-gap:0}
 .exemplo-nota{
-  align-self:start;padding:11px 0 11px;
+  padding:12px 0 8px;
   font-size:.86rem;line-height:1.62;color:var(--paper-dim);
 }
 .exemplo-nota:empty{padding:0}
@@ -1157,25 +1217,47 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
 .exemplo-nota strong{color:var(--paper)}
 
 .exemplo-cod{
-  margin:0;padding:0 18px;overflow-x:auto;
+  margin:0;padding:10px 18px;overflow-x:auto;
   scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
   background:var(--panel);border-left:2px solid var(--wire);
   font-family:'IBM Plex Mono',monospace;font-size:.79rem;line-height:1.7;
   color:var(--paper);white-space:pre;
 }
-/* o respiro do arquivo fica nas pontas do bloco, não em cada trecho: o miolo
-   precisa emendar sem costura */
-.exemplo-cod:first-of-type{padding-top:12px}
-.exemplo-cod:last-of-type{padding-bottom:12px}
-
 .exemplo-saida{
-  grid-column:2;margin-top:10px;padding:9px 16px;
+  margin-top:10px;padding:9px 16px;
   background:var(--ink);border:1px solid var(--wire);border-radius:4px;
 }
 .exemplo-saida-rot{
   display:block;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px;
 }
 .exemplo-saida .cod{margin:0;padding:0;background:none;border:0;font-size:.76rem;color:var(--paper-dim)}
+.exemplo-vazio{display:none}
+
+/* DUAS COLUNAS, e o corte sai da conta, não do gosto.
+
+   Elas precisam de `--cod` + `--nota-min` + o vão entre elas: 604 + 300 + 30 =
+   934px. E `--amplo` não pode passar do vão que sobra das setas de navegação,
+   que é `((100vw - trilho) + leitura) / 2 - 76`. Igualando as duas:
+
+     (100vw + 440) / 2 - 76 >= 934   →   100vw >= 1580
+
+   Abaixo de 1580px o bloco fica empilhado e volta para a coluna de leitura,
+   onde os 598px do código sobram com folga. */
+@media(min-width:1580px){
+  .exemplo-grade{
+    /* o código é FIXO e a nota absorve o que sobrar: encolher a coluna que não
+       quebra linha é o que produz a barra de rolagem */
+    grid-template-columns:minmax(var(--nota-min),1fr) var(--cod);
+    column-gap:30px;
+  }
+  .exemplo-nota{align-self:start;padding:11px 0}
+  /* o respiro do arquivo fica nas pontas do bloco, não em cada trecho: o miolo
+     precisa emendar sem costura */
+  .exemplo-cod{padding:0 18px}
+  .exemplo-cod:first-of-type{padding-top:12px}
+  .exemplo-cod:last-of-type{padding-bottom:12px}
+  .exemplo-saida{grid-column:2}
+}
 
 /* ---------- as três cores do realce ----------
    Vermelho para a estrutura da linguagem, azul para os literais, branco para
