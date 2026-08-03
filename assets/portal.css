@@ -563,6 +563,7 @@ body.sem-trilho .trilho{display:none}
   /* com as setas nas laterais o rodapé inteiro some: ele só repetia as mesmas
      duas rotas, e repetir custa a altura que as setas foram economizar */
   .aula-pe{display:none}
+
 }
 
 /* ---------- o wizard da avaliação ---------- */
@@ -759,9 +760,13 @@ body.com-busca{overflow:hidden}
 }
 .busca-campo::-webkit-search-cancel-button{display:none}
 .busca-res{overflow-y:auto;padding:6px}
+/* O rótulo do grupo em VERMELHO, e não no azul de tudo o mais: ele é a única
+   coisa da lista que não é resultado — é a divisória entre eles. No azul ele
+   se confundia com o contexto de cada item, que também é azul e também é
+   monoespaçado, e a lista virava uma coluna só. */
 .busca-grupo{
-  padding:10px 12px 5px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;
-  letter-spacing:.12em;text-transform:uppercase;color:var(--phosphor-dim);
+  padding:12px 12px 5px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--amber);
 }
 .busca-item{
   display:flex;flex-direction:column;gap:3px;width:100%;text-align:left;
@@ -915,19 +920,24 @@ body.com-busca{overflow:hidden}
 .cert{cursor:zoom-in}
 .cert:focus-visible{outline:2px solid var(--phosphor);outline-offset:3px}
 
-.modal-pilha{display:flex;flex-direction:column;gap:12px;width:min(760px,100%)}
+.modal-pilha{display:flex;flex-direction:column;gap:14px;width:min(1040px,100%)}
 .modal-acoes{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px}
 .modal-cert .modal-caixa{width:100%;background:none;border:0;box-shadow:none;overflow:visible}
 /* dentro do modal o certificado é o conteúdo inteiro: sem cursor de lupa,
    sem hover, e com o corpo maior — é para isso que ele foi ampliado */
-.modal-cert .cert{cursor:default;padding:12px}
-.modal-cert .cert-folha{min-height:340px;padding:34px 40px 22px}
-.modal-cert .cert-aluno{font-size:clamp(1.8rem,4vw,2.6rem)}
-.modal-cert .cert-curso{font-size:1.35rem}
-.modal-cert .cert-meta,.modal-cert .cert-pe{font-size:.76rem}
+.modal-cert .cert{cursor:default;padding:14px}
+.modal-cert .cert-folha{min-height:min(62vh,480px);padding:46px 56px 30px;gap:30px}
+.modal-cert .cert-marca{font-size:1rem}
+.modal-cert .cert-aluno{font-size:clamp(2.1rem,5vw,3.4rem)}
+.modal-cert .cert-curso{font-size:1.6rem}
+.modal-cert .cert-frase{font-size:.78rem}
+.modal-cert .cert-meta,.modal-cert .cert-pe{font-size:.8rem}
 .cert-share{gap:8px}
 .cert-share svg{width:15px;height:15px}
-.cert-share-nota{font-size:.7rem}
+.cert-share-nota{font-size:.7rem;margin-right:2px}
+/* desabilitado, e parecendo: o botão existe para dizer o que haverá ali */
+.cert-share-off{opacity:.4;cursor:not-allowed}
+.cert-share-off:hover{background:none;border-color:var(--wire);color:var(--paper-dim)}
 
 .cert-previa{margin-top:26px;display:flex;flex-direction:column;gap:12px}
 /* o rótulo anda junto do título, e não na outra ponta da tela: ele explica o
@@ -1025,14 +1035,53 @@ body.com-busca{overflow:hidden}
    refere; centralizada, ela flutuaria no meio de dez linhas de código e
    deixaria de apontar para lugar nenhum. O `<pre>` NÃO leva start: ele estica
    até o fim da linha da grade, e é esse esticar que emenda o fundo. */
-.exemplo{margin:22px 0;max-width:100%}
+/* O EXEMPLO ESCAPA DA COLUNA DE LEITURA.
+
+   Ela tem 820px porque prosa longa acima de 68 caracteres por linha cansa. O
+   exemplo não é prosa: são duas colunas, e uma delas é código, que não se
+   quebra por conforto — dentro de 820px sobravam ~440px para o programa, e
+   qualquer linha real virava barra de rolagem.
+
+   `100%` dentro do `calc` da margem resolve contra a coluna (820px), então a
+   margem negativa é exatamente a metade do que ele cresceu para cada lado. O
+   bloco fica centrado no mesmo eixo do texto, sem invólucro a mais. */
+.exemplo{
+  --exemplo-larg:min(1180px, calc(100vw - var(--trilho) - 2 * var(--pad-x)));
+  width:var(--exemplo-larg);
+  margin:24px 0 24px calc((100% - var(--exemplo-larg)) / 2);
+}
+
+/* O TETO SOBE PARA A POSIÇÃO DA SETA onde há setas laterais.
+
+   A seta fica no centro do vão e o exemplo cresce a partir do centro da
+   coluna: passando dela, os dois brigam pelo mesmo pixel. A largura máxima em
+   que isso ainda não acontece tem forma fechada — seta de 44px, 16px de folga:
+
+     máx = ((100vw - trilho) + leitura) / 2 - 76
+
+   A 1920px dá 1104; a 1400px, 844 — ainda mais que os 820 da coluna de
+   leitura, então escapar dela nunca deixa o exemplo mais estreito do que
+   estava. É por isso que o teto é conta e não constante.
+
+   A regra vem DEPOIS da base, e não dentro do bloco das setas lá em cima: com
+   a mesma especificidade quem vem por último vence, e lá em cima ela perdia
+   em silêncio. */
+@media(min-width:1400px){
+  .exemplo{
+    --exemplo-larg:min(
+      1180px,
+      calc((100vw - var(--trilho) + var(--leitura)) / 2 - 76px)
+    );
+  }
+}
 .exemplo-barra{display:flex;justify-content:flex-end;margin-bottom:5px}
 .exemplo-arq{font-size:.64rem;letter-spacing:.06em}
 
 .exemplo-grade{
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);
-  column-gap:26px;row-gap:0;
+  /* o código leva a fatia maior: a nota quebra linha, o programa não */
+  grid-template-columns:minmax(0,0.82fr) minmax(0,1.18fr);
+  column-gap:30px;row-gap:0;
 }
 .exemplo-nota{
   align-self:start;padding:11px 0 11px;
