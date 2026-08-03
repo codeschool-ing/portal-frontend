@@ -41,7 +41,9 @@
 
 .portal{
   display:grid;
-  grid-template-columns:272px minmax(0,1fr);
+  /* 330 e não 272: com 272 quase todo nome de aula quebrava em duas ou três
+     linhas, e uma lista de treze itens quebrados vira parede. */
+  grid-template-columns:330px minmax(0,1fr);
   min-height:100vh;
   padding-top:64px;               /* a barra é fixa e tem altura fixa */
 }
@@ -81,56 +83,109 @@ body.sem-trilho .trilho{display:none}
   font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--phosphor);
 }
 
-.trilho-cursos,.trilho-aulas{display:flex;flex-direction:column;gap:1px}
-.trilho-curso,.trilho-aula{
-  display:grid;align-items:center;gap:8px;padding:7px 11px;border-radius:4px;
-  font-size:.84rem;color:var(--paper-dim);line-height:1.3;
+.trilho-cursos{display:flex;flex-direction:column;gap:1px}
+.trilho-curso{
+  display:grid;grid-template-columns:8px 1fr auto;align-items:center;gap:8px;
+  padding:7px 11px;border-radius:4px;font-size:.84rem;color:var(--paper-dim);line-height:1.3;
 }
-.trilho-curso{grid-template-columns:8px 1fr auto}
-.trilho-aula{grid-template-columns:12px 20px 1fr}
-.trilho-curso:hover,.trilho-aula:hover{background:var(--panel);color:var(--paper)}
-.trilho-aula.on{background:var(--panel);color:var(--phosphor);box-shadow:inset 2px 0 0 var(--phosphor)}
-.trilho-aula.feita .ta-tit{color:var(--paper-dim);text-decoration:line-through;text-decoration-color:var(--wire)}
-.ta-marca,.ta-num{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--phosphor-dim)}
-.trilho-aula.feita .ta-marca{color:var(--phosphor)}
+.trilho-curso:hover{background:var(--panel);color:var(--paper)}
 .tc-conta{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--phosphor-dim)}
 .tc-marca{width:8px;height:8px;border-radius:50%;border:1px solid var(--wire)}
 .tc-marca[data-estado="concluido"]{background:var(--phosphor);border-color:var(--phosphor)}
 .tc-marca[data-estado="atual"]{background:var(--amber);border-color:var(--amber)}
 .tc-marca[data-estado="disponivel"]{border-color:var(--phosphor)}
-.ta-conta{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--phosphor-dim);justify-self:end}
-.trilho-aula{grid-template-columns:12px 20px 1fr auto}
 
-/* As seções da aula aberta. Só a aula atual abre — ver o cabeçalho do
-   trilho.js: todas abertas dariam ~40 linhas num curso médio. */
-.trilho-secoes{display:flex;flex-direction:column;gap:1px;margin:2px 0 6px}
+/* AULA É CABEÇALHO, SEÇÃO É LINHA. Antes as duas eram linhas parecidas com
+   recuos diferentes, e não dava para saber qual era qual sem ler. A aula ganha
+   caixa alta monoespaçada e um contador; a seção fica em texto normal com
+   ícone. Duas naturezas diferentes, duas formas diferentes. */
+.trilho-aulas{display:flex;flex-direction:column;gap:2px}
+.trilho-aula{
+  display:grid;grid-template-columns:20px 1fr auto;align-items:center;gap:6px;
+  border-radius:4px;padding:2px 6px 2px 2px;
+}
+.trilho-aula:hover{background:var(--panel)}
+.trilho-aula.on{background:var(--panel);box-shadow:inset 2px 0 0 var(--phosphor)}
+.ta-abrir{
+  display:grid;place-items:center;width:20px;height:26px;
+  background:none;border:0;color:var(--phosphor-dim);cursor:pointer;
+}
+.ta-abrir svg{width:13px;height:13px;transition:transform .18s}
+.trilho-aula.aberta .ta-abrir svg{transform:rotate(-180deg)}
+.ta-titulo{display:flex;flex-direction:column;gap:1px;padding:7px 0;min-width:0}
+.ta-num{
+  font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--phosphor-dim);
+}
+.trilho-aula.on .ta-num{color:var(--phosphor)}
+.ta-tit{
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.82rem;
+  line-height:1.25;color:var(--paper);
+}
+.trilho-aula.feita .ta-tit{color:var(--paper-dim)}
+.ta-conta{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--phosphor-dim)}
+
+.trilho-secoes{display:flex;flex-direction:column;gap:1px;margin:1px 0 6px}
 .trilho-secao{
-  display:grid;grid-template-columns:14px 1fr;align-items:center;gap:8px;
-  padding:6px 11px 6px 30px;border-radius:4px;
-  font-size:.79rem;line-height:1.3;color:var(--paper-dim);
+  display:grid;grid-template-columns:16px 1fr;align-items:center;gap:9px;
+  padding:6px 11px 6px 28px;border-radius:4px;
+  font-size:.79rem;line-height:1.35;color:var(--paper-dim);
 }
 .trilho-secao:hover{background:var(--panel);color:var(--paper)}
 .trilho-secao.on{color:var(--phosphor);background:var(--panel)}
-.ts-marca{width:7px;height:7px;border-radius:50%;border:1px solid var(--wire)}
-.trilho-secao.feita .ts-marca{background:var(--phosphor);border-color:var(--phosphor)}
-.trilho-secao.on .ts-marca{border-color:var(--phosphor)}
+/* play para o que falta, check para o que foi feito: o ícone diz o estado sem
+   depender só de cor, e diz também que aquilo é algo a percorrer */
+.ts-marca{display:grid;place-items:center;color:var(--phosphor-dim)}
+.ts-marca svg{width:14px;height:14px}
+.trilho-secao.feita .ts-marca{color:var(--phosphor)}
+.trilho-secao.on .ts-marca{color:var(--phosphor)}
+.trilho-secao.feita .ts-tit{color:var(--paper-dim)}
 .trilho-secao.aval .ts-tit{font-style:italic}
 
 /* ---------- barra do topo: só o que a vitrine não tinha ---------- */
 .nav-contexto{margin-left:26px;min-width:0;flex:1 1 auto}
-.ctx{display:flex;align-items:center;gap:10px;max-width:420px;color:var(--paper-dim)}
-.ctx:hover{color:var(--paper)}
+.ctx-caixa{position:relative}
+.ctx{
+  display:flex;align-items:center;gap:10px;max-width:460px;
+  background:none;border:1px solid transparent;border-radius:4px;
+  padding:5px 9px;color:var(--paper-dim);cursor:pointer;font:inherit;
+}
+.ctx:hover{color:var(--paper);border-color:var(--wire)}
+.ctx-seta{font-size:.7rem;color:var(--phosphor-dim)}
+.ctx-menu{
+  display:none;position:absolute;top:calc(100% + 8px);left:0;min-width:280px;max-height:70vh;overflow-y:auto;
+  background:var(--panel);border:1px solid var(--wire);border-radius:5px;padding:5px;z-index:120;
+}
+.ctx-caixa.aberto .ctx-menu{display:block}
+.ctx-grupo{
+  display:block;padding:9px 11px 4px;font-family:'IBM Plex Mono',monospace;
+  font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--phosphor-dim);
+}
+.ctx-op{
+  display:block;width:100%;text-align:left;padding:7px 11px;border-radius:4px;
+  background:none;border:0;color:var(--paper-dim);font:inherit;font-size:.86rem;cursor:pointer;
+}
+.ctx-op:hover{background:var(--ink);color:var(--paper)}
+.ctx-op.on{color:var(--phosphor)}
+.ctx-mapa{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--phosphor);border-bottom:1px solid var(--wire);border-radius:0;margin-bottom:4px}
 .ctx-nome{font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ctx-barra{flex:0 0 84px;height:4px;border-radius:2px;background:var(--wire);overflow:hidden}
 .ctx-barra span{display:block;height:100%;background:var(--phosphor)}
 .ctx-pct{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--phosphor)}
 
-.nav-icone{display:flex;align-items:center;justify-content:center;width:32px;height:32px;color:var(--paper-dim);border-radius:4px}
+/* `base.css` NÃO reseta o elemento `button`: cada componente da vitrine declara
+   o próprio fundo (`.tema`, `.burger`, `.nav-cta`…). Todo botão novo precisa
+   declarar o dele, senão herda o cinza claro do navegador — foi o que deixou a
+   lupa, o avatar e as setas da ordenação brancos sobre o tema escuro. */
+.nav-icone{
+  display:flex;align-items:center;justify-content:center;width:32px;height:32px;
+  background:none;border:0;color:var(--paper-dim);border-radius:4px;cursor:pointer;
+}
 .nav-icone:hover{color:var(--phosphor);background:var(--panel)}
 .nav-icone svg{width:17px;height:17px}
 
 .conta{position:relative}
-.conta-btn{display:flex;align-items:center}
+.conta-btn{display:flex;align-items:center;background:none;border:0;padding:0;cursor:pointer}
 .conta-avatar{
   display:grid;place-items:center;width:30px;height:30px;border-radius:50%;
   background:var(--panel);border:1px solid var(--wire);color:var(--phosphor);
@@ -146,7 +201,7 @@ body.sem-trilho .trilho{display:none}
 .conta-op{padding:8px 11px;border-radius:4px;font-size:.86rem;color:var(--paper-dim)}
 .conta-op:hover{background:var(--ink);color:var(--paper)}
 
-.trilho-btn{display:none;font-size:1.3rem;color:var(--paper-dim);padding:0 10px}
+.trilho-btn{display:none;background:none;border:0;font-size:1.3rem;color:var(--paper-dim);padding:0 10px;cursor:pointer}
 .trilho-veu{display:none}
 
 /* ==========================================================
@@ -372,6 +427,74 @@ body.sem-trilho .trilho{display:none}
 
 .aula-pe{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--wire)}
 .aula-nav{display:flex;gap:8px}
+.pe-desmarcar{
+  background:none;border:0;cursor:pointer;font:inherit;
+  font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim);
+  text-decoration:underline;text-underline-offset:3px;
+}
+.pe-desmarcar:hover{color:var(--amber)}
+
+/* AS SETAS DE NAVEGAÇÃO VÃO PARA AS LATERAIS em tela larga. O conteúdo é preso
+   a uma coluna de leitura, então sobra espaço nos lados e falta na vertical —
+   e cada pixel gasto embaixo é texto empurrado para fora da dobra. Abaixo de
+   1180px não há lateral sobrando, e elas voltam para o rodapé. */
+.lado-seta{display:none}
+
+/* 1400px, e não 1180: as setas só entram quando existe lateral DE VERDADE
+   sobrando ao lado da coluna de leitura. A 1180 a coluna ocupa quase toda a
+   área útil e a seta cairia por cima do texto — aí o rodapé é o lugar certo.
+
+   A posição é calculada a partir da COLUNA, não da janela: a coluna tem 820px
+   e é centrada na área que sobra do trilho (330px), então o centro dela está
+   em `50vw + 165px`. Ancorar na borda da janela deixava as setas boiando a
+   150px do texto numa tela de 1600. */
+@media(min-width:1400px){
+  .lado-seta{
+    display:grid;place-items:center;position:fixed;top:50%;transform:translateY(-50%);
+    width:44px;height:44px;border-radius:50%;z-index:60;
+    background:var(--panel);border:1px solid var(--wire);color:var(--paper-dim);
+    transition:color .15s,border-color .15s,background .15s;
+  }
+  .lado-seta:hover{color:var(--phosphor);border-color:var(--phosphor);background:var(--ink)}
+  .lado-seta svg{width:20px;height:20px}
+  .lado-esq{left:max(342px, calc(50vw + 165px - 410px - 60px))}
+  .lado-dir{right:max(12px, calc(50vw - 575px - 60px))}
+  .aula-pe .aula-nav{display:none}
+}
+
+/* ---------- o wizard da avaliação ---------- */
+.wizard{display:flex;flex-direction:column;gap:14px}
+.wz-topo{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.wz-conta{
+  font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--phosphor-dim);
+}
+.wz-pontos{display:flex;flex-wrap:wrap;gap:5px}
+.wz-ponto{
+  width:26px;height:26px;border-radius:50%;cursor:pointer;
+  background:none;border:1px solid var(--wire);color:var(--paper-dim);
+  font-family:'IBM Plex Mono',monospace;font-size:.68rem;
+  transition:border-color .15s,color .15s;
+}
+.wz-ponto:hover{border-color:var(--phosphor-dim);color:var(--paper)}
+.wz-ponto.on{border-color:var(--phosphor);color:var(--phosphor)}
+.wz-ponto.certo{background:rgba(91,140,255,.16);border-color:var(--phosphor-dim);color:var(--phosphor)}
+.wz-ponto.errado{background:rgba(255,77,94,.14);border-color:rgba(255,77,94,.5);color:var(--amber)}
+.wz-ponto.pendente{border-style:dashed}
+.wz-pe{display:flex;gap:8px;justify-content:space-between}
+.wz-pe .btn:disabled{opacity:.4;cursor:default}
+
+.wz-resultado{
+  display:flex;flex-direction:column;gap:10px;align-items:flex-start;
+  padding:22px;border:1px solid var(--wire);border-radius:6px;background:var(--ink);
+}
+.wz-res-rot{
+  font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--phosphor);
+}
+.wz-res-nota{font-family:'Space Grotesk',sans-serif;font-size:1.6rem}
+.wz-res-nota strong{color:var(--phosphor)}
+.wz-res-obs{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--paper-dim)}
 
 /* ==========================================================
    5 · EXERCÍCIOS — os sete tipos
@@ -382,16 +505,12 @@ body.sem-trilho .trilho{display:none}
   padding:16px 18px;display:flex;flex-direction:column;gap:12px;
 }
 .ex-topo{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-.ex-tipo,.ex-dif,.ex-selo{
+.ex-tipo,.ex-dif{
   font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.08em;
   text-transform:uppercase;padding:3px 7px;border-radius:3px;border:1px solid var(--wire);
 }
 .ex-tipo{color:var(--phosphor);border-color:var(--phosphor-dim)}
 .ex-dif{color:var(--paper-dim)}
-.ex-selo{margin-left:auto}
-.selo-forte{color:var(--phosphor);border-color:var(--phosphor-dim)}
-.selo-medio{color:var(--paper-dim)}
-.selo-fraco{color:var(--paper-dim);opacity:.7}
 
 .ex-enunciado{font-size:.95rem;line-height:1.6}
 .ex-instrucao{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
@@ -461,32 +580,33 @@ body.sem-trilho .trilho{display:none}
 .ord-txt{font-size:.88rem;line-height:1.45}
 .ord-setas{display:flex;flex-direction:column;gap:2px}
 .ord-seta{
-  width:22px;height:17px;display:grid;place-items:center;border-radius:3px;
-  border:1px solid var(--wire);color:var(--paper-dim);font-size:.62rem;
+  width:24px;height:18px;display:grid;place-items:center;border-radius:3px;
+  background:none;border:1px solid var(--wire);color:var(--paper-dim);cursor:pointer;
 }
+.ord-seta svg{width:13px;height:13px}
+.ord-pega svg{width:14px;height:14px;display:block}
 .ord-seta:hover:not(:disabled){border-color:var(--phosphor);color:var(--phosphor)}
 .ord-seta:disabled{opacity:.35}
 .ord-certo{border-color:var(--phosphor)}
 .ord-errado{border-color:var(--amber)}
 
-/* ---------- associação ---------- */
-.assoc{display:flex;flex-direction:column;gap:7px;list-style:none}
-.assoc-par{
-  display:grid;grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr);align-items:center;gap:10px;
-  padding:9px 11px;border:1px solid var(--wire);border-radius:5px;
+/* ---------- associação: fichas, no lugar dos selects ---------- */
+.assoc-colunas{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.assoc-col{display:flex;flex-direction:column;gap:7px}
+.ficha{
+  text-align:left;padding:10px 12px;border-radius:5px;cursor:pointer;
+  background:var(--panel);border:1px solid var(--wire);color:var(--paper);
+  font:inherit;font-size:.86rem;line-height:1.35;
+  transition:border-color .15s,background .15s,transform .12s;
 }
-.assoc-esq{font-size:.88rem;line-height:1.4}
-.assoc-liga{color:var(--phosphor-dim);text-align:center}
-.assoc-sel{
-  background:var(--panel);border:1px solid var(--wire);border-radius:4px;
-  padding:7px 9px;color:var(--paper);font:inherit;font-size:.85rem;min-width:0;
-}
-.assoc-sel:focus{outline:none;border-color:var(--phosphor)}
-.assoc-certo{border-color:var(--phosphor)}
-.assoc-errado{border-color:var(--amber)}
-.assoc-gabarito{
-  grid-column:3;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--phosphor);
-}
+.ficha:hover:not(:disabled){border-color:var(--phosphor-dim)}
+.ficha.sel{border-color:var(--phosphor);background:rgba(91,140,255,.1)}
+.ficha-certa{border-color:var(--phosphor);background:rgba(91,140,255,.08);opacity:.65;cursor:default}
+.ficha-errada{border-color:var(--amber);background:rgba(255,77,94,.1)}
+.ficha.tremendo{animation:tremer .3s}
+@keyframes tremer{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.assoc-conta{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
+.assoc-erros{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--amber);margin-top:8px}
 
 /* ---------- código e saída esperada ---------- */
 .cod-bloco{border:1px solid var(--wire);border-radius:5px;overflow:hidden;background:var(--panel)}
@@ -554,6 +674,7 @@ body.sem-trilho .trilho{display:none}
     height:auto;
   }
   body.trilho-aberto .trilho{transform:none}
+  .trilho{width:min(340px,88vw)}
   body.sem-trilho .trilho-btn{display:none}
   .trilho-btn{display:block}
   .trilho-veu{display:block;position:fixed;inset:64px 0 0;background:rgba(10,14,20,.6);z-index:105}
@@ -568,10 +689,13 @@ body.sem-trilho .trilho{display:none}
 
 @media(max-width:700px){
   .conteudo{padding:20px 16px 48px}
-  .assoc-par{grid-template-columns:minmax(0,1fr);gap:6px}
-  .assoc-liga{display:none}
   .aula-pe{flex-direction:column;align-items:stretch}
   .aula-nav{justify-content:space-between}
+  .wz-pe{flex-wrap:wrap}
+  /* as duas colunas de fichas continuam lado a lado até bem estreito: separar
+     em duas colunas É o exercício, e empilhá-las apagaria a metáfora */
+  .assoc-colunas{gap:7px}
+  .ficha{padding:9px 10px;font-size:.8rem}
 }
 
 @media(max-width:620px){

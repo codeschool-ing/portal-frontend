@@ -13,8 +13,9 @@
 import { rota, quandoTrocar, iniciar, caminhoAtual, despachar, irPara } from './rotas.js';
 import { ehEscolha } from './catalogo.js';
 import { assinar, agora } from './estado.js';
-import { montarTrilho } from './trilho.js';
-import { trilhaDoAluno, progressoDaTrilha } from './telas/comum.js';
+import { montarTrilho, alternarAula } from './trilho.js';
+import { trilhaDoAluno, progressoDaTrilha, TRILHAS_POR_FAMILIA } from './telas/comum.js';
+import * as api from './api.js';
 import { esc } from './texto.js';
 
 import entrar from './telas/entrar.js';
@@ -91,13 +92,42 @@ function pintarContexto() {
   const t = agora().sessao ? trilhaDoAluno() : null;
   if (!t) { cx.innerHTML = ''; return; }
   const p = progressoDaTrilha(t);
+
+  /* A trilha na barra é um SELETOR, não um rótulo. Trocar de trilha era sair e
+     entrar de novo — o que é absurdo para uma escolha que o aluno pode querer
+     rever a qualquer momento, e que não custa nada, porque o progresso é por
+     curso e curso compartilhado continua contando. */
   cx.innerHTML =
-    '<a class="ctx" href="#/trilha">' +
-      '<span class="ctx-nome">' + esc(t.nome) + '</span>' +
-      '<span class="ctx-barra"><span style="width:' + p.pct + '%"></span></span>' +
-      '<span class="ctx-pct">' + p.pct + '%</span>' +
-    '</a>';
+    '<div class="ctx-caixa">' +
+      '<button type="button" class="ctx" aria-haspopup="true" aria-expanded="false">' +
+        '<span class="ctx-nome">' + esc(t.nome) + '</span>' +
+        '<span class="ctx-barra"><span style="width:' + p.pct + '%"></span></span>' +
+        '<span class="ctx-pct">' + p.pct + '%</span>' +
+        '<span class="ctx-seta" aria-hidden="true">▾</span>' +
+      '</button>' +
+      '<div class="ctx-menu" role="menu">' +
+        '<a class="ctx-op ctx-mapa" href="#/trilha">' + txt('ver o mapa da trilha') + ' →</a>' +
+        TRILHAS_POR_FAMILIA().map(([familia, lista]) =>
+          '<span class="ctx-grupo">' + txt('trilhas por ' + familia) + '</span>' +
+          lista.map((x) => '<button type="button" class="ctx-op' + (x.id === t.id ? ' on' : '') + '" ' +
+            'data-trilha="' + esc(x.id) + '">' + esc(x.nome) + '</button>').join('')).join('') +
+      '</div>' +
+    '</div>';
 }
+
+$('#nav-contexto').addEventListener('click', async (e) => {
+  const caixa = $('#nav-contexto .ctx-caixa');
+  if (e.target.closest('.ctx')) {
+    const abriu = caixa.classList.toggle('aberto');
+    caixa.querySelector('.ctx').setAttribute('aria-expanded', String(abriu));
+    return;
+  }
+  const op = e.target.closest('.ctx-op[data-trilha]');
+  if (!op) return;
+  caixa.classList.remove('aberto');
+  await api.matricular(op.dataset.trilha);
+  irPara('/trilha');
+});
 
 /* ---------- menu da conta ---------- */
 function pintarConta() {
@@ -131,6 +161,7 @@ $('#idioma').addEventListener('click', (e) => {
 document.addEventListener('click', (e) => {
   if (!e.target.closest('#idioma')) $('#idioma').classList.remove('aberto');
   if (!e.target.closest('#conta')) $('#conta').classList.remove('aberto');
+  if (!e.target.closest('#nav-contexto')) $('#nav-contexto .ctx-caixa')?.classList.remove('aberto');
 });
 
 /* ---------- tema: mesma chave de localStorage da vitrine, de propósito ----
@@ -157,7 +188,16 @@ $('#trilho-btn').addEventListener('click', () => {
   $('#trilho-veu').hidden = !abriu;
 });
 $('#trilho-veu').addEventListener('click', fecharTrilho);
-$('#trilho').addEventListener('click', (e) => { if (e.target.closest('a')) fecharTrilho(); });
+$('#trilho').addEventListener('click', (e) => {
+  const abrir = e.target.closest('.ta-abrir');
+  if (abrir) {
+    // é um <button>, não navega: só mostra ou esconde as seções daquela aula
+    alternarAula(paramsDaRota()?.id, Number(abrir.dataset.aula));
+    montarTrilho(trilho, caminhoAtual(), paramsDaRota());
+    return;
+  }
+  if (e.target.closest('a')) fecharTrilho();
+});
 addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharTrilho(); });
 
 /* busca: por ora leva ao catálogo, que já tem o campo. Um ⌘K de verdade entra
