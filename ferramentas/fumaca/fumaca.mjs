@@ -27,6 +27,9 @@ import { chromium } from 'playwright';
 
 const BASE = process.env.PORTAL || 'http://127.0.0.1:8899';
 const CHROME = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+/* PAGINA aponta o teste para o pacote de arquivo único em vez do site servido:
+   PORTAL=file:///caminho PAGINA=/portal-aluno.html node ferramentas/fumaca/fumaca.mjs */
+const PAGINA = process.env.PAGINA || '/index.html';
 const erros = [];
 const b = await chromium.launch({ executablePath: CHROME });
 const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
@@ -39,7 +42,7 @@ const ok = (nome, cond, extra = '') => {
   console.log((cond ? '  ok   ' : '  FALHA') + ' ' + nome + (extra ? ' — ' + extra : ''));
 };
 
-await p.goto(BASE + '/index.html', { waitUntil: 'networkidle' });
+await p.goto(BASE + PAGINA, { waitUntil: 'networkidle' });
 
 console.log('\n== 1. carga e redirecionamento ==');
 ok('caiu em /entrar sem sessão', p.url().includes('#/entrar'), p.url());
@@ -93,13 +96,13 @@ const colisoes = await p.evaluate(() => {
 ok('nenhuma aresta cruza um cartão', colisoes === 0, colisoes + ' colisões');
 
 console.log('\n== 4. curso e aula ==');
-await p.goto(BASE + '/index.html#/curso/javascript');
+await p.goto(BASE + PAGINA + '#/curso/javascript');
 await p.waitForSelector('.aula-linha');
 const nAulas = await p.locator('.aula-linha').count();
 ok('aula = tópico', nAulas === 12, nAulas + ' aulas');
 ok('trilho virou lista de aulas', (await p.locator('.trilho-aula').count()) === 12);
 
-await p.goto(BASE + '/index.html#/curso/javascript/aula/1');
+await p.goto(BASE + PAGINA + '#/curso/javascript/aula/1');
 await p.waitForSelector('.ex');
 const tipos = await p.$$eval('.ex', (els) => els.map((e) => e.className.replace('ex ex-', '')));
 ok('sete tipos na aula', tipos.length === 7, tipos.join(', '));
@@ -169,7 +172,7 @@ await p.waitForTimeout(400);
 ok('sobreviveu ao reload', (await p.locator('.ctx-pct').innerText()) === pctAntes, pctAntes);
 
 console.log('\n== 8. idioma ==');
-await p.goto(BASE + '/index.html#/painel');
+await p.goto(BASE + PAGINA + '#/painel');
 await p.waitForSelector('.retomar');
 await p.click('.idioma-btn');
 await p.click('.idioma-op[lang="en"]');
@@ -186,7 +189,7 @@ ok('tema claro aplicado', (await p.evaluate(() => document.documentElement.datas
 await p.click('#tema-btn');
 
 await p.setViewportSize({ width: 390, height: 780 });
-await p.goto(BASE + '/index.html#/curso/javascript/aula/1');
+await p.goto(BASE + PAGINA + '#/curso/javascript/aula/1');
 await p.waitForSelector('.ex');
 await p.waitForTimeout(300);
 ok('trilho vira gaveta', await p.locator('#trilho-btn').isVisible());
@@ -205,10 +208,10 @@ await b.close();
 // regressão: o botão de refazer não pode existir visível antes de responder
 const b2 = await chromium.launch({ executablePath: CHROME });
 const p2 = await b2.newPage({ viewport:{width:1440,height:900} });
-await p2.goto(BASE+'/index.html#/entrar',{waitUntil:'networkidle'});
+await p2.goto(BASE + PAGINA + '#/entrar',{waitUntil:'networkidle'});
 await p2.fill('#e-nome','X'); await p2.selectOption('#e-trilha','backend');
 await p2.click('#form-entrar button[type=submit]'); await p2.waitForTimeout(300);
-await p2.goto(BASE+'/index.html#/curso/javascript/aula/1',{waitUntil:'networkidle'});
+await p2.goto(BASE + PAGINA + '#/curso/javascript/aula/1',{waitUntil:'networkidle'});
 await p2.waitForSelector('.ex');
 console.log('\n== 10. nada revelado antes de responder ==');
 ok('refazer escondido', (await p2.locator('.ex-refazer:visible').count()) === 0);

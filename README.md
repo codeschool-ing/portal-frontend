@@ -27,6 +27,39 @@ npm i playwright
 node ferramentas/fumaca/fumaca.mjs
 ```
 
+## Um arquivo só, para abrir do disco
+
+```sh
+python3 ferramentas/bundle/bundle.py     # -> portal-aluno.html
+```
+
+Embute CSS, scripts, favicon e — o passo que a ferramenta equivalente da
+vitrine não precisava ter — **achata os módulos ES**. Eles não sobrevivem ao
+`file://`: `<script type="module" src="…">` dispara um fetch, e fetch de
+`file://` é bloqueado por CORS em todo navegador. A página abriria em branco,
+sem sintoma além do console. Cada módulo vira uma IIFE que devolve o que
+exportava, e os `import` viram leitura de um registro.
+
+A saída continua sendo `<script type="module">`, de propósito: módulo embutido
+não faz fetch, mas mantém a execução **adiada**, que é a mesma ordem do
+`index.html` servido. Um `<script>` clássico rodaria antes da hora e o pacote
+deixaria de exercitar o que o site exercita.
+
+O achatamento pressupõe o código deste repositório, e só ele — sem
+reexportação, sem ciclo de imports e sem `await` no topo de módulo. Qualquer um
+dos três para a geração com erro, em vez de produzir um pacote quebrado em
+silêncio.
+
+O mesmo teste de fumaça roda contra o pacote, e é assim que se sabe que ele não
+regrediu:
+
+```sh
+PORTAL="file://$PWD" PAGINA=/portal-aluno.html node ferramentas/fumaca/fumaca.mjs
+```
+
+O portal continua sendo servido de `index.html` + `assets/` + `app/`; o pacote
+é para entregar uma cópia que abre com dois cliques.
+
 ## O que veio da vitrine, e o que não veio
 
 A identidade é a mesma escola, então quase tudo atravessa:
@@ -195,6 +228,7 @@ app/trilho.js                  o trilho lateral
 app/telas/*.js                 uma por tela
 app/exercicios/*.js            um por tipo, mais o invólucro e a correção
 ferramentas/fumaca/            o teste de fumaça
+ferramentas/bundle/            gera o HTML único
 ```
 
 Ninguém fora de `estado.js` lê `localStorage`, e ninguém fora de `api.js` lê
