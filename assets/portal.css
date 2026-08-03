@@ -57,26 +57,36 @@ html[data-tema="claro"]{color-scheme:light}
   background:none;backdrop-filter:none;border-bottom:0;align-items:stretch;
 }
 
-/* AS TRÊS LARGURAS DO PORTAL, e não há uma quarta.
+/* A AULA TEM UMA LARGURA SÓ, e ela tem dois valores.
 
      --trilho    a coluna do menu
-     --leitura   onde vive TODO o conteúdo de uma seção: prosa, vídeo, figura,
-                 material, anotação. 820px porque prosa acima de ~68 caracteres
-                 por linha cansa, e o vídeo alinhado com o texto lê melhor do
-                 que um vídeo que começa antes dele e termina depois.
-     --amplo     a exceção, e é UMA: o bloco de código anotado, que tem duas
-                 colunas e uma delas não se quebra por conforto.
+     --leitura   820px: a coluna estreita, onde a aula vive enquanto o bloco de
+                 código anotado couber empilhado. Prosa acima de ~68 caracteres
+                 por linha cansa, e esse é o número que dá 68.
+     --amplo     a coluna larga, onde a aula vive quando o bloco de código abre
+                 em duas colunas — ele tem uma coluna que não se quebra por
+                 conforto, e é ela quem manda no tamanho.
+     --tela      qual das duas está valendo agora. TUDO na aula usa esta: o
+                 título, as migalhas, os passos, a prosa, o player, o exemplo,
+                 o material, o rodapé.
 
-   NADA PASSA DE `--amplo`. O player já foi de ponta a ponta da área inteira, e
-   o efeito colateral era o conteúdo da aula ter três alinhamentos diferentes
-   dependendo da seção — o olho procurava a margem esquerda a cada troca. Há um
-   teste que percorre os filhos da tela de aula e reprova qualquer um que
-   ultrapasse esse teto.
+   Foi a terceira tentativa, e as duas primeiras erraram do mesmo jeito. A
+   primeira deixou o player sangrar de ponta a ponta enquanto o texto ficava em
+   820. A segunda soltou o exemplo (e depois o player) para `--amplo` e deixou o
+   resto em 820. As duas produziram a MESMA coisa: margens esquerdas diferentes
+   dentro de uma aula, o olho procurando onde a linha começa a cada rolagem.
 
-   Elas são variáveis porque outras regras derivam delas: as setas de navegação
-   ficam no vão que sobra do trilho e da leitura, e o teto do `--amplo` sai da
-   posição dessas setas. Número repetido em dois lugares diverge no dia em que
-   um deles muda — já aconteceu com o recuo do conteúdo. */
+   Uma variável só resolve por construção — não há como um elemento discordar do
+   outro, nem no meio de um redimensionamento. E o teste deixou de perguntar
+   "quem passou do teto" para perguntar "todos começam na mesma coluna?", que é
+   a regra de verdade.
+
+   O preço está declarado: em `--amplo` a linha de prosa vai a 121ch (medido),
+   contra os 68 confortáveis. É a troca que a largura única cobra, e ela só
+   acontece em tela grande, onde a alternativa era o desalinho.
+
+   As setas de navegação ficam no vão que sobra, e derivam de `--tela` também:
+   quando a aula alarga, o vão encolhe e elas acompanham. */
 .portal{
   --trilho:380px;
   --leitura:820px;
@@ -95,10 +105,20 @@ html[data-tema="claro"]{color-scheme:light}
   --cod:604px;
   --nota:440px;
   --nota-min:300px;
+  /* O TETO DA COLUNA LARGA SAI DA SETA, e não de um número escolhido.
+     As setas moram no meio do vão e têm 44px; para sobrar 16px entre a seta e
+     o conteúdo, o vão de cada lado precisa de 4 × 38 = 152px no total:
+
+       --amplo <= 100vw - trilho - 152
+
+     Enquanto isso não bastar, quem manda é o recuo do `.conteudo`. E o piso é
+     o conteúdo do bloco: `--cod + --nota + 30`, acima do qual alargar só
+     esticaria a coluna de texto. */
   --amplo:min(
     calc(var(--cod) + var(--nota) + 30px),
     calc(100vw - var(--trilho) - 2 * var(--pad-x))
   );
+  --tela:var(--leitura);
   display:grid;
   /* 380 e não 272: com 272 quase todo nome de aula quebrava em duas ou três
      linhas, e uma lista de treze itens quebrados vira parede. Os 50px que
@@ -444,7 +464,9 @@ body.sem-trilho .trilho{display:none}
 .aula-linha.feita .aula-tit{color:var(--paper-dim)}
 
 /* ---------- a aula, agora em seções ---------- */
-.tela-aula{max-width:var(--leitura)}
+/* uma largura para a tela inteira, e todos os filhos herdam dela por serem
+   filhos — nenhum deles declara largura própria */
+.tela-aula{max-width:var(--tela)}
 .aula-cabeca{display:flex;flex-direction:column;gap:12px}
 
 /* Os passos são a espinha da aula: onde estou entre as seções e quanto falta.
@@ -482,25 +504,33 @@ body.sem-trilho .trilho{display:none}
    ela quer dizer alguma coisa — "isto aqui é outra coisa que não prosa" —, o
    que não conseguia dizer quando estava dentro de outra moldura.
 
-   68ch é o limite de linha para leitura longa: acima disso o olho perde o
-   começo da linha seguinte, que é o defeito que a divisão em seções existe
-   para não reintroduzir. */
+   A PROSA NÃO TEM MAIS TETO PRÓPRIO — ela vai até `--tela`, como todo o resto.
+
+   Tinha: `max-width:68ch`, que é o limite clássico de linha para leitura longa.
+   O efeito era que, em `--amplo`, o parágrafo parava em 605px enquanto o
+   player e o exemplo ao lado dele iam a 1074 — a mesma margem esquerda e três
+   margens direitas, que é o desalinho pela outra ponta.
+
+   O preço é real e está medido: em 1074px a linha vai a 121ch, contra os 68
+   confortáveis. Foi uma escolha entre dois defeitos, e o alinhamento
+   ganhou; se a linha longa incomodar na leitura, o teto volta em `ch` e o que
+   se perde é o alinhamento à direita, não o da esquerda. */
 .aula-texto{
   gap:0;background:none;border:0;border-radius:0;padding:0;
 }
-.aula-texto p{max-width:68ch;line-height:1.72;margin-bottom:14px}
+.aula-texto p{line-height:1.72;margin-bottom:14px}
 .aula-texto p:last-child{margin-bottom:0}
 .aula-texto strong{color:var(--paper)}
 .aula-texto code{
   font-family:'IBM Plex Mono',monospace;font-size:.86em;
   background:var(--ink);padding:1px 5px;border-radius:3px;color:var(--phosphor);
 }
-/* O bloco de código da prosa é o mesmo componente dos exercícios. Ele NÃO
-   respeita o limite de 68ch: código não se quebra por conforto de leitura, e
-   uma linha longa deve rolar dentro da caixa em vez de ser dobrada. */
+/* O bloco de código da prosa é o mesmo componente dos exercícios: linha longa
+   rola dentro da caixa em vez de ser dobrada — código não se quebra por
+   conforto de leitura. */
 .prosa-cod{margin:0 0 16px;max-width:100%}
 .prosa-cod .cod{font-size:.8rem}
-.prosa-lista{max-width:68ch;display:flex;flex-direction:column;gap:8px;margin:0 0 14px;padding-left:18px}
+.prosa-lista{display:flex;flex-direction:column;gap:8px;margin:0 0 14px;padding-left:18px}
 .prosa-lista li{list-style:'› ';padding-left:5px;line-height:1.6;color:var(--paper-dim)}
 .prosa-lista li strong{color:var(--paper)}
 
@@ -521,41 +551,21 @@ body.sem-trilho .trilho{display:none}
 
 /* DUAS FORMAS DE SEÇÃO, E O LAYOUT SEGUE A FORMA.
 
-   A seção que TEM vídeo mostra o player de ponta a ponta da área de conteúdo,
-   depois do cabeçalho. A que NÃO tem não tem quadro nenhum — nem cinza, nem
-   reservado. Ver o comentário em telas/aula.js.
+   A seção que TEM vídeo mostra o player logo depois do cabeçalho, na largura da
+   aula. A que NÃO tem não tem quadro nenhum — nem cinza, nem reservado: um
+   retângulo vazio promete um vídeo que nunca vem, e a promessa não expira. Ver
+   o comentário em telas/aula.js.
 
-   O sangramento cancela o recuo do `.conteudo` com margem negativa, e os dois
-   saem da MESMA variável (`--pad-x`): repetir o número em dois lugares fez
-   exatamente o que se espera, divergiu, e sobraram 2px de rolagem horizontal
-   no celular.
-
-   O `.tela` continua com o teto de 1180px, então o player sangra até a borda
-   dessa coluna e não da tela inteira — que é onde o texto acima e abaixo dele
-   também termina. Alinhado com o conteúdo, e não com a janela. */
-/* O PLAYER ACOMPANHA A COLUNA DE LEITURA, como todo o resto.
-
-   Ele já foi de ponta a ponta da área de conteúdo, e era o que a referência
-   fazia. Mas ali o vídeo é a tela inteira; aqui ele divide a seção com título,
-   texto, material e anotação — e sangrar fazia a aula ter margens diferentes
-   conforme a seção, com o olho procurando a esquerda a cada troca.
-
-   Sobrou um ganho que não estava previsto: as setas de navegação moram no vão
-   e não passam mais por cima da imagem. */
-/* A ALTURA VIRA LARGURA, e não um corte na altura.
-   O teto continua sendo o mesmo — um player não pode empurrar todo o resto da
-   seção para baixo da dobra —, mas agora ele limita a LARGURA, e a proporção
-   16/9 deriva a altura a partir dela. Cortar a altura de uma caixa com
-   `aspect-ratio` não encolhe a caixa: achata, e o vídeo dentro dela estica. */
+   O player ocupa a largura inteira porque é isso que TODO filho da tela faz
+   agora; o que ele tem de próprio é um teto de altura, e ele vira teto de
+   LARGURA. Um player não pode empurrar o resto da seção para baixo da dobra —
+   mas cortar a altura de uma caixa com `aspect-ratio` não encolhe a caixa:
+   achata, e o vídeo dentro dela estica. Limitando a largura, a proporção 16/9
+   deriva a altura, e em janela baixa o player fica menor que o resto da aula em
+   vez de deformado. */
 .aula-com-video .video-fachada{
   --video-alt:min(64vh, calc(100vh - 300px));
-  --video-larg:min(100%, calc(var(--video-alt) * 16 / 9));
-  width:var(--video-larg);
-  /* Negativa só quando o player passa da coluna — aí ele cresce igual para os
-     dois lados. Quando cabe, a margem é zero e ele começa onde o texto começa:
-     centrar um vídeo mais estreito que a coluna inventaria uma margem esquerda
-     que nenhum outro elemento da aula tem. */
-  margin-left:min(0px, calc((100% - var(--video-larg)) / 2));
+  width:min(100%, calc(var(--video-alt) * 16 / 9));
 }
 
 .video-fachada{
@@ -586,28 +596,30 @@ body.sem-trilho .trilho{display:none}
 .lista-ex{display:flex;flex-direction:column;gap:16px}
 
 .aula-pe{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--wire)}
-/* AS SETAS DE NAVEGAÇÃO VÃO PARA AS LATERAIS em tela larga. O conteúdo é preso
-   a uma coluna de leitura, então sobra espaço nos lados e falta na vertical —
-   e cada pixel gasto embaixo é texto empurrado para fora da dobra. Abaixo de
-   1180px não há lateral sobrando, e elas voltam para o rodapé. */
+/* AS SETAS DE NAVEGAÇÃO VÃO PARA AS LATERAIS em tela larga. A aula é presa a
+   uma coluna, então sobra espaço nos lados e falta na vertical — e cada pixel
+   gasto embaixo é texto empurrado para fora da dobra. */
 .lado-seta{display:none}
 
 /* AS SETAS FICAM NA SOBRA DA TELA, e não coladas no texto.
 
-   A coluna de leitura tem no máximo 1180px e é centrada na área que sobra do
-   trilho. O que resta dos dois lados — o "vão" — é espaço que nenhum conteúdo
-   usa, e é exatamente onde um controle de navegação deve morar: perto o
-   bastante para ser alcançado, longe o bastante para não disputar a linha com
-   a palavra que está sendo lida.
+   A aula tem no máximo `--tela` e é centrada na área que sobra do trilho. O que
+   resta dos dois lados — o "vão" — é espaço que nenhum conteúdo usa, e é
+   exatamente onde um controle de navegação deve morar: perto o bastante para
+   ser alcançado, longe o bastante para não disputar a linha com a palavra que
+   está sendo lida.
 
-     vão de cada lado = (100vw - trilho - coluna de leitura) / 2
+     vão de cada lado = (100vw - trilho - tela) / 2
      seta da esquerda  → centrada no vão entre o trilho e a coluna
      seta da direita   → centrada no vão entre a coluna e a borda da tela
 
-   O CORTE É 1400px, e o número sai da conta: com o trilho de 380 e a leitura de
-   820, o vão de cada lado é (1400-380-820)/2 = 100px — o suficiente para uma
-   seta de 44px com folga dos dois lados. Abaixo disso não há vão, e o rodapé
-   volta a ser o lugar certo. Ele nunca deixou de existir. */
+   É `--tela`, e não `--leitura`: quando a aula alarga o vão encolhe, e uma seta
+   posicionada pela coluna estreita ficaria por cima do conteúdo da larga.
+
+   O CORTE É 1400px, e o número sai da conta: com o trilho de 380 e a coluna
+   estreita de 820, o vão de cada lado é (1400-380-820)/2 = 100px — o suficiente
+   para uma seta de 44px com folga dos dois lados. Abaixo disso não há vão, e o
+   rodapé volta a ser o lugar certo. Ele nunca deixou de existir. */
 @media(min-width:1400px){
   .lado-seta{
     display:grid;place-items:center;position:fixed;top:50%;
@@ -618,11 +630,11 @@ body.sem-trilho .trilho{display:none}
   .lado-seta:hover{color:var(--phosphor);border-color:var(--phosphor);background:var(--ink)}
   .lado-seta svg{width:20px;height:20px}
   .lado-esq{
-    left:calc(var(--trilho) + (100vw - var(--trilho) - var(--leitura)) / 4);
+    left:calc(var(--trilho) + (100vw - var(--trilho) - var(--tela)) / 4);
     transform:translate(-50%,-50%);
   }
   .lado-dir{
-    right:calc((100vw - var(--trilho) - var(--leitura)) / 4);
+    right:calc((100vw - var(--trilho) - var(--tela)) / 4);
     transform:translate(50%,-50%);
   }
   /* com as setas nas laterais o rodapé inteiro some: ele só repetia as mesmas
@@ -1160,62 +1172,7 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
    refere; centralizada, ela flutuaria no meio de dez linhas de código e
    deixaria de apontar para lugar nenhum. O `<pre>` NÃO leva start: ele estica
    até o fim da linha da grade, e é esse esticar que emenda o fundo. */
-/* O EXEMPLO ESCAPA DA COLUNA DE LEITURA.
-
-   Ela tem 820px porque prosa longa acima de 68 caracteres por linha cansa. O
-   exemplo não é prosa: são duas colunas, e uma delas é código, que não se
-   quebra por conforto — dentro de 820px sobravam ~440px para o programa, e
-   qualquer linha real virava barra de rolagem.
-
-   `100%` dentro do `calc` da margem resolve contra a coluna (820px), então a
-   margem negativa é exatamente a metade do que ele cresceu para cada lado. O
-   bloco fica centrado no mesmo eixo do texto, sem invólucro a mais. */
 .exemplo{margin:24px 0}
-
-/* O TETO SOBE PARA A POSIÇÃO DA SETA onde há setas laterais.
-
-   A seta fica no centro do vão e o exemplo cresce a partir do centro da
-   coluna: passando dela, os dois brigam pelo mesmo pixel. A largura máxima em
-   que isso ainda não acontece tem forma fechada — seta de 44px, 16px de folga:
-
-     máx = ((100vw - trilho) + leitura) / 2 - 76
-
-   A 1920px dá 1104; a 1400px, 844 — ainda mais que os 820 da coluna de
-   leitura, então escapar dela nunca deixa o exemplo mais estreito do que
-   estava. É por isso que o teto é conta e não constante.
-
-   A regra vem DEPOIS da base, e não dentro do bloco das setas lá em cima: com
-   a mesma especificidade quem vem por último vence, e lá em cima ela perdia
-   em silêncio. */
-/* Só com duas colunas o bloco escapa da coluna de leitura — e o teto continua
-   saindo da posição da seta de navegação, que mora no vão ao lado. `100%`
-   dentro do `calc` da margem resolve contra a coluna de leitura, então a
-   margem negativa é metade do que ele cresceu para cada lado. */
-@media(min-width:1580px){
-  .portal{
-    --amplo:min(
-      calc(var(--cod) + var(--nota) + 30px),
-      calc((100vw - var(--trilho) + var(--leitura)) / 2 - 76px)
-    );
-  }
-  .exemplo{
-    width:var(--amplo);
-    margin-left:calc((100% - var(--amplo)) / 2);
-  }
-  /* O PLAYER ACOMPANHA O EXEMPLO quando o exemplo escapa — e só então.
-     Enquanto o bloco de código fica empilhado dentro da coluna de leitura, a
-     aula tem uma margem esquerda só e o vídeo não tem motivo para sair dela.
-     A partir daqui o exemplo já saiu, e um vídeo de 820 ao lado de um exemplo
-     de 1074 seria a terceira largura da mesma aula — que é justamente o que a
-     regra das três larguras evita. Alinhados, são duas.
-
-     O teto de altura continua valendo por dentro do `min`: onde a janela é
-     baixa, é ele quem manda, e o vídeo fica menor que o exemplo em vez de
-     comer a tela. */
-  .aula-com-video .video-fachada{
-    --video-larg:min(var(--amplo), calc(var(--video-alt) * 16 / 9));
-  }
-}
 .exemplo-barra{display:flex;justify-content:flex-end;margin-bottom:5px}
 .exemplo-arq{font-size:.64rem;letter-spacing:.06em}
 
@@ -1258,17 +1215,33 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
 .exemplo-saida .cod{margin:0;padding:0;background:none;border:0;font-size:.76rem;color:var(--paper-dim)}
 .exemplo-vazio{display:none}
 
-/* DUAS COLUNAS, e o corte sai da conta, não do gosto.
+/* O CORTE ÚNICO DA AULA, e ele sai da conta, não do gosto.
 
-   Elas precisam de `--cod` + `--nota-min` + o vão entre elas: 604 + 300 + 30 =
-   934px. E `--amplo` não pode passar do vão que sobra das setas de navegação,
-   que é `((100vw - trilho) + leitura) / 2 - 76`. Igualando as duas:
+   Aqui acontecem as duas coisas ao mesmo tempo, porque são a mesma coisa: o
+   bloco de código abre em duas colunas E a aula inteira passa para a largura
+   larga. Duas colunas precisam de `--cod` + `--nota-min` + o vão entre elas:
 
-     (100vw + 440) / 2 - 76 >= 934   →   100vw >= 1580
+     604 + 300 + 30 = 934px
 
-   Abaixo de 1580px o bloco fica empilhado e volta para a coluna de leitura,
-   onde os 598px do código sobram com folga. */
-@media(min-width:1580px){
+   E `--amplo` não pode passar do que as setas deixam — `100vw - trilho - 152`.
+   Igualando as duas:
+
+     100vw - 380 - 152 >= 934   →   100vw >= 1466
+
+   Abaixo de 1466px a aula volta para 820 e o bloco fica empilhado, onde os
+   598px do código sobram com folga. Entre 1466 e 1606 a aula cresce junto com
+   a janela, de 934 até os 1074 do conteúdo; daí para cima ela para de crescer,
+   porque alargar mais só esticaria a coluna de texto. */
+@media(min-width:1466px){
+  .portal{
+    /* daqui para cima quem aperta é a seta, não o recuo do `.conteudo`: 152 é
+       mais que os 88 do recuo em qualquer largura desta faixa */
+    --amplo:min(
+      calc(var(--cod) + var(--nota) + 30px),
+      calc(100vw - var(--trilho) - 152px)
+    );
+    --tela:var(--amplo);
+  }
   .exemplo-grade{
     /* o código é FIXO e a nota absorve o que sobrar: encolher a coluna que não
        quebra linha é o que produz a barra de rolagem */
