@@ -95,6 +95,43 @@ const colisoes = await p.evaluate(() => {
 });
 ok('nenhuma aresta cruza um cartão', colisoes === 0, colisoes + ' colisões');
 
+/* O CURSOR ACENDE AS ARESTAS DO CURSO — comportamento da vitrine que tinha
+   ficado para trás: o `base.css` veio com o estilo do `.aresta.on`, e o
+   ouvinte que põe a classe não. Metade copiada não dá erro em lugar nenhum,
+   só não acontece. */
+const aceso = await p.evaluate(async () => {
+  const tela = document.querySelector('.tela-trilha');
+  /* um curso que seja ponta de pelo menos uma aresta — pegar o primeiro cartão
+     serviria só por sorte, e sorte não é teste */
+  const arestas = [...tela.querySelectorAll('.aresta')];
+  const alvo = arestas[0].dataset.para;
+  const no = tela.querySelector('[data-no="' + alvo + '"]');
+  const espera = arestas.filter((a) => a.dataset.de === alvo || a.dataset.para === alvo).length;
+  no.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+  const acesas = [...tela.querySelectorAll('.aresta.on')];
+  /* a espessura tem `transition:.15s`, e `getComputedStyle` durante a transição
+     devolve o valor DO MEIO do caminho — medir na hora lê 1.5px e reprova uma
+     regra que está certa */
+  await new Promise((r) => setTimeout(r, 250));
+  const grossa = acesas.length
+    ? parseFloat(getComputedStyle(acesas[0].querySelector('.linha')).strokeWidth)
+    : 0;
+  const outra = arestas.find((a) => !a.classList.contains('on'));
+  const fina = outra ? parseFloat(getComputedStyle(outra.querySelector('.linha')).strokeWidth) : 0;
+  no.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }));
+  return {
+    espera, acesas: acesas.length, grossa, fina,
+    depois: tela.querySelectorAll('.aresta.on').length,
+    soDoCurso: acesas.every((a) => a.dataset.de === alvo || a.dataset.para === alvo),
+  };
+});
+ok('o cursor acende as arestas do curso', aceso.acesas === aceso.espera && aceso.espera > 0,
+  aceso.acesas + ' de ' + aceso.espera);
+ok('e não acende as dos outros', aceso.soDoCurso);
+ok('a aresta acesa fica mais grossa', aceso.grossa > aceso.fina,
+  aceso.grossa + 'px vs ' + aceso.fina + 'px');
+ok('e apaga quando o cursor sai', aceso.depois === 0);
+
 console.log('\n== 4. curso e aula ==');
 await p.goto(BASE + PAGINA + '#/curso/javascript');
 await p.waitForSelector('.aula-linha');

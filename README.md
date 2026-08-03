@@ -107,10 +107,20 @@ assista só ele."* Um cadeado aqui contradiria uma promessa já publicada. Por
 isso o estado mais restritivo se chama `adiante`, continua clicável, e o rodapé
 do cartão diz "recomendado depois de X" em vez de "bloqueado".
 
+**O cursor acende as arestas do curso** — as que chegam nele e as que saem. Isso
+existia na vitrine e tinha ficado pelo caminho de um jeito silencioso: o
+`base.css` veio com o estilo do `.aresta.on`, e o ouvinte que põe a classe não
+veio. Metade copiada não dá erro em lugar nenhum — só não acontece. O ouvinte é
+um só, na tela, e não um por cartão: os cartões são refeitos a cada troca de
+bifurcação, e ouvinte por cartão vaza a cada remontagem.
+
 O teste de fumaça reproduz o detector de colisão da vitrine — 120 pontos por
 curva, conferindo se algum cai dentro de um cartão que não seja ponta daquela
 aresta. Herdar o roteamento sem herdar a conferência seria ficar com o risco e
-sem a rede.
+sem a rede. Ele também confere o realce, e ali há uma armadilha de medição: a
+espessura da linha tem `transition`, e `getComputedStyle` no meio da transição
+devolve o valor intermediário — medir na hora lê 1,5px e reprova uma regra que
+está certa.
 
 ## Aula = tópico, seção = assunto
 
