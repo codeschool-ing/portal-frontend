@@ -23,6 +23,7 @@ const VAZIO = {
   progresso: {},                // { cursoId: { aulas: { ix: { secoes, exercicios } } } }
   notas: {},                    // { cursoId: { aulaIx: { secId: texto } } }
   provas: {},                   // { 'curso:javascript': { tentativas, melhor, aprovado } }
+  conta: null,                  // { planoId, desde } — o que hoje é mentira e amanhã vem da cobrança
   ultima: null,                 // { cursoId, aulaIx, secId } — o "continuar de onde parou"
 };
 
@@ -235,6 +236,45 @@ export function respostasDadas() {
     });
   });
   return fora;
+}
+
+/* ---------- conta e plano ----------
+   FUTURO: `planoId` vem do serviço de cobrança, e trocar de plano é um POST
+   que devolve o novo. Aqui é um campo, para as telas serem escritas contra a
+   forma certa desde já.
+
+   Quem entra sem plano cai no primeiro da lista — não em "nenhum": um portal
+   sem plano nenhum tem estados que não existem na vida real, e cada um deles
+   vira um `if` que ninguém vai exercitar. */
+export function contaDoAluno() {
+  const c = estado.conta;
+  const planoId = c?.planoId || (window.PLANOS?.[0]?.id ?? 'estudante');
+  return { planoId, desde: c?.desde || null, email: estado.sessao?.email || '' };
+}
+
+export const planoAtual = () =>
+  (window.PLANOS || []).find((p) => p.id === contaDoAluno().planoId) || (window.PLANOS || [])[0] || null;
+
+export function trocarPlano(planoId) {
+  mudar(() => {
+    estado.conta = { ...(estado.conta || {}), planoId, desde: new Date().toISOString() };
+  });
+}
+
+export function trocarEmail(email) {
+  mudar(() => {
+    estado.sessao = { ...(estado.sessao || {}), email: String(email || '').trim() };
+  });
+}
+
+/* A senha NÃO é guardada. Não há hash no cliente que valha alguma coisa, e
+   gravar a senha em localStorage seria pior do que não ter tela nenhuma: daria
+   a impressão de que existe autenticação. O que fica é a DATA da troca — que é
+   o que o aluno precisa ver, e o que o servidor vai confirmar na Etapa 2. */
+export function marcarTrocaDeSenha() {
+  mudar(() => {
+    estado.conta = { ...(estado.conta || {}), senhaEm: new Date().toISOString() };
+  });
 }
 
 export function opcaoAtiva(trilhaId, idx) {

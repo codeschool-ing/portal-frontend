@@ -102,11 +102,17 @@ const nAulas = await p.locator('.aula-linha').count();
 ok('aula = tópico', nAulas === 12, nAulas + ' aulas');
 ok('trilho virou lista de aulas', (await p.locator('.trilho-aula').count()) === 12);
 
-/* A aula é dividida em seções e a avaliação é a última. Uma aula sem seções
-   escritas — o caso do curso de JavaScript — tem duas: conteúdo e avaliação. */
-await p.goto(BASE + PAGINA + '#/curso/javascript/aula/1');
+/* A aula é dividida em seções e a avaliação é a última. Uma aula ainda SEM
+   seções escritas tem duas: conteúdo e avaliação. O curso usado aqui já foi o
+   de JavaScript, e deixou de servir no dia em que ele ganhou conteúdo — o que
+   é o comportamento certo, e a razão de o teste apontar para um curso que
+   continua sem texto. */
+await p.goto(BASE + PAGINA + '#/curso/git/aula/1');
 await p.waitForSelector('.passo');
 ok('aula sem seções escritas tem conteúdo + avaliação', (await p.locator('.passo').count()) === 2);
+
+await p.goto(BASE + PAGINA + '#/curso/javascript/aula/1');
+await p.waitForSelector('.passo');
 ok('a primeira seção não é a avaliação', (await p.locator('.ex').count()) === 0);
 
 /* A avaliação é um WIZARD: uma questão por vez, com marcadores no topo. */
@@ -201,7 +207,9 @@ ok('justificativas continuam reveladas', reveladas > 0, reveladas + ' visíveis'
 ok('marcador da questão ficou verde', (await p.locator('.wz-ponto.certo').count()) >= 4);
 
 console.log('\n== 7. progresso e persistência ==');
-await p.goto(BASE + PAGINA + '#/curso/javascript/aula/1/conteudo');
+// curso ainda sem texto, para a aula ter exatamente conteúdo + avaliação e o
+// "avançar" cair na avaliação em um passo
+await p.goto(BASE + PAGINA + '#/curso/git/aula/1/conteudo');
 await p.waitForSelector('.lado-dir');
 ok('não há mais botão de concluir', (await p.locator('.marcar').count()) === 0);
 await p.click('.lado-dir');
@@ -260,10 +268,16 @@ const denominadores = await p.evaluate(() => {
   const conta = document.querySelector('.trilho-conta').textContent;
   return { aulas, conta };
 });
-/* 12 aulas de javascript: 3 têm exercícios (conteúdo + avaliação = 2 seções
-   contáveis cada) e 9 não (só o conteúdo conta). 3*2 + 9*1 = 15. Sem a
-   exclusão das avaliações pendentes o denominador seria 24. */
-ok('avaliação pendente fora do denominador', /\b15\b/.test(denominadores.conta), denominadores.conta);
+/* 12 aulas de javascript. Seções de CONTEÚDO: as quatro primeiras foram
+   escritas (3+3+2+2 = 10) e as outras oito ainda caem no invólucro de uma
+   seção só (8). Somam 18. AVALIAÇÕES: só as três aulas que têm exercícios
+   entram no denominador. 18 + 3 = 21.
+
+   O número muda quando mais conteúdo é escrito, e isso é o comportamento
+   certo: a aula passou mesmo a ter mais trabalho dentro. O que o teste guarda
+   é a REGRA — sem a exclusão das avaliações vazias o denominador seria 30, e
+   o curso nunca chegaria a 100%. */
+ok('avaliação pendente fora do denominador', /\b21\b/.test(denominadores.conta), denominadores.conta);
 
 console.log('\n== 9. curso prático: código na prosa ==');
 await p.goto(BASE + PAGINA + '#/curso/html-css');
@@ -440,6 +454,13 @@ ok('diagrama inline herda a cor do tema', await p.evaluate(() => {
 
 await p.goto(BASE + PAGINA + '#/curso/html-css/aula/3/imagens');
 await p.waitForSelector('.fig img');
+/* `scrollIntoViewIfNeeded` NÃO é firula do teste: a figura tem
+   `loading="lazy"`, e imagem preguiçosa abaixo da dobra não é carregada até
+   aparecer. Sem o rolar, `complete` é falso e o teste acusaria um defeito que
+   não existe — foi o que aconteceu, e só no pacote de arquivo único, onde a
+   altura da página difere o suficiente para tirar a figura da margem. */
+await p.locator('.fig img').scrollIntoViewIfNeeded();
+await p.waitForTimeout(200);
 ok('figura de arquivo carregou', await p.evaluate(() => {
   const i = document.querySelector('.fig img');
   return i.complete && i.naturalWidth > 0;
@@ -524,8 +545,6 @@ await p.goto(BASE + PAGINA + '#/certificados');
 await p.waitForSelector('.cert');
 ok('há exemplos de certificado', (await p.locator('.cert-exemplo').count()) === 2);
 ok('o exemplo se declara exemplo', (await p.locator('.cert-selo').first().innerText()).length > 0);
-ok('o exemplo não inventa código de validação',
-  !/CS-/.test(await p.locator('.cert-exemplo .cert-codigo').first().innerText()));
 ok('nenhum certificado emitido sem prova aprovada',
   (await p.locator('.cert:not(.cert-exemplo)').count()) === 0);
 
@@ -536,7 +555,71 @@ for (const [rota, sel] of [['#/painel', '.retomar'], ['#/catalogo', '.tela-catal
   ok('sem a tag em ' + rota, (await p.locator('.tela-head .tag').count()) === 0);
 }
 
-console.log('\n== 17. tema claro e estreito ==');
+console.log('\n== 17. certificado, plano e conta ==');
+await p.goto(BASE + PAGINA + '#/certificados');
+await p.waitForSelector('.cert');
+/* A regressão que este teste guarda: o certificado NÃO é uma janela de
+   terminal. Ele nasceu reaproveitando o `.term-bar` da vitrine, e é o único
+   artefato do portal que sai daqui — precisa parecer documento. */
+ok('certificado não é janela de terminal', (await p.locator('.cert .term-bar').count()) === 0);
+ok('tem a forma de documento',
+  (await p.locator('.cert-folha').count()) > 0 && (await p.locator('.cert-aluno').count()) > 0);
+ok('o nome do aluno é o maior elemento', await p.evaluate(() => {
+  const px = (s) => parseFloat(getComputedStyle(document.querySelector(s)).fontSize);
+  return px('.cert-aluno') > px('.cert-curso');
+}));
+
+/* O código de validação de um exemplo não pode parecer um código real. */
+ok('o exemplo não inventa código', !/CS-/.test(await p.locator('.cert-exemplo .cert-codigo').first().innerText()));
+
+await p.goto(BASE + PAGINA + '#/plano');
+await p.waitForSelector('.pl-tabela');
+const linhas = await p.locator('.pl-tabela tbody tr').count();
+ok('a tabela compara todos os recursos', linhas >= 10, linhas + ' linhas');
+ok('a coluna do plano assinado é destacada', (await p.locator('.pl-tabela th.on').count()) === 1);
+const antes = await p.locator('.pl-atual-topo h2').innerText();
+await p.locator('.pl-trocar').first().click();
+await p.waitForTimeout(300);
+const depois = await p.locator('.pl-atual-topo h2').innerText();
+ok('o upgrade troca o plano', depois !== antes, antes + ' → ' + depois);
+ok('o plano sobrevive ao reload', await p.evaluate(() =>
+  Boolean(JSON.parse(localStorage.getItem('codeschool-portal')).conta?.planoId)));
+
+await p.goto(BASE + PAGINA + '#/conta');
+await p.waitForSelector('#f-email');
+await p.fill('#c-email', 'nao-e-email');
+await p.click('#f-email button[type=submit]');
+await p.waitForTimeout(150);
+ok('e-mail implausível é recusado', (await p.locator('#a-email').getAttribute('class')).includes('ruim'));
+await p.fill('#c-email', 'aluno@codeschool.ing');
+await p.click('#f-email button[type=submit]');
+await p.waitForTimeout(150);
+ok('e-mail plausível é aceito', (await p.locator('#a-email').getAttribute('class')).includes('bom'));
+
+/* A senha nova NÃO pode ser guardada em lugar nenhum: não há autenticação, e
+   gravá-la daria a impressão contrária. O teste procura a string no
+   armazenamento inteiro. */
+await p.fill('#c-senha-atual', 'antiga123');
+await p.fill('#c-senha-nova', 'correta-cavalo-bateria-grampo');
+await p.fill('#c-senha-rep', 'outra-coisa');
+await p.click('#f-senha button[type=submit]');
+await p.waitForTimeout(150);
+ok('senhas que não conferem são recusadas', (await p.locator('#a-senha').getAttribute('class')).includes('ruim'));
+await p.fill('#c-senha-rep', 'correta-cavalo-bateria-grampo');
+await p.click('#f-senha button[type=submit]');
+await p.waitForTimeout(150);
+ok('senha trocada', (await p.locator('#a-senha').getAttribute('class')).includes('bom'));
+ok('a senha não foi guardada em lugar nenhum',
+  !(await p.evaluate(() => JSON.stringify(localStorage).includes('correta-cavalo'))));
+
+console.log('\n== 18. o menu da conta leva ao plano ==');
+await p.goto(BASE + PAGINA + '#/painel');
+await p.waitForSelector('.retomar');
+await p.click('.conta-btn');
+await p.waitForTimeout(120);
+ok('há um item "Meu plano"', (await p.locator('.conta-op[href="#/plano"]').count()) === 1);
+
+console.log('\n== 19. tema claro e estreito ==');
 await p.click('.idioma-btn'); await p.click('.idioma-op[lang="pt-BR"]'); await p.waitForTimeout(300);
 await p.click('#tema-btn');
 await p.waitForTimeout(250);
@@ -568,7 +651,7 @@ await p2.fill('#e-nome','X'); await p2.selectOption('#e-trilha','backend');
 await p2.click('#form-entrar button[type=submit]'); await p2.waitForTimeout(300);
 await p2.goto(BASE + PAGINA + '#/curso/javascript/aula/1/avaliacao',{waitUntil:'networkidle'});
 await p2.waitForSelector('.ex');
-console.log('\n== 18. nada revelado antes de responder ==');
+console.log('\n== 20. nada revelado antes de responder ==');
 ok('refazer escondido', (await p2.locator('.ex-refazer:visible').count()) === 0);
 ok('justificativas escondidas', (await p2.locator('.alt-porque:visible').count()) === 0);
 ok('vereditos vazios', (await p2.locator('.ex-veredito:visible').count()) === 0);
