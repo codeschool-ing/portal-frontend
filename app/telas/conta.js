@@ -43,11 +43,6 @@ export default async function conta() {
       '</p>' +
     '</section>' +
 
-    '<section class="bloco">' +
-      '<div class="bloco-topo"><h2>' + txt('Idioma') + '</h2></div>' +
-      '<p class="conta-nota">' + txt('O idioma fica no seletor da barra do topo, ao lado do tema.') + '</p>' +
-    '</section>' +
-
     '<section class="bloco bloco-risco">' +
       '<div class="bloco-topo"><h2>' + txt('Apagar meu progresso') + '</h2></div>' +
       '<p class="conta-nota">' + txt('Remove aulas concluídas, respostas e a matrícula. Não há desfazer.') + '</p>' +

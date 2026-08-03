@@ -60,7 +60,7 @@ ok('contexto na barra', (await p.locator('.ctx-nome').innerText()).includes('Bac
 ok('cartão de retomar', await p.locator('.retomar').isVisible());
 
 console.log('\n== 3. trilha: o grafo como mapa ==');
-await p.click('a[href="#/trilha"]');
+await p.click('.trilho-link[href="#/trilha"]');
 await p.waitForSelector('.trilha-grafo');
 await p.waitForTimeout(500);
 const arestas = await p.locator('.aresta').count();
@@ -109,20 +109,42 @@ await p.waitForSelector('.passo');
 ok('aula sem seções escritas tem conteúdo + avaliação', (await p.locator('.passo').count()) === 2);
 ok('a primeira seção não é a avaliação', (await p.locator('.ex').count()) === 0);
 
+/* A avaliação é um WIZARD: uma questão por vez, com marcadores no topo. */
 await p.goto(BASE + PAGINA + '#/curso/javascript/aula/1/avaliacao');
-await p.waitForSelector('.ex');
-const tipos = await p.$$eval('.ex', (els) => els.map((e) => e.className.replace('ex ex-', '')));
-ok('sete tipos na avaliação', tipos.length === 7, tipos.join(', '));
+await p.waitForSelector('.wizard');
+ok('uma questão por vez', (await p.locator('.ex').count()) === 1);
+ok('sete marcadores', (await p.locator('.wz-ponto').count()) === 7);
+
+const tipos = [];
+for (let i = 0; i < 7; i += 1) {
+  await p.locator('.wz-ponto').nth(i).click();
+  await p.waitForTimeout(120);
+  tipos.push((await p.locator('.ex').getAttribute('class')).replace('ex ex-', ''));
+}
+ok('os sete tipos estão no wizard', new Set(tipos).size === 7, tipos.join(', '));
 
 console.log('\n== 5. respondendo cada tipo ==');
+// leva o wizard até a questão daquele tipo, responde e confere o veredito
+const irAte = async (tipo) => {
+  const n = await p.locator('.wz-ponto').count();
+  for (let i = 0; i < n; i += 1) {
+    await p.locator('.wz-ponto').nth(i).click();
+    await p.waitForTimeout(120);
+    if (await p.locator('.ex-' + tipo).count()) return true;
+  }
+  return false;
+};
 const resp = async (sel, fn, esperado) => {
+  const tipo = sel.replace('.ex-', '');
+  if (!await irAte(tipo)) { ok(tipo, false, 'não achei no wizard'); return; }
   const ex = p.locator(sel);
   await fn(ex);
-  await ex.locator('.ex-responder').click();
+  const botao = ex.locator('.ex-responder');
+  if (await botao.count()) await botao.click();   // a associação se conclui sozinha
   await p.waitForFunction((s) => document.querySelector(s + ' .ex-veredito')?.className.match(/v-(certo|errado|pendente)/),
     sel, { timeout: 5000 });
   const cls = await ex.locator('.ex-veredito').getAttribute('class');
-  ok(sel.replace('.ex-', ''), cls.includes(esperado), cls);
+  ok(tipo, cls.includes(esperado), cls);
 };
 
 // quiz: marca a alternativa correta pelo data-ix
@@ -150,10 +172,15 @@ await resp('.ex-ordenacao', async (ex) => {
   }
 }, 'v-certo');
 
+/* A associação virou clique-a-clique com feedback imediato, no gesto do
+   Duolingo. Como o par errado se desfaz, o mapa final está sempre certo — o
+   veredito passa a medir os ERROS do caminho, e acertar é fechar sem nenhum. */
 await resp('.ex-associacao', async (ex) => {
   const pares = await p.evaluate(() => window.EXERCICIOS_EXEMPLO.find((e) => e.tipo === 'associacao').pares);
   for (const par of pares) {
-    await ex.locator(`.assoc-sel[data-esquerda="${par.esquerda.replace(/"/g, '\\"')}"]`).selectOption(par.direita);
+    await ex.locator('.ficha-esq').filter({ hasText: par.esquerda.replace(/`/g, '') }).first().click();
+    await ex.locator('.ficha-dir').filter({ hasText: par.direita.replace(/`/g, '') }).first().click();
+    await p.waitForTimeout(80);
   }
 }, 'v-certo');
 
@@ -162,20 +189,25 @@ await resp('.ex-saida-esperada', async (ex) => ex.locator('.ex-campo').fill('fal
 await resp('.ex-codigo', async (ex) => ex.locator('.cod-area').fill('console.log(1)'), 'v-pendente');
 await resp('.ex-resposta-expressao', async (ex) => ex.locator('.ex-campo').fill('3*x**2'), 'v-pendente');
 
-console.log('\n== 6. porque só aparece depois ==');
-const vazamento = await p.evaluate(() => {
-  // recarrega uma aula limpa e confere que nenhum `porque` está visível antes
-  return [...document.querySelectorAll('.alt-porque')].filter((e) => !e.hidden).length;
-});
-ok('justificativas reveladas só após responder', vazamento > 0, vazamento + ' visíveis agora (esperado)');
+console.log('\n== 6. o wizard guarda o que foi respondido ==');
+/* Voltar a uma questão já respondida tem de devolvê-la como ficou: com o
+   veredito à vista e as justificativas reveladas. Remontar apagaria isso, e o
+   aluno acharia que perdeu o que fez. */
+await irAte('quiz');
+ok('veredito continua lá ao voltar',
+  (await p.locator('.ex-quiz .ex-veredito').getAttribute('class')).includes('v-certo'));
+const reveladas = await p.locator('.ex-quiz .alt-porque:visible').count();
+ok('justificativas continuam reveladas', reveladas > 0, reveladas + ' visíveis');
+ok('marcador da questão ficou verde', (await p.locator('.wz-ponto.certo').count()) >= 4);
 
 console.log('\n== 7. progresso e persistência ==');
 await p.goto(BASE + PAGINA + '#/curso/javascript/aula/1/conteudo');
-await p.waitForSelector('.marcar');
-await p.click('.marcar');
-// marcar leva à seção seguinte: concluir e seguir é o mesmo gesto
+await p.waitForSelector('.lado-dir');
+ok('não há mais botão de concluir', (await p.locator('.marcar').count()) === 0);
+await p.click('.lado-dir');
+// avançar É concluir: um gesto só, sem botão separado
 await p.waitForFunction(() => location.hash.endsWith('/avaliacao'), null, { timeout: 5000 });
-ok('marcar avança para a próxima seção', true);
+ok('avançar leva à próxima seção', true);
 ok('seção marcada no trilho', (await p.locator('.trilho-secao.feita').count()) === 1);
 const pctAntes = await p.locator('.ctx-pct').innerText();
 await p.reload({ waitUntil: 'networkidle' });
@@ -199,8 +231,8 @@ ok('casou apesar de o título estar traduzido', (await p.locator('.aula-titulo')
 
 // a última seção de uma aula leva à primeira da aula seguinte
 await p.goto(BASE + PAGINA + '#/curso/web-fundamentos/aula/8/avaliacao');
-await p.waitForSelector('.aula-nav');
-await p.click('.aula-nav a:last-child');
+await p.waitForSelector('.lado-dir');
+await p.click('.lado-dir');
 await p.waitForFunction(() => /\/aula\/9\//.test(location.hash), null, { timeout: 5000 });
 ok('a próxima atravessa a fronteira da aula', true);
 
@@ -208,13 +240,20 @@ ok('a próxima atravessa a fronteira da aula', true);
    a estrutura é previsível — mas não conta no progresso, senão nenhum curso
    fecharia enquanto o conteúdo não existisse. */
 await p.goto(BASE + PAGINA + '#/curso/web-fundamentos/aula/8/avaliacao');
-await p.waitForSelector('.ex');
-ok('a avaliação de hospedagem tem exercícios', (await p.locator('.ex').count()) === 2);
+await p.waitForSelector('.wizard');
+// no wizard só uma questão fica na tela; quem conta é a fileira de marcadores
+ok('a avaliação de hospedagem tem 2 questões', (await p.locator('.wz-ponto').count()) === 2);
 
 await p.goto(BASE + PAGINA + '#/curso/javascript/aula/3/avaliacao');
 await p.waitForSelector('.aval-pendente');
 ok('avaliação sem exercícios aparece como pendente', true);
-ok('e não oferece botão de concluir', (await p.locator('.marcar').count()) === 0);
+/* avançar conclui — MENOS numa avaliação pendente, que não tem o que concluir */
+await p.click('.lado-dir');
+await p.waitForTimeout(300);
+await p.goto(BASE + PAGINA + '#/curso/javascript/aula/3/avaliacao');
+await p.waitForSelector('.passo');
+ok('avaliação pendente não é concluída ao avançar',
+  (await p.locator('.passo.passo-aval.feito').count()) === 0);
 
 const denominadores = await p.evaluate(() => {
   const aulas = CURSOS.find((c) => c.id === 'javascript').topicos.length;

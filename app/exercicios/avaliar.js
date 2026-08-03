@@ -41,11 +41,15 @@ export function avaliarLocal(ex, resposta) {
     }
 
     case 'associacao': {
-      /* resposta = { [esquerda]: direita }. Conta quantos pares saíram certos
-         para o feedback conseguir dizer "3 de 5", mas acertar é acertar todos:
-         par certo por eliminação não vale meio exercício. */
-      const certos = ex.pares.filter((p) => (resposta || {})[p.esquerda] === p.direita).length;
-      return veredito(certos === ex.pares.length, { certos, total: ex.pares.length });
+      /* Este tipo tem feedback imediato: o par errado se desfaz na hora, então
+         o mapeamento final está SEMPRE certo — basta insistir. Comparar o mapa
+         com o gabarito daria 100% para todo mundo.
+
+         A medida passa a ser o CAMINHO: quantos pares foram tentados errado
+         antes de fechar. Zero erros é acerto. É a régua do pipeline aplicada ao
+         processo — acertar por eliminação não conta como saber. */
+      if (!resposta || resposta.parcial) return veredito(false, { parcial: true });
+      return veredito(resposta.erros === 0, { erros: resposta.erros, total: ex.pares.length });
     }
 
     default:

@@ -150,6 +150,14 @@ Ficam três arquivos com três donos e a mesma chave de junção:
 | `aulas.js` | as seções e o texto delas | do portal |
 | exercícios | a avaliação | do pipeline |
 
+**Avançar é concluir.** Não há botão de "marcar como concluída": ele e a seta
+de avançar faziam a mesma coisa, e juntá-los num "Concluir e continuar" só
+adiava a pergunta. Passar para a próxima seção marca a atual como feita — que é
+o que o aluno já queria dizer ao clicar em avançar. O custo é real e fica
+registrado: não há como desmarcar, e quem passar batido acumula progresso sem
+ter lido. É a troca aceita em favor de um gesto só, e combina com o resto do
+portal, que mostra e não tranca.
+
 A forma de uma aula é fixa: **[vídeo + conteúdo] × N, e avaliação no fim.**
 
 - **Toda seção de conteúdo abre com um quadro de vídeo**, reservado enquanto
@@ -347,9 +355,39 @@ Ninguém fora de `estado.js` lê `localStorage`, e ninguém fora de `api.js` lê
 Hash e não History API: o portal é servido como arquivo estático, e `pushState`
 exigiria o servidor devolver o index em qualquer caminho.
 
-## Duas armadilhas que só apareceram na tela
+## A avaliação é um wizard
 
-Ficam registradas porque nenhuma das duas aparece lendo o código:
+Uma questão por vez, com marcadores no topo. Empilhar sete exercícios numa
+página faz rolar para achar onde parou e mostra de uma vez um volume que
+intimida.
+
+Os marcadores são **clicáveis** e as telas ficam **guardadas**: voltar à
+questão 1 devolve a questão 1 como ela ficou, com veredito e justificativas à
+vista. Remontar apagaria isso, e o aluno acharia que perdeu o que fez. Travar o
+avanço até acertar também está fora — a trilha inteira é recomendação e não
+trava; a avaliação não podia ser mais rígida que ela.
+
+**A associação virou clique-a-clique, no gesto do Duolingo:** toca-se num item
+da esquerda, depois no par dele à direita, e o par é conferido na hora. Isso
+funciona igual no toque e no mouse, não esconde as opções num menu, e vira
+prática em vez de formulário.
+
+Mas quebra a medida, e a correção importa: **com feedback imediato o mapeamento
+final está sempre certo** — basta insistir. Se o veredito continuasse comparando
+o mapa com o gabarito, todo mundo tiraria 100%. A medida passou a ser o
+caminho: **quantos pares foram tentados errado antes de fechar**. Zero é acerto.
+É a régua do pipeline — acertar por eliminação não conta como saber — aplicada
+ao processo em vez do resultado.
+
+**O selo de `_verificacao` saiu da tela do aluno.** Ele continua no dado e
+continua filtrando em `exerciciosDaAula`: é uma decisão de *publicação*, não uma
+informação para quem estuda. Dizer "só conferência estrutural" a um aluno é
+avisá-lo de que aquele exercício talvez não preste — e se talvez não preste, não
+devia estar publicado.
+
+## Três armadilhas que só apareceram na tela
+
+Ficam registradas porque nenhuma aparece lendo o código:
 
 1. **`base.css` estiliza o elemento `nav`**, não uma classe — a vitrine tem
    exatamente um. O portal tem três (barra, trilho, migalhas), e os dois de
@@ -359,6 +397,11 @@ Ficam registradas porque nenhuma das duas aparece lendo o código:
 2. **`[hidden]` perde para `.btn{display:inline-flex}`** — a regra do navegador
    tem especificidade zero. O botão "Tentar de novo" aparecia antes de existir o
    que refazer.
+3. **`base.css` nunca reseta o elemento `button`** — cada componente da vitrine
+   declara o próprio fundo (`.tema`, `.burger`, `.nav-cta`). Todo botão novo
+   precisa declarar o dele, senão herda o cinza claro do navegador. Foi o que
+   deixou a lupa, o avatar e as setas da ordenação brancos sobre o tema escuro:
+   um sintoma só, três lugares, uma causa.
 
 ## O que vem depois
 

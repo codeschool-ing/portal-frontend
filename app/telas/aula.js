@@ -1,43 +1,60 @@
 /* ==========================================================================
    Aula — uma SEÇÃO por vez.
 
-   Antes, a aula inteira era uma página e uma caixinha de "concluída". Com 4
-   horas de carga média por tópico e metade deles enumerando três ou mais
-   assuntos no título, isso era uma parede de texto com um marco só no fim.
-   Agora cada seção é uma tela, e a última — quando o tópico tem exercícios —
-   é a avaliação.
-
    TODA SEÇÃO DE CONTEÚDO ABRE COM UM QUADRO DE VÍDEO, reservado quando ainda
-   não há id. É a mesma decisão da vitrine, e pelo mesmo motivo escrito lá: o
-   espaço já fica guardado, então publicar os vídeos um a um não reorganiza a
-   tela de ninguém. (Numa versão anterior o quadro só aparecia onde a seção
-   declarasse `video`, para não espalhar retângulos vazios — mas isso fazia a
-   aula mudar de forma conforme o vídeo chegasse, que é exatamente o defeito
-   que reservar o espaço existe para evitar.)
+   não há id: o espaço já fica guardado, então publicar os vídeos um a um não
+   reorganiza a tela de ninguém. A avaliação não tem vídeo — ali o aluno
+   responde, não assiste.
 
-   A seção de avaliação não tem vídeo: ali o aluno responde, não assiste.
+   DUAS COISAS QUE MUDARAM DE LUGAR, E POR QUÊ
+
+   1. "Anterior" e "próxima" saíram do rodapé e viraram setas nas LATERAIS, em
+      tela larga. O conteúdo é preso a uma coluna de leitura, então sobra
+      espaço nos dois lados e falta na vertical — onde cada pixel gasto é
+      texto empurrado para baixo da dobra. Abaixo de 1180px não há lateral
+      sobrando e elas voltam para o rodapé.
+
+   2. Não há mais botão de concluir. Ele e a seta faziam a mesma coisa, e
+      juntar os dois num "Concluir e continuar" só adiou a pergunta: se avançar
+      já era concluir, o botão era um segundo caminho para o mesmo gesto.
+
+      AGORA AVANÇAR É CONCLUIR. Passar para a próxima seção marca a atual como
+      feita — que é o que o aluno já queria dizer ao clicar em avançar. O
+      feedback continua imediato e em dois lugares: o passo ganha o check e o
+      trilho também.
+
+      O que se perde, e vale saber: não há mais como marcar sem sair da seção,
+      nem desmarcar. Quem passar batido acumula progresso sem ter lido. É a
+      troca aceita em favor de um gesto só — e ela combina com o resto do
+      portal, que mostra e não tranca.
    ========================================================================== */
 
 import * as api from '../api.js';
 import { aulasDoCurso, cursoPorId } from '../catalogo.js';
 import { secoesDaAula } from '../aulas.js';
 import { secaoConcluida, visitarSecao } from '../estado.js';
-import { montarExercicio } from '../exercicios/index.js';
-import { irPara } from '../rotas.js';
+import { montarAvaliacao } from '../exercicios/index.js';
 import { vazio } from './comum.js';
 import { esc, prosa } from '../texto.js';
 
+const SETA = (d) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+  'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + d + '"/></svg>';
+const SETA_ESQ = SETA('M15 5l-7 7 7 7');
+const SETA_DIR = SETA('M9 5l7 7-7 7');
+
 /* A seção seguinte e a anterior atravessam a fronteira da aula: no fim da
    última seção o "próxima" leva à primeira seção da aula seguinte. Sem isso o
-   aluno teria de voltar ao curso a cada tópico, que é atrito puro. */
+   aluno voltaria ao índice do curso a cada tópico, que é atrito puro. */
 function vizinhas(cursoId, ix, pos) {
   const aulas = aulasDoCurso(cursoId);
   const secoes = secoesDaAula(cursoId, aulas[ix].chave);
+  const ultimaDe = (i) => {
+    const s = secoesDaAula(cursoId, aulas[i].chave);
+    return s[s.length - 1].id;
+  };
   const anterior = pos > 0
     ? { ix, secId: secoes[pos - 1].id }
-    : (ix > 0
-      ? { ix: ix - 1, secId: ultimaSecao(cursoId, aulas, ix - 1) }
-      : null);
+    : (ix > 0 ? { ix: ix - 1, secId: ultimaDe(ix - 1) } : null);
   const proxima = pos + 1 < secoes.length
     ? { ix, secId: secoes[pos + 1].id }
     : (ix + 1 < aulas.length
@@ -45,11 +62,6 @@ function vizinhas(cursoId, ix, pos) {
       : null);
   return { anterior, proxima };
 }
-
-const ultimaSecao = (cursoId, aulas, ix) => {
-  const s = secoesDaAula(cursoId, aulas[ix].chave);
-  return s[s.length - 1].id;
-};
 
 export default async function aula({ id, ix, sec }) {
   const c = cursoPorId(id);
@@ -64,7 +76,6 @@ export default async function aula({ id, ix, sec }) {
 
   visitarSecao(id, n, secao.id);
 
-  const feita = secaoConcluida(id, n, secao.id);
   const { anterior, proxima } = vizinhas(id, n, pos);
   const rota = (v) => '#/curso/' + esc(id) + '/aula/' + v.ix + '/' + esc(v.secId);
 
@@ -75,12 +86,24 @@ export default async function aula({ id, ix, sec }) {
     '<a class="passo' + (i === pos ? ' on' : '') + (secaoConcluida(id, n, s.id) ? ' feito' : '') +
       (s.tipo === 'avaliacao' ? ' passo-aval' : '') + (s.pendente ? ' passo-pendente' : '') + '" ' +
       'href="#/curso/' + esc(id) + '/aula/' + n + '/' + esc(s.id) + '">' +
-      '<span class="passo-n">' + (s.tipo === 'avaliacao' ? '✓' : String(i + 1).padStart(2, '0')) + '</span>' +
+      '<span class="passo-n">' + (s.tipo === 'avaliacao' ? '★' : String(i + 1).padStart(2, '0')) + '</span>' +
       '<span class="passo-tit">' + esc(s.titulo) + '</span>' +
     '</a>'
   )).join('');
 
+  /* A seta de avançar existe SEMPRE. Na última seção do curso ela leva à
+     página do curso — se ela sumisse ali, a última seção seria a única que
+     nunca poderia ser concluída, porque concluir passou a ser avançar. */
+  const destinoProximo = proxima ? rota(proxima) : '#/curso/' + esc(id);
+  const lateral = (destino, lado, seta, rotulo, avanca) => (destino
+    ? '<a class="lado-seta lado-' + lado + (avanca ? ' avancar' : '') + '" href="' + destino +
+      '" aria-label="' + txt(rotulo) + '">' + seta + '</a>'
+    : '');
+
   el.innerHTML =
+    lateral(anterior && rota(anterior), 'esq', SETA_ESQ, 'seção anterior') +
+    lateral(destinoProximo, 'dir', SETA_DIR, 'concluir e ir para a próxima seção', true) +
+
     '<nav class="migalhas">' +
       '<a href="#/curso/' + esc(id) + '">' + esc(c.nome) + '</a>' +
       '<span aria-hidden="true">›</span>' +
@@ -106,9 +129,7 @@ export default async function aula({ id, ix, sec }) {
       ? '<section class="bloco aula-exercicios' + (secao.pendente ? ' aval-pendente' : '') + '">' +
           (secao.pendente
             ? '<p class="mono dim">' + txt('[avaliação em preparação — os exercícios deste tópico ainda não foram produzidos]') + '</p>'
-            : '<p class="aval-intro">' + secao.quantos + ' ' +
-                txt('exercícios, cobrindo o tópico inteiro e não só a última seção.') + '</p>') +
-          '<div class="lista-ex"></div>' +
+            : '') +
         '</section>'
       : '<section class="bloco aula-texto">' +
           (secao.corpo
@@ -116,24 +137,16 @@ export default async function aula({ id, ix, sec }) {
             : '<p class="mono dim">' + txt('[conteúdo da aula — entra com o material real na Etapa 2]') + '</p>') +
         '</section>') +
 
+    /* O rodapé só existe onde não há setas laterais — abaixo de 1400px. Não
+       há botão de concluir: avançar é concluir. */
     '<footer class="aula-pe">' +
-      /* Avaliação sem exercícios não se conclui: marcar "feito" o que não foi
-         feito é a forma mais barata de um portal mentir sobre progresso. */
-      (secao.pendente
-        ? '<span class="pe-nota mono dim">' + txt('nada a concluir aqui ainda') + '</span>'
-        : '<button type="button" class="btn ' + (feita ? 'btn-ghost' : 'btn-primary') + ' marcar">' +
-            (feita ? '✓ ' + txt('seção concluída') : txt('Marcar como concluída')) +
-          '</button>') +
-      '<div class="aula-nav">' +
-        (anterior ? '<a class="btn btn-ghost" href="' + rota(anterior) + '">← ' + txt('anterior') + '</a>' : '') +
-        (proxima ? '<a class="btn btn-ghost" href="' + rota(proxima) + '">' + txt('próxima') + ' →</a>' : '') +
-      '</div>' +
+      (anterior ? '<a class="btn btn-ghost" href="' + rota(anterior) + '">← ' + txt('anterior') + '</a>' : '<span></span>') +
+      '<a class="btn btn-primary avancar" href="' + destinoProximo + '">' + txt('próxima') + ' →</a>' +
     '</footer>';
 
-  if (secao.tipo === 'avaliacao') {
+  if (secao.tipo === 'avaliacao' && !secao.pendente) {
     const exercicios = await api.exerciciosDaAula(id, a.chave);
-    const lista = el.querySelector('.lista-ex');
-    exercicios.forEach((ex, i) => lista.appendChild(montarExercicio(ex, { cursoId: id, aulaIx: n }, i)));
+    el.querySelector('.aula-exercicios').appendChild(montarAvaliacao(exercicios, { cursoId: id, aulaIx: n }));
   }
 
   const quadro = el.querySelector('.video-fachada');
@@ -146,18 +159,13 @@ export default async function aula({ id, ix, sec }) {
     });
   }
 
-  const botaoMarcar = el.querySelector('.marcar');
-  if (botaoMarcar) botaoMarcar.addEventListener('click', async (e) => {
-    const agoraFeita = !secaoConcluida(id, n, secao.id);
-    await api.concluirSecao(id, n, secao.id, agoraFeita);
-    const b = e.currentTarget;
-    b.className = 'btn ' + (agoraFeita ? 'btn-ghost' : 'btn-primary') + ' marcar';
-    b.textContent = agoraFeita ? '✓ ' + txt('seção concluída') : txt('Marcar como concluída');
-    el.querySelectorAll('.passo')[pos].classList.toggle('feito', agoraFeita);
-    // concluir e seguir é o gesto natural: sem isto a pessoa marca e procura
-    // o botão de avançar, que está do outro lado do rodapé
-    if (agoraFeita && proxima) irPara(rota(proxima).slice(1));
-    else if (agoraFeita && !proxima) irPara('/curso/' + id);
+  /* Avançar conclui. A marcação é síncrona por dentro, então acontece antes de
+     o navegador processar a troca de hash — não há corrida. A avaliação ainda
+     sem exercícios fica de fora: não há o que concluir nela. */
+  el.addEventListener('click', (e) => {
+    if (!e.target.closest('.avancar')) return;
+    if (secao.pendente) return;
+    if (!secaoConcluida(id, n, secao.id)) api.concluirSecao(id, n, secao.id, true);
   });
 
   return { titulo: a.titulo + ' · ' + secao.titulo, el };
