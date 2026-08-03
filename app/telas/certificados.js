@@ -131,8 +131,13 @@ function botoesLinkedIn({ nome, cod, quando }) {
   });
   const post = LINKEDIN + '/sharing/share-offsite/?' + q({ url: urlDeValidacao(cod) });
 
-  return '<a class="btn btn-primary cert-share" href="' + esc(perfil) + '" target="_blank" rel="noopener">' +
-      ICO_LINKEDIN + txt('Adicionar ao perfil') + '</a>' +
+  /* Só o ícone. A marca do LinkedIn é reconhecida sem legenda, e o rótulo
+     ocupava metade da faixa de ações para dizer o que o desenho já diz. O
+     texto continua existindo para quem não vê o ícone — no `aria-label` e no
+     `title`, que é o que o leitor de tela anuncia e o que o cursor mostra. */
+  return '<a class="cert-in" href="' + esc(perfil) + '" target="_blank" rel="noopener" ' +
+      'title="' + txt('Adicionar ao perfil do LinkedIn') + '" ' +
+      'aria-label="' + txt('Adicionar ao perfil do LinkedIn') + '">' + ICO_LINKEDIN + '</a>' +
     '<a class="btn btn-ghost cert-share" href="' + esc(post) + '" target="_blank" rel="noopener">' +
       txt('Compartilhar') + '</a>';
 }
@@ -251,17 +256,18 @@ export default async function certificados() {
     const chave = art.dataset.cert;
     const nomeCert = art.querySelector('.cert-curso')?.textContent || '';
     /* O botão do LinkedIn existe NOS DOIS CASOS, ao lado do fechar. No exemplo
-       ele vem desabilitado e dizendo por quê: esconder o botão faria a pessoa
-       achar que a função não existe, e mostrá-lo funcionando publicaria uma
-       credencial que ninguém tirou. Desabilitado com motivo é o único dos três
-       que não mente. */
+       ele vem desabilitado, e o motivo está no `title`: esconder o botão faria
+       a pessoa achar que a função não existe, e mostrá-lo funcionando
+       publicaria uma credencial que ninguém tirou. Desabilitado com motivo é o
+       único dos três que não mente. */
     abrirModal(art.outerHTML, {
       classe: 'modal-cert',
       rotulo: txt('Certificado') + ' — ' + nomeCert,
       acoes: exemplo
-        ? '<span class="cert-share-nota mono dim">' + txt('exemplo — nada a compartilhar') + '</span>' +
-          '<span class="btn btn-ghost cert-share cert-share-off" aria-disabled="true">' +
-            ICO_LINKEDIN + txt('Adicionar ao perfil') + '</span>'
+        ? '<span class="cert-in cert-in-off" aria-disabled="true" ' +
+            'title="' + txt('exemplo — não há certificado para adicionar') + '" ' +
+            'aria-label="' + txt('exemplo — não há certificado para adicionar') + '">' +
+            ICO_LINKEDIN + '</span>'
         : botoesLinkedIn({ nome: nomeCert, cod: codigo(chave + quem), quando: new Date().toISOString() }),
     });
   };

@@ -179,12 +179,34 @@ vai: uma seção de texto com um retângulo cinza em cima promete algo que não
 vem, e a promessa não expira. A reserva não se perdeu; ela deixou de ser
 automática e passou a ser **dita**.
 
-**A seção com vídeo troca de layout:** o player vai de ponta a ponta da área de
-conteúdo, escapando da coluna de leitura. O **título fica acima dele**, como nas
-seções de texto — "onde estou" vem antes de "o que eu assisto", e a resposta
-tem de ser a mesma nas duas formas. (O player já esteve acima do título, para
-não empurrar o play para baixo da dobra; o preço era cair numa seção sem saber
-de que aula ela era.)
+**O título fica acima do player**, como nas seções de texto — "onde estou" vem
+antes de "o que eu assisto", e a resposta tem de ser a mesma nas duas formas.
+(O player já esteve acima do título, para não empurrar o play para baixo da
+dobra; o preço era cair numa seção sem saber de que aula ela era.)
+
+### As três larguras, e nada fora delas
+
+| | |
+| --- | --- |
+| `--trilho` | a coluna do menu |
+| `--leitura` | **todo** o conteúdo de uma seção: prosa, vídeo, figura, material, anotação |
+| `--amplo` | a exceção, e é uma só: o bloco de código anotado |
+
+`--leitura` são 820px porque prosa acima de ~68 caracteres por linha cansa. O
+vídeo entra nela junto com o resto: ele já foi de ponta a ponta da área
+inteira, e o efeito colateral era a aula ter **três alinhamentos diferentes
+conforme a seção** — o olho procurando a margem esquerda a cada troca. Sobrou
+um ganho que não estava previsto: as setas de navegação moram no vão e pararam
+de passar por cima da imagem.
+
+`--amplo` existe porque o exemplo anotado não é prosa: são duas colunas, e uma
+delas é código, que não se quebra por conforto. O teto dele sai da posição da
+seta, como descrito adiante.
+
+**Nada passa de `--amplo`.** O teste percorre as 89 seções escritas dos três
+cursos, uma a uma, e mede cada filho da tela de aula — é caro, uma navegação
+por seção, e é o único jeito de a regra valer para o conteúdo que existe e não
+para a seção que alguém lembrou de abrir.
 
 **Vídeo não é sinônimo de abertura de aula.** Das 26 seções com vídeo, 5 são a
 primeira da aula, 15 a segunda, 5 a terceira e 1 a quarta. Se todas fossem a
@@ -745,11 +767,6 @@ a posição da seta deriva das duas — e número repetido em dois lugares diver
 Já divergiu uma vez, no recuo do conteúdo, e custou 2px de rolagem horizontal
 no celular.
 
-**O player sangra usando a mesma conta.** Com o título acima dele, o vídeo
-precisa escapar da coluna de 820px e ir até as bordas da área:
-`margin-left: 50% - 50vw + trilho/2` — o full-bleed clássico, corrigido pelo
-trilho, que desloca o centro. Sem a correção o vídeo começaria embaixo do menu.
-
 ## O certificado abre em grande
 
 Clicar num certificado o amplia sobre o resto da tela, com o fundo esmaecido e
@@ -762,8 +779,18 @@ Acima da caixa, à direita, ficam as ações. São duas, e fazem coisas diferent
 
 | botão | o que faz |
 | --- | --- |
-| **Adicionar ao perfil** | abre o formulário de *licenças e certificados* do LinkedIn já preenchido — nome, instituição, mês, ano e código |
+| o ícone do LinkedIn | abre o formulário de *licenças e certificados* já preenchido — nome, instituição, mês, ano e código |
 | **Compartilhar** | publica um post com o link de validação |
+
+O primeiro é **só o ícone**: a marca do LinkedIn é reconhecida sem legenda, e o
+rótulo ocupava metade da faixa para dizer o que o desenho já diz. O texto não
+sumiu — foi para o `aria-label` e o `title`, que é o que o leitor de tela
+anuncia e o que o cursor mostra. Um teste reprova se o botão ficar mudo.
+
+A cor é a da marca deles, `#0A66C2`, no tema claro. No escuro ela dá 2,5:1 de
+contraste contra o painel — abaixo dos 3:1 que um ícone precisa —, então o tema
+escuro clareia. Clarear a cor de uma marca não é liberdade: é o que a torna
+visível, e invisível ela não representa marca nenhuma.
 
 O primeiro é o que a pessoa realmente quer: certificado no perfil é uma
 credencial; post some do feed em dois dias.

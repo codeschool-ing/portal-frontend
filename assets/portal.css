@@ -57,13 +57,30 @@ html[data-tema="claro"]{color-scheme:light}
   background:none;backdrop-filter:none;border-bottom:0;align-items:stretch;
 }
 
-/* As duas medidas que mais de uma regra precisa saber: a largura do trilho e a
-   da coluna de leitura. Elas viram variáveis porque as setas de navegação são
-   posicionadas no VÃO que sobra delas — e um número repetido em dois lugares
-   diverge no dia em que um deles muda. Já aconteceu com o recuo do conteúdo. */
+/* AS TRÊS LARGURAS DO PORTAL, e não há uma quarta.
+
+     --trilho    a coluna do menu
+     --leitura   onde vive TODO o conteúdo de uma seção: prosa, vídeo, figura,
+                 material, anotação. 820px porque prosa acima de ~68 caracteres
+                 por linha cansa, e o vídeo alinhado com o texto lê melhor do
+                 que um vídeo que começa antes dele e termina depois.
+     --amplo     a exceção, e é UMA: o bloco de código anotado, que tem duas
+                 colunas e uma delas não se quebra por conforto.
+
+   NADA PASSA DE `--amplo`. O player já foi de ponta a ponta da área inteira, e
+   o efeito colateral era o conteúdo da aula ter três alinhamentos diferentes
+   dependendo da seção — o olho procurava a margem esquerda a cada troca. Há um
+   teste que percorre os filhos da tela de aula e reprova qualquer um que
+   ultrapasse esse teto.
+
+   Elas são variáveis porque outras regras derivam delas: as setas de navegação
+   ficam no vão que sobra do trilho e da leitura, e o teto do `--amplo` sai da
+   posição dessas setas. Número repetido em dois lugares diverge no dia em que
+   um deles muda — já aconteceu com o recuo do conteúdo. */
 .portal{
   --trilho:380px;
   --leitura:820px;
+  --amplo:min(1180px, calc(100vw - var(--trilho) - 2 * var(--pad-x)));
   display:grid;
   /* 380 e não 272: com 272 quase todo nome de aula quebrava em duas ou três
      linhas, e uma lista de treze itens quebrados vira parede. Os 50px que
@@ -498,27 +515,17 @@ body.sem-trilho .trilho{display:none}
    O `.tela` continua com o teto de 1180px, então o player sangra até a borda
    dessa coluna e não da tela inteira — que é onde o texto acima e abaixo dele
    também termina. Alinhado com o conteúdo, e não com a janela. */
-/* O SANGRAMENTO, COM O TÍTULO ACIMA.
+/* O PLAYER ACOMPANHA A COLUNA DE LEITURA, como todo o resto.
 
-   A coluna de leitura tem 820px e é centrada na área que sobra do trilho. O
-   player precisa escapar dela e ir até as duas bordas dessa área — e a conta
-   sai fechada:
+   Ele já foi de ponta a ponta da área de conteúdo, e era o que a referência
+   fazia. Mas ali o vídeo é a tela inteira; aqui ele divide a seção com título,
+   texto, material e anotação — e sangrar fazia a aula ter margens diferentes
+   conforme a seção, com o olho procurando a esquerda a cada troca.
 
-     a coluna começa em  X = (100vw + trilho - largura) / 2
-     queremos que o vídeo comece em  trilho
-     logo  margin-left = trilho - X = 50% - 50vw + trilho/2
-
-   `50%` aqui é metade da COLUNA (o bloco que contém o vídeo) e `50vw` metade
-   da janela: é o truque clássico de full-bleed, corrigido pelo trilho, que
-   desloca o centro. Sem a correção o vídeo começaria embaixo do menu.
-
-   Ele funciona sem saber a largura da área e sem um invólucro a mais no HTML,
-   que é o que a primeira versão precisava. */
+   Sobrou um ganho que não estava previsto: as setas de navegação moram no vão
+   e não passam mais por cima da imagem. */
 .aula-com-video .video-fachada{
-  width:calc(100vw - var(--trilho));
-  margin-left:calc(50% - 50vw + var(--trilho) / 2);
-  border-radius:0;border-left:0;border-right:0;
-  max-height:min(70vh, calc(100vh - 320px));
+  max-height:min(64vh, calc(100vh - 300px));
 }
 
 .video-fachada{
@@ -971,10 +978,26 @@ body.com-busca{overflow:hidden}
 .modal-cert .cert-meta,.modal-cert .cert-pe{font-size:.8rem}
 .cert-share{gap:8px}
 .cert-share svg{width:15px;height:15px}
-.cert-share-nota{font-size:.7rem;margin-right:2px}
+
+/* O BOTÃO DO LINKEDIN É SÓ O ÍCONE, na cor da marca deles.
+
+   O azul oficial é #0A66C2, e ele é o que se usa no tema claro. No escuro ele
+   dá 2,5:1 de contraste contra o painel — abaixo dos 3:1 que um ícone precisa
+   para ser distinguível —, então o tema escuro clareia. Clarear a cor de uma
+   marca não é liberdade: é o que a torna visível, e invisível ela não
+   representa marca nenhuma. */
+.cert-in{
+  --linkedin:#3b8fd9;
+  display:grid;place-items:center;width:36px;height:36px;border-radius:5px;
+  color:var(--linkedin);border:1px solid transparent;
+  transition:background .15s,border-color .15s;
+}
+html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
+.cert-in svg{width:21px;height:21px}
+.cert-in:hover{background:var(--panel);border-color:var(--linkedin)}
 /* desabilitado, e parecendo: o botão existe para dizer o que haverá ali */
-.cert-share-off{opacity:.4;cursor:not-allowed}
-.cert-share-off:hover{background:none;border-color:var(--wire);color:var(--paper-dim)}
+.cert-in-off{opacity:.35;cursor:not-allowed}
+.cert-in-off:hover{background:none;border-color:transparent}
 
 .cert-previa{margin-top:26px;display:flex;flex-direction:column;gap:12px}
 /* o rótulo anda junto do título, e não na outra ponta da tela: ele explica o
@@ -1086,9 +1109,8 @@ body.com-busca{overflow:hidden}
    margem negativa é exatamente a metade do que ele cresceu para cada lado. O
    bloco fica centrado no mesmo eixo do texto, sem invólucro a mais. */
 .exemplo{
-  --exemplo-larg:min(1180px, calc(100vw - var(--trilho) - 2 * var(--pad-x)));
-  width:var(--exemplo-larg);
-  margin:24px 0 24px calc((100% - var(--exemplo-larg)) / 2);
+  width:var(--amplo);
+  margin:24px 0 24px calc((100% - var(--amplo)) / 2);
 }
 
 /* O TETO SOBE PARA A POSIÇÃO DA SETA onde há setas laterais.
@@ -1107,8 +1129,8 @@ body.com-busca{overflow:hidden}
    a mesma especificidade quem vem por último vence, e lá em cima ela perdia
    em silêncio. */
 @media(min-width:1400px){
-  .exemplo{
-    --exemplo-larg:min(
+  .portal{
+    --amplo:min(
       1180px,
       calc((100vw - var(--trilho) + var(--leitura)) / 2 - 76px)
     );

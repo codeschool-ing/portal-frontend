@@ -611,22 +611,17 @@ ok('seção de vídeo tem o quadro', true);
 ok('seção só de vídeo não inventa bloco de texto', (await p.locator('.aula-texto').count()) === 0);
 ok('a duração aparece no player', (await p.locator('.video-duracao').innerText()).includes('min'));
 
-/* O player sangra de ponta a ponta: a margem negativa cancela o padding do
-   `.conteudo`, e os dois números têm de continuar batendo. */
+/* O PLAYER ACOMPANHA A COLUNA DE LEITURA. Ele já foi de ponta a ponta da área
+   inteira, e o efeito colateral era a aula ter alinhamentos diferentes conforme
+   a seção — o olho procurando a margem esquerda a cada troca. */
 const bleed = await p.evaluate(() => {
   const v = document.querySelector('.video-fachada').getBoundingClientRect();
-  const c = document.querySelector('#conteudo').getBoundingClientRect();
-  return { esq: Math.abs(v.left - c.left), dir: Math.abs(v.right - c.right), topo: v.top };
+  const t = document.querySelector('.aula-titulo').getBoundingClientRect();
+  return { esq: Math.abs(v.left - t.left), larg: Math.round(v.width) };
 });
-ok('o player vai de ponta a ponta', bleed.esq < 2 && bleed.dir < 2,
-  bleed.esq.toFixed(1) + 'px / ' + bleed.dir.toFixed(1) + 'px');
+ok('o player alinha com o texto da seção', bleed.esq < 2,
+  bleed.larg + 'px, ' + bleed.esq.toFixed(1) + 'px de desalinho');
 
-/* E o sangramento não pode virar rolagem horizontal. Ele já virou: o recuo do
-   `.conteudo` em tela estreita era 16px e a margem negativa continuou 18px,
-   e sobraram 2px. Os dois saem da mesma variável agora — este teste é o que
-   avisa se voltarem a ser dois números. */
-// estreita a MESMA aba e devolve depois: uma aba nova nasceria noutro
-// contexto, sem a sessão, e cairia em /entrar
 await p.setViewportSize({ width: 390, height: 844 });
 await p.waitForTimeout(250);
 const sobra = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
@@ -670,6 +665,50 @@ const posicoes = await p.evaluate(() => {
 ok('há vídeo fora da primeira seção', Object.keys(posicoes).length >= 3,
   JSON.stringify(posicoes));
 
+/* TODA SEÇÃO CABE NOS LIMITES, SEM EXCEÇÃO.
+
+   O portal tem três larguras — trilho, coluna de leitura e a `--amplo`, que é
+   a exceção do bloco de código anotado. Nada pode passar da terceira, e só o
+   `.exemplo` pode passar da segunda.
+
+   O teste percorre TODAS as seções escritas dos três cursos, uma a uma, e mede
+   cada filho da tela. É caro (uma navegação por seção) e é o único jeito de a
+   regra valer para o conteúdo que existe, e não para a seção que eu lembrei de
+   abrir. */
+await p.setViewportSize({ width: 1920, height: 1000 });
+await p.waitForTimeout(200);
+const foraDoLimite = await p.evaluate(async () => {
+  const fora = [];
+  for (const curso of Object.keys(window.AULAS)) {
+    const topicos = Object.keys(window.AULAS[curso]);
+    for (let i = 0; i < topicos.length; i += 1) {
+      for (const sec of window.AULAS[curso][topicos[i]]) {
+        location.hash = `#/curso/${curso}/aula/${i}/${sec.id}`;
+        await new Promise((r) => setTimeout(r, 50));
+        const tela = document.querySelector('.tela-aula');
+        if (!tela) continue;
+        const cs = getComputedStyle(document.querySelector('.portal'));
+        const amplo = parseFloat(cs.getPropertyValue('--amplo'));
+        const leitura = parseFloat(cs.getPropertyValue('--leitura'));
+        [...tela.children].forEach((f) => {
+          if (f.classList.contains('lado-seta')) return;    // flutua, não é conteúdo
+          const w = f.getBoundingClientRect().width;
+          const nome = `${curso}/${sec.id}:${f.className.split(' ')[0]}`;
+          if (w > amplo + 1) fora.push(nome + ' passou de --amplo (' + Math.round(w) + ')');
+          else if (w > leitura + 1 && !f.classList.contains('exemplo')) {
+            fora.push(nome + ' passou de --leitura sem ser exemplo (' + Math.round(w) + ')');
+          }
+        });
+      }
+    }
+  }
+  return fora;
+});
+ok('nenhuma seção passa dos limites de largura', foraDoLimite.length === 0,
+  foraDoLimite.slice(0, 3).join(' · ') || 'as 89 seções cabem');
+await p.setViewportSize({ width: 1440, height: 900 });
+await p.waitForTimeout(200);
+
 console.log('\n== 18. certificado, plano e conta ==');
 await p.goto(BASE + PAGINA + '#/certificados');
 await p.waitForSelector('.cert');
@@ -704,14 +743,20 @@ ok('o fundo congela', await p.evaluate(() =>
 /* O botão do LinkedIn existe ao lado do fechar NOS DOIS CASOS — esconder faria
    parecer que a função não existe. No exemplo ele vem desabilitado e sem
    `href`: visível, e incapaz de publicar uma credencial que ninguém tirou. */
-ok('o exemplo mostra o botão do LinkedIn', (await p.locator('.modal-acoes .cert-share').count()) === 1);
+ok('o exemplo mostra o botão do LinkedIn', (await p.locator('.modal-acoes .cert-in').count()) === 1);
 ok('mas ele não leva a lugar nenhum', await p.evaluate(() => {
-  const b = document.querySelector('.modal-acoes .cert-share');
+  const b = document.querySelector('.modal-acoes .cert-in');
   return b.tagName !== 'A' && b.getAttribute('aria-disabled') === 'true';
 }));
 ok('o botão fica à esquerda do fechar', await p.evaluate(() => {
-  const b = document.querySelector('.modal-acoes .cert-share').getBoundingClientRect();
+  const b = document.querySelector('.modal-acoes .cert-in').getBoundingClientRect();
   return b.right <= document.querySelector('.modal-fechar').getBoundingClientRect().left + 1;
+}));
+/* Só o ícone: o rótulo saiu da tela e ficou no `aria-label`, que é o que o
+   leitor de tela anuncia. Botão de ícone sem nome acessível é um botão mudo. */
+ok('o botão é só o ícone, com nome acessível', await p.evaluate(() => {
+  const b = document.querySelector('.modal-acoes .cert-in');
+  return b.textContent.trim() === '' && (b.getAttribute('aria-label') || '').length > 5;
 }));
 await p.keyboard.press('Escape');
 await p.waitForTimeout(200);
@@ -742,7 +787,7 @@ ok('certificado emitido com curso concluído e prova aprovada', true);
 
 await p.locator('.cert:not(.cert-exemplo)').first().click();
 await p.waitForSelector('.modal-cert');
-const perfil = await p.locator('.modal-acoes .cert-share').first().getAttribute('href');
+const perfil = await p.locator('.modal-acoes .cert-in').first().getAttribute('href');
 ok('há botão de adicionar ao perfil do LinkedIn',
   perfil.startsWith('https://www.linkedin.com/profile/add?'));
 /* Os campos que o LinkedIn exige para preencher o formulário sozinho. Faltar
@@ -752,7 +797,7 @@ ok('a URL leva todos os campos do certificado', campos.every((c) => perfil.inclu
   campos.filter((c) => !perfil.includes(c)).join(', ') || 'todos');
 ok('o código na URL é o mesmo que está impresso', await p.evaluate(() => {
   const cod = document.querySelector('.modal-cert .cert-codigo').textContent.trim();
-  const href = document.querySelector('.modal-acoes .cert-share').href;
+  const href = document.querySelector('.modal-acoes .cert-in').href;
   return href.includes(encodeURIComponent(cod));
 }));
 await p.keyboard.press('Escape');
