@@ -15,7 +15,7 @@
 
 import {
   grafoDaTrilha, cursoPorId, trilhasDoCurso, caminhoDaTrilha,
-  horasDe, faixaDeHoras, aulasDoCurso,
+  horasDe, faixaDeHoras,
 } from './catalogo.js';
 import { cursoConcluido, progressoDoCurso, opcaoAtiva, agora } from './estado.js';
 import { esc } from './texto.js';
@@ -23,12 +23,11 @@ import { esc } from './texto.js';
 /* ---------- estado de cada curso ---------- */
 
 export function estadoDoCurso(id) {
-  const total = aulasDoCurso(id).length;
-  if (cursoConcluido(id, total)) return 'concluido';
-  const p = progressoDoCurso(id, total);
+  if (cursoConcluido(id)) return 'concluido';
+  const p = progressoDoCurso(id);
   if (p.feitas > 0) return 'atual';
   const deps = cursoPorId(id)?.depende || [];
-  const prontos = deps.every((d) => cursoConcluido(d, aulasDoCurso(d).length));
+  const prontos = deps.every((d) => cursoConcluido(d));
   return prontos ? 'disponivel' : 'adiante';
 }
 
@@ -46,8 +45,7 @@ function cartaoCurso(id, ordem, deps) {
   if (!c) return '';
   const nT = trilhasDoCurso(id).length;
   const requer = (deps || []).map((d) => cursoPorId(d)?.nome).filter(Boolean);
-  const total = aulasDoCurso(id).length;
-  const p = progressoDoCurso(id, total);
+  const p = progressoDoCurso(id);
   const est = estadoDoCurso(id);
 
   return (
@@ -57,11 +55,11 @@ function cartaoCurso(id, ordem, deps) {
       '<span class="nome">' + esc(c.nome) + '</span>' +
       (nT > 1 ? '<span class="tag-compartilhado">' + txt('em') + ' ' + nT + ' ' + txt('trilhas') + '</span>' : '') +
       '<span class="meta">' + c.horas + 'h · ' + txt(c.nivel) + '</span>' +
-      (total
-        ? '<span class="no-barra" role="img" aria-label="' + p.feitas + ' de ' + total + '">' +
+      (p.total
+        ? '<span class="no-barra" role="img" aria-label="' + p.feitas + ' de ' + p.total + '">' +
             '<span class="no-barra-cheia" style="width:' + p.pct + '%"></span>' +
           '</span>' +
-          '<span class="no-conta">' + p.feitas + '/' + total + ' ' + txt('aulas') + '</span>'
+          '<span class="no-conta">' + p.feitas + '/' + p.total + ' ' + txt('seções') + '</span>'
         : '') +
       (requer.length && est === 'adiante'
         ? '<span class="requer">' + txt('recomendado depois de') + ' ' + esc(requer.join(' + ')) + '</span>'
@@ -78,7 +76,7 @@ export function montarTrilha(t) {
   const { min, max } = faixaDeHoras(t);
   const g = grafoDaTrilha(t, opcaoAtiva);
 
-  const feitos = caminho.filter((id) => cursoConcluido(id, aulasDoCurso(id).length)).length;
+  const feitos = caminho.filter((id) => cursoConcluido(id)).length;
 
   const colunas = g.colunas.map((nos, v) => {
     const cartoes = nos.map((no) => {

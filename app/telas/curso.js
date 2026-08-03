@@ -8,7 +8,8 @@
    ========================================================================== */
 
 import { aulasDoCurso, cursoPorId, trilhasDoCurso, depoisDe } from '../catalogo.js';
-import { progressoDoCurso, aulaConcluida } from '../estado.js';
+import { secoesDaAula } from '../aulas.js';
+import { progressoDoCurso, progressoDaAula, aulaConcluida } from '../estado.js';
 import { estadoDoCurso } from '../grafo.js';
 import { barra, vazio } from './comum.js';
 import { esc, marcado } from '../texto.js';
@@ -18,7 +19,7 @@ export default async function curso({ id }) {
   if (!c) return { titulo: txt('Curso'), el: vazio(txt('Curso não encontrado.')) };
 
   const aulas = aulasDoCurso(id);
-  const p = progressoDoCurso(id, aulas.length);
+  const p = progressoDoCurso(id);
   const est = estadoDoCurso(id);
   const abre = depoisDe(id);
 
@@ -38,8 +39,8 @@ export default async function curso({ id }) {
         '<span>' + aulas.length + ' ' + txt('aulas') + '</span>' +
         '<span>' + txt('em') + ' ' + trilhasDoCurso(id).length + ' ' + txt('trilhas') + '</span>' +
       '</div>' +
-      barra(p.pct, p.feitas + ' de ' + aulas.length) +
-      '<p class="curso-conta">' + p.feitas + '/' + aulas.length + ' ' + txt('aulas concluídas') + '</p>' +
+      barra(p.pct, p.feitas + ' de ' + p.total) +
+      '<p class="curso-conta">' + p.feitas + '/' + p.total + ' ' + txt('seções concluídas') + '</p>' +
     '</header>' +
 
     '<div class="curso-colunas">' +
@@ -48,11 +49,19 @@ export default async function curso({ id }) {
         '<ol class="aulas">' +
           aulas.map((a) => {
             const feita = aulaConcluida(id, a.ix);
+            const secoes = secoesDaAula(id, a.chave);
+            const pa = progressoDaAula(id, a.ix);
+            const temAval = secoes.some((s) => s.tipo === 'avaliacao');
             return '<li><a class="aula-linha' + (feita ? ' feita' : '') + '" ' +
-              'href="#/curso/' + esc(id) + '/aula/' + a.ix + '">' +
+              'href="#/curso/' + esc(id) + '/aula/' + a.ix + '/' + esc(secoes[0].id) + '">' +
               '<span class="aula-marca" aria-hidden="true">' + (feita ? '✓' : '') + '</span>' +
               '<span class="aula-num">' + String(a.ix + 1).padStart(2, '0') + '</span>' +
               '<span class="aula-tit">' + esc(a.titulo) + '</span>' +
+              '<span class="aula-secoes">' +
+                (secoes.length > 1 ? secoes.length + ' ' + txt('seções') : txt('1 seção')) +
+                (temAval ? ' · ' + txt('com avaliação') : '') +
+              '</span>' +
+              '<span class="aula-prog">' + pa.feitas + '/' + pa.total + '</span>' +
             '</a></li>';
           }).join('') +
         '</ol>' +

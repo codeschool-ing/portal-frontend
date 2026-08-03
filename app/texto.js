@@ -20,6 +20,17 @@ export function marcado(s) {
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 }
 
+/* Prosa de uma seção de aula: uma lista de parágrafos, em que um item que é
+   ele próprio uma lista vira <ul>. É deliberadamente pobre — não é Markdown,
+   e não precisa ser: o conteúdo real virá de um banco na Etapa 2, e inventar
+   um dialeto agora só criaria uma migração. */
+export function prosa(corpo) {
+  if (!corpo || !corpo.length) return '';
+  return corpo.map((bloco) => (Array.isArray(bloco)
+    ? '<ul class="prosa-lista">' + bloco.map((i) => '<li>' + marcado(i) + '</li>').join('') + '</ul>'
+    : '<p>' + marcado(bloco) + '</p>')).join('');
+}
+
 /* Embaralhamento com semente: a ordem de apresentação não pode mudar a cada
    render (o aluno perderia o que já arrastou), nem ser a ordem do JSON, que
    nos tipos `ordenacao` e `associacao` É o gabarito. */

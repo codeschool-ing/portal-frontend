@@ -1,3 +1,8 @@
+# Saída do bundle.py: gerada a partir de index.html + assets/ + app/.
+# Serve para enviar por e-mail ou abrir do disco, não para publicar — servido,
+# o navegador cacheia cada arquivo separadamente.
+/portal-aluno.html
+
 # O portal não tem build nem dependências: `node_modules` só existe quando se
 # instala o playwright para rodar o teste de fumaça.
 node_modules/

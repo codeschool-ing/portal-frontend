@@ -23,7 +23,9 @@
    mesmo tipo aparece de novo em `estatistica`, onde ele é legítimo.
    ========================================================================== */
 
-window.EXERCICIOS_EXEMPLO = [
+/* Concatena em vez de atribuir: há um arquivo por curso, como no pipeline, e
+   nenhum deles pode depender de ser o primeiro a carregar. */
+window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
 
   /* ================= aula de demonstração: os sete tipos ================= */
   /* javascript · tópico 1 · "Tipos, coerção, igualdade estrita e valores falsos" */
@@ -246,4 +248,4 @@ window.EXERCICIOS_EXEMPLO = [
     verificacao_variavel: 'x',
     _verificacao: 'estrutura',
   },
-];
+]);

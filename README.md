@@ -27,6 +27,39 @@ npm i playwright
 node ferramentas/fumaca/fumaca.mjs
 ```
 
+## Um arquivo só, para abrir do disco
+
+```sh
+python3 ferramentas/bundle/bundle.py     # -> portal-aluno.html
+```
+
+Embute CSS, scripts, favicon e — o passo que a ferramenta equivalente da
+vitrine não precisava ter — **achata os módulos ES**. Eles não sobrevivem ao
+`file://`: `<script type="module" src="…">` dispara um fetch, e fetch de
+`file://` é bloqueado por CORS em todo navegador. A página abriria em branco,
+sem sintoma além do console. Cada módulo vira uma IIFE que devolve o que
+exportava, e os `import` viram leitura de um registro.
+
+A saída continua sendo `<script type="module">`, de propósito: módulo embutido
+não faz fetch, mas mantém a execução **adiada**, que é a mesma ordem do
+`index.html` servido. Um `<script>` clássico rodaria antes da hora e o pacote
+deixaria de exercitar o que o site exercita.
+
+O achatamento pressupõe o código deste repositório, e só ele — sem
+reexportação, sem ciclo de imports e sem `await` no topo de módulo. Qualquer um
+dos três para a geração com erro, em vez de produzir um pacote quebrado em
+silêncio.
+
+O mesmo teste de fumaça roda contra o pacote, e é assim que se sabe que ele não
+regrediu:
+
+```sh
+PORTAL="file://$PWD" PAGINA=/portal-aluno.html node ferramentas/fumaca/fumaca.mjs
+```
+
+O portal continua sendo servido de `index.html` + `assets/` + `app/`; o pacote
+é para entregar uma cópia que abre com dois cliques.
+
 ## O que veio da vitrine, e o que não veio
 
 A identidade é a mesma escola, então quase tudo atravessa:
@@ -78,14 +111,86 @@ curva, conferindo se algum cai dentro de um cartão que não seja ponta daquela
 aresta. Herdar o roteamento sem herdar a conferência seria ficar com o risco e
 sem a rede.
 
-## Aula = tópico
+## Aula = tópico, seção = assunto
 
 O catálogo não tem conceito de aula; o grão mais fino é `topicos`, e são 1.503
 deles. O portal adota **tópico como aula** em vez de inventar uma terceira
 chave: os exercícios que o pipeline emite já trazem `topico` como campo de
 primeira classe, então currículo e conteúdo já concordavam entre si.
 
-**Mas o título exibido não serve de chave.** `aplicarConteudo()` reescreve
+**Mas um tópico não é um assunto — é um punhado deles.** Os números do catálogo:
+
+| | |
+| --- | --- |
+| tópicos com dois-pontos (`X: a, b e c`) | **811 (54%)** |
+| tópicos que enumeram **3+ assuntos** no título | **734 (49%)** |
+| carga média por tópico | **4,0h** |
+| pior caso (`react-ts`) | **7,5h por tópico** |
+
+Quatro horas não é uma página, e uma caixinha de "concluída" no fim delas faz a
+barra do aluno andar em saltos que não correspondem a nada. Então a aula se
+divide em **seções**, e a última é sempre a avaliação.
+
+**As seções são escritas, nunca derivadas.** Dava para quebrar o título no `:` e
+nas vírgulas e ganhar 734 divisões de graça, e seria um erro: é heurística
+léxica sobre prosa autoral, exatamente o que `REGRAS.md` registra ter tentado e
+descartado na conferência de "exige tópico posterior" — *"a resposta está na
+autoria, não na detecção"*. Aqui falharia igual: `Cliente, servidor e host: quem
+pede e quem responde` viraria uma seção chamada "quem pede e quem responde". A
+enumeração no título é **evidência** de que as seções são necessárias; não é
+fonte para lê-las.
+
+As seções moram em `assets/aulas.js`, e não em `dados.js`, porque aquele é cópia
+do catálogo da vitrine e o modal de lá renderiza `topicos` como lista plana.
+Ficam três arquivos com três donos e a mesma chave de junção:
+
+| arquivo | o quê | de quem |
+| --- | --- | --- |
+| `dados.js` | catálogo: cursos, trilhas, tópicos | compartilhado com a vitrine |
+| `aulas.js` | as seções e o texto delas | do portal |
+| exercícios | a avaliação | do pipeline |
+
+A forma de uma aula é fixa: **[vídeo + conteúdo] × N, e avaliação no fim.**
+
+- **Toda seção de conteúdo abre com um quadro de vídeo**, reservado enquanto
+  não há id. É a decisão da vitrine e o motivo escrito lá: o espaço já fica
+  guardado, então publicar os vídeos um a um não reorganiza a tela de ninguém.
+  A avaliação não tem vídeo — ali o aluno responde, não assiste.
+- **A avaliação é sempre a última seção**, tenha exercícios ou não. A estrutura
+  fica previsível e a avaliação vazia diz o que vem, em vez de sumir.
+- **A avaliação é por tópico, não por seção.** Descê-la para o nível da seção
+  obrigaria a mudar a chave que o pipeline emite — e ela cobra o tópico inteiro
+  de qualquer forma.
+- **Aula sem seções escritas vira uma seção só**, com o comportamento de antes.
+  O conteúdo entra curso a curso, sem um dia de transição em que metade do
+  portal fica quebrada.
+
+**A avaliação vazia não conta no progresso.** Se contasse, nenhum curso jamais
+chegaria a 100% enquanto os exercícios não existissem, e certificado nenhum
+sairia. Ela aparece na tela, marcada como pendente e sem botão de concluir —
+marcar como feito o que não foi feito é a forma mais barata de um portal mentir
+sobre progresso. O denominador cresce quando os exercícios chegam, o que é
+honesto: a aula passou mesmo a ter mais trabalho dentro.
+
+**A unidade de progresso passou a ser a seção.** `aulaConcluida` virou derivado:
+a aula está feita quando todas as seções dela estão. Um registro no formato
+antigo (uma caixinha por aula) é migrado na primeira escrita, então quem já
+tinha progresso não o vê zerar.
+
+`web-fundamentos` está escrito por inteiro — **11 aulas, 38 seções de conteúdo
+e 11 avaliações com 23 exercícios** — como exemplo de curso cheio. É conteúdo
+tecnicamente correto e **sem revisão pedagógica**: serve para avaliar a
+estrutura, e a escola reescreve.
+
+Ele cobre **seis dos sete tipos**, e a ausência do sétimo é informação, não
+descuido: `codigo` exigiria escrever um programa, e o curso não ensina
+linguagem nenhuma — é o primeiro da escola, sem pré-requisito. Pedi-lo violaria
+a regra do gerador de que um exercício do tópico N só pode exigir o que os
+tópicos 1..N ensinaram. É o mesmo achado que `REGRAS.md` registrou em
+`arquiteto-comunicacao`, onde três dos sete tipos eram inaplicáveis. Os sete
+juntos continuam em `javascript`, aula 2.
+
+**E o título exibido não serve de chave.** `aplicarConteudo()` reescreve
 `c.topicos` no lugar a cada troca de idioma — em inglês o tópico vira *"Types,
 coercion, strict equality and falsy values"* e nenhum exercício casa. O defeito
 aparece sem ninguém tocar em nada: basta o navegador estar configurado noutro
@@ -185,8 +290,10 @@ index.html                     o shell: barra, trilho e <main>
 assets/base.css                CSS da vitrine, sem alteração
 assets/portal.css              só o que a vitrine não tinha
 assets/dados.js                catálogo (vira API na Etapa 2)
-assets/exercicios-exemplo.js   conteúdo descartável, formato definitivo
+assets/aulas.js                as seções de cada tópico e o texto delas
+assets/exercicios-*.js         um arquivo por curso, como o pipeline faz
 app/catalogo.js                leitura do catálogo e o grafo — não toca no DOM
+app/aulas.js                   do que uma aula é feita: seções + avaliação
 app/grafo.js                   o grafo como mapa de progresso
 app/estado.js                  progresso do aluno (localStorage → servidor)
 app/api.js                     camada de mentira, assinaturas do backend real
@@ -195,6 +302,7 @@ app/trilho.js                  o trilho lateral
 app/telas/*.js                 uma por tela
 app/exercicios/*.js            um por tipo, mais o invólucro e a correção
 ferramentas/fumaca/            o teste de fumaça
+ferramentas/bundle/            gera o HTML único
 ```
 
 Ninguém fora de `estado.js` lê `localStorage`, e ninguém fora de `api.js` lê

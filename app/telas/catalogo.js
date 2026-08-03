@@ -5,7 +5,7 @@
    vitrine. Curso novo com categoria nova aparece sozinho no filtro.
    ========================================================================== */
 
-import { aulasDoCurso, cursoPorId } from '../catalogo.js';
+import { aulasDoCurso } from '../catalogo.js';
 import { progressoDoCurso } from '../estado.js';
 import { estadoDoCurso } from '../grafo.js';
 import { barra } from './comum.js';
@@ -51,15 +51,15 @@ export default async function catalogo() {
     });
 
     grade.innerHTML = lista.map((c) => {
-      const total = aulasDoCurso(c.id).length;
-      const p = progressoDoCurso(c.id, total);
+      const aulas = aulasDoCurso(c.id).length;
+      const p = progressoDoCurso(c.id);
       const est = estadoDoCurso(c.id);
       return '<a class="cartao no-' + est + '" href="#/curso/' + esc(c.id) + '">' +
         '<span class="cartao-cat">' + esc(c.categoria) + '</span>' +
         '<span class="cartao-nome">' + esc(c.nome) + '</span>' +
         '<span class="cartao-resumo">' + esc(c.resumo) + '</span>' +
-        '<span class="cartao-meta">' + c.horas + 'h · ' + txt(c.nivel) + ' · ' + total + ' ' + txt('aulas') + '</span>' +
-        (p.feitas ? barra(p.pct, p.feitas + ' de ' + total) : '') +
+        '<span class="cartao-meta">' + c.horas + 'h · ' + txt(c.nivel) + ' · ' + aulas + ' ' + txt('aulas') + '</span>' +
+        (p.feitas ? barra(p.pct, p.feitas + ' de ' + p.total) : '') +
       '</a>';
     }).join('');
     el.querySelector('#cat-vazio').hidden = lista.length > 0;
