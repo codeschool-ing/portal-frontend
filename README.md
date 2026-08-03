@@ -792,7 +792,7 @@ contexto de cada resultado, que também é azul e também é monoespaçado, e a
 lista virava uma coluna só. Ele é a única linha ali que não é resultado — é a
 divisória entre eles, e merece a outra cor da marca.
 
-## Três armadilhas que só apareceram na tela
+## Quatro armadilhas que só apareceram na tela
 
 Ficam registradas porque nenhuma aparece lendo o código:
 
@@ -804,7 +804,24 @@ Ficam registradas porque nenhuma aparece lendo o código:
 2. **`[hidden]` perde para `.btn{display:inline-flex}`** — a regra do navegador
    tem especificidade zero. O botão "Tentar de novo" aparecia antes de existir o
    que refazer.
-3. **`base.css` nunca reseta o elemento `button`** — cada componente da vitrine
+3. **O navegador não sabe que a página é escura.** O portal é escuro porque o
+   CSS pinta tudo de escuro — e nada disso conta para o navegador, que continua
+   desenhando o que é *dele* com o tema do sistema: a barra de rolagem, o
+   `<select>`, o botão de limpar do campo de busca. Faltava `color-scheme`.
+
+   O sintoma não é igual em todo lugar, e foi assim que ele passou: no Firefox
+   a barra fina é discreta o bastante para ninguém reparar; no Chromium — logo
+   no Brave, no Chrome e no Edge — ela é uma faixa cinza-clara no meio da tela
+   escura. Um mesmo defeito, visível em metade dos navegadores.
+
+   A vitrine já sabia metade disso: onde ela deixa uma barra à mostra
+   (`.cursos-rol`), declara `scrollbar-width` **e** `scrollbar-color` juntos. O
+   trilho do portal tinha copiado só a primeira. Agora há `color-scheme` na
+   raiz seguindo o tema, a cor declarada em cada contêiner rolável, e um teste
+   que **varre a página inteira** procurando qualquer elemento que role com a
+   cor do sistema — em vez de uma lista escrita à mão que envelhece.
+
+4. **`base.css` nunca reseta o elemento `button`** — cada componente da vitrine
    declara o próprio fundo (`.tema`, `.burger`, `.nav-cta`). Todo botão novo
    precisa declarar o dele, senão herda o cinza claro do navegador. Foi o que
    deixou a lupa, o avatar e as setas da ordenação brancos sobre o tema escuro:

@@ -853,7 +853,54 @@ await p.click('.conta-btn');
 await p.waitForTimeout(120);
 ok('há um item "Meu plano"', (await p.locator('.conta-op[href="#/plano"]').count()) === 1);
 
-console.log('\n== 22. tema claro e estreito ==');
+console.log('\n== 22. o navegador sabe que a página é escura ==');
+/* O portal é escuro porque o CSS pinta tudo de escuro — e nada disso conta
+   para o navegador, que desenha o que é DELE com o tema do sistema. Foi assim
+   que uma barra de rolagem cinza-claro apareceu no meio da tela escura, no
+   Chromium, sem aparecer no Firefox. `color-scheme` é a declaração que
+   faltava; `scrollbar-color` é o remendo por contêiner que a vitrine já usava
+   e que o trilho tinha ficado sem. */
+await p.goto(BASE + PAGINA + '#/curso/web-fundamentos');
+await p.waitForSelector('.trilho-aula');
+const esquema = await p.evaluate(() => {
+  const cor = (s) => getComputedStyle(document.querySelector(s)).scrollbarColor;
+  return {
+    raiz: getComputedStyle(document.documentElement).colorScheme,
+    trilho: cor('#trilho'),
+    rola: (() => { const t = document.querySelector('#trilho'); return t.scrollHeight > t.clientHeight; })(),
+  };
+});
+ok('a raiz declara o esquema escuro', esquema.raiz === 'dark', esquema.raiz);
+ok('o trilho realmente rola', esquema.rola);
+ok('e a barra dele tem cor declarada', esquema.trilho !== 'auto', esquema.trilho);
+
+/* Nenhum contêiner rolável pode ficar com a cor do sistema. O teste varre
+   todos, em vez de conferir uma lista escrita à mão que envelhece. */
+const semCor = await p.evaluate(() => {
+  const fora = [];
+  document.querySelectorAll('*').forEach((el) => {
+    const cs = getComputedStyle(el);
+    const rolaY = el.scrollHeight > el.clientHeight && /auto|scroll/.test(cs.overflowY);
+    const rolaX = el.scrollWidth > el.clientWidth && /auto|scroll/.test(cs.overflowX);
+    if (!rolaY && !rolaX) return;
+    if (cs.scrollbarWidth === 'none') return;          // barra escondida de propósito
+    if (cs.scrollbarColor === 'auto') fora.push(el.className || el.tagName);
+  });
+  return fora;
+});
+ok('nenhum rolável usa a cor do sistema', semCor.length === 0, semCor.join(', ') || 'nenhum');
+
+/* E no tema claro o esquema acompanha: declarar `dark` fixo deixaria os
+   controles do navegador escuros numa página branca — o mesmo defeito, do
+   outro lado. */
+await p.click('#tema-btn');
+await p.waitForTimeout(250);
+ok('no tema claro o esquema vira claro',
+  (await p.evaluate(() => getComputedStyle(document.documentElement).colorScheme)) === 'light');
+await p.click('#tema-btn');
+await p.waitForTimeout(250);
+
+console.log('\n== 23. tema claro e estreito ==');
 await p.click('.idioma-btn'); await p.click('.idioma-op[lang="pt-BR"]'); await p.waitForTimeout(300);
 await p.click('#tema-btn');
 await p.waitForTimeout(250);
@@ -885,7 +932,7 @@ await p2.fill('#e-nome','X'); await p2.selectOption('#e-trilha','backend');
 await p2.click('#form-entrar button[type=submit]'); await p2.waitForTimeout(300);
 await p2.goto(BASE + PAGINA + '#/curso/javascript/aula/1/avaliacao',{waitUntil:'networkidle'});
 await p2.waitForSelector('.ex');
-console.log('\n== 23. nada revelado antes de responder ==');
+console.log('\n== 24. nada revelado antes de responder ==');
 ok('refazer escondido', (await p2.locator('.ex-refazer:visible').count()) === 0);
 ok('justificativas escondidas', (await p2.locator('.alt-porque:visible').count()) === 0);
 ok('vereditos vazios', (await p2.locator('.ex-veredito:visible').count()) === 0);

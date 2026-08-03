@@ -15,6 +15,24 @@
    1 · SHELL
    ========================================================== */
 
+/* O ESQUEMA DE COR PRECISA SER DECLARADO, E NÃO SÓ PINTADO.
+
+   O portal é escuro porque o CSS pinta tudo de escuro — mas nada disso conta
+   para o NAVEGADOR, que continua achando que está numa página clara. O que ele
+   desenha por conta própria sai no tema errado: a barra de rolagem cinza-claro,
+   o `<select>`, o botãozinho de limpar do campo de busca.
+
+   Isso não aparece igual em todo lugar, e foi assim que o defeito chegou: no
+   Firefox a barra fina é discreta o bastante para passar despercebida; no
+   Chromium (e portanto no Brave, no Chrome e no Edge) ela é uma faixa clara no
+   meio de uma tela escura.
+
+   `color-scheme` é a declaração que faltava. Ele acompanha o tema, e com isso o
+   navegador desenha o que é dele no tom certo — inclusive antes de o CSS
+   carregar, o que também mata o flash branco. */
+:root{color-scheme:dark}
+html[data-tema="claro"]{color-scheme:light}
+
 /* `hidden` precisa vencer as classes de componente. A regra do navegador para
    `[hidden]` tem especificidade zero, então `.btn{display:inline-flex}` a
    atropela — e o botão "Tentar de novo" aparecia antes de existir o que
@@ -80,8 +98,17 @@ body.sem-trilho .trilho{display:none}
   height:calc(100vh - 64px);overflow-y:auto;
   border-right:1px solid var(--wire);
   padding:26px 18px 48px;
-  scrollbar-width:thin;
+  /* `scrollbar-width` sozinho não basta: sem a COR, o Chromium usa a do
+     sistema. A vitrine sempre declara as duas juntas (ver `.cursos-rol` no
+     base.css), e o trilho tinha ficado só com a primeira metade. A regra
+     `::-webkit-` é o mesmo remendo de lá, para as versões que ainda ignoram
+     `scrollbar-color`. */
+  scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
 }
+.trilho::-webkit-scrollbar{width:7px}
+.trilho::-webkit-scrollbar-track{background:transparent}
+.trilho::-webkit-scrollbar-thumb{background:var(--wire);border-radius:4px}
+.trilho:hover::-webkit-scrollbar-thumb{background:var(--phosphor-dim)}
 .trilho-nav{display:flex;flex-direction:column;gap:6px;margin-bottom:30px}
 .trilho-link{
   padding:11px 14px;border-radius:4px;font-size:.94rem;color:var(--paper-dim);
@@ -174,6 +201,7 @@ body.sem-trilho .trilho{display:none}
 .ctx-seta{font-size:.7rem;color:var(--phosphor-dim)}
 .ctx-menu{
   display:none;position:absolute;top:calc(100% + 8px);left:0;min-width:280px;max-height:70vh;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
   background:var(--panel);border:1px solid var(--wire);border-radius:5px;padding:5px;z-index:120;
 }
 .ctx-caixa.aberto .ctx-menu{display:block}
@@ -716,9 +744,15 @@ body.sem-trilho .trilho{display:none}
 .cod-bloco{border:1px solid var(--wire);border-radius:5px;overflow:hidden;background:var(--panel)}
 .cod-barra{padding:6px 11px;border-bottom:1px solid var(--wire);background:var(--ink)}
 .cod-ling{font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
-.cod{padding:12px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;font-size:.82rem;line-height:1.55}
+.cod{
+  padding:12px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;font-size:.82rem;line-height:1.55;
+  scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
+}
 .cod-editor .ex-campo{border:0;border-radius:0;background:var(--panel)}
-.cod-area{min-height:180px;white-space:pre;overflow-wrap:normal;overflow-x:auto}
+.cod-area{
+  min-height:180px;white-space:pre;overflow-wrap:normal;overflow-x:auto;
+  scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
+}
 
 .casos{display:flex;flex-direction:column;gap:10px;padding-top:4px}
 .casos-tit{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
@@ -759,7 +793,10 @@ body.com-busca{overflow:hidden}
   font:inherit;font-size:1rem;outline:none;
 }
 .busca-campo::-webkit-search-cancel-button{display:none}
-.busca-res{overflow-y:auto;padding:6px}
+.busca-res{
+  overflow-y:auto;padding:6px;
+  scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
+}
 /* O rótulo do grupo em VERMELHO, e não no azul de tudo o mais: ele é a única
    coisa da lista que não é resultado — é a divisória entre eles. No azul ele
    se confundia com o contexto de cada item, que também é azul e também é
@@ -976,7 +1013,10 @@ body.com-busca{overflow:hidden}
 
 /* A tabela rola dentro da própria caixa em telas estreitas — a página nunca
    rola na horizontal, que é a regra do portal inteiro. */
-.pl-tabela-rolo{overflow-x:auto;margin:0 -4px;padding:0 4px}
+.pl-tabela-rolo{
+  overflow-x:auto;margin:0 -4px;padding:0 4px;
+  scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
+}
 .pl-tabela{width:100%;border-collapse:collapse;min-width:520px}
 .pl-tabela th,.pl-tabela td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--wire)}
 .pl-tabela thead th{
@@ -1096,6 +1136,7 @@ body.com-busca{overflow:hidden}
 
 .exemplo-cod{
   margin:0;padding:0 18px;overflow-x:auto;
+  scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
   background:var(--panel);border-left:2px solid var(--wire);
   font-family:'IBM Plex Mono',monospace;font-size:.79rem;line-height:1.7;
   color:var(--paper);white-space:pre;
