@@ -334,7 +334,7 @@ index.html                     o shell: barra, trilho e <main>
 assets/base.css                CSS da vitrine, sem alteração
 assets/portal.css              só o que a vitrine não tinha
 assets/dados.js                catálogo (vira API na Etapa 2)
-assets/aulas.js                as seções de cada tópico e o texto delas
+assets/aulas-*.js              as seções de cada tópico e o texto delas
 assets/exercicios-*.js         um arquivo por curso, como o pipeline faz
 app/catalogo.js                leitura do catálogo e o grafo — não toca no DOM
 app/aulas.js                   do que uma aula é feita: seções + avaliação
@@ -343,6 +343,8 @@ app/estado.js                  progresso do aluno (localStorage → servidor)
 app/api.js                     camada de mentira, assinaturas do backend real
 app/rotas.js                   roteador por hash
 app/trilho.js                  o trilho lateral
+app/busca.js                   o índice da busca global — não toca no DOM
+app/painel-busca.js            o painel do ⌘K
 app/telas/*.js                 uma por tela
 app/exercicios/*.js            um por tipo, mais o invólucro e a correção
 ferramentas/fumaca/            o teste de fumaça
@@ -384,6 +386,69 @@ continua filtrando em `exerciciosDaAula`: é uma decisão de *publicação*, nã
 informação para quem estuda. Dizer "só conferência estrutural" a um aluno é
 avisá-lo de que aquele exercício talvez não preste — e se talvez não preste, não
 devia estar publicado.
+
+## Busca, desempenho e notas
+
+Três telas que não inventam dado nenhum: elas mostram o que o portal já tinha e
+não exibia.
+
+### A busca (`⌘K`, `/`, ou a lupa)
+
+A lupa e o `⌘K` existiam desde o primeiro dia e os dois levavam ao catálogo — um
+atalho que prometia busca e entregava navegação. **Ela importa mais aqui do que
+num site comum:** são 86 cursos e 1.503 aulas, e quem lembra "aquela parte sobre
+o TTL do DNS" não tinha caminho nenhum até lá — nem pelo menu, nem pelo grafo,
+nem pelo trilho.
+
+Indexa cinco grupos, em ordem de utilidade decrescente: **seções** (o grão que
+se procura de verdade), **aulas**, **cursos**, **exercícios** e **as notas do
+próprio aluno**.
+
+Duas decisões vêm de defeitos já pagos neste projeto:
+
+1. **Casa contra o texto exibido e contra o português ao mesmo tempo.** O
+   catálogo é traduzido em runtime; num navegador em inglês o título da aula é
+   "Hosting: shared, VPS, cloud and CDN", mas as seções, as notas e os
+   exercícios estão em português. Indexar só um dos dois faria metade do
+   conteúdo sumir conforme o idioma — que é exatamente o defeito que já mordeu a
+   junção dos exercícios.
+2. **Ignora acento**, dos dois lados da comparação. Quem digita no celular quase
+   nunca acentua.
+
+O trecho ao lado de cada resultado sai do **corpo**, nunca do título: repetir
+embaixo o título que está em cima não informa nada. E ele é texto puro — a
+marcação mínima do corpo (crase e `**`) é retirada antes de indexar, senão
+aparecia crua na tela. Os dois casos estão no teste de fumaça.
+
+Seções só entram onde o conteúdo foi escrito. Nos 84 cursos sem texto a "seção"
+é um invólucro com o nome da própria aula, e listá-la devolveria cada resultado
+duas vezes.
+
+### Desempenho, e por que ele tem três estados
+
+Cada resposta já gravava tentativas, acerto e se chegou a ser conferida. Isso
+morria ali: o aluno respondia, via o veredito e nunca mais reencontrava aquilo.
+
+**"Errou" e "ninguém conferiu" não viram a mesma barra.** Os tipos que precisam
+de servidor (`codigo`, `saida-esperada`, `resposta-expressao`) respondem
+`acertou: null` enquanto não houver execução, e contá-los como erro inventaria
+uma reprovação que não aconteceu. É a régua do funil do outro lado: lá, não
+julgado nunca vira aprovado; aqui, não julgado nunca vira reprovado. Eles
+aparecem como "aguardando o servidor" e ficam fora da taxa.
+
+**Refazer os errados** monta o mesmo wizard da avaliação com o que o aluno errou
+em qualquer curso — é a única tela que reúne conteúdo de aulas diferentes, e
+faz sentido porque o critério aqui não é o currículo, é o erro. Cada exercício
+volta com **o curso e a aula de onde veio**: o wizard grava em
+`progresso[curso].aulas[ix]`, e um contexto único registraria o acerto na aula
+errada, fazendo o desempenho mentir sobre onde a pessoa melhorou.
+
+### Notas
+
+Um campo recolhido no fim de cada seção, com salvamento automático. É a única
+coisa do portal que não veio do catálogo nem do pipeline: é do aluno. Por isso
+tem tela própria, agrupada por curso — na hora de revisar ninguém lembra em qual
+seção anotou o quê — e entra na busca junto com o resto.
 
 ## Três armadilhas que só apareceram na tela
 

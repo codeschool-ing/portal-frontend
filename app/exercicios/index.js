@@ -198,9 +198,14 @@ export function montarAvaliacao(exercicios, ctx) {
      vista. Remontar apagaria isso, e o aluno acharia que perdeu o que fez. */
   const telas = exercicios.map(() => null);
 
+  /* `ctx` pode ser um contexto só (a avaliação de uma aula) ou um por
+     exercício (a tela de refazer, que junta exercícios de aulas diferentes e
+     precisa gravar cada resposta na aula de origem). */
+  const contexto = (i) => (Array.isArray(ctx) ? ctx[i] : ctx);
+
   function mostrar(i) {
     atual = i;
-    if (!telas[i]) telas[i] = montarExercicio(exercicios[i], ctx, i);
+    if (!telas[i]) telas[i] = montarExercicio(exercicios[i], contexto(i), i);
     palco.textContent = '';
     palco.appendChild(telas[i]);
     pintarTopo();
