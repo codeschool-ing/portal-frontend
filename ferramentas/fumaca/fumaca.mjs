@@ -673,26 +673,35 @@ ok('o título fica acima do player', await p.evaluate(() => {
 ok('o player cabe na tela', await p.evaluate(() =>
   document.querySelector('.video-fachada').getBoundingClientRect().height <= window.innerHeight * 0.8));
 
-/* ONDE O EXEMPLO ESCAPA, O PLAYER ESCAPA JUNTO. Enquanto o bloco de código
-   fica empilhado dentro da coluna de leitura, os dois têm a largura dela. A
-   partir de 1580px o bloco sai, e o player sai com ele: um vídeo de 820 ao
-   lado de um exemplo de 1074 seria a terceira largura da mesma aula. */
-for (const [larg, alt, juntos] of [[1440, 900, false], [1580, 950, true], [1920, 950, true]]) {
+/* A AULA TEM UMA LARGURA SÓ, e ela vale para o título, a prosa, o player e o
+   exemplo ao mesmo tempo. O corte é 1466px: abaixo dele a aula fica em 820 com
+   o bloco de código empilhado; acima, os quatro crescem juntos até 1074.
+
+   Duas tentativas anteriores soltaram um elemento de cada vez — primeiro o
+   player, depois o exemplo — e as duas produziram margens diferentes dentro da
+   mesma aula. Por isso o teste mede os quatro juntos, e não um contra o outro. */
+for (const [larg, alt, esperado] of [
+  [1280, 900, 818], [1440, 900, 820], [1466, 950, 934], [1580, 950, 1048],
+  [1700, 950, 1074], [1920, 950, 1074],
+]) {
   await p.setViewportSize({ width: larg, height: alt });
   await p.goto(BASE + PAGINA + '#/curso/javascript/aula/0/let-const');
   await p.waitForSelector('.exemplo');
-  const par = await p.evaluate(() => {
+  const um = await p.evaluate(() => {
     const r = (s) => document.querySelector(s).getBoundingClientRect();
-    const v = r('.video-fachada'); const e = r('.exemplo');
+    const cx = ['.aula-titulo', '.aula-texto p', '.video-fachada', '.exemplo'].map(r);
+    const v = r('.video-fachada');
     return {
-      v: Math.round(v.width), e: Math.round(e.width),
-      desalinho: Math.abs(v.left - e.left), proporcao: v.width / v.height,
+      larguras: cx.map((c) => Math.round(c.width)),
+      esquerdas: [...new Set(cx.map((c) => Math.round(c.left)))],
+      proporcao: v.width / v.height,
     };
   });
-  ok('a ' + larg + 'px o player tem a largura do exemplo' + (juntos ? '' : ' (ambos na coluna)'),
-    Math.abs(par.v - par.e) <= 1 && par.desalinho < 2, par.v + 'px e ' + par.e + 'px');
+  const iguais = um.larguras.every((w) => Math.abs(w - esperado) <= 1);
+  ok('a ' + larg + 'px título, prosa, player e exemplo têm a mesma largura',
+    iguais && um.esquerdas.length === 1, JSON.stringify(um.larguras));
   ok('a ' + larg + 'px o player mantém a proporção 16/9',
-    Math.abs(par.proporcao - 16 / 9) < 0.02, par.proporcao.toFixed(2));
+    Math.abs(um.proporcao - 16 / 9) < 0.02, um.proporcao.toFixed(2));
 }
 
 /* Janela baixa: o teto de altura passou a encolher a LARGURA, porque cortar a
@@ -744,16 +753,17 @@ const posicoes = await p.evaluate(() => {
 ok('há vídeo fora da primeira seção', Object.keys(posicoes).length >= 3,
   JSON.stringify(posicoes));
 
-/* TODA SEÇÃO CABE NOS LIMITES, SEM EXCEÇÃO.
+/* TODA SEÇÃO TEM UMA LARGURA SÓ, SEM EXCEÇÃO.
 
-   O portal tem três larguras — trilho, coluna de leitura e a `--amplo`, que é
-   a exceção do bloco de código anotado. Nada pode passar da terceira, e só o
-   `.exemplo` pode passar da segunda.
+   A pergunta que este teste faz mudou. Antes era "quem passou do teto?", com
+   uma lista de quem podia passar — e a lista crescia a cada elemento que ganhava
+   o direito de escapar, enquanto o defeito real (margens diferentes dentro da
+   mesma aula) passava. Agora a pergunta é a regra: TODOS os filhos da tela
+   começam e terminam na mesma coluna, e ela é `--tela`.
 
-   O teste percorre TODAS as seções escritas dos três cursos, uma a uma, e mede
-   cada filho da tela. É caro (uma navegação por seção) e é o único jeito de a
-   regra valer para o conteúdo que existe, e não para a seção que eu lembrei de
-   abrir. */
+   O teste percorre TODAS as seções escritas dos três cursos, uma a uma. É caro
+   (uma navegação por seção) e é o único jeito de a regra valer para o conteúdo
+   que existe, e não para a seção que eu lembrei de abrir. */
 await p.setViewportSize({ width: 1920, height: 1000 });
 await p.waitForTimeout(200);
 const foraDoLimite = await p.evaluate(async () => {
@@ -766,20 +776,21 @@ const foraDoLimite = await p.evaluate(async () => {
         await new Promise((r) => setTimeout(r, 50));
         const tela = document.querySelector('.tela-aula');
         if (!tela) continue;
-        const cs = getComputedStyle(document.querySelector('.portal'));
-        const amplo = parseFloat(cs.getPropertyValue('--amplo'));
-        const leitura = parseFloat(cs.getPropertyValue('--leitura'));
+        const alvo = tela.getBoundingClientRect();
         [...tela.children].forEach((f) => {
           if (f.classList.contains('lado-seta')) return;    // flutua, não é conteúdo
-          const w = f.getBoundingClientRect().width;
+          const r = f.getBoundingClientRect();
+          if (r.width === 0) return;                        // escondido nesta largura
           const nome = `${curso}/${sec.id}:${f.className.split(' ')[0]}`;
-          /* dois podem passar da coluna de leitura, e passam JUNTOS: o bloco de
-             código anotado, porque o código não se quebra, e o player, que
-             acompanha o bloco para a aula não ter uma terceira largura */
-          const escapa = f.classList.contains('exemplo') || f.classList.contains('video-fachada');
-          if (w > amplo + 1) fora.push(nome + ' passou de --amplo (' + Math.round(w) + ')');
-          else if (w > leitura + 1 && !escapa) {
-            fora.push(nome + ' passou de --leitura sem ser exemplo (' + Math.round(w) + ')');
+          if (Math.abs(r.left - alvo.left) > 1) {
+            fora.push(nome + ' começa fora da coluna (' + Math.round(r.left - alvo.left) + 'px)');
+          }
+          /* o player é a única folga, e só para baixo: em janela baixa o teto de
+             altura o encolhe, e encolher é o oposto de estourar */
+          const podeEncolher = f.classList.contains('video-fachada');
+          const sobra = alvo.right - r.right;
+          if (sobra < -1 || (sobra > 1 && !podeEncolher)) {
+            fora.push(nome + ' termina fora da coluna (' + Math.round(-sobra) + 'px)');
           }
         });
       }
@@ -787,8 +798,8 @@ const foraDoLimite = await p.evaluate(async () => {
   }
   return fora;
 });
-ok('nenhuma seção passa dos limites de largura', foraDoLimite.length === 0,
-  foraDoLimite.slice(0, 3).join(' · ') || 'as 89 seções cabem');
+ok('em toda seção o conteúdo tem uma coluna só', foraDoLimite.length === 0,
+  foraDoLimite.slice(0, 3).join(' · ') || 'as 89 seções alinhadas');
 await p.setViewportSize({ width: 1440, height: 900 });
 await p.waitForTimeout(200);
 
@@ -976,11 +987,13 @@ ok('e a de voltar habilita', !(await p.locator('[data-rolar="-1"]').isDisabled()
 ok('a página não ganhou rolagem horizontal', await p.evaluate(() =>
   document.documentElement.scrollWidth <= window.innerWidth + 1));
 
-console.log('\n== 20. o exemplo cabe entre as setas ==');
-/* O exemplo escapa da coluna de leitura para o código não virar barra de
-   rolagem, e as setas de navegação moram no vão. Os dois disputam o mesmo
-   espaço, e o teto do exemplo é calculado a partir da posição da seta. */
-for (const larg of [1280, 1440, 1580, 1700, 1920, 2400]) {
+console.log('\n== 20. a aula cabe entre as setas ==');
+/* A aula alarga para o código não virar barra de rolagem, e as setas de
+   navegação moram no vão que sobra. Os dois disputam o mesmo espaço: o teto da
+   aula é `100vw - trilho - 152`, que é exatamente o que deixa 16px entre a seta
+   de 44px e o conteúdo. A varredura confere a conta em oito larguras, incluindo
+   as duas bordas do corte (1466) e a largura em que a aula para de crescer. */
+for (const larg of [1280, 1440, 1466, 1500, 1606, 1700, 1920, 2400]) {
   await p.setViewportSize({ width: larg, height: 950 });
   await p.goto(BASE + PAGINA + '#/curso/javascript/aula/0/arrow', { waitUntil: 'networkidle' });
   await p.waitForSelector('.exemplo');

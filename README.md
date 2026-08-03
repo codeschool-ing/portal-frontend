@@ -184,60 +184,90 @@ antes de "o que eu assisto", e a resposta tem de ser a mesma nas duas formas.
 (O player já esteve acima do título, para não empurrar o play para baixo da
 dobra; o preço era cair numa seção sem saber de que aula ela era.)
 
-### As três larguras, e nada fora delas
+### A aula tem uma largura só, e ela tem dois valores
 
 | | |
 | --- | --- |
 | `--trilho` | a coluna do menu |
-| `--leitura` | **todo** o conteúdo de uma seção: prosa, vídeo, figura, material, anotação |
-| `--amplo` | a exceção: o bloco de código anotado — e o player, quando o bloco escapa |
+| `--leitura` | 820px, a coluna estreita |
+| `--amplo` | 934–1074px, a coluna larga |
+| `--tela` | qual das duas está valendo agora — **tudo** na aula usa esta |
 
-`--leitura` são 820px porque prosa acima de ~68 caracteres por linha cansa. O
-vídeo entra nela junto com o resto: ele já foi de ponta a ponta da área
-inteira, e o efeito colateral era a aula ter **três alinhamentos diferentes
-conforme a seção** — o olho procurando a margem esquerda a cada troca. Sobrou
-um ganho que não estava previsto: as setas de navegação moram no vão e pararam
-de passar por cima da imagem.
+Foi a terceira tentativa, e as duas primeiras erraram do mesmo jeito.
 
-**O player acompanha o exemplo quando o exemplo escapa, e só então.** Enquanto
-o bloco de código fica empilhado dentro da coluna de leitura, os dois têm a
-largura dela e a aula tem uma margem esquerda só. A partir de 1580px o bloco
-sai, e deixar o player para trás criaria justamente a terceira largura que a
-regra evita — um vídeo de 820 ao lado de um exemplo de 1074, na mesma aula.
-Alinhados, continuam sendo duas.
+A primeira deixou o **player** sangrar de ponta a ponta enquanto o texto ficava
+em 820. A segunda soltou o **exemplo** para `--amplo` — e depois o player junto
+com ele — e deixou o resto em 820. As duas produziram a mesma coisa: margens
+diferentes dentro de uma aula, o olho procurando onde a linha começa a cada
+rolagem. Consertar elemento por elemento não convergia, porque o defeito não
+era de nenhum elemento: era de haver mais de uma largura.
+
+Agora há `--tela`, e ela vale para o título, as migalhas, os passos, a prosa, o
+player, o exemplo, o material e o rodapé. Uma variável só resolve **por
+construção** — não há como um elemento discordar do outro, nem no meio de um
+redimensionamento.
+
+**O preço está declarado.** A prosa perdeu o `max-width:68ch`, então em 1074px a
+linha vai a **121ch** (medido), contra os 68 confortáveis para leitura longa. Foi
+uma escolha entre dois defeitos e o alinhamento ganhou; se a linha longa
+incomodar, o teto volta em `ch` e o que se perde é o alinhamento à direita, não
+o da esquerda.
+
+#### Os dois números, e de onde saem
+
+A coluna larga foi **medida, não chutada**. A linha mais longa que existe nos
+exemplos tem 74 caracteres; IBM Plex Mono a 12,64px avança 7,601px por caractere
+— 562px, mais 36px de recuo, 598px. Daí `--cod:604px`: pouco mais do que a
+linha, não a tela inteira. A nota tem `--nota:440px` de teto e `--nota-min:300px`
+de piso, e é ela quem encolhe quando falta espaço, porque o código não pode.
+
+O teto da coluna larga sai da **seta de navegação**, que mora no vão. Ela tem
+44px, e para sobrar 16px entre ela e o conteúdo o vão precisa de `4 × 38 = 152`:
+
+```
+--amplo <= 100vw - trilho - 152
+```
+
+E o corte entre as duas colunas sai de igualar esse teto ao que as duas colunas
+do exemplo pedem — `604 + 300 + 30 = 934`:
+
+```
+100vw - 380 - 152 >= 934   →   100vw >= 1466
+```
+
+Um corte só, e as duas coisas acontecem nele: o bloco de código abre em duas
+colunas **e** a aula inteira passa para a largura larga. Entre 1466 e 1606 a aula
+cresce junto com a janela, de 934 até 1074; daí para cima ela para, porque
+alargar mais só esticaria a coluna de texto.
+
+| tela | aula | exemplo | folga até a seta |
+| --- | --- | --- | --- |
+| 1280 | 818 | empilhado | setas no rodapé |
+| 1440 | 820 | empilhado | 38px |
+| 1466 | 934 | duas colunas | 16px |
+| 1500 | 968 | duas colunas | 16px |
+| 1606 | 1074 | duas colunas | 16px |
+| 1920 | 1074 | duas colunas | 95px |
+| 2400 | 1074 | duas colunas | 215px |
+
+#### A única folga é do player, e é só para baixo
 
 O teto de altura do player (`min(64vh, 100vh - 300px)`, para o play não empurrar
-o resto da seção para baixo da dobra) passou a limitar a **largura**, e a
-proporção 16/9 deriva a altura a partir dela. Cortar a altura de uma caixa com
-`aspect-ratio` não encolhe a caixa: achata, e o vídeo dentro dela estica. Em
-janela baixa o player fica menor que o exemplo — nunca deformado — e volta a
-começar onde o texto começa, porque centrar um vídeo mais estreito que a coluna
-inventaria uma margem que nenhum outro elemento da aula tem.
+o resto da seção para baixo da dobra) limita a **largura**, e a proporção 16/9
+deriva a altura a partir dela. Cortar a altura de uma caixa com `aspect-ratio`
+não encolhe a caixa: achata, e o vídeo dentro dela estica — a 1920×700 o player
+chegou a 2,05:1 antes disso. Em janela baixa ele fica menor que o resto da aula,
+alinhado à esquerda como todos, e nunca deformado.
 
-`--amplo` existe porque o exemplo anotado não é prosa: são duas colunas, e uma
-delas é código, que não se quebra por conforto. O teto dele sai da posição da
-seta, como descrito adiante.
+#### O teste mudou de pergunta
 
-A largura das duas colunas foi **medida, não chutada**. A linha mais longa que
-existe nos exemplos tem 74 caracteres; IBM Plex Mono a 12,64px avança 7,601px
-por caractere — 562px, mais 36px de recuo, 598px. Daí `--cod:604px`: pouco mais
-do que a linha, não a tela inteira. A nota tem `--nota:440px` de teto e
-`--nota-min:300px` de piso, e é ela quem encolhe quando falta espaço, porque o
-código não pode.
-
-**Uma coluna é o padrão; duas são a exceção.** Empilhado — nota logo acima do
-trecho que ela comenta — funciona em qualquer largura, e é assim que o celular
-lê. O lado a lado só entra em `min-width:1580px`, e esse número também sai da
-conta: as duas colunas mais o vão pedem `604 + 300 + 30 = 934px`, e o teto do
-exemplo (`(100vw - trilho + leitura) / 2 - 76`) só alcança 934 quando a tela
-passa de 1580. Antes, o padrão era duas colunas com um corte para empilhar, e
-o resultado era um intervalo em que a coluna de código nascia estreita demais e
-ganhava barra de rolagem própria.
-
-**Nada passa de `--amplo`.** O teste percorre as 89 seções escritas dos três
-cursos, uma a uma, e mede cada filho da tela de aula — é caro, uma navegação
-por seção, e é o único jeito de a regra valer para o conteúdo que existe e não
-para a seção que alguém lembrou de abrir.
+Antes ele perguntava *"quem passou do teto?"*, com uma lista de quem podia
+passar — e a lista crescia a cada elemento que ganhava o direito de escapar,
+enquanto o defeito real passava batido. Agora ele pergunta a regra: **todos os
+filhos da tela começam e terminam na mesma coluna**. O teste percorre as 89
+seções escritas dos três cursos, uma a uma — é caro, uma navegação por seção, e
+é o único jeito de a regra valer para o conteúdo que existe e não para a seção
+que alguém lembrou de abrir.
 
 **Vídeo não é sinônimo de abertura de aula.** Das 26 seções com vídeo, 5 são a
 primeira da aula, 15 a segunda, 5 a terceira e 1 a quarta. Se todas fossem a
@@ -646,19 +676,10 @@ A primeira versão daqui errava em duas coisas, e as duas foram corrigidas:
    da direita tem de parecer um arquivo, e continuidade é o argumento inteiro.
    Há um teste que mede se os trechos se emendam sem folga.
 
-Abaixo de 900px as duas colunas viram uma, com a nota *antes* do trecho.
-
-**O bloco escapa da coluna de leitura.** Ela tem 820px porque prosa acima de 68
-caracteres por linha cansa; o exemplo não é prosa — são duas colunas, e uma
-delas é código, que não se quebra por conforto. Dentro de 820px sobravam ~440px
-para o programa, e qualquer linha real virava barra de rolagem.
-
-Quanto ele pode crescer não é um número escolhido: sai da **posição da seta de
-navegação**, que mora no vão ao lado. Com a seta de 44px e 16px de folga, a
-maior largura em que os dois não brigam pelo mesmo pixel tem forma fechada —
-`((100vw - trilho) + leitura) / 2 - 76`. A 1920px dá 1104px; a 1400px, 844 —
-ainda mais que a coluna de leitura, então escapar dela nunca deixa o exemplo
-mais estreito do que estava. O teste mede a folga em três larguras.
+Abaixo de 1466px as duas colunas viram uma, com a nota *antes* do trecho — e é
+o mesmo corte em que a aula inteira volta para a coluna estreita. Não são duas
+decisões: é a largura do bloco que define a largura da aula, pela conta descrita
+em *A aula tem uma largura só*.
 
 **O realce de sintaxe tem três cores, e são as da marca:** vermelho para a
 estrutura da linguagem, azul para os literais, branco para o resto —
@@ -793,10 +814,11 @@ seta esquerda → centrada no vão entre o trilho e a coluna
 seta direita  → centrada no vão entre a coluna e a borda da tela
 ```
 
-O trilho e a coluna viraram **variáveis CSS** (`--trilho`, `--leitura`) porque
-a posição da seta deriva das duas — e número repetido em dois lugares diverge.
-Já divergiu uma vez, no recuo do conteúdo, e custou 2px de rolagem horizontal
-no celular.
+O trilho e a coluna viraram **variáveis CSS** (`--trilho`, `--tela`) porque a
+posição da seta deriva das duas — e número repetido em dois lugares diverge. Já
+divergiu uma vez, no recuo do conteúdo, e custou 2px de rolagem horizontal no
+celular. É `--tela` e não `--leitura`: quando a aula alarga o vão encolhe, e uma
+seta posicionada pela coluna estreita ficaria por cima do conteúdo da larga.
 
 ## O certificado abre em grande
 
