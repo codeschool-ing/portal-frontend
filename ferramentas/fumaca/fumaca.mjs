@@ -432,9 +432,29 @@ const partes = await p.locator('.exemplo-cod').count();
 ok('exemplo anotado, um trecho por nota', partes >= 5, partes + ' trechos');
 ok('a saída do exemplo aparece', await p.locator('.exemplo-saida').isVisible());
 
+/* DUAS FORMAS, E A ESCOLHA É POR LARGURA DISPONÍVEL.
+
+   Empilhado é o padrão: a nota ANTES do trecho, as duas em uma coluna só. As
+   duas colunas só aparecem quando as DUAS cabem — o código sem rolar e a nota
+   ainda legível —, o que dá 1580px de janela. Onde não cabem, o que sobraria é
+   código picotado ao lado de nota espremida, pior que empilhado em qualquer
+   tela. */
+ok('em 1440px o bloco fica empilhado', await p.evaluate(() => {
+  const n = document.querySelector('.exemplo-nota').getBoundingClientRect();
+  const c = document.querySelector('.exemplo-cod').getBoundingClientRect();
+  return n.bottom <= c.top + 2;                      // um em cima do outro
+}));
+ok('e a nota vem antes do trecho dela', await p.evaluate(() => {
+  const g = document.querySelector('.exemplo-grade');
+  return g.children[0].classList.contains('exemplo-nota');
+}));
+
+await p.setViewportSize({ width: 1920, height: 950 });
+await p.waitForTimeout(250);
+
 /* A FORMA DO GO BY EXAMPLE: a explicação à ESQUERDA, o programa à direita, e
    cada nota na altura do trecho que ela comenta. */
-ok('a nota fica à esquerda do código', await p.evaluate(() => {
+ok('em 1920px a nota fica à esquerda do código', await p.evaluate(() => {
   const n = document.querySelector('.exemplo-nota').getBoundingClientRect();
   const c = document.querySelector('.exemplo-cod').getBoundingClientRect();
   return n.right <= c.left + 2;
@@ -453,6 +473,21 @@ ok('o código é contínuo, sem costura entre os trechos', await p.evaluate(() =
   return cods.slice(1).every((c, i) =>
     Math.abs(c.getBoundingClientRect().top - cods[i].getBoundingClientRect().bottom) < 1);
 }));
+
+/* A LARGURA DA COLUNA DE CÓDIGO SAI DA MEDIDA DO CONTEÚDO: a linha mais longa
+   dos exemplos tem 74 caracteres, que a .79rem da IBM Plex Mono dão 562px;
+   com os 36px de recuo, 598. A coluna tem 604 — pouco mais, de propósito. */
+const colunaCod = await p.evaluate(() => {
+  const c = document.querySelector('.exemplo-cod');
+  return { larg: Math.round(c.getBoundingClientRect().width),
+    sobra: Math.round(c.getBoundingClientRect().width - c.scrollWidth) };
+});
+ok('a coluna de código cabe a linha mais longa, com folga',
+  colunaCod.larg >= 598 && colunaCod.sobra >= 0,
+  colunaCod.larg + 'px, ' + colunaCod.sobra + 'px de sobra');
+
+await p.setViewportSize({ width: 1440, height: 900 });
+await p.waitForTimeout(250);
 
 /* O realce usa as três cores da marca. O teste procura pelo menos duas
    famílias diferentes num exemplo que tem palavra-chave e literal. */
@@ -611,22 +646,17 @@ ok('seção de vídeo tem o quadro', true);
 ok('seção só de vídeo não inventa bloco de texto', (await p.locator('.aula-texto').count()) === 0);
 ok('a duração aparece no player', (await p.locator('.video-duracao').innerText()).includes('min'));
 
-/* O player sangra de ponta a ponta: a margem negativa cancela o padding do
-   `.conteudo`, e os dois números têm de continuar batendo. */
+/* O PLAYER ACOMPANHA A COLUNA DE LEITURA. Ele já foi de ponta a ponta da área
+   inteira, e o efeito colateral era a aula ter alinhamentos diferentes conforme
+   a seção — o olho procurando a margem esquerda a cada troca. */
 const bleed = await p.evaluate(() => {
   const v = document.querySelector('.video-fachada').getBoundingClientRect();
-  const c = document.querySelector('#conteudo').getBoundingClientRect();
-  return { esq: Math.abs(v.left - c.left), dir: Math.abs(v.right - c.right), topo: v.top };
+  const t = document.querySelector('.aula-titulo').getBoundingClientRect();
+  return { esq: Math.abs(v.left - t.left), larg: Math.round(v.width) };
 });
-ok('o player vai de ponta a ponta', bleed.esq < 2 && bleed.dir < 2,
-  bleed.esq.toFixed(1) + 'px / ' + bleed.dir.toFixed(1) + 'px');
+ok('o player alinha com o texto da seção', bleed.esq < 2,
+  bleed.larg + 'px, ' + bleed.esq.toFixed(1) + 'px de desalinho');
 
-/* E o sangramento não pode virar rolagem horizontal. Ele já virou: o recuo do
-   `.conteudo` em tela estreita era 16px e a margem negativa continuou 18px,
-   e sobraram 2px. Os dois saem da mesma variável agora — este teste é o que
-   avisa se voltarem a ser dois números. */
-// estreita a MESMA aba e devolve depois: uma aba nova nasceria noutro
-// contexto, sem a sessão, e cairia em /entrar
 await p.setViewportSize({ width: 390, height: 844 });
 await p.waitForTimeout(250);
 const sobra = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
@@ -670,6 +700,50 @@ const posicoes = await p.evaluate(() => {
 ok('há vídeo fora da primeira seção', Object.keys(posicoes).length >= 3,
   JSON.stringify(posicoes));
 
+/* TODA SEÇÃO CABE NOS LIMITES, SEM EXCEÇÃO.
+
+   O portal tem três larguras — trilho, coluna de leitura e a `--amplo`, que é
+   a exceção do bloco de código anotado. Nada pode passar da terceira, e só o
+   `.exemplo` pode passar da segunda.
+
+   O teste percorre TODAS as seções escritas dos três cursos, uma a uma, e mede
+   cada filho da tela. É caro (uma navegação por seção) e é o único jeito de a
+   regra valer para o conteúdo que existe, e não para a seção que eu lembrei de
+   abrir. */
+await p.setViewportSize({ width: 1920, height: 1000 });
+await p.waitForTimeout(200);
+const foraDoLimite = await p.evaluate(async () => {
+  const fora = [];
+  for (const curso of Object.keys(window.AULAS)) {
+    const topicos = Object.keys(window.AULAS[curso]);
+    for (let i = 0; i < topicos.length; i += 1) {
+      for (const sec of window.AULAS[curso][topicos[i]]) {
+        location.hash = `#/curso/${curso}/aula/${i}/${sec.id}`;
+        await new Promise((r) => setTimeout(r, 50));
+        const tela = document.querySelector('.tela-aula');
+        if (!tela) continue;
+        const cs = getComputedStyle(document.querySelector('.portal'));
+        const amplo = parseFloat(cs.getPropertyValue('--amplo'));
+        const leitura = parseFloat(cs.getPropertyValue('--leitura'));
+        [...tela.children].forEach((f) => {
+          if (f.classList.contains('lado-seta')) return;    // flutua, não é conteúdo
+          const w = f.getBoundingClientRect().width;
+          const nome = `${curso}/${sec.id}:${f.className.split(' ')[0]}`;
+          if (w > amplo + 1) fora.push(nome + ' passou de --amplo (' + Math.round(w) + ')');
+          else if (w > leitura + 1 && !f.classList.contains('exemplo')) {
+            fora.push(nome + ' passou de --leitura sem ser exemplo (' + Math.round(w) + ')');
+          }
+        });
+      }
+    }
+  }
+  return fora;
+});
+ok('nenhuma seção passa dos limites de largura', foraDoLimite.length === 0,
+  foraDoLimite.slice(0, 3).join(' · ') || 'as 89 seções cabem');
+await p.setViewportSize({ width: 1440, height: 900 });
+await p.waitForTimeout(200);
+
 console.log('\n== 18. certificado, plano e conta ==');
 await p.goto(BASE + PAGINA + '#/certificados');
 await p.waitForSelector('.cert');
@@ -704,20 +778,52 @@ ok('o fundo congela', await p.evaluate(() =>
 /* O botão do LinkedIn existe ao lado do fechar NOS DOIS CASOS — esconder faria
    parecer que a função não existe. No exemplo ele vem desabilitado e sem
    `href`: visível, e incapaz de publicar uma credencial que ninguém tirou. */
-ok('o exemplo mostra o botão do LinkedIn', (await p.locator('.modal-acoes .cert-share').count()) === 1);
+ok('o exemplo mostra o botão do LinkedIn', (await p.locator('.modal-acoes .cert-in').count()) === 1);
 ok('mas ele não leva a lugar nenhum', await p.evaluate(() => {
-  const b = document.querySelector('.modal-acoes .cert-share');
+  const b = document.querySelector('.modal-acoes .cert-in');
   return b.tagName !== 'A' && b.getAttribute('aria-disabled') === 'true';
 }));
 ok('o botão fica à esquerda do fechar', await p.evaluate(() => {
-  const b = document.querySelector('.modal-acoes .cert-share').getBoundingClientRect();
+  const b = document.querySelector('.modal-acoes .cert-in').getBoundingClientRect();
   return b.right <= document.querySelector('.modal-fechar').getBoundingClientRect().left + 1;
+}));
+/* Só o ícone: o rótulo saiu da tela e ficou no `aria-label`, que é o que o
+   leitor de tela anuncia. Botão de ícone sem nome acessível é um botão mudo. */
+ok('o botão é só o ícone, com nome acessível', await p.evaluate(() => {
+  const b = document.querySelector('.modal-acoes .cert-in');
+  return b.textContent.trim() === '' && (b.getAttribute('aria-label') || '').length > 5;
 }));
 await p.keyboard.press('Escape');
 await p.waitForTimeout(200);
 ok('Esc fecha o certificado', (await p.locator('.modal-cert').count()) === 0);
 ok('e o fundo volta a rolar', await p.evaluate(() =>
   getComputedStyle(document.documentElement).overflow !== 'hidden'));
+
+/* No celular o certificado extrapolava nos DOIS eixos. A culpa não era dele: o
+   `.modal` é grade com faixa `auto`, e ali `width:min(1040px,100%)` resolve
+   contra o `max-content` do próprio filho — a conta se morde e não limita nada.
+   A faixa virou `minmax(0,1fr)`; o teste mede a folha, não a regra. */
+await p.setViewportSize({ width: 390, height: 844 });
+await p.waitForTimeout(120);
+await p.locator('.cert').first().click();
+await p.waitForSelector('.modal-cert');
+const certCel = await p.evaluate(() => {
+  const f = document.querySelector('.modal-cert .cert-folha').getBoundingClientRect();
+  return {
+    larg: Math.round(f.width), esq: Math.round(f.left),
+    passa: Math.round(f.right - window.innerWidth),
+    embaixo: Math.round(f.bottom - document.documentElement.clientHeight),
+    rolaH: document.documentElement.scrollWidth - window.innerWidth,
+  };
+});
+ok('a 390px o certificado cabe na largura', certCel.passa <= 0 && certCel.esq >= 0,
+  certCel.larg + 'px começando em ' + certCel.esq);
+ok('e cabe na altura', certCel.embaixo <= 0, certCel.embaixo + 'px de sobra por baixo');
+ok('e a página não rola na horizontal', certCel.rolaH <= 1, certCel.rolaH + 'px');
+await p.keyboard.press('Escape');
+await p.waitForTimeout(160);
+await p.setViewportSize({ width: 1440, height: 900 });
+await p.waitForTimeout(120);
 
 /* Agora um certificado DE VERDADE: curso concluído e prova aprovada. É a
    única forma de ver os botões do LinkedIn, e é a que importa conferir —
@@ -742,7 +848,7 @@ ok('certificado emitido com curso concluído e prova aprovada', true);
 
 await p.locator('.cert:not(.cert-exemplo)').first().click();
 await p.waitForSelector('.modal-cert');
-const perfil = await p.locator('.modal-acoes .cert-share').first().getAttribute('href');
+const perfil = await p.locator('.modal-acoes .cert-in').first().getAttribute('href');
 ok('há botão de adicionar ao perfil do LinkedIn',
   perfil.startsWith('https://www.linkedin.com/profile/add?'));
 /* Os campos que o LinkedIn exige para preencher o formulário sozinho. Faltar
@@ -752,7 +858,7 @@ ok('a URL leva todos os campos do certificado', campos.every((c) => perfil.inclu
   campos.filter((c) => !perfil.includes(c)).join(', ') || 'todos');
 ok('o código na URL é o mesmo que está impresso', await p.evaluate(() => {
   const cod = document.querySelector('.modal-cert .cert-codigo').textContent.trim();
-  const href = document.querySelector('.modal-acoes .cert-share').href;
+  const href = document.querySelector('.modal-acoes .cert-in').href;
   return href.includes(encodeURIComponent(cod));
 }));
 await p.keyboard.press('Escape');
@@ -826,7 +932,7 @@ console.log('\n== 20. o exemplo cabe entre as setas ==');
 /* O exemplo escapa da coluna de leitura para o código não virar barra de
    rolagem, e as setas de navegação moram no vão. Os dois disputam o mesmo
    espaço, e o teto do exemplo é calculado a partir da posição da seta. */
-for (const larg of [1440, 1680, 1920]) {
+for (const larg of [1280, 1440, 1580, 1700, 1920, 2400]) {
   await p.setViewportSize({ width: larg, height: 950 });
   await p.goto(BASE + PAGINA + '#/curso/javascript/aula/0/arrow', { waitUntil: 'networkidle' });
   await p.waitForSelector('.exemplo');
@@ -834,15 +940,26 @@ for (const larg of [1440, 1680, 1920]) {
     const r = (s) => { const e = document.querySelector(s); return e && e.getBoundingClientRect(); };
     const ex = r('.exemplo'); const esq = r('.lado-esq'); const dir = r('.lado-dir');
     const cod = document.querySelector('.exemplo-cod');
+    /* abaixo de 1400px as setas voltam para o rodapé: elas continuam no DOM,
+       mas não disputam mais o vão, e medir distância até elas não diz nada */
+    const noVao = !!esq && getComputedStyle(document.querySelector('.lado-esq')).position === 'fixed';
     return {
       larg: Math.round(ex.width),
-      folga: Math.min(esq ? ex.left - esq.right : 999, dir ? dir.left - ex.right : 999),
+      noVao,
+      folga: noVao ? Math.min(ex.left - esq.right, dir.left - ex.right) : null,
       rola: cod.scrollWidth > cod.clientWidth + 1,
+      pagina: document.documentElement.scrollWidth - window.innerWidth,
     };
   });
-  ok('a ' + larg + 'px o exemplo não encosta na seta', m.folga >= 8,
-    m.larg + 'px de largura, ' + Math.round(m.folga) + 'px de folga');
+  if (m.noVao) {
+    ok('a ' + larg + 'px o exemplo não encosta na seta', m.folga >= 8,
+      m.larg + 'px de largura, ' + Math.round(m.folga) + 'px de folga');
+  } else {
+    ok('a ' + larg + 'px as setas estão no rodapé, sem disputar o vão', true,
+      m.larg + 'px de largura');
+  }
   ok('a ' + larg + 'px o código não vira barra de rolagem', !m.rola);
+  ok('a ' + larg + 'px a página não rola na horizontal', m.pagina <= 1, m.pagina + 'px');
 }
 await p.setViewportSize({ width: 1440, height: 900 });
 
