@@ -98,6 +98,23 @@ body.sem-trilho .trilho{display:none}
 .tc-marca[data-estado="concluido"]{background:var(--phosphor);border-color:var(--phosphor)}
 .tc-marca[data-estado="atual"]{background:var(--amber);border-color:var(--amber)}
 .tc-marca[data-estado="disponivel"]{border-color:var(--phosphor)}
+.ta-conta{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--phosphor-dim);justify-self:end}
+.trilho-aula{grid-template-columns:12px 20px 1fr auto}
+
+/* As seções da aula aberta. Só a aula atual abre — ver o cabeçalho do
+   trilho.js: todas abertas dariam ~40 linhas num curso médio. */
+.trilho-secoes{display:flex;flex-direction:column;gap:1px;margin:2px 0 6px}
+.trilho-secao{
+  display:grid;grid-template-columns:14px 1fr;align-items:center;gap:8px;
+  padding:6px 11px 6px 30px;border-radius:4px;
+  font-size:.79rem;line-height:1.3;color:var(--paper-dim);
+}
+.trilho-secao:hover{background:var(--panel);color:var(--paper)}
+.trilho-secao.on{color:var(--phosphor);background:var(--panel)}
+.ts-marca{width:7px;height:7px;border-radius:50%;border:1px solid var(--wire)}
+.trilho-secao.feita .ts-marca{background:var(--phosphor);border-color:var(--phosphor)}
+.trilho-secao.on .ts-marca{border-color:var(--phosphor)}
+.trilho-secao.aval .ts-tit{font-style:italic}
 
 /* ---------- barra do topo: só o que a vitrine não tinha ---------- */
 .nav-contexto{margin-left:26px;min-width:0;flex:1 1 auto}
@@ -250,18 +267,69 @@ body.sem-trilho .trilho{display:none}
 .elo-depois{border-color:var(--phosphor-dim);color:var(--phosphor)}
 .elo:hover{background:var(--ink)}
 
-.aulas{display:flex;flex-direction:column;gap:1px;counter-reset:aula}
+/* `list-style:none` porque a numeração é do `.aula-num`, em monoespaçada e com
+   zero à esquerda: deixar o marcador do <ol> também aparecer numerava a mesma
+   linha duas vezes ("1. 01 Cliente, servidor e host"). */
+.aulas{display:flex;flex-direction:column;gap:1px;list-style:none;padding:0}
 .aula-linha{
-  display:grid;grid-template-columns:18px 26px 1fr;align-items:center;gap:10px;
+  display:grid;grid-template-columns:18px 26px 1fr auto;align-items:center;gap:4px 10px;
   padding:10px 12px;border-radius:4px;color:var(--paper);font-size:.9rem;
+}
+.aula-secoes{
+  grid-column:3;font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--phosphor-dim);
+}
+.aula-prog{
+  grid-column:4;grid-row:1/3;font-family:'IBM Plex Mono',monospace;
+  font-size:.7rem;color:var(--paper-dim);
 }
 .aula-linha:hover{background:var(--ink)}
 .aula-marca{color:var(--phosphor);font-size:.8rem}
 .aula-num{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--phosphor-dim)}
 .aula-linha.feita .aula-tit{color:var(--paper-dim)}
 
-/* ---------- a aula ---------- */
+/* ---------- a aula, agora em seções ---------- */
 .tela-aula{max-width:820px}
+.aula-cabeca{display:flex;flex-direction:column;gap:12px}
+
+/* Os passos são a espinha da aula: onde estou entre as seções e quanto falta.
+   Eles QUEBRAM em várias linhas em vez de rolar na horizontal — ao contrário
+   das fileiras da vitrine, que rolam porque lá a altura é o recurso escasso e
+   há setas para navegar. Aqui não há setas, e uma fileira rolável sem
+   affordance esconde a última seção sem avisar: foi o que aconteceu com "Como
+   escolher", a quinta do tópico de hospedagem, que simplesmente não aparecia. */
+.passos{display:flex;flex-wrap:wrap;gap:6px}
+.passo{
+  flex:0 0 auto;display:flex;align-items:center;gap:7px;max-width:230px;
+  padding:7px 11px;border:1px solid var(--wire);border-radius:4px;
+  color:var(--paper-dim);font-size:.8rem;transition:border-color .15s,color .15s;
+}
+.passo:hover{border-color:var(--phosphor-dim);color:var(--paper)}
+.passo.on{border-color:var(--phosphor);color:var(--phosphor);background:var(--panel)}
+.passo.feito .passo-n{color:var(--phosphor)}
+.passo.feito:not(.on) .passo-tit{color:var(--paper-dim)}
+.passo-n{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--phosphor-dim)}
+.passo-tit{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.passo-aval{border-style:dashed}
+
+.secao-titulo{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.1rem,2.2vw,1.4rem);line-height:1.2}
+
+/* A prosa da seção. 68ch é o limite de linha para leitura longa — acima disso
+   o olho perde o começo da linha seguinte, que é o defeito que a divisão em
+   seções existe para não reintroduzir. */
+.aula-texto{gap:0}
+.aula-texto p{max-width:68ch;line-height:1.72;margin-bottom:14px}
+.aula-texto p:last-child{margin-bottom:0}
+.aula-texto strong{color:var(--paper)}
+.aula-texto code{
+  font-family:'IBM Plex Mono',monospace;font-size:.86em;
+  background:var(--ink);padding:1px 5px;border-radius:3px;color:var(--phosphor);
+}
+.prosa-lista{max-width:68ch;display:flex;flex-direction:column;gap:8px;margin:0 0 14px;padding-left:18px}
+.prosa-lista li{list-style:'› ';padding-left:5px;line-height:1.6;color:var(--paper-dim)}
+.prosa-lista li strong{color:var(--paper)}
+
+.aval-intro{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--paper-dim)}
+.retomar-onde{font-size:.68rem}
 .migalhas{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
 .migalhas a{color:var(--phosphor)}
 .aula-titulo{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.3rem,2.8vw,1.8rem);line-height:1.18}
@@ -489,6 +557,12 @@ body.sem-trilho .trilho{display:none}
 @media(max-width:620px){
   .nav-contexto{display:none}
   .tela-head h1{font-size:1.25rem}
+  /* A busca sai antes de todo o resto — é o item mais dispensável da barra,
+     porque o Catálogo está a um toque no trilho e ele já tem o campo. Sem
+     isto o avatar da conta era cortado pela borda direita a 390px. É a mesma
+     ordem de sacrifício da vitrine, onde "Área do aluno" cede primeiro. */
+  #busca-btn{display:none}
+  .conta-avatar{width:28px;height:28px}
 }
 
 @media(prefers-reduced-motion:reduce){

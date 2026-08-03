@@ -39,7 +39,11 @@ rota('/entrar', entrar);
 rota('/painel', painel);
 rota('/trilha', telaTrilha);
 rota('/curso/:id', curso);
+/* Duas rotas para a mesma tela: sem a seção, cai na primeira. É o que faz um
+   link antigo (ou o botão do curso) continuar funcionando depois de a aula ter
+   virado várias seções. */
 rota('/curso/:id/aula/:ix', aula);
+rota('/curso/:id/aula/:ix/:sec', aula);
 rota('/catalogo', catalogo);
 rota('/certificados', certificados);
 rota('/conta', conta);

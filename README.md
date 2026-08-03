@@ -111,14 +111,66 @@ curva, conferindo se algum cai dentro de um cartão que não seja ponta daquela
 aresta. Herdar o roteamento sem herdar a conferência seria ficar com o risco e
 sem a rede.
 
-## Aula = tópico
+## Aula = tópico, seção = assunto
 
 O catálogo não tem conceito de aula; o grão mais fino é `topicos`, e são 1.503
 deles. O portal adota **tópico como aula** em vez de inventar uma terceira
 chave: os exercícios que o pipeline emite já trazem `topico` como campo de
 primeira classe, então currículo e conteúdo já concordavam entre si.
 
-**Mas o título exibido não serve de chave.** `aplicarConteudo()` reescreve
+**Mas um tópico não é um assunto — é um punhado deles.** Os números do catálogo:
+
+| | |
+| --- | --- |
+| tópicos com dois-pontos (`X: a, b e c`) | **811 (54%)** |
+| tópicos que enumeram **3+ assuntos** no título | **734 (49%)** |
+| carga média por tópico | **4,0h** |
+| pior caso (`react-ts`) | **7,5h por tópico** |
+
+Quatro horas não é uma página, e uma caixinha de "concluída" no fim delas faz a
+barra do aluno andar em saltos que não correspondem a nada. Então a aula se
+divide em **seções**, e a última — quando o tópico tem exercícios — é a
+avaliação.
+
+**As seções são escritas, nunca derivadas.** Dava para quebrar o título no `:` e
+nas vírgulas e ganhar 734 divisões de graça, e seria um erro: é heurística
+léxica sobre prosa autoral, exatamente o que `REGRAS.md` registra ter tentado e
+descartado na conferência de "exige tópico posterior" — *"a resposta está na
+autoria, não na detecção"*. Aqui falharia igual: `Cliente, servidor e host: quem
+pede e quem responde` viraria uma seção chamada "quem pede e quem responde". A
+enumeração no título é **evidência** de que as seções são necessárias; não é
+fonte para lê-las.
+
+As seções moram em `assets/aulas.js`, e não em `dados.js`, porque aquele é cópia
+do catálogo da vitrine e o modal de lá renderiza `topicos` como lista plana.
+Ficam três arquivos com três donos e a mesma chave de junção:
+
+| arquivo | o quê | de quem |
+| --- | --- | --- |
+| `dados.js` | catálogo: cursos, trilhas, tópicos | compartilhado com a vitrine |
+| `aulas.js` | as seções e o texto delas | do portal |
+| exercícios | a avaliação | do pipeline |
+
+Duas regras que caem daí:
+
+- **A avaliação é por tópico, não por seção.** Descer a avaliação para o nível
+  da seção obrigaria a mudar a chave que o pipeline emite — e ela cobra o
+  tópico inteiro de qualquer forma. Tópico sem exercícios não ganha seção de
+  avaliação; senão nasceriam 1.500 páginas vazias.
+- **Aula sem seções escritas vira uma seção só**, com o comportamento de antes.
+  O conteúdo entra curso a curso, sem um dia de transição em que metade do
+  portal fica quebrada.
+
+**A unidade de progresso passou a ser a seção.** `aulaConcluida` virou derivado:
+a aula está feita quando todas as seções dela estão. Um registro no formato
+antigo (uma caixinha por aula) é migrado na primeira escrita, então quem já
+tinha progresso não o vê zerar.
+
+`web-fundamentos` está escrito por inteiro — 11 aulas, 38 seções — como exemplo
+de como uma aula fica cheia. É conteúdo tecnicamente correto e **sem revisão
+pedagógica**: serve para avaliar a estrutura, e a escola reescreve.
+
+**E o título exibido não serve de chave.** `aplicarConteudo()` reescreve
 `c.topicos` no lugar a cada troca de idioma — em inglês o tópico vira *"Types,
 coercion, strict equality and falsy values"* e nenhum exercício casa. O defeito
 aparece sem ninguém tocar em nada: basta o navegador estar configurado noutro
@@ -218,8 +270,10 @@ index.html                     o shell: barra, trilho e <main>
 assets/base.css                CSS da vitrine, sem alteração
 assets/portal.css              só o que a vitrine não tinha
 assets/dados.js                catálogo (vira API na Etapa 2)
+assets/aulas.js                as seções de cada tópico e o texto delas
 assets/exercicios-exemplo.js   conteúdo descartável, formato definitivo
 app/catalogo.js                leitura do catálogo e o grafo — não toca no DOM
+app/aulas.js                   do que uma aula é feita: seções + avaliação
 app/grafo.js                   o grafo como mapa de progresso
 app/estado.js                  progresso do aluno (localStorage → servidor)
 app/api.js                     camada de mentira, assinaturas do backend real

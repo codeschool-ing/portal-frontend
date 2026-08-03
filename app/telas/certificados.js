@@ -13,7 +13,7 @@
    portal for esqueleto, certificar por curso não compromete nada.
    ========================================================================== */
 
-import { aulasDoCurso, caminhoDaTrilha } from '../catalogo.js';
+import { caminhoDaTrilha } from '../catalogo.js';
 import { cursoConcluido, opcaoAtiva } from '../estado.js';
 import { trilhaDoAluno } from './comum.js';
 import { esc } from '../texto.js';
@@ -24,7 +24,7 @@ export default async function certificados() {
 
   const t = trilhaDoAluno();
   const doCaminho = t ? caminhoDaTrilha(t, opcaoAtiva) : [];
-  const feitos = CURSOS.filter((c) => cursoConcluido(c.id, aulasDoCurso(c.id).length));
+  const feitos = CURSOS.filter((c) => cursoConcluido(c.id));
 
   el.innerHTML =
     '<header class="tela-head">' +

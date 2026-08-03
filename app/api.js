@@ -11,6 +11,7 @@
 
 import * as estado from './estado.js';
 import { aulasDoCurso, cursoPorId, trilhaPorId } from './catalogo.js';
+import { exerciciosDaAula as buscarExercicios, secoesDaAula } from './aulas.js';
 import { avaliarLocal, PRECISA_SERVIDOR } from './exercicios/avaliar.js';
 
 const eco = (v) => Promise.resolve(v);
@@ -45,33 +46,41 @@ export function matricular(trilhaId) {
 
 export const progresso = () => eco(estado.agora().progresso);
 
-export function concluirAula(cursoId, ix, concluida = true) {
-  estado.marcarAula(cursoId, ix, concluida);
+export function concluirSecao(cursoId, ix, secId, feita = true) {
+  estado.marcarSecao(cursoId, ix, secId, feita);
   return eco(true);
 }
 
-/* Onde o aluno parou. É a pergunta mais frequente do portal, então ela é uma
-   chamada só — e cai na primeira aula da trilha quando ainda não há histórico,
-   em vez de devolver nulo e obrigar cada tela a inventar um fallback. */
+/* Onde o aluno parou — e agora com a SEÇÃO, não só a aula. Devolver o topo de
+   uma aula de quatro horas é devolver a pessoa à rolagem; é a diferença entre
+   o recurso ser útil e ser decorativo.
+
+   Cai na primeira seção da trilha quando ainda não há histórico, em vez de
+   devolver nulo e obrigar cada tela a inventar um fallback. */
 export function continuarDe() {
   const e = estado.agora();
-  if (e.ultima && cursoPorId(e.ultima.cursoId)) return eco(e.ultima);
+  const primeiraSecao = (cursoId, ix) => {
+    const a = aulasDoCurso(cursoId)[ix];
+    return a ? secoesDaAula(cursoId, a.chave)[0]?.id : undefined;
+  };
+
+  if (e.ultima && cursoPorId(e.ultima.cursoId)) {
+    const { cursoId, aulaIx } = e.ultima;
+    return eco({ ...e.ultima, secId: e.ultima.secId || primeiraSecao(cursoId, aulaIx) });
+  }
   const t = e.matricula && trilhaPorId(e.matricula.trilhaId);
   if (!t) return eco(null);
   const primeiro = t.cursos.find((i) => typeof i === 'string');
-  return eco(primeiro ? { cursoId: primeiro, aulaIx: 0 } : null);
+  if (!primeiro) return eco(null);
+  return eco({ cursoId: primeiro, aulaIx: 0, secId: primeiraSecao(primeiro, 0) });
 }
 
 /* ---------- exercícios ----------
    FUTURO: vem do banco, filtrado por `_verificacao` — a doc do pipeline diz
    que é esse campo que decide o que o portal publica primeiro. Hoje sai do
    arquivo de exemplos, e o filtro já existe para não ser retrofitado depois. */
-export function exerciciosDaAula(cursoId, tituloDoTopico, { minimo = 'estrutura' } = {}) {
-  const ordem = { estrutura: 0, execucao: 1, criticado: 2 };
-  const todos = (window.EXERCICIOS_EXEMPLO || []).filter(
-    (e) => e.curso === cursoId && e.topico === tituloDoTopico,
-  );
-  return eco(todos.filter((e) => ordem[e._verificacao ?? 'estrutura'] >= ordem[minimo]));
+export function exerciciosDaAula(cursoId, chaveDoTopico, opcoes) {
+  return eco(buscarExercicios(cursoId, chaveDoTopico, opcoes));
 }
 
 /* Avaliar uma resposta.

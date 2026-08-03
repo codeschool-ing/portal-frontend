@@ -102,10 +102,17 @@ const nAulas = await p.locator('.aula-linha').count();
 ok('aula = tópico', nAulas === 12, nAulas + ' aulas');
 ok('trilho virou lista de aulas', (await p.locator('.trilho-aula').count()) === 12);
 
+/* A aula é dividida em seções e a avaliação é a última. Uma aula sem seções
+   escritas — o caso do curso de JavaScript — tem duas: conteúdo e avaliação. */
 await p.goto(BASE + PAGINA + '#/curso/javascript/aula/1');
+await p.waitForSelector('.passo');
+ok('aula sem seções escritas tem conteúdo + avaliação', (await p.locator('.passo').count()) === 2);
+ok('a primeira seção não é a avaliação', (await p.locator('.ex').count()) === 0);
+
+await p.goto(BASE + PAGINA + '#/curso/javascript/aula/1/avaliacao');
 await p.waitForSelector('.ex');
 const tipos = await p.$$eval('.ex', (els) => els.map((e) => e.className.replace('ex ex-', '')));
-ok('sete tipos na aula', tipos.length === 7, tipos.join(', '));
+ok('sete tipos na avaliação', tipos.length === 7, tipos.join(', '));
 
 console.log('\n== 5. respondendo cada tipo ==');
 const resp = async (sel, fn, esperado) => {
@@ -163,15 +170,39 @@ const vazamento = await p.evaluate(() => {
 ok('justificativas reveladas só após responder', vazamento > 0, vazamento + ' visíveis agora (esperado)');
 
 console.log('\n== 7. progresso e persistência ==');
+await p.goto(BASE + PAGINA + '#/curso/javascript/aula/1/conteudo');
+await p.waitForSelector('.marcar');
 await p.click('.marcar');
-await p.waitForTimeout(200);
-ok('aula marcada no trilho', (await p.locator('.trilho-aula.feita').count()) === 1);
+// marcar leva à seção seguinte: concluir e seguir é o mesmo gesto
+await p.waitForFunction(() => location.hash.endsWith('/avaliacao'), null, { timeout: 5000 });
+ok('marcar avança para a próxima seção', true);
+ok('seção marcada no trilho', (await p.locator('.trilho-secao.feita').count()) === 1);
 const pctAntes = await p.locator('.ctx-pct').innerText();
 await p.reload({ waitUntil: 'networkidle' });
 await p.waitForTimeout(400);
 ok('sobreviveu ao reload', (await p.locator('.ctx-pct').innerText()) === pctAntes, pctAntes);
 
-console.log('\n== 8. idioma ==');
+console.log('\n== 8. seções escritas ==');
+await p.goto(BASE + PAGINA + '#/curso/web-fundamentos/aula/8');
+await p.waitForSelector('.passo');
+const passos = await p.$$eval('.passo-tit', (e) => e.map((x) => x.textContent));
+ok('o tópico de hospedagem virou 5 seções', passos.length === 5, passos.join(' · '));
+ok('a primeira seção é a compartilhada', /compartilhada/i.test(passos[0]), passos[0]);
+ok('prosa renderizada', (await p.locator('.aula-texto p').count()) >= 2);
+ok('trilho abre as seções da aula atual', (await p.locator('.trilho-secao').count()) === 5);
+/* A regressão que importa: as seções são casadas pelo tópico EM PORTUGUÊS, e o
+   título exibido é traduzido. Num navegador em inglês — que é o caso deste
+   Chromium — casar pelo título devolveria zero seções. */
+ok('casou apesar de o título estar traduzido', (await p.locator('.aula-titulo').innerText()) !== '');
+
+// a última seção de uma aula leva à primeira da aula seguinte
+await p.goto(BASE + PAGINA + '#/curso/web-fundamentos/aula/8/escolher');
+await p.waitForSelector('.aula-nav');
+await p.click('.aula-nav a:last-child');
+await p.waitForFunction(() => /\/aula\/9\//.test(location.hash), null, { timeout: 5000 });
+ok('a próxima atravessa a fronteira da aula', true);
+
+console.log('\n== 9. idioma ==');
 await p.goto(BASE + PAGINA + '#/painel');
 await p.waitForSelector('.retomar');
 await p.click('.idioma-btn');
@@ -181,7 +212,7 @@ const nomeEn = await p.locator('.ctx-nome').innerText();
 ok('trilha traduzida', /Back-end Development/i.test(nomeEn), nomeEn);
 ok('tela remontada no idioma novo', await p.locator('.retomar').isVisible());
 
-console.log('\n== 9. tema claro e estreito ==');
+console.log('\n== 10. tema claro e estreito ==');
 await p.click('.idioma-btn'); await p.click('.idioma-op[lang="pt-BR"]'); await p.waitForTimeout(300);
 await p.click('#tema-btn');
 await p.waitForTimeout(250);
@@ -189,7 +220,7 @@ ok('tema claro aplicado', (await p.evaluate(() => document.documentElement.datas
 await p.click('#tema-btn');
 
 await p.setViewportSize({ width: 390, height: 780 });
-await p.goto(BASE + PAGINA + '#/curso/javascript/aula/1');
+await p.goto(BASE + PAGINA + '#/curso/javascript/aula/1/avaliacao');
 await p.waitForSelector('.ex');
 await p.waitForTimeout(300);
 ok('trilho vira gaveta', await p.locator('#trilho-btn').isVisible());
@@ -211,9 +242,9 @@ const p2 = await b2.newPage({ viewport:{width:1440,height:900} });
 await p2.goto(BASE + PAGINA + '#/entrar',{waitUntil:'networkidle'});
 await p2.fill('#e-nome','X'); await p2.selectOption('#e-trilha','backend');
 await p2.click('#form-entrar button[type=submit]'); await p2.waitForTimeout(300);
-await p2.goto(BASE + PAGINA + '#/curso/javascript/aula/1',{waitUntil:'networkidle'});
+await p2.goto(BASE + PAGINA + '#/curso/javascript/aula/1/avaliacao',{waitUntil:'networkidle'});
 await p2.waitForSelector('.ex');
-console.log('\n== 10. nada revelado antes de responder ==');
+console.log('\n== 11. nada revelado antes de responder ==');
 ok('refazer escondido', (await p2.locator('.ex-refazer:visible').count()) === 0);
 ok('justificativas escondidas', (await p2.locator('.alt-porque:visible').count()) === 0);
 ok('vereditos vazios', (await p2.locator('.ex-veredito:visible').count()) === 0);
