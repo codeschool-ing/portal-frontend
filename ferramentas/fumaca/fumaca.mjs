@@ -202,11 +202,12 @@ ok('marcador da questão ficou verde', (await p.locator('.wz-ponto.certo').count
 
 console.log('\n== 7. progresso e persistência ==');
 await p.goto(BASE + PAGINA + '#/curso/javascript/aula/1/conteudo');
-await p.waitForSelector('.marcar');
-await p.click('.marcar');
-// marcar leva à seção seguinte: concluir e seguir é o mesmo gesto
+await p.waitForSelector('.lado-dir');
+ok('não há mais botão de concluir', (await p.locator('.marcar').count()) === 0);
+await p.click('.lado-dir');
+// avançar É concluir: um gesto só, sem botão separado
 await p.waitForFunction(() => location.hash.endsWith('/avaliacao'), null, { timeout: 5000 });
-ok('marcar avança para a próxima seção', true);
+ok('avançar leva à próxima seção', true);
 ok('seção marcada no trilho', (await p.locator('.trilho-secao.feita').count()) === 1);
 const pctAntes = await p.locator('.ctx-pct').innerText();
 await p.reload({ waitUntil: 'networkidle' });
@@ -246,7 +247,13 @@ ok('a avaliação de hospedagem tem 2 questões', (await p.locator('.wz-ponto').
 await p.goto(BASE + PAGINA + '#/curso/javascript/aula/3/avaliacao');
 await p.waitForSelector('.aval-pendente');
 ok('avaliação sem exercícios aparece como pendente', true);
-ok('e não oferece botão de concluir', (await p.locator('.marcar').count()) === 0);
+/* avançar conclui — MENOS numa avaliação pendente, que não tem o que concluir */
+await p.click('.lado-dir');
+await p.waitForTimeout(300);
+await p.goto(BASE + PAGINA + '#/curso/javascript/aula/3/avaliacao');
+await p.waitForSelector('.passo');
+ok('avaliação pendente não é concluída ao avançar',
+  (await p.locator('.passo.passo-aval.feito').count()) === 0);
 
 const denominadores = await p.evaluate(() => {
   const aulas = CURSOS.find((c) => c.id === 'javascript').topicos.length;

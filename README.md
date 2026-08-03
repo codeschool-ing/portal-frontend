@@ -150,6 +150,14 @@ Ficam três arquivos com três donos e a mesma chave de junção:
 | `aulas.js` | as seções e o texto delas | do portal |
 | exercícios | a avaliação | do pipeline |
 
+**Avançar é concluir.** Não há botão de "marcar como concluída": ele e a seta
+de avançar faziam a mesma coisa, e juntá-los num "Concluir e continuar" só
+adiava a pergunta. Passar para a próxima seção marca a atual como feita — que é
+o que o aluno já queria dizer ao clicar em avançar. O custo é real e fica
+registrado: não há como desmarcar, e quem passar batido acumula progresso sem
+ter lido. É a troca aceita em favor de um gesto só, e combina com o resto do
+portal, que mostra e não tranca.
+
 A forma de uma aula é fixa: **[vídeo + conteúdo] × N, e avaliação no fim.**
 
 - **Toda seção de conteúdo abre com um quadro de vídeo**, reservado enquanto

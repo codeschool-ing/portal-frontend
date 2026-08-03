@@ -14,11 +14,19 @@
       texto empurrado para baixo da dobra. Abaixo de 1180px não há lateral
       sobrando e elas voltam para o rodapé.
 
-   2. O botão de concluir e o de avançar faziam a mesma coisa: marcar já
-      levava adiante. Agora é UM botão — "Concluir e continuar" —, que é o
-      gesto real. Quem só quer passar adiante usa a seta; quem terminou usa o
-      botão. E quem marcou por engano tem um "desmarcar" discreto, que antes
-      não existia.
+   2. Não há mais botão de concluir. Ele e a seta faziam a mesma coisa, e
+      juntar os dois num "Concluir e continuar" só adiou a pergunta: se avançar
+      já era concluir, o botão era um segundo caminho para o mesmo gesto.
+
+      AGORA AVANÇAR É CONCLUIR. Passar para a próxima seção marca a atual como
+      feita — que é o que o aluno já queria dizer ao clicar em avançar. O
+      feedback continua imediato e em dois lugares: o passo ganha o check e o
+      trilho também.
+
+      O que se perde, e vale saber: não há mais como marcar sem sair da seção,
+      nem desmarcar. Quem passar batido acumula progresso sem ter lido. É a
+      troca aceita em favor de um gesto só — e ela combina com o resto do
+      portal, que mostra e não tranca.
    ========================================================================== */
 
 import * as api from '../api.js';
@@ -26,7 +34,6 @@ import { aulasDoCurso, cursoPorId } from '../catalogo.js';
 import { secoesDaAula } from '../aulas.js';
 import { secaoConcluida, visitarSecao } from '../estado.js';
 import { montarAvaliacao } from '../exercicios/index.js';
-import { irPara } from '../rotas.js';
 import { vazio } from './comum.js';
 import { esc, prosa } from '../texto.js';
 
@@ -69,7 +76,6 @@ export default async function aula({ id, ix, sec }) {
 
   visitarSecao(id, n, secao.id);
 
-  const feita = secaoConcluida(id, n, secao.id);
   const { anterior, proxima } = vizinhas(id, n, pos);
   const rota = (v) => '#/curso/' + esc(id) + '/aula/' + v.ix + '/' + esc(v.secId);
 
@@ -85,13 +91,18 @@ export default async function aula({ id, ix, sec }) {
     '</a>'
   )).join('');
 
-  const lateral = (v, lado, seta, rotulo) => (v
-    ? '<a class="lado-seta lado-' + lado + '" href="' + rota(v) + '" aria-label="' + txt(rotulo) + '">' + seta + '</a>'
+  /* A seta de avançar existe SEMPRE. Na última seção do curso ela leva à
+     página do curso — se ela sumisse ali, a última seção seria a única que
+     nunca poderia ser concluída, porque concluir passou a ser avançar. */
+  const destinoProximo = proxima ? rota(proxima) : '#/curso/' + esc(id);
+  const lateral = (destino, lado, seta, rotulo, avanca) => (destino
+    ? '<a class="lado-seta lado-' + lado + (avanca ? ' avancar' : '') + '" href="' + destino +
+      '" aria-label="' + txt(rotulo) + '">' + seta + '</a>'
     : '');
 
   el.innerHTML =
-    lateral(anterior, 'esq', SETA_ESQ, 'seção anterior') +
-    lateral(proxima, 'dir', SETA_DIR, 'próxima seção') +
+    lateral(anterior && rota(anterior), 'esq', SETA_ESQ, 'seção anterior') +
+    lateral(destinoProximo, 'dir', SETA_DIR, 'concluir e ir para a próxima seção', true) +
 
     '<nav class="migalhas">' +
       '<a href="#/curso/' + esc(id) + '">' + esc(c.nome) + '</a>' +
@@ -126,18 +137,11 @@ export default async function aula({ id, ix, sec }) {
             : '<p class="mono dim">' + txt('[conteúdo da aula — entra com o material real na Etapa 2]') + '</p>') +
         '</section>') +
 
+    /* O rodapé só existe onde não há setas laterais — abaixo de 1400px. Não
+       há botão de concluir: avançar é concluir. */
     '<footer class="aula-pe">' +
-      (secao.pendente
-        ? '<span class="pe-nota mono dim">' + txt('nada a concluir aqui ainda') + '</span>'
-        : '<button type="button" class="btn ' + (feita ? 'btn-ghost' : 'btn-primary') + ' marcar">' +
-            (feita ? txt('Continuar') + ' →' : txt('Concluir e continuar') + ' →') +
-          '</button>' +
-          (feita ? '<button type="button" class="pe-desmarcar">' + txt('desmarcar') + '</button>' : '')) +
-      /* as mesmas duas rotas das setas laterais, para quando não há lateral */
-      '<div class="aula-nav">' +
-        (anterior ? '<a class="btn btn-ghost" href="' + rota(anterior) + '">← ' + txt('anterior') + '</a>' : '') +
-        (proxima ? '<a class="btn btn-ghost" href="' + rota(proxima) + '">' + txt('próxima') + ' →</a>' : '') +
-      '</div>' +
+      (anterior ? '<a class="btn btn-ghost" href="' + rota(anterior) + '">← ' + txt('anterior') + '</a>' : '<span></span>') +
+      '<a class="btn btn-primary avancar" href="' + destinoProximo + '">' + txt('próxima') + ' →</a>' +
     '</footer>';
 
   if (secao.tipo === 'avaliacao' && !secao.pendente) {
@@ -155,22 +159,13 @@ export default async function aula({ id, ix, sec }) {
     });
   }
 
-  const seguir = () => {
-    if (proxima) irPara(rota(proxima).slice(1));
-    else irPara('/curso/' + id);
-  };
-
-  const marcar = el.querySelector('.marcar');
-  if (marcar) marcar.addEventListener('click', async () => {
-    if (!secaoConcluida(id, n, secao.id)) await api.concluirSecao(id, n, secao.id, true);
-    seguir();
-  });
-
-  const desmarcar = el.querySelector('.pe-desmarcar');
-  if (desmarcar) desmarcar.addEventListener('click', async () => {
-    await api.concluirSecao(id, n, secao.id, false);
-    irPara(location.hash.slice(1));   // remonta a tela no estado novo
-    globalThis.redesenharTudo?.();
+  /* Avançar conclui. A marcação é síncrona por dentro, então acontece antes de
+     o navegador processar a troca de hash — não há corrida. A avaliação ainda
+     sem exercícios fica de fora: não há o que concluir nela. */
+  el.addEventListener('click', (e) => {
+    if (!e.target.closest('.avancar')) return;
+    if (secao.pendente) return;
+    if (!secaoConcluida(id, n, secao.id)) api.concluirSecao(id, n, secao.id, true);
   });
 
   return { titulo: a.titulo + ' · ' + secao.titulo, el };

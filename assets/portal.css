@@ -119,7 +119,7 @@ body.sem-trilho .trilho{display:none}
 }
 .trilho-aula.on .ta-num{color:var(--phosphor)}
 .ta-tit{
-  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.82rem;
+  font-family:'Space Grotesk',sans-serif;font-weight:400;font-size:.82rem;
   line-height:1.25;color:var(--paper);
 }
 .trilho-aula.feita .ta-tit{color:var(--paper-dim)}
@@ -404,12 +404,12 @@ body.sem-trilho .trilho{display:none}
 .aula-titulo{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.3rem,2.8vw,1.8rem);line-height:1.18}
 
 /* O quadro é reservado em TODA seção de conteúdo, com vídeo ou sem — publicar
-   um a um não pode reorganizar a tela de ninguém. Mas 16/9 na largura inteira
-   da coluna dá 460px, e enquanto os vídeos não existem isso é meia tela vazia
-   antes de cada texto. O teto de 600px mantém a reserva honesta (o quadro tem
-   o mesmo tamanho antes e depois do vídeo chegar) e devolve ~150px à leitura. */
+   um a um não pode reorganizar a tela de ninguém. Ele acompanha a LARGURA DA
+   SEÇÃO: um teto de 600px devolvia altura à leitura, mas deixava o vídeo
+   desalinhado do bloco de texto logo abaixo, e desalinho custa mais atenção
+   do que os 150px valiam. */
 .video-fachada{
-  position:relative;aspect-ratio:16/9;max-width:600px;
+  position:relative;aspect-ratio:16/9;
   border-radius:6px;overflow:hidden;cursor:pointer;
   background:var(--panel);border:1px solid var(--wire);
   display:grid;place-items:center;
@@ -426,14 +426,6 @@ body.sem-trilho .trilho{display:none}
 .lista-ex{display:flex;flex-direction:column;gap:16px}
 
 .aula-pe{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--wire)}
-.aula-nav{display:flex;gap:8px}
-.pe-desmarcar{
-  background:none;border:0;cursor:pointer;font:inherit;
-  font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim);
-  text-decoration:underline;text-underline-offset:3px;
-}
-.pe-desmarcar:hover{color:var(--amber)}
-
 /* AS SETAS DE NAVEGAÇÃO VÃO PARA AS LATERAIS em tela larga. O conteúdo é preso
    a uma coluna de leitura, então sobra espaço nos lados e falta na vertical —
    e cada pixel gasto embaixo é texto empurrado para fora da dobra. Abaixo de
@@ -459,7 +451,9 @@ body.sem-trilho .trilho{display:none}
   .lado-seta svg{width:20px;height:20px}
   .lado-esq{left:max(342px, calc(50vw + 165px - 410px - 60px))}
   .lado-dir{right:max(12px, calc(50vw - 575px - 60px))}
-  .aula-pe .aula-nav{display:none}
+  /* com as setas nas laterais o rodapé inteiro some: ele só repetia as mesmas
+     duas rotas, e repetir custa a altura que as setas foram economizar */
+  .aula-pe{display:none}
 }
 
 /* ---------- o wizard da avaliação ---------- */
