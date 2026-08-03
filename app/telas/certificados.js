@@ -27,6 +27,7 @@
 import { caminhoDaTrilha, cursoPorId } from '../catalogo.js';
 import { cursoConcluido, opcaoAtiva, provaAprovada, resultadoProva, agora } from '../estado.js';
 import { trilhaDoAluno } from './comum.js';
+import { abrirModal } from '../modal.js';
 import { esc } from '../texto.js';
 
 const DATA = (d) => new Intl.DateTimeFormat(document.documentElement.lang || 'pt-BR', {
@@ -61,7 +62,12 @@ function codigo(semente) {
    código —, e é de propósito: quem olha rápido, quem lê o rótulo e quem for
    conferir o número recebem a mesma informação. */
 function cartao({ rotulo, nome, meta, quem, quando, chave, exemplo, nota }) {
-  return '<article class="cert' + (exemplo ? ' cert-exemplo' : '') + '">' +
+  /* O certificado inteiro é um botão. Não há um "ver maior" ao lado: o alvo
+     que a pessoa quer clicar é o documento, e um controle menor ao lado dele
+     seria um alvo pior para a mesma intenção. */
+  return '<article class="cert' + (exemplo ? ' cert-exemplo' : '') + '" ' +
+      'tabindex="0" role="button" data-cert="' + esc(chave) + '" ' +
+      'aria-label="' + txt('Ver o certificado em tamanho grande') + '">' +
     '<div class="cert-folha">' +
       '<header class="cert-topo">' +
         '<span class="cert-marca"><span class="cert-led" aria-hidden="true"></span>codeschool<b>.ing</b></span>' +
@@ -88,6 +94,51 @@ function cartao({ rotulo, nome, meta, quem, quando, chave, exemplo, nota }) {
     '</div>' +
   '</article>';
 }
+
+/* ---------- compartilhar no LinkedIn ----------
+
+   Dois endpoints, e eles fazem coisas diferentes:
+
+     share-offsite  publica um POST com o link do certificado
+     profile/add    abre o formulário de "licenças e certificados" do perfil
+                    JÁ PREENCHIDO — nome, instituição, data e código
+
+   O segundo é o que a pessoa realmente quer: certificado no perfil é uma
+   credencial, não um post que some do feed em dois dias.
+
+   O `certUrl` aponta para uma página de validação que AINDA NÃO EXISTE — ela
+   nasce com o servidor, na Etapa 2. A URL é montada no formato definitivo de
+   propósito: é a forma que precisa estar certa agora, porque o dia em que o
+   servidor existir não pode ser o dia de descobrir que o formato era outro. E
+   o botão diz isso, em vez de fingir. */
+const LINKEDIN = 'https://www.linkedin.com';
+const urlDeValidacao = (cod) => 'https://codeschool.ing/certificado/' + encodeURIComponent(cod);
+
+function botoesLinkedIn({ nome, cod, quando }) {
+  const d = new Date(quando);
+  const q = (o) => Object.entries(o)
+    .filter(([, v]) => v !== undefined && v !== '')
+    .map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&');
+
+  const perfil = LINKEDIN + '/profile/add?' + q({
+    startTask: 'CERTIFICATION_NAME',
+    name: nome,
+    organizationName: 'codeschool.ing',
+    issueYear: d.getFullYear(),
+    issueMonth: d.getMonth() + 1,
+    certId: cod,
+    certUrl: urlDeValidacao(cod),
+  });
+  const post = LINKEDIN + '/sharing/share-offsite/?' + q({ url: urlDeValidacao(cod) });
+
+  return '<a class="btn btn-primary cert-share" href="' + esc(perfil) + '" target="_blank" rel="noopener">' +
+      ICO_LINKEDIN + txt('Adicionar ao perfil') + '</a>' +
+    '<a class="btn btn-ghost cert-share" href="' + esc(post) + '" target="_blank" rel="noopener">' +
+      txt('Compartilhar') + '</a>';
+}
+
+const ICO_LINKEDIN = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
+  '<path d="M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-.95 1.83-1.95 3.77-1.95 4.03 0 4.78 2.5 4.78 5.76V21h-4v-5.6c0-1.34-.03-3.07-1.9-3.07-1.9 0-2.2 1.46-2.2 2.97V21H9z"/></svg>';
 
 export default async function certificados() {
   const el = document.createElement('div');
@@ -192,6 +243,34 @@ export default async function certificados() {
           '<div class="certs">' + exemplos + '</div>' +
         '</section>'
       : '');
+
+  /* Um ouvinte na tela inteira, e não um por cartão: os cartões são refeitos
+     a cada render, e ouvinte por cartão vaza a cada remontagem. */
+  const abrir = (art) => {
+    const exemplo = art.classList.contains('cert-exemplo');
+    const chave = art.dataset.cert;
+    const nomeCert = art.querySelector('.cert-curso')?.textContent || '';
+    abrirModal(art.outerHTML, {
+      classe: 'modal-cert',
+      rotulo: txt('Certificado') + ' — ' + nomeCert,
+      acoes: exemplo
+        ? '<span class="cert-share-nota mono dim">' +
+            txt('exemplo — não há o que compartilhar') + '</span>'
+        : botoesLinkedIn({ nome: nomeCert, cod: codigo(chave + quem), quando: new Date().toISOString() }),
+    });
+  };
+
+  el.addEventListener('click', (e) => {
+    const art = e.target.closest('.cert');
+    if (art) abrir(art);
+  });
+  el.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const art = e.target.closest('.cert');
+    if (!art) return;
+    e.preventDefault();
+    abrir(art);
+  });
 
   return { titulo: txt('Certificados'), el };
 }

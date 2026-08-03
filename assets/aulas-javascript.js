@@ -147,6 +147,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'igualdade',
+        video: true,
+        duracao: '08 min',
         titulo: '== contra ===',
         corpo: [
           '`==` compara depois de converter; `===` compara sem converter. A tabela do `==` tem casos que ninguém memoriza, e a saída disso é simples: **use `===` sempre.**',
@@ -175,6 +177,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'falsos',
+        video: true,
+        duracao: '11 min',
         titulo: 'Os oito valores falsos',
         corpo: [
           'Num `if`, qualquer valor vira booleano. São **oito** os que viram `false` — e todo o resto vira `true`, inclusive `[]`, `{}` e `"0"`:',
@@ -246,6 +250,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'espalhar',
+        video: true,
+        duracao: '09 min',
         titulo: 'Espalhar e juntar',
         corpo: [
           'As mesmas três reticências fazem coisas opostas conforme o lado em que estão: à direita elas **espalham**, à esquerda elas **juntam**.',
@@ -314,6 +320,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'this',
+        video: true,
+        duracao: '13 min',
         titulo: 'O valor de this',
         corpo: [
           '`this` não é decidido onde a função é escrita, e sim **onde ela é chamada** — com uma exceção, a arrow function. Quase todo bug de `this` é a mesma função tendo sido separada do objeto dela.',

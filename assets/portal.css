@@ -39,13 +39,19 @@
   background:none;backdrop-filter:none;border-bottom:0;align-items:stretch;
 }
 
+/* As duas medidas que mais de uma regra precisa saber: a largura do trilho e a
+   da coluna de leitura. Elas viram variáveis porque as setas de navegação são
+   posicionadas no VÃO que sobra delas — e um número repetido em dois lugares
+   diverge no dia em que um deles muda. Já aconteceu com o recuo do conteúdo. */
 .portal{
+  --trilho:380px;
+  --leitura:820px;
   display:grid;
   /* 380 e não 272: com 272 quase todo nome de aula quebrava em duas ou três
      linhas, e uma lista de treze itens quebrados vira parede. Os 50px que
      vieram depois compram a diferença entre "Front-end with React and
      TypeScript" numa linha ou em duas. */
-  grid-template-columns:380px minmax(0,1fr);
+  grid-template-columns:var(--trilho) minmax(0,1fr);
   min-height:100vh;
   padding-top:64px;               /* a barra é fixa e tem altura fixa */
 }
@@ -273,6 +279,23 @@ body.sem-trilho .trilho{display:none}
    3 · O GRAFO COMO MAPA DE PROGRESSO
    ========================================================== */
 
+/* MAIS AR ENTRE OS NÍVEIS. A vitrine usa 48px, e lá isso basta: o grafo é uma
+   das sete telas e some depois de uma rolada. Aqui ele é a tela onde o aluno
+   volta para se situar, e com 48px as arestas passam raspando nos cartões —
+   não colidem, mas a leitura fica apertada e o olho não separa uma coluna da
+   seguinte.
+
+   A troca é rolagem horizontal, e ela é barata: o grafo já rola, já tem as
+   setas e já tem o esmaecido nas bordas. O roteamento das arestas é medido
+   sobre as posições REAIS, então ele acompanha sem uma linha de JavaScript —
+   e o detector de colisão do teste de fumaça confirma que acompanhou.
+
+   Aqui e não no `base.css`, que é cópia da vitrine e tem de continuar
+   sincronizável. */
+.portal .grafo-niveis{gap:88px}
+.portal .nivel{gap:26px}
+.portal .subcol{gap:20px}
+
 /* `.grafo-niveis` e `.nivel` têm height:100%, então a caixa precisa de altura
    definida — na vitrine ela vinha da seção fullpage, que aqui não existe. */
 .tela-trilha .grafo-caixa{height:clamp(360px,58vh,640px)}
@@ -358,7 +381,7 @@ body.sem-trilho .trilho{display:none}
 .aula-linha.feita .aula-tit{color:var(--paper-dim)}
 
 /* ---------- a aula, agora em seções ---------- */
-.tela-aula{max-width:820px}
+.tela-aula{max-width:var(--leitura)}
 .aula-cabeca{display:flex;flex-direction:column;gap:12px}
 
 /* Os passos são a espinha da aula: onde estou entre as seções e quanto falta.
@@ -435,28 +458,40 @@ body.sem-trilho .trilho{display:none}
 
 /* DUAS FORMAS DE SEÇÃO, E O LAYOUT SEGUE A FORMA.
 
-   A seção que TEM vídeo abre com o player de ponta a ponta da área de
-   conteúdo, e o título desce para baixo dele: vídeo é o que a pessoa veio
-   fazer ali, e um cabeçalho na frente empurra o play para baixo da dobra num
-   notebook. A seção que NÃO tem vídeo não tem quadro nenhum — nem cinza, nem
+   A seção que TEM vídeo mostra o player de ponta a ponta da área de conteúdo,
+   depois do cabeçalho. A que NÃO tem não tem quadro nenhum — nem cinza, nem
    reservado. Ver o comentário em telas/aula.js.
 
-   O sangramento é feito cancelando o padding do `.conteudo` com margem
-   negativa, e por isso os números aqui e lá TÊM DE BATER: se um mudar sem o
-   outro, aparece uma faixa clara de um lado do vídeo. */
-.aula-com-video{max-width:none;gap:0}
+   O sangramento cancela o recuo do `.conteudo` com margem negativa, e os dois
+   saem da MESMA variável (`--pad-x`): repetir o número em dois lugares fez
+   exatamente o que se espera, divergiu, e sobraram 2px de rolagem horizontal
+   no celular.
+
+   O `.tela` continua com o teto de 1180px, então o player sangra até a borda
+   dessa coluna e não da tela inteira — que é onde o texto acima e abaixo dele
+   também termina. Alinhado com o conteúdo, e não com a janela. */
+/* O SANGRAMENTO, COM O TÍTULO ACIMA.
+
+   A coluna de leitura tem 820px e é centrada na área que sobra do trilho. O
+   player precisa escapar dela e ir até as duas bordas dessa área — e a conta
+   sai fechada:
+
+     a coluna começa em  X = (100vw + trilho - largura) / 2
+     queremos que o vídeo comece em  trilho
+     logo  margin-left = trilho - X = 50% - 50vw + trilho/2
+
+   `50%` aqui é metade da COLUNA (o bloco que contém o vídeo) e `50vw` metade
+   da janela: é o truque clássico de full-bleed, corrigido pelo trilho, que
+   desloca o centro. Sem a correção o vídeo começaria embaixo do menu.
+
+   Ele funciona sem saber a largura da área e sem um invólucro a mais no HTML,
+   que é o que a primeira versão precisava. */
 .aula-com-video .video-fachada{
-  margin:calc(-1 * var(--pad-y)) calc(-1 * var(--pad-x)) 0;
-  border-radius:0;border-left:0;border-right:0;border-top:0;
-  /* o teto de altura impede que numa tela larga o player empurre o título
-     inteiro para fora — 16/9 de 1500px são 840px, mais que a dobra */
-  max-height:min(72vh, calc(100vh - 260px));
+  width:calc(100vw - var(--trilho));
+  margin-left:calc(50% - 50vw + var(--trilho) / 2);
+  border-radius:0;border-left:0;border-right:0;
+  max-height:min(70vh, calc(100vh - 320px));
 }
-.aula-com-video .aula-miolo{
-  max-width:1180px;margin:0 auto;padding-top:var(--pad-y);
-  display:flex;flex-direction:column;gap:22px;width:100%;
-}
-.aula-so-texto .aula-miolo{display:contents}
 
 .video-fachada{
   position:relative;aspect-ratio:16/9;
@@ -492,25 +527,39 @@ body.sem-trilho .trilho{display:none}
    1180px não há lateral sobrando, e elas voltam para o rodapé. */
 .lado-seta{display:none}
 
-/* 1400px, e não 1180: as setas só entram quando existe lateral DE VERDADE
-   sobrando ao lado da coluna de leitura. A 1180 a coluna ocupa quase toda a
-   área útil e a seta cairia por cima do texto — aí o rodapé é o lugar certo.
+/* AS SETAS FICAM NA SOBRA DA TELA, e não coladas no texto.
 
-   A posição é calculada a partir da COLUNA, não da janela: a coluna tem 820px
-   e é centrada na área que sobra do trilho (380px), então o centro dela está
-   em `50vw + 190px`. Ancorar na borda da janela deixava as setas boiando a
-   150px do texto numa tela de 1600. */
+   A coluna de leitura tem no máximo 1180px e é centrada na área que sobra do
+   trilho. O que resta dos dois lados — o "vão" — é espaço que nenhum conteúdo
+   usa, e é exatamente onde um controle de navegação deve morar: perto o
+   bastante para ser alcançado, longe o bastante para não disputar a linha com
+   a palavra que está sendo lida.
+
+     vão de cada lado = (100vw - trilho - coluna de leitura) / 2
+     seta da esquerda  → centrada no vão entre o trilho e a coluna
+     seta da direita   → centrada no vão entre a coluna e a borda da tela
+
+   O CORTE É 1400px, e o número sai da conta: com o trilho de 380 e a leitura de
+   820, o vão de cada lado é (1400-380-820)/2 = 100px — o suficiente para uma
+   seta de 44px com folga dos dois lados. Abaixo disso não há vão, e o rodapé
+   volta a ser o lugar certo. Ele nunca deixou de existir. */
 @media(min-width:1400px){
   .lado-seta{
-    display:grid;place-items:center;position:fixed;top:50%;transform:translateY(-50%);
+    display:grid;place-items:center;position:fixed;top:50%;
     width:44px;height:44px;border-radius:50%;z-index:60;
     background:var(--panel);border:1px solid var(--wire);color:var(--paper-dim);
     transition:color .15s,border-color .15s,background .15s;
   }
   .lado-seta:hover{color:var(--phosphor);border-color:var(--phosphor);background:var(--ink)}
   .lado-seta svg{width:20px;height:20px}
-  .lado-esq{left:max(392px, calc(50vw + 190px - 410px - 60px))}
-  .lado-dir{right:max(12px, calc(50vw - 575px - 60px))}
+  .lado-esq{
+    left:calc(var(--trilho) + (100vw - var(--trilho) - var(--leitura)) / 4);
+    transform:translate(-50%,-50%);
+  }
+  .lado-dir{
+    right:calc((100vw - var(--trilho) - var(--leitura)) / 4);
+    transform:translate(50%,-50%);
+  }
   /* com as setas nas laterais o rodapé inteiro some: ele só repetia as mesmas
      duas rotas, e repetir custa a altura que as setas foram economizar */
   .aula-pe{display:none}
@@ -859,6 +908,27 @@ body.com-busca{overflow:hidden}
 .cert-exemplo .cert-led{box-shadow:none;background:var(--wire)}
 .cert-exemplo .cert-marca b{color:var(--paper-dim)}
 
+/* ---------- o certificado ampliado ----------
+   Ele é o único artefato do portal que a pessoa quer OLHAR, e não usar. Por
+   isso o clique abre em grande, com o resto da tela apagado e congelado — o
+   mesmo modal da vitrine, com uma faixa de ações acima da caixa. */
+.cert{cursor:zoom-in}
+.cert:focus-visible{outline:2px solid var(--phosphor);outline-offset:3px}
+
+.modal-pilha{display:flex;flex-direction:column;gap:12px;width:min(760px,100%)}
+.modal-acoes{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px}
+.modal-cert .modal-caixa{width:100%;background:none;border:0;box-shadow:none;overflow:visible}
+/* dentro do modal o certificado é o conteúdo inteiro: sem cursor de lupa,
+   sem hover, e com o corpo maior — é para isso que ele foi ampliado */
+.modal-cert .cert{cursor:default;padding:12px}
+.modal-cert .cert-folha{min-height:340px;padding:34px 40px 22px}
+.modal-cert .cert-aluno{font-size:clamp(1.8rem,4vw,2.6rem)}
+.modal-cert .cert-curso{font-size:1.35rem}
+.modal-cert .cert-meta,.modal-cert .cert-pe{font-size:.76rem}
+.cert-share{gap:8px}
+.cert-share svg{width:15px;height:15px}
+.cert-share-nota{font-size:.7rem}
+
 .cert-previa{margin-top:26px;display:flex;flex-direction:column;gap:12px}
 /* o rótulo anda junto do título, e não na outra ponta da tela: ele explica o
    título, e explicação a um metro de distância não explica nada */
@@ -943,53 +1013,77 @@ body.com-busca{overflow:hidden}
 
 /* ---------- código como exemplo, no estilo Go By Example ----------
 
-   Duas colunas: o programa desce inteiro pela esquerda, a nota de cada trecho
-   fica ao lado. A borda vertical entre elas é o que faz o código parecer um
-   arquivo contínuo mesmo com as notas interrompendo a leitura horizontal.
+   Duas colunas: a EXPLICAÇÃO à esquerda, o PROGRAMA à direita, cada nota na
+   altura do trecho que ela comenta. Ver o comentário em texto.js.
 
-   O `align-items:start` é o que segura a nota no alto do trecho a que ela se
-   refere; centralizada, ela flutuaria no meio de um bloco de dez linhas e
-   deixaria de apontar para lugar nenhum. */
-.exemplo{
-  margin:18px 0;border:1px solid var(--wire);border-radius:6px;
-  background:var(--panel);overflow:hidden;
-}
-.exemplo-barra{
-  display:flex;align-items:center;gap:10px;padding:6px 12px;
-  border-bottom:1px solid var(--wire);background:var(--ink);
-}
-.exemplo-arq{font-size:.66rem;margin-left:auto}
-.exemplo-par{
-  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);
-  align-items:start;border-bottom:1px solid var(--wire);
-}
-.exemplo-par:last-of-type{border-bottom:0}
-.exemplo-cod{
-  margin:0;padding:12px 14px;overflow-x:auto;
-  font-family:'IBM Plex Mono',monospace;font-size:.78rem;line-height:1.65;
-  color:var(--paper);white-space:pre;
+   O que faz a coluna da direita parecer um arquivo, e não uma pilha de
+   pedaços: `row-gap:0`, nenhuma borda entre as linhas, e o mesmo fundo em
+   todas as células de código. Sem isso o bloco vira uma tabela — que é
+   exatamente o que ele existe para não ser.
+
+   `align-items:start` na nota é o que a segura no alto do trecho a que se
+   refere; centralizada, ela flutuaria no meio de dez linhas de código e
+   deixaria de apontar para lugar nenhum. O `<pre>` NÃO leva start: ele estica
+   até o fim da linha da grade, e é esse esticar que emenda o fundo. */
+.exemplo{margin:22px 0;max-width:100%}
+.exemplo-barra{display:flex;justify-content:flex-end;margin-bottom:5px}
+.exemplo-arq{font-size:.64rem;letter-spacing:.06em}
+
+.exemplo-grade{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);
+  column-gap:26px;row-gap:0;
 }
 .exemplo-nota{
-  padding:12px 14px;border-left:1px solid var(--wire);
-  font-size:.82rem;line-height:1.6;color:var(--paper-dim);
+  align-self:start;padding:11px 0 11px;
+  font-size:.86rem;line-height:1.62;color:var(--paper-dim);
 }
-.exemplo-nota code{font-size:.94em}
-.exemplo-par.sem-nota{grid-template-columns:1fr}
-.exemplo-saida{border-top:1px solid var(--wire);background:var(--ink);padding:10px 14px}
-.exemplo-saida-rot{
-  display:block;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;
+.exemplo-nota:empty{padding:0}
+.exemplo-nota code{
+  font-family:'IBM Plex Mono',monospace;font-size:.86em;
+  background:var(--panel);padding:1px 5px;border-radius:3px;color:var(--paper);
 }
-.exemplo-saida .cod{margin:0;padding:0;background:none;border:0}
+.exemplo-nota strong{color:var(--paper)}
 
-/* Abaixo de 900px as duas colunas não cabem lado a lado sem picotar o código.
-   A nota vai para CIMA do trecho: ler a explicação e então o código é a ordem
-   que funciona quando não há alinhamento lateral para amarrar os dois. */
+.exemplo-cod{
+  margin:0;padding:0 18px;overflow-x:auto;
+  background:var(--panel);border-left:2px solid var(--wire);
+  font-family:'IBM Plex Mono',monospace;font-size:.79rem;line-height:1.7;
+  color:var(--paper);white-space:pre;
+}
+/* o respiro do arquivo fica nas pontas do bloco, não em cada trecho: o miolo
+   precisa emendar sem costura */
+.exemplo-cod:first-of-type{padding-top:12px}
+.exemplo-cod:last-of-type{padding-bottom:12px}
+
+.exemplo-saida{
+  grid-column:2;margin-top:10px;padding:9px 16px;
+  background:var(--ink);border:1px solid var(--wire);border-radius:4px;
+}
+.exemplo-saida-rot{
+  display:block;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px;
+}
+.exemplo-saida .cod{margin:0;padding:0;background:none;border:0;font-size:.76rem;color:var(--paper-dim)}
+
+/* ---------- as três cores do realce ----------
+   Vermelho para a estrutura da linguagem, azul para os literais, branco para
+   o resto. Comentário no cinza apagado — ele é o único que se lê como prosa,
+   e prosa dentro de código não deve competir com o código. */
+.t-pal{color:var(--amber)}
+.t-txt,.t-num{color:var(--phosphor)}
+.t-com{color:var(--paper-dim);font-style:italic}
+.t-fun,.t-pro{color:var(--paper)}
+
+/* Abaixo de 900px as duas colunas não cabem sem picotar o código. A nota vai
+   para CIMA do trecho: ler a explicação e então o código é a ordem que
+   funciona quando não há alinhamento lateral para amarrar os dois. */
 @media(max-width:900px){
-  .exemplo-par{grid-template-columns:1fr}
-  .exemplo-nota{
-    order:-1;border-left:0;border-bottom:1px solid var(--wire);
-    background:var(--ink);padding:10px 14px;
-  }
+  .exemplo-grade{grid-template-columns:1fr}
+  .exemplo-nota{padding:12px 0 8px}
+  .exemplo-cod{padding:10px 14px}
+  .exemplo-cod:first-of-type{padding-top:10px}
+  .exemplo-saida{grid-column:1}
+  .exemplo-vazio{display:none}
 }
 
 /* ---------- material complementar ---------- */
@@ -1072,7 +1166,7 @@ body.com-busca{overflow:hidden}
    deixa de caber numa linha, e pela mesma razão: abaixo disso não há largura
    para chrome persistente e conteúdo ao mesmo tempo. */
 @media(max-width:1180px){
-  .portal{grid-template-columns:minmax(0,1fr)}
+  .portal{--trilho:0px;grid-template-columns:minmax(0,1fr)}
   .trilho{
     position:fixed;top:64px;left:0;bottom:0;width:min(300px,84vw);z-index:110;
     background:var(--ink);transform:translateX(-102%);transition:transform .22s ease;

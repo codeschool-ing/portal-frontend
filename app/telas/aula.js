@@ -130,17 +130,6 @@ export default async function aula({ id, ix, sec }) {
     lateral(anterior && rota(anterior), 'esq', SETA_ESQ, 'seção anterior') +
     lateral(destinoProximo, 'dir', SETA_DIR, 'concluir e ir para a próxima seção', true) +
 
-    (temVideo
-      ? '<div class="video-fachada" data-video="' + esc(videoPronto || '') + '">' +
-          (videoPronto
-            ? '<button type="button" class="video-play" aria-label="' + txt('Assistir') + '">▶</button>'
-            : '<span class="video-breve mono dim">' + txt('vídeo em breve') + '</span>') +
-          (secao.duracao ? '<span class="video-duracao mono">' + esc(secao.duracao) + '</span>' : '') +
-        '</div>'
-      : '') +
-
-    '<div class="aula-miolo">' +
-
     '<nav class="migalhas">' +
       '<a href="#/curso/' + esc(id) + '">' + esc(c.nome) + '</a>' +
       '<span aria-hidden="true">›</span>' +
@@ -153,6 +142,19 @@ export default async function aula({ id, ix, sec }) {
     '</header>' +
 
     '<h2 class="secao-titulo">' + esc(secao.titulo) + '</h2>' +
+
+    /* O PLAYER VEM DEPOIS DO CABEÇALHO. Ele já esteve antes, para não empurrar
+       o play para baixo da dobra — e o preço era a pessoa cair numa seção sem
+       saber de que aula ela é. Onde estou vem antes de o que assisto, e a
+       resposta é a mesma nas seções de texto. */
+    (temVideo
+      ? '<div class="video-fachada" data-video="' + esc(videoPronto || '') + '">' +
+          (videoPronto
+            ? '<button type="button" class="video-play" aria-label="' + txt('Assistir') + '">▶</button>'
+            : '<span class="video-breve mono dim">' + txt('vídeo em breve') + '</span>') +
+          (secao.duracao ? '<span class="video-duracao mono">' + esc(secao.duracao) + '</span>' : '') +
+        '</div>'
+      : '') +
 
     (secao.tipo === 'avaliacao'
       ? '<section class="bloco aula-exercicios' + (secao.pendente ? ' aval-pendente' : '') + '">' +
@@ -189,9 +191,7 @@ export default async function aula({ id, ix, sec }) {
     '<footer class="aula-pe">' +
       (anterior ? '<a class="btn btn-ghost" href="' + rota(anterior) + '">← ' + txt('anterior') + '</a>' : '<span></span>') +
       '<a class="btn btn-primary avancar" href="' + destinoProximo + '">' + txt('próxima') + ' →</a>' +
-    '</footer>' +
-
-    '</div>';
+    '</footer>';
 
   if (secao.tipo === 'avaliacao' && !secao.pendente) {
     const exercicios = await api.exerciciosDaAula(id, a.chave);

@@ -95,6 +95,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'ida-e-volta',
+        video: true,
+        duracao: '09 min',
         titulo: 'A viagem de ida e volta',
         corpo: [
           'Digitar um endereço e ver a página aparecer esconde uma sequência que vale conhecer inteira, porque é ela que o resto do curso destrincha:',
@@ -132,6 +134,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'socket',
+        video: true,
+        duracao: '07 min',
         titulo: 'Socket: o endereço de um programa',
         corpo: [
           'O IP encontra a máquina, mas uma máquina roda dezenas de programas em rede ao mesmo tempo. Quem separa é a **porta**, um número que identifica qual programa deve receber aquele dado.',
@@ -214,6 +218,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'as-camadas',
+        video: true,
+        duracao: '13 min',
         titulo: 'As quatro que importam na prática',
         corpo: [
           'O modelo OSI tem sete camadas e é bom para estudar. No dia a dia, quatro explicam quase tudo:',
@@ -242,6 +248,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
     'HTTP e HTTPS: métodos, cabeçalhos e códigos de status': [
       {
         id: 'metodos',
+        video: true,
+        duracao: '10 min',
         titulo: 'Métodos: o verbo do pedido',
         corpo: [
           'Todo pedido HTTP começa por um verbo que diz a intenção. Os que aparecem sempre:',
@@ -266,6 +274,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'status',
+        video: true,
+        duracao: '08 min',
         titulo: 'Códigos de status: as cinco famílias',
         corpo: [
           'A resposta começa com um número de três dígitos, e o primeiro dígito já classifica:',
@@ -312,6 +322,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'cache',
+        video: true,
+        duracao: '06 min',
         titulo: 'Cache: não pedir de novo o que não mudou',
         corpo: [
           'O jeito mais rápido de carregar um arquivo é não carregá-lo. O **cache** guarda a resposta e a reutiliza enquanto ela valer, e quem manda nisso é o servidor, pelo `Cache-Control`.',
@@ -486,6 +498,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'renderizacao',
+        video: true,
+        duracao: '11 min',
         titulo: 'Layout, pintura e composição',
         corpo: [
           'Com estilo resolvido, faltam três passos: **layout** calcula a posição e o tamanho de cada caixa, **pintura** desenha os pixels, e **composição** junta as camadas na tela.',
@@ -517,6 +531,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'console',
+        video: true,
+        duracao: '12 min',
         titulo: 'Console: erros e experimentos',
         corpo: [
           'O **Console** é o primeiro lugar a olhar quando algo não funciona, e o mais ignorado por quem está começando. Erro de JavaScript, arquivo que não carregou, recurso bloqueado — tudo aparece ali, e quase sempre com a linha exata.',

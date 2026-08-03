@@ -32,6 +32,7 @@ import refazer from './telas/refazer.js';
 import notas from './telas/notas.js';
 import { provaCurso, provaTrilha } from './telas/prova.js';
 import { abrirBusca, fechar as fecharBusca, buscaAberta } from './painel-busca.js';
+import { fecharModal, modalAberto } from './modal.js';
 
 /* ---------- o que o i18n-runtime precisa de nós ---------- */
 globalThis.ehEscolha = ehEscolha;                 // usado por aplicarConteudo()
@@ -211,9 +212,13 @@ $('#trilho').addEventListener('click', (e) => {
   }
   if (e.target.closest('a')) fecharTrilho();
 });
+/* Esc fecha o que estiver por cima, na ordem em que as camadas se empilham:
+   modal, busca, gaveta. Sem a ordem, fechar o modal fecharia a gaveta atrás
+   dele — que a pessoa nem estava vendo. */
 addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
-  if (buscaAberta()) fecharBusca();
+  if (modalAberto()) fecharModal();
+  else if (buscaAberta()) fecharBusca();
   else fecharTrilho();
 });
 
