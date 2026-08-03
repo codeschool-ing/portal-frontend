@@ -44,6 +44,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'metadados',
+        video: true,
+        duracao: '08 min',
         titulo: 'Metadados que fazem diferença',
         corpo: [
           'O `<head>` não aparece na tela e decide muita coisa do que acontece nela.',
@@ -155,6 +157,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'imagens',
+        video: true,
+        duracao: '10 min',
         titulo: 'Imagens que não desperdiçam banda',
         corpo: [
           'Servir a mesma imagem de 2000px para um celular é jogar fora banda e bateria de quem tem menos dos dois. `srcset` deixa o navegador escolher:',
@@ -196,6 +200,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'especificidade',
+        video: true,
+        duracao: '12 min',
         titulo: 'Especificidade: a conta que decide quem ganha',
         corpo: [
           'Quando duas regras atingem o mesmo elemento e declaram a mesma propriedade, vence a mais específica. A especificidade é um trio de números — **(ids, classes, elementos)** — comparado da esquerda para a direita:',
@@ -228,6 +234,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'box-sizing',
+        video: true,
+        duracao: '07 min',
         titulo: 'box-sizing, e a primeira linha de todo CSS',
         corpo: [
           'Por padrão, `width` mede só o conteúdo. Então uma caixa declarada com 200px e mais padding e borda ocupa **mais** que 200px:',
@@ -344,6 +352,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'alinhamento',
+        video: true,
+        duracao: '14 min',
         titulo: 'Alinhar e distribuir',
         corpo: [
           'Centralizar nos dois sentidos, que já foi um quebra-cabeça, hoje são três linhas. Em vez de mostrar as três soltas, vale ler uma barra de navegação inteira — que é onde essas propriedades realmente aparecem — com a explicação de cada trecho ao lado dele:',
@@ -409,6 +419,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'areas',
+        video: true,
+        duracao: '11 min',
         titulo: 'Áreas nomeadas: o layout desenhado',
         corpo: [
           'A forma mais legível de grid é dar nome às regiões e desenhá-las:',
@@ -477,6 +489,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'media',
+        video: true,
+        duracao: '09 min',
         titulo: 'Media queries além da largura',
         corpo: [
           'Largura é a mais usada, e longe de ser a única:',
@@ -511,6 +525,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       },
       {
         id: 'transform',
+        video: true,
+        duracao: '10 min',
         titulo: 'Transformações',
         corpo: [
           '`transform` move, gira, escala e inclina sem tirar o elemento do fluxo: **o espaço dele continua reservado** onde sempre esteve, e nada em volta se mexe.',

@@ -428,15 +428,55 @@ ok('tela remontada no idioma novo', await p.locator('.retomar').isVisible());
 console.log('\n== 13. figuras, código anotado e material ==');
 await p.goto(BASE + PAGINA + '#/curso/html-css/aula/7/alinhamento');
 await p.waitForSelector('.exemplo');
-const partes = await p.locator('.exemplo-par').count();
+const partes = await p.locator('.exemplo-cod').count();
 ok('exemplo anotado, um trecho por nota', partes >= 5, partes + ' trechos');
 ok('a saída do exemplo aparece', await p.locator('.exemplo-saida').isVisible());
-ok('a nota fica ao lado do código', await p.evaluate(() => {
-  const par = document.querySelector('.exemplo-par');
-  const c = par.querySelector('.exemplo-cod').getBoundingClientRect();
-  const n = par.querySelector('.exemplo-nota').getBoundingClientRect();
-  return n.left >= c.right - 2;                     // duas colunas, não empilhado
+
+/* A FORMA DO GO BY EXAMPLE: a explicação à ESQUERDA, o programa à direita, e
+   cada nota na altura do trecho que ela comenta. */
+ok('a nota fica à esquerda do código', await p.evaluate(() => {
+  const n = document.querySelector('.exemplo-nota').getBoundingClientRect();
+  const c = document.querySelector('.exemplo-cod').getBoundingClientRect();
+  return n.right <= c.left + 2;
 }));
+ok('cada nota alinha com o trecho dela', await p.evaluate(() => {
+  const notas = [...document.querySelectorAll('.exemplo-nota')];
+  const cods = [...document.querySelectorAll('.exemplo-cod')];
+  return notas.every((n, i) => Math.abs(n.getBoundingClientRect().top
+    - cods[i].getBoundingClientRect().top) < 4);
+}));
+
+/* E a coluna da direita tem de parecer UM arquivo: os trechos se emendam sem
+   folga. Foi por causa disso que as bordas entre eles saíram. */
+ok('o código é contínuo, sem costura entre os trechos', await p.evaluate(() => {
+  const cods = [...document.querySelectorAll('.exemplo-cod')];
+  return cods.slice(1).every((c, i) =>
+    Math.abs(c.getBoundingClientRect().top - cods[i].getBoundingClientRect().bottom) < 1);
+}));
+
+/* O realce usa as três cores da marca. O teste procura pelo menos duas
+   famílias diferentes num exemplo que tem palavra-chave e literal. */
+await p.goto(BASE + PAGINA + '#/curso/javascript/aula/0/let-const');
+await p.waitForSelector('.exemplo-cod .t-pal');
+const cores = await p.evaluate(() => {
+  const cor = (s) => {
+    const e = document.querySelector('.exemplo-cod ' + s);
+    return e ? getComputedStyle(e).color : null;
+  };
+  return { pal: cor('.t-pal'), txt: cor('.t-txt') };
+});
+ok('o realce distingue palavra-chave de literal',
+  cores.pal && cores.txt && cores.pal !== cores.txt, cores.pal + ' vs ' + cores.txt);
+
+/* A regressão que o realce pode criar: marcação escapando errado. Uma tag
+   dentro de um exemplo de HTML tem de continuar aparecendo como texto. */
+await p.goto(BASE + PAGINA + '#/curso/html-css/aula/7/alinhamento');
+await p.waitForSelector('.exemplo-cod');
+ok('o código realçado continua escapado', await p.evaluate(() =>
+  !document.querySelector('.exemplo-cod').innerHTML.includes('<script')));
+
+await p.goto(BASE + PAGINA + '#/curso/html-css/aula/7/alinhamento');
+await p.waitForSelector('.exemplo');
 
 /* Material: o link tem de baixar (e não navegar), com nome de arquivo. */
 const mat = p.locator('.mat').first();
@@ -594,11 +634,11 @@ ok('o player não estoura a tela do celular', sobra <= 0, sobra + 'px de sobra')
 await p.setViewportSize({ width: 1440, height: 900 });
 await p.waitForTimeout(250);
 
-/* E o título fica ABAIXO do vídeo: pôr o cabeçalho na frente empurraria o play
-   para fora da dobra num notebook. */
-ok('o título desce para baixo do player', await p.evaluate(() => {
+/* E o título fica ACIMA do vídeo, como nas seções de texto: "onde estou" vem
+   antes de "o que eu assisto", e a resposta tem de ser a mesma nas duas. */
+ok('o título fica acima do player', await p.evaluate(() => {
   const v = document.querySelector('.video-fachada').getBoundingClientRect();
-  return document.querySelector('.aula-titulo').getBoundingClientRect().top >= v.bottom - 1;
+  return document.querySelector('.aula-titulo').getBoundingClientRect().bottom <= v.top + 1;
 }));
 ok('o player cabe na tela', await p.evaluate(() =>
   document.querySelector('.video-fachada').getBoundingClientRect().height <= window.innerHeight * 0.8));
@@ -611,8 +651,24 @@ const icones = await p.evaluate(() => {
     total: linhas.length,
   };
 });
-ok('o trilho mostra a duração das seções de vídeo', icones.comDuracao === 1,
+ok('o trilho mostra a duração das seções de vídeo', icones.comDuracao === 2,
   icones.comDuracao + ' de ' + icones.total);
+
+/* Vídeo NÃO é sinônimo de abertura de aula. Se todas as seções de vídeo
+   fossem a primeira da aula, a forma teria virado convenção sem que ninguém
+   decidisse isso — e a segunda, a terceira e a quarta seção também podem ser
+   a hora de assistir. */
+const posicoes = await p.evaluate(() => {
+  const fora = {};
+  Object.values(window.AULAS).forEach((curso) => {
+    Object.values(curso).forEach((secoes) => {
+      secoes.forEach((s, i) => { if (s.video !== undefined) fora[i + 1] = (fora[i + 1] || 0) + 1; });
+    });
+  });
+  return fora;
+});
+ok('há vídeo fora da primeira seção', Object.keys(posicoes).length >= 3,
+  JSON.stringify(posicoes));
 
 console.log('\n== 18. certificado, plano e conta ==');
 await p.goto(BASE + PAGINA + '#/certificados');
@@ -630,6 +686,67 @@ ok('o nome do aluno é o maior elemento', await p.evaluate(() => {
 
 /* O código de validação de um exemplo não pode parecer um código real. */
 ok('o exemplo não inventa código', !/CS-/.test(await p.locator('.cert-exemplo .cert-codigo').first().innerText()));
+
+/* O certificado abre em grande, com o fundo congelado — o mesmo modal da
+   vitrine. Congelar é `overflow:hidden` no documento: prender só a roda
+   deixava passar a barra de rolagem e as setas do teclado. */
+await p.locator('.cert').first().click();
+await p.waitForSelector('.modal-cert');
+ok('o certificado abre em modal', await p.locator('.modal-cert .cert-folha').isVisible());
+ok('e cresce na tela', await p.evaluate(() => {
+  const dentro = document.querySelector('.modal-cert .cert-aluno').getBoundingClientRect().height;
+  const fora = document.querySelector('.tela-certificados .cert-aluno').getBoundingClientRect().height;
+  return dentro > fora;
+}));
+ok('o fundo congela', await p.evaluate(() =>
+  getComputedStyle(document.documentElement).overflow === 'hidden'));
+
+/* Exemplo não compartilha: não há credencial para levar a lugar nenhum. */
+ok('o exemplo não oferece compartilhar', (await p.locator('.modal-acoes .cert-share').count()) === 0);
+await p.keyboard.press('Escape');
+await p.waitForTimeout(200);
+ok('Esc fecha o certificado', (await p.locator('.modal-cert').count()) === 0);
+ok('e o fundo volta a rolar', await p.evaluate(() =>
+  getComputedStyle(document.documentElement).overflow !== 'hidden'));
+
+/* Agora um certificado DE VERDADE: curso concluído e prova aprovada. É a
+   única forma de ver os botões do LinkedIn, e é a que importa conferir —
+   uma URL de compartilhamento malformada só aparece no site do LinkedIn. */
+await p.evaluate(() => {
+  const e = JSON.parse(localStorage.getItem('codeschool-portal'));
+  e.provas = { ...(e.provas || {}), 'curso:git': { tentativas: 1, melhor: 90, aprovado: true } };
+  e.progresso = e.progresso || {};
+  e.progresso.git = { aulas: {} };
+  // marca todas as seções contáveis de git como feitas
+  CURSOS.find((c) => c.id === 'git').topicos.forEach((_, ix) => {
+    e.progresso.git.aulas[ix] = { secoes: { conteudo: true, avaliacao: true }, exercicios: {} };
+  });
+  localStorage.setItem('codeschool-portal', JSON.stringify(e));
+});
+/* `reload`, e não só navegar: `estado.js` lê o localStorage UMA vez, no carregamento
+   do módulo. Escrever por fora e trocar de rota não faria o portal reler nada. */
+await p.goto(BASE + PAGINA + '#/certificados', { waitUntil: 'networkidle' });
+await p.reload({ waitUntil: 'networkidle' });
+await p.waitForSelector('.cert:not(.cert-exemplo)');
+ok('certificado emitido com curso concluído e prova aprovada', true);
+
+await p.locator('.cert:not(.cert-exemplo)').first().click();
+await p.waitForSelector('.modal-cert');
+const perfil = await p.locator('.modal-acoes .cert-share').first().getAttribute('href');
+ok('há botão de adicionar ao perfil do LinkedIn',
+  perfil.startsWith('https://www.linkedin.com/profile/add?'));
+/* Os campos que o LinkedIn exige para preencher o formulário sozinho. Faltar
+   um deles não dá erro: abre o formulário em branco, e ninguém preenche. */
+const campos = ['startTask=CERTIFICATION_NAME', 'name=', 'organizationName=', 'issueYear=', 'issueMonth=', 'certId=', 'certUrl='];
+ok('a URL leva todos os campos do certificado', campos.every((c) => perfil.includes(c)),
+  campos.filter((c) => !perfil.includes(c)).join(', ') || 'todos');
+ok('o código na URL é o mesmo que está impresso', await p.evaluate(() => {
+  const cod = document.querySelector('.modal-cert .cert-codigo').textContent.trim();
+  const href = document.querySelector('.modal-acoes .cert-share').href;
+  return href.includes(encodeURIComponent(cod));
+}));
+await p.keyboard.press('Escape');
+await p.waitForTimeout(150);
 
 await p.goto(BASE + PAGINA + '#/plano');
 await p.waitForSelector('.pl-tabela');

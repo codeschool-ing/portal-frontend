@@ -89,42 +89,54 @@ function figura(b) {
 
 /* ---------- código como exemplo, no estilo Go By Example ----------
 
-   A forma do gobyexample.com: o programa inteiro descendo pela esquerda, e a
-   explicação de cada trecho ao LADO dele, não antes nem depois. Ler é seguir
-   uma coluna; entender é olhar para o lado.
+   A FORMA É A DO gobyexample.com, e ela é mais simples do que a primeira
+   tentativa daqui: de um lado a explicação, do outro o programa, cada nota na
+   ALTURA do trecho que ela comenta.
 
-   Por que ela vale um bloco próprio em vez de alternar código e parágrafo: o
-   parágrafo entre dois trechos QUEBRA o programa. Quem lê perde o fio de que
-   aquilo é um arquivo só, e não consegue copiar o conjunto. Aqui o código
-   continua contínuo na coluna da esquerda e mesmo assim cada pedaço tem a sua
-   nota — que é exatamente o problema que o Go By Example resolveu.
+   O que mudou em relação à versão anterior, e por que:
+
+   1. A NOTA FICA À ESQUERDA, o código à direita. Lê-se a explicação e então
+      se olha para o lado — que é a ordem em que a pessoa aprende. Com o código
+      primeiro, ela lê algo que ainda não sabe o que é.
+   2. NÃO HÁ LINHA ENTRE OS TRECHOS. Elas transformavam o programa numa tabela
+      de pedaços, que é exatamente o que este bloco existe para evitar: o
+      programa é UM arquivo, e a coluna da direita tem de parecer um arquivo.
+      Continuidade é o argumento inteiro.
+
+   O realce vem de `realce.js`, em três cores — vermelho para a estrutura da
+   linguagem, azul para os literais, branco para o resto.
 
      { exemplo: {
          linguagem: 'css',
+         arquivo: 'barra.css',                    // opcional
          partes: [ { codigo: '…', nota: 'por que isto' }, … ],
-         saida: '…'                              // opcional
+         saida: '…'                               // opcional
      } }
 
    Em tela estreita as duas colunas viram uma, com a nota ANTES do trecho: ler
    a explicação e então o código é a ordem que funciona sem o alinhamento
-   lateral. */
+   lateral para amarrar os dois. */
 function exemploAnotado(ex) {
   const partes = ex.partes || [];
   return '<div class="exemplo">' +
-    '<div class="exemplo-barra">' +
-      '<span class="cod-ling">' + esc(ex.linguagem || 'código') + '</span>' +
-      (ex.arquivo ? '<span class="exemplo-arq mono dim">' + esc(ex.arquivo) + '</span>' : '') +
-    '</div>' +
-    partes.map((p) => '<div class="exemplo-par' + (p.nota ? '' : ' sem-nota') + '">' +
-      '<pre class="exemplo-cod"><code>' + esc(p.codigo) + '</code></pre>' +
-      (p.nota ? '<p class="exemplo-nota">' + marcado(p.nota) + '</p>' : '') +
-    '</div>').join('') +
-    (ex.saida
-      ? '<div class="exemplo-saida">' +
-          '<span class="exemplo-saida-rot mono dim">' + txt('saída') + '</span>' +
-          '<pre class="cod"><code>' + esc(ex.saida) + '</code></pre>' +
+    (ex.arquivo || ex.linguagem
+      ? '<div class="exemplo-barra">' +
+          '<span class="exemplo-arq mono dim">' + esc(ex.arquivo || ex.linguagem) + '</span>' +
         '</div>'
       : '') +
+    '<div class="exemplo-grade">' +
+      partes.map((p) => (
+        '<p class="exemplo-nota">' + (p.nota ? marcado(p.nota) : '') + '</p>' +
+        '<pre class="exemplo-cod"><code>' + realcar(p.codigo, ex.linguagem) + '</code></pre>'
+      )).join('') +
+      (ex.saida
+        ? '<span class="exemplo-vazio" aria-hidden="true"></span>' +
+          '<div class="exemplo-saida">' +
+            '<span class="exemplo-saida-rot mono dim">' + txt('saída') + '</span>' +
+            '<pre class="cod"><code>' + esc(ex.saida) + '</code></pre>' +
+          '</div>'
+        : '') +
+    '</div>' +
   '</div>';
 }
 
@@ -141,4 +153,93 @@ export function embaralharCom(semente, lista) {
     const t = a[i]; a[i] = a[j]; a[j] = t;
   }
   return a;
+}
+
+/* ---------- realce de sintaxe ----------
+
+   MORA AQUI, E NÃO NUM MÓDULO PRÓPRIO, por uma razão mecânica: ele precisa de
+   `esc`, e `esc` mora aqui. Separá-los criaria um ciclo de imports — que o
+   `bundle.py` recusa, e com razão. Também é coerente: este arquivo é o que
+   transforma conteúdo em HTML, e realçar é isso.
+
+   TRÊS CORES, E SÃO AS DA MARCA: vermelho (`--amber`) para o que é estrutura
+   da linguagem, azul (`--phosphor`) para o que é valor literal, e o branco do
+   texto para o resto. Comentário fica no cinza apagado. Não há uma quarta cor,
+   e isso é decisão: paleta de editor com dez tons dentro de uma página de
+   curso compete com o conteúdo em vez de ajudar a lê-lo.
+
+   ISTO NÃO É UM PARSER. É uma varredura por expressão regular, com as
+   alternativas em ordem de precedência — comentário antes de string, string
+   antes de tudo — para que nada seja realçado DENTRO de um literal. Ela erra
+   nos casos que um parser acertaria (uma barra de divisão parecida com regex,
+   por exemplo), e erra devolvendo texto sem cor, nunca texto errado.
+
+   O ESCAPE ACONTECE AQUI, UMA VEZ SÓ. Quem chama recebe HTML pronto e não
+   pode escapar de novo — seria escapar o `<span>`. Todo pedaço que sai daqui
+   passou por `esc()`: ou o trecho casado, ou o texto entre dois casamentos. */
+
+const PALAVRAS_JS = ['const', 'let', 'var', 'function', 'return', 'if', 'else', 'for', 'while',
+  'do', 'switch', 'case', 'break', 'continue', 'try', 'catch', 'finally', 'throw', 'new',
+  'class', 'extends', 'super', 'this', 'typeof', 'instanceof', 'in', 'of', 'delete', 'void',
+  'import', 'export', 'from', 'default', 'async', 'await', 'yield', 'static', 'get', 'set',
+  'null', 'undefined', 'true', 'false', 'NaN'];
+
+/* Cada linguagem é uma lista de [classe, expressão]. A ordem é a precedência:
+   a primeira que casar naquela posição vence. */
+const REGRAS = {
+  javascript: [
+    ['com', /\/\/[^\n]*|\/\*[\s\S]*?\*\//],
+    ['txt', /`(?:\\[\s\S]|[^`\\])*`|"(?:\\[\s\S]|[^"\\\n])*"|'(?:\\[\s\S]|[^'\\\n])*'/],
+    ['num', /\b\d[\d_]*(?:\.\d+)?(?:e[+-]?\d+)?n?\b/i],
+    ['pal', new RegExp('\\b(?:' + PALAVRAS_JS.join('|') + ')\\b')],
+    ['fun', /\b[A-Za-z_$][\w$]*(?=\s*\()/],
+  ],
+  css: [
+    ['com', /\/\*[\s\S]*?\*\//],
+    ['txt', /"(?:\\[\s\S]|[^"\\\n])*"|'(?:\\[\s\S]|[^'\\\n])*'/],
+    ['pal', /@[\w-]+|![\w-]+/],
+    ['num', /#[0-9a-f]{3,8}\b|\b\d+(?:\.\d+)?(?:px|rem|em|ch|%|vw|vh|fr|s|ms|deg)?\b/i],
+    ['fun', /[.#][\w-]+|&?::?[\w-]+(?=[\s,{:])/],
+    ['pro', /[-a-z]+(?=\s*:)/],
+  ],
+  html: [
+    ['com', /<!--[\s\S]*?-->/],
+    ['txt', /"(?:[^"\n])*"|'(?:[^'\n])*'/],
+    ['pal', /<\/?[\w-]+|\/?>/],
+    ['pro', /\b[\w-]+(?==)/],
+  ],
+};
+REGRAS.js = REGRAS.javascript;
+
+/* Uma expressão só, com as alternativas em grupos nomeados pela classe. Casar
+   uma vez por posição é o que garante a precedência — e é o que impede que a
+   palavra `const` dentro de uma string vire palavra-chave. */
+const compilar = (regras) => new RegExp(
+  regras.map(([cls, re]) => '(?<' + cls + '>' + re.source + ')').join('|'),
+  'gi',
+);
+
+const COMPILADAS = Object.fromEntries(
+  Object.entries(REGRAS).map(([ling, regras]) => [ling, compilar(regras)]),
+);
+
+function realcar(codigo, linguagem) {
+  const re = COMPILADAS[String(linguagem || '').toLowerCase()];
+  const cru = String(codigo ?? '');
+  if (!re) return esc(cru);           // linguagem que não conhecemos sai sem cor
+
+  let fora = '';
+  let ultimo = 0;
+  re.lastIndex = 0;
+  let m = re.exec(cru);
+  while (m) {
+    const cls = Object.keys(m.groups).find((k) => m.groups[k] !== undefined);
+    fora += esc(cru.slice(ultimo, m.index)) + '<span class="t-' + cls + '">' + esc(m[0]) + '</span>';
+    ultimo = m.index + m[0].length;
+    // casamento vazio travaria o laço; nenhuma regra devia produzir um, mas
+    // uma alteração futura pode, e o custo de se proteger é esta linha
+    if (m[0].length === 0) re.lastIndex += 1;
+    m = re.exec(cru);
+  }
+  return fora + esc(cru.slice(ultimo));
 }

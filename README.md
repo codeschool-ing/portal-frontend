@@ -179,15 +179,17 @@ vai: uma seção de texto com um retângulo cinza em cima promete algo que não
 vem, e a promessa não expira. A reserva não se perdeu; ela deixou de ser
 automática e passou a ser **dita**.
 
-**A seção com vídeo troca de layout.** O player sobe para o topo, de ponta a
-ponta da área de conteúdo, e o título desce para baixo dele — vídeo é o que a
-pessoa veio fazer ali, e um cabeçalho na frente empurra o play para baixo da
-dobra num notebook.
+**A seção com vídeo troca de layout:** o player vai de ponta a ponta da área de
+conteúdo, escapando da coluna de leitura. O **título fica acima dele**, como nas
+seções de texto — "onde estou" vem antes de "o que eu assisto", e a resposta
+tem de ser a mesma nas duas formas. (O player já esteve acima do título, para
+não empurrar o play para baixo da dobra; o preço era cair numa seção sem saber
+de que aula ela era.)
 
-O sangramento cancela o recuo do `.conteudo` com margem negativa, e por isso os
-dois saem da **mesma variável** (`--pad-x`, `--pad-y`). Não saíam: o recuo
-estreito virou 16px de um lado e continuou 18px do outro, e sobraram 2px de
-rolagem horizontal no celular. Há um teste para isso agora.
+**Vídeo não é sinônimo de abertura de aula.** Das 26 seções com vídeo, 5 são a
+primeira da aula, 15 a segunda, 5 a terceira e 1 a quarta. Se todas fossem a
+primeira, a forma teria virado convenção sem ninguém decidir isso — e há um
+teste que reprova se as posições voltarem a se concentrar.
 
 No trilho, o ícone diz a natureza junto com o estado: **play** para vídeo,
 **linhas** para leitura, **estrela** para a avaliação, **check** para o que já
@@ -379,6 +381,7 @@ app/rotas.js                   roteador por hash
 app/trilho.js                  o trilho lateral
 app/busca.js                   o índice da busca global — não toca no DOM
 app/painel-busca.js            o painel do ⌘K
+app/modal.js                   o modal da vitrine, reaproveitado
 app/provas.js                  monta a prova do curso e a da trilha
 app/materiais.js               a lista de material para baixar
 assets/planos.js               os planos e o que cada um inclui
@@ -575,12 +578,35 @@ conteúdo. É o campo que vai precisar de sanitização no dia em que o conteúd
 vier de fora, e o comentário no código existe para essa pergunta não passar
 batida.)
 
-**O `exemplo` é a forma do [Go By Example](https://gobyexample.com):** o
-programa inteiro descendo pela esquerda, a explicação de cada trecho ao lado
-dele. Ela vale um bloco próprio porque **um parágrafo entre dois trechos quebra
-o programa** — quem lê perde o fio de que aquilo é um arquivo só. Aqui o código
-continua contínuo e mesmo assim cada pedaço tem a sua nota. Abaixo de 900px as
-duas colunas viram uma, com a nota *antes* do trecho.
+**O `exemplo` é a forma do [Go By Example](https://gobyexample.com):** a
+explicação de um lado, o programa do outro, cada nota na altura do trecho que
+ela comenta. Ela vale um bloco próprio porque **um parágrafo entre dois trechos
+quebra o programa** — quem lê perde o fio de que aquilo é um arquivo só.
+
+A primeira versão daqui errava em duas coisas, e as duas foram corrigidas:
+
+1. **A nota vai à esquerda, o código à direita.** Lê-se a explicação e então se
+   olha para o lado, que é a ordem em que a pessoa aprende. Com o código
+   primeiro, ela lê algo que ainda não sabe o que é.
+2. **Não há linha entre os trechos.** As bordas transformavam o programa numa
+   tabela de pedaços — exatamente o que este bloco existe para evitar. A coluna
+   da direita tem de parecer um arquivo, e continuidade é o argumento inteiro.
+   Há um teste que mede se os trechos se emendam sem folga.
+
+Abaixo de 900px as duas colunas viram uma, com a nota *antes* do trecho.
+
+**O realce de sintaxe tem três cores, e são as da marca:** vermelho para a
+estrutura da linguagem, azul para os literais, branco para o resto —
+comentário no cinza apagado. Não há uma quarta: paleta de editor com dez tons
+dentro de uma página de curso compete com o conteúdo em vez de ajudar a lê-lo.
+
+Ele **não é um parser**, e o código diz isso: é uma varredura por expressão
+regular com as alternativas em ordem de precedência — comentário antes de
+string, string antes de tudo —, para que nada seja realçado dentro de um
+literal. Erra nos casos que um parser acertaria, e erra devolvendo texto sem
+cor, nunca texto errado. Mora em `texto.js` e não num módulo próprio por uma
+razão mecânica: precisa de `esc`, e separá-los criaria um ciclo de imports que
+o `bundle.py` recusa.
 
 ### Onde ele mais rende: o curso de JavaScript
 
@@ -678,6 +704,67 @@ Os planos em `assets/planos.js` são ficção deliberada com a forma certa: pre�
 ciclo e cobrança são domínio de um serviço de pagamento. E **nada é bloqueado
 por plano hoje**: travar exige servidor, e com o estado no navegador qualquer
 trava seria teatro — bastaria editar uma chave. A tela diz isso.
+
+## Espaço: o grafo, as setas e a coluna de leitura
+
+Três ajustes que são a mesma ideia — **deixar o vazio trabalhar**:
+
+**O grafo respira.** A vitrine usa 48px entre os níveis, e lá basta: o grafo é
+uma das sete telas e some depois de uma rolada. Aqui é a tela onde o aluno
+volta para se situar, e com 48px as arestas passam raspando nos cartões. Não
+colidem — o detector de colisão do teste continua acusando zero —, mas o olho
+não separa uma coluna da seguinte. Foram para 88px, e a troca é rolagem
+horizontal, que o grafo já tinha resolvida (setas e esmaecido nas bordas).
+
+**As setas de navegação foram para a sobra da tela.** A coluna de leitura tem
+820px e é centrada na área que sobra do trilho; o que resta dos dois lados é
+espaço que nenhum conteúdo usa. É exatamente onde um controle de navegação deve
+morar: perto o bastante para ser alcançado, longe o bastante para não disputar
+a linha com a palavra que está sendo lida.
+
+```
+vão de cada lado = (100vw - trilho - coluna) / 2
+seta esquerda → centrada no vão entre o trilho e a coluna
+seta direita  → centrada no vão entre a coluna e a borda da tela
+```
+
+O trilho e a coluna viraram **variáveis CSS** (`--trilho`, `--leitura`) porque
+a posição da seta deriva das duas — e número repetido em dois lugares diverge.
+Já divergiu uma vez, no recuo do conteúdo, e custou 2px de rolagem horizontal
+no celular.
+
+**O player sangra usando a mesma conta.** Com o título acima dele, o vídeo
+precisa escapar da coluna de 820px e ir até as bordas da área:
+`margin-left: 50% - 50vw + trilho/2` — o full-bleed clássico, corrigido pelo
+trilho, que desloca o centro. Sem a correção o vídeo começaria embaixo do menu.
+
+## O certificado abre em grande
+
+Clicar num certificado o amplia sobre o resto da tela, com o fundo esmaecido e
+**congelado** — o mesmo modal da vitrine, reaproveitado inteiro. O
+congelamento é `overflow:hidden` no documento e não JavaScript, pelo motivo que
+o `base.css` já registrava: prender só a roda e o toque deixava passar a barra
+de rolagem, a inércia do trackpad e as setas dentro de um campo.
+
+Acima da caixa, à direita, ficam as ações. São duas, e fazem coisas diferentes:
+
+| botão | o que faz |
+| --- | --- |
+| **Adicionar ao perfil** | abre o formulário de *licenças e certificados* do LinkedIn já preenchido — nome, instituição, mês, ano e código |
+| **Compartilhar** | publica um post com o link de validação |
+
+O primeiro é o que a pessoa realmente quer: certificado no perfil é uma
+credencial; post some do feed em dois dias.
+
+O `certUrl` aponta para uma página de validação que **ainda não existe** — ela
+nasce com o servidor. A URL é montada no formato definitivo de propósito: o dia
+em que o servidor existir não pode ser o dia de descobrir que o formato era
+outro. Um teste confere que os sete campos que o LinkedIn espera estão lá e que
+o código na URL é o mesmo impresso no documento — uma URL malformada só daria
+sinal no site do LinkedIn.
+
+Certificado de **exemplo não compartilha**: no lugar dos botões, a frase que
+explica por quê.
 
 ## Três armadilhas que só apareceram na tela
 
