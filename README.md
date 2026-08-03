@@ -1,1 +1,230 @@
-# portal-frontend
+# portal-frontend — Portal do Aluno da codeschool.ing
+
+**Etapa 2** do projeto: a área do aluno. A Etapa 1 é a vitrine
+([`codeschool-ing.github.io`](https://github.com/codeschool-ing/codeschool-ing.github.io)),
+que apresenta 86 cursos e 16 trilhas e capta matrícula. Aqui é onde quem se
+matriculou estuda.
+
+Sem build e sem dependências, como a vitrine: HTML, CSS e módulos ES puros. Abre
+de qualquer servidor estático.
+
+> **Estado: esqueleto.** A estrutura está de pé e é navegável ponta a ponta, mas
+> não há autenticação, não há servidor e o conteúdo é de mentira. O que já é
+> definitivo é a **forma** — o formato dos exercícios, as assinaturas da API e o
+> contrato dos tipos. Ver "O que é esqueleto e o que é definitivo".
+
+## Rodar
+
+```sh
+python3 -m http.server 8899
+# abrir http://localhost:8899
+```
+
+Conferir que continua de pé:
+
+```sh
+npm i playwright
+node ferramentas/fumaca/fumaca.mjs
+```
+
+## O que veio da vitrine, e o que não veio
+
+A identidade é a mesma escola, então quase tudo atravessa:
+
+| o quê | como veio |
+| --- | --- |
+| `assets/base.css` | cópia de `style.css` da vitrine, **sem alteração** |
+| `assets/dados.js` | cópia do catálogo — 86 cursos, 16 trilhas |
+| `assets/i18n*.js` | cópia dos cinco idiomas |
+| `assets/i18n-runtime.js` | cópia, com **uma** linha divergente (abaixo) |
+| o grafo de dependências | extraído para `app/catalogo.js` e `app/grafo.js` |
+
+**O que ficou lá: o fullpage.** Cada seção ocupando a tela e a rolagem saltando
+entre elas pressupõe narrativa linear — sete telas, você rola uma vez e chegou
+ao fim. Um portal é acesso aleatório, sessão retomada no meio, conteúdo de
+altura imprevisível. Sequestrar a roda do mouse num lugar onde a pessoa vai
+passar horas lendo é hostil. É a única decisão grande da vitrine que não veio.
+
+No lugar dele, chrome persistente: a mesma barra de 64px, um trilho lateral que
+responde "onde estou" e "quanto falta" sem clique, e conteúdo que rola normal.
+
+**A barra do topo é a mesma, com outro trabalho.** Ficaram a marca com o LED, o
+tema, o idioma e a moldura `.term-bar` dos painéis. Saíram os links de venda
+(Trilhas · Cursos · Planos · FAQ) e entrou o contexto do aluno. Há uma simetria
+aqui: o link "Área do aluno" da vitrine é descrito no README de lá como
+*marcador de funcionalidade futura*. Este repositório é o destino dele.
+
+O trilho vira gaveta em **1180px** e o grafo vira lista em **861px** — os dois
+pontos de corte são os da vitrine, reaproveitados porque foram medidos lá, não
+escolhidos.
+
+## O grafo virou mapa de progresso
+
+É o melhor reaproveitamento do projeto, e sai quase de graça: `depende` já é,
+literalmente, uma regra de desbloqueio. O algoritmo é o mesmo — níveis por Kahn,
+ordenação de Sugiyama com custo lexicográfico de três critérios, roteamento
+geométrico das arestas com folga de 16px. O que mudou é o que o cartão diz.
+
+Quatro estados: **concluído · em andamento · disponível · mais adiante**.
+
+**Ele mostra, mas não tranca.** O FAQ da vitrine promete, por escrito: *"Não. A
+trilha é uma recomendação de ordem — se você só precisa de um curso dela,
+assista só ele."* Um cadeado aqui contradiria uma promessa já publicada. Por
+isso o estado mais restritivo se chama `adiante`, continua clicável, e o rodapé
+do cartão diz "recomendado depois de X" em vez de "bloqueado".
+
+O teste de fumaça reproduz o detector de colisão da vitrine — 120 pontos por
+curva, conferindo se algum cai dentro de um cartão que não seja ponta daquela
+aresta. Herdar o roteamento sem herdar a conferência seria ficar com o risco e
+sem a rede.
+
+## Aula = tópico
+
+O catálogo não tem conceito de aula; o grão mais fino é `topicos`, e são 1.503
+deles. O portal adota **tópico como aula** em vez de inventar uma terceira
+chave: os exercícios que o pipeline emite já trazem `topico` como campo de
+primeira classe, então currículo e conteúdo já concordavam entre si.
+
+**Mas o título exibido não serve de chave.** `aplicarConteudo()` reescreve
+`c.topicos` no lugar a cada troca de idioma — em inglês o tópico vira *"Types,
+coercion, strict equality and falsy values"* e nenhum exercício casa. O defeito
+aparece sem ninguém tocar em nada: basta o navegador estar configurado noutro
+idioma, que é o caso da maioria fora do Brasil. Foi assim que ele apareceu, num
+Chromium em inglês.
+
+A chave é o **texto em português**, guardado por `guardarBase()` no
+carregamento. É a mesma decisão do i18n da vitrine — *a chave de tradução é o
+próprio texto em português* — aplicada à junção com o conteúdo. Cada aula
+carrega as duas coisas: `titulo` para mostrar, `chave` para casar.
+
+## A tradução tem duas metades, e só uma atravessa intacta
+
+| metade | na vitrine | no portal |
+| --- | --- | --- |
+| `txt('texto em português')` | exceção | **caminho principal** |
+| passeio pelos nós de texto | caminho principal | só o esqueleto estático |
+| `aplicarConteudo()`, que reescreve `CURSOS`/`TRILHAS` no lugar | igual | igual |
+
+O passeio (`mapearTextos`) funciona na vitrine porque o HTML é estático e existe
+uma lista `DINAMICOS` com onze contêineres a ignorar. Num portal quase todo
+texto nasce em JavaScript, e essa lista viraria a página inteira. O mecanismo é
+o mesmo; o que muda é o peso de cada metade.
+
+Por isso a **única divergência** entre as duas cópias de `i18n-runtime.js` é a
+lista `DINAMICOS`, que saiu do código e virou `window.I18N_DINAMICOS`, definido
+no `index.html`. Existe para que não haja outra divergência.
+
+**Interface e conteúdo são coisas diferentes.** A interface traduz nos cinco
+idiomas; enunciado de exercício e texto de aula são conteúdo de banco, e na
+Etapa 2 vêm traduzidos do servidor ou não vêm. Os exercícios de exemplo estão só
+em português de propósito — e como toda chave ausente cai no português sozinha,
+navegar em inglês com exercício em português não quebra nada.
+
+## Os sete tipos de exercício
+
+O contrato de um tipo é pequeno: `corpo(ex, uid)`, `montar(raiz)` (opcional),
+`colher(raiz)`, `revelar(raiz, ex, veredito)`. O invólucro comum — enunciado,
+dica, botão, veredito, selo — mora em `app/exercicios/index.js`.
+
+O que divide os sete não é a UI, é **onde a correção pode acontecer**:
+
+| tipo | corrige onde | hoje |
+| --- | --- | --- |
+| `quiz` · `multipla-escolha` · `ordenacao` · `associacao` | cliente — é comparação pura | **funciona de verdade** |
+| `codigo` · `saida-esperada` | servidor: execução em contêiner | veredito "não conferido" |
+| `resposta-expressao` | servidor: equivalência simbólica (sympy) | veredito "não conferido" |
+
+Os dois caminhos passam por `api.avaliar()` com o mesmo formato de veredito,
+então o dia em que o servidor existir muda o corpo de um `if`.
+
+**Não conferido nunca vira aprovado.** É regra do pipeline e vale inteira aqui:
+enquanto não há execução, o portal diz que não conferiu, em vez de dar um
+"certo" que ninguém verificou.
+
+Três regras da escola que a interface respeita desde o primeiro dia, porque são
+fáceis de errar e caras de corrigir depois:
+
+- **`porque` é feedback pós-resposta, não pista visível.** Só aparece depois de
+  responder.
+- **A ordem do JSON é o gabarito** em `ordenacao` (os `itens` estão na ordem
+  certa) e em `associacao` (`pares[i].esquerda ↔ pares[i].direita`). As duas são
+  embaralhadas com semente, e a coluna da direita da associação sai **ordenada
+  alfabeticamente** — a mesma razão pela qual a sonda do pipeline faz isso.
+- **`armadilha` não vai para a tela** antes da resposta: ela nomeia exatamente o
+  que o exercício mede. Vira feedback depois.
+
+Em `codigo`, os primeiros casos de teste viram exemplo e o resto fica oculto:
+mostrar todos convida a construir a solução que passa nos casos sem resolver o
+problema — que é o defeito que o gerador do pipeline tem de descartar antes de
+fechar um exercício.
+
+## O que é esqueleto e o que é definitivo
+
+**Descartável:** o conteúdo de `assets/exercicios-exemplo.js`, a tela de entrar
+(qualquer nome entra), o texto das aulas, o certificado sem código de validação.
+
+**Definitivo:** o formato dos exercícios — os campos são exatamente os que o
+pipeline emite (`enunciado`, `dica_socratica`,
+`alternativas[].{texto,correta,porque}`, `itens`, `armadilha`, `pares`,
+`distratores_direita`, `testes[].{descricao,entrada,saida_esperada}`,
+`verificacao_*`). O portal acrescenta dois campos que são dele, não do
+exercício: `id` e `curso`.
+
+Ignorar a ferramenta por ora não custa nada; inventar um formato paralelo
+custaria uma migração.
+
+Também definitivo: `_verificacao` (`criticado` / `execucao` / `estrutura`)
+aparece em cada exercício e já filtra em `api.exerciciosDaAula()`. A doc do
+pipeline diz que é esse campo que decide o que o portal publica primeiro —
+melhor ele existir vazio que ser retrofitado.
+
+## Estrutura
+
+```
+index.html                     o shell: barra, trilho e <main>
+assets/base.css                CSS da vitrine, sem alteração
+assets/portal.css              só o que a vitrine não tinha
+assets/dados.js                catálogo (vira API na Etapa 2)
+assets/exercicios-exemplo.js   conteúdo descartável, formato definitivo
+app/catalogo.js                leitura do catálogo e o grafo — não toca no DOM
+app/grafo.js                   o grafo como mapa de progresso
+app/estado.js                  progresso do aluno (localStorage → servidor)
+app/api.js                     camada de mentira, assinaturas do backend real
+app/rotas.js                   roteador por hash
+app/trilho.js                  o trilho lateral
+app/telas/*.js                 uma por tela
+app/exercicios/*.js            um por tipo, mais o invólucro e a correção
+ferramentas/fumaca/            o teste de fumaça
+```
+
+Ninguém fora de `estado.js` lê `localStorage`, e ninguém fora de `api.js` lê
+`estado.js` para buscar dado. Trocar a persistência é trocar um arquivo.
+
+Hash e não History API: o portal é servido como arquivo estático, e `pushState`
+exigiria o servidor devolver o index em qualquer caminho.
+
+## Duas armadilhas que só apareceram na tela
+
+Ficam registradas porque nenhuma das duas aparece lendo o código:
+
+1. **`base.css` estiliza o elemento `nav`**, não uma classe — a vitrine tem
+   exatamente um. O portal tem três (barra, trilho, migalhas), e os dois de
+   dentro herdaram `position:fixed` e viraram uma segunda barra por cima do
+   conteúdo. Neutralizado em `portal.css`, e não em `base.css`, que precisa
+   continuar sincronizável com a vitrine.
+2. **`[hidden]` perde para `.btn{display:inline-flex}`** — a regra do navegador
+   tem especificidade zero. O botão "Tentar de novo" aparecia antes de existir o
+   que refazer.
+
+## O que vem depois
+
+- **Servidor**: autenticação, progresso por aluno, execução de código em
+  contêiner descartável e o CAS para `resposta-expressao`.
+- **Conteúdo real**: religar `ferramentas/exercicios` do repo da vitrine e
+  ingerir os JSON aprovados, começando pelos `_verificacao: criticado`.
+- **Texto e vídeo das aulas**, hoje um quadro reservado por aula.
+- **A unidade intermediária de certificação.** Hoje o certificado é por curso,
+  porque é a única unidade que existe. O README da vitrine deixa quatro
+  perguntas em aberto sobre isso — o eixo, o nome, a âncora e o custo de
+  tradução — e registra a armadilha: cortar por nível repetiria o erro do caso
+  Go. O custo só salta no primeiro certificado emitido para aluno real.

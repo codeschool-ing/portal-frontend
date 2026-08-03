@@ -1,0 +1,497 @@
+/* ==========================================================================
+   codeschool.ing — Portal do Aluno
+
+   Camada sobre `base.css`, que é o CSS da vitrine copiado sem alteração. Tudo
+   o que dá identidade — cores, tipografia, a moldura de terminal, o tema
+   claro, o grafo — vem de lá e não se repete aqui. Este arquivo tem só o que
+   a vitrine não precisava ter: um shell de três zonas e as telas de estudo.
+
+   O QUE NÃO ATRAVESSOU: `.screen{height:100vh}`, o fullpage. Ele pressupõe
+   narrativa linear — sete telas, você rola uma vez e chegou ao fim. Num
+   portal a rolagem é contínua e o conteúdo tem altura imprevisível.
+   ========================================================================== */
+
+/* ==========================================================
+   1 · SHELL
+   ========================================================== */
+
+/* `hidden` precisa vencer as classes de componente. A regra do navegador para
+   `[hidden]` tem especificidade zero, então `.btn{display:inline-flex}` a
+   atropela — e o botão "Tentar de novo" aparecia antes de existir o que
+   refazer. Vale para qualquer elemento escondido por atributo, que é como o
+   portal esconde coisa que ainda não deve ser vista (a justificativa de uma
+   alternativa, por exemplo). */
+[hidden]{display:none !important}
+
+.portal-body{overflow-y:auto}
+
+/* O `base.css` estiliza o ELEMENTO `nav` — a vitrine tem exatamente um, que é
+   a barra fixa do topo, e nunca precisou de classe. O portal tem outros: o
+   trilho lateral e as migalhas da aula são navegação de verdade e merecem a
+   marcação certa. Sem esta regra os dois herdam `position:fixed` e viram uma
+   segunda barra por cima do conteúdo — foi o que aconteceu, e é o tipo de
+   colisão que só aparece na tela.
+
+   A neutralização é aqui, e não lá, porque `base.css` é cópia da vitrine e
+   tem de continuar sincronizável: divergir dele custa mais que esta regra. */
+.portal nav{
+  position:static;height:auto;padding:0;z-index:auto;
+  background:none;backdrop-filter:none;border-bottom:0;align-items:stretch;
+}
+
+.portal{
+  display:grid;
+  grid-template-columns:272px minmax(0,1fr);
+  min-height:100vh;
+  padding-top:64px;               /* a barra é fixa e tem altura fixa */
+}
+body.sem-trilho .portal{grid-template-columns:minmax(0,1fr)}
+body.sem-trilho .trilho{display:none}
+
+.conteudo{
+  min-width:0;
+  padding:26px clamp(18px,3.2vw,44px) 60px;
+}
+.conteudo:focus{outline:none}
+
+/* ---------- trilho lateral ---------- */
+.trilho{
+  position:sticky;top:64px;align-self:start;
+  height:calc(100vh - 64px);overflow-y:auto;
+  border-right:1px solid var(--wire);
+  padding:20px 14px 40px;
+  scrollbar-width:thin;
+}
+.trilho-nav{display:flex;flex-direction:column;gap:2px;margin-bottom:22px}
+.trilho-link{
+  padding:8px 11px;border-radius:4px;font-size:.9rem;color:var(--paper-dim);
+  border-left:2px solid transparent;transition:color .15s,background .15s;
+}
+.trilho-link:hover{color:var(--paper);background:var(--panel)}
+.trilho-link.on{color:var(--phosphor);border-left-color:var(--phosphor);background:var(--panel)}
+
+.trilho-sec{display:flex;flex-direction:column;gap:8px}
+.trilho-tit{
+  font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--phosphor-dim);padding:0 11px;
+}
+.trilho-conta{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--paper-dim);padding:0 11px}
+.trilho-voltar{
+  display:inline-block;margin-bottom:16px;padding:0 11px;
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--phosphor);
+}
+
+.trilho-cursos,.trilho-aulas{display:flex;flex-direction:column;gap:1px}
+.trilho-curso,.trilho-aula{
+  display:grid;align-items:center;gap:8px;padding:7px 11px;border-radius:4px;
+  font-size:.84rem;color:var(--paper-dim);line-height:1.3;
+}
+.trilho-curso{grid-template-columns:8px 1fr auto}
+.trilho-aula{grid-template-columns:12px 20px 1fr}
+.trilho-curso:hover,.trilho-aula:hover{background:var(--panel);color:var(--paper)}
+.trilho-aula.on{background:var(--panel);color:var(--phosphor);box-shadow:inset 2px 0 0 var(--phosphor)}
+.trilho-aula.feita .ta-tit{color:var(--paper-dim);text-decoration:line-through;text-decoration-color:var(--wire)}
+.ta-marca,.ta-num{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--phosphor-dim)}
+.trilho-aula.feita .ta-marca{color:var(--phosphor)}
+.tc-conta{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--phosphor-dim)}
+.tc-marca{width:8px;height:8px;border-radius:50%;border:1px solid var(--wire)}
+.tc-marca[data-estado="concluido"]{background:var(--phosphor);border-color:var(--phosphor)}
+.tc-marca[data-estado="atual"]{background:var(--amber);border-color:var(--amber)}
+.tc-marca[data-estado="disponivel"]{border-color:var(--phosphor)}
+
+/* ---------- barra do topo: só o que a vitrine não tinha ---------- */
+.nav-contexto{margin-left:26px;min-width:0;flex:1 1 auto}
+.ctx{display:flex;align-items:center;gap:10px;max-width:420px;color:var(--paper-dim)}
+.ctx:hover{color:var(--paper)}
+.ctx-nome{font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctx-barra{flex:0 0 84px;height:4px;border-radius:2px;background:var(--wire);overflow:hidden}
+.ctx-barra span{display:block;height:100%;background:var(--phosphor)}
+.ctx-pct{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--phosphor)}
+
+.nav-icone{display:flex;align-items:center;justify-content:center;width:32px;height:32px;color:var(--paper-dim);border-radius:4px}
+.nav-icone:hover{color:var(--phosphor);background:var(--panel)}
+.nav-icone svg{width:17px;height:17px}
+
+.conta{position:relative}
+.conta-btn{display:flex;align-items:center}
+.conta-avatar{
+  display:grid;place-items:center;width:30px;height:30px;border-radius:50%;
+  background:var(--panel);border:1px solid var(--wire);color:var(--phosphor);
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.82rem;
+}
+.conta-btn:hover .conta-avatar{border-color:var(--phosphor)}
+.conta-menu{
+  display:none;position:absolute;top:calc(100% + 8px);right:0;min-width:186px;
+  background:var(--panel);border:1px solid var(--wire);border-radius:5px;
+  padding:5px;flex-direction:column;z-index:120;
+}
+.conta.aberto .conta-menu{display:flex}
+.conta-op{padding:8px 11px;border-radius:4px;font-size:.86rem;color:var(--paper-dim)}
+.conta-op:hover{background:var(--ink);color:var(--paper)}
+
+.trilho-btn{display:none;font-size:1.3rem;color:var(--paper-dim);padding:0 10px}
+.trilho-veu{display:none}
+
+/* ==========================================================
+   2 · TELAS — blocos genéricos
+   ========================================================== */
+
+.tela{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.tela-head{display:flex;flex-direction:column;gap:6px}
+.tela-head h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.4rem,3vw,2rem);line-height:1.15}
+.tela-head p{color:var(--paper-dim);font-size:.92rem}
+
+.bloco{
+  background:var(--panel);border:1px solid var(--wire);border-radius:6px;
+  padding:18px 20px;display:flex;flex-direction:column;gap:14px;
+}
+.bloco-topo{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.bloco-topo h2{font-family:'Space Grotesk',sans-serif;font-size:1.02rem}
+.bloco-link{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--phosphor)}
+.bloco-risco{border-color:rgba(255,77,94,.3)}
+.btn-risco{border-color:var(--amber);color:var(--amber)}
+.btn-risco:hover{background:rgba(255,77,94,.1)}
+
+.barra{display:block;height:5px;border-radius:3px;background:var(--wire);overflow:hidden}
+.barra-cheia{display:block;height:100%;background:var(--phosphor);transition:width .3s ease}
+
+.cartoes{display:grid;grid-template-columns:repeat(auto-fill,minmax(226px,1fr));gap:12px}
+.cartao{
+  display:flex;flex-direction:column;gap:6px;padding:14px;
+  background:var(--ink);border:1px solid var(--wire);border-radius:5px;
+  transition:border-color .2s,transform .2s;
+}
+.cartao:hover{border-color:var(--phosphor);transform:translateY(-2px)}
+.cartao-nome{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.94rem;line-height:1.2}
+.cartao-resumo{font-size:.82rem;color:var(--paper-dim);line-height:1.45}
+.cartao-cat,.cartao-meta,.cartao-conta{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--paper-dim)}
+.cartao-cat{color:var(--phosphor-dim);letter-spacing:.08em;text-transform:uppercase}
+
+/* ---------- continuar de onde parou ---------- */
+.retomar{
+  display:flex;flex-direction:column;gap:8px;padding:20px 22px;
+  background:var(--panel);border:1px solid var(--phosphor-dim);border-radius:6px;
+  transition:border-color .2s;
+}
+.retomar:hover{border-color:var(--phosphor)}
+.retomar-rot{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--phosphor)}
+.retomar-aula{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:clamp(1.05rem,2.2vw,1.35rem);line-height:1.2}
+.retomar-curso{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
+.retomar-btn{align-self:flex-start;margin-top:6px}
+
+.trilha-numeros{display:flex;flex-wrap:wrap;gap:20px}
+.trilha-numeros span{display:flex;flex-direction:column;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
+.trilha-numeros b{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;color:var(--paper)}
+
+/* ==========================================================
+   3 · O GRAFO COMO MAPA DE PROGRESSO
+   ========================================================== */
+
+/* `.grafo-niveis` e `.nivel` têm height:100%, então a caixa precisa de altura
+   definida — na vitrine ela vinha da seção fullpage, que aqui não existe. */
+.tela-trilha .grafo-caixa{height:clamp(360px,58vh,640px)}
+.tela-trilha .trilha-topo{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-start}
+.tela-trilha .trilha-topo p{max-width:58ch;color:var(--paper-dim);font-size:.9rem}
+.tela-trilha .trilha-resumo{display:flex;gap:18px;flex-wrap:wrap}
+.tela-trilha .trilha-resumo span{display:flex;flex-direction:column;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--paper-dim)}
+.tela-trilha .trilha-resumo b{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;color:var(--paper)}
+.tela-trilha .trilha-resumo i{font-style:normal;font-size:.64rem}
+
+/* Os quatro estados. `adiante` é o mais restritivo e MESMO ASSIM é clicável:
+   o FAQ da vitrine promete que a trilha é recomendação de ordem, não trava. */
+.curso-no.no-concluido{border-color:var(--phosphor-dim);background:rgba(91,140,255,.06)}
+.curso-no.no-atual{border-color:var(--amber)}
+.curso-no.no-adiante{opacity:.62}
+.curso-no.no-adiante:hover{opacity:1}
+
+.no-estado{
+  font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--paper-dim);
+}
+.no-estado[data-estado="concluido"]{color:var(--phosphor)}
+.no-estado[data-estado="atual"]{color:var(--amber)}
+.no-estado[data-estado="disponivel"]{color:var(--phosphor-dim)}
+
+.no-barra{display:block;height:3px;border-radius:2px;background:var(--wire);overflow:hidden;margin-top:5px}
+.no-barra-cheia{display:block;height:100%;background:var(--phosphor)}
+.no-conta{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--paper-dim)}
+
+/* aresta cujo pré-requisito já foi cumprido acende; o resto fica discreto */
+.aresta-feita .linha{stroke:var(--phosphor);opacity:.55}
+
+.grafo-legenda{display:flex;flex-wrap:wrap;gap:16px}
+.leg{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--paper-dim)}
+.leg-cor{width:11px;height:11px;border-radius:2px;border:1px solid var(--wire);background:var(--ink)}
+.leg-cor.no-concluido{border-color:var(--phosphor-dim);background:rgba(91,140,255,.25)}
+.leg-cor.no-atual{border-color:var(--amber)}
+.leg-cor.no-adiante{opacity:.5}
+
+/* ==========================================================
+   4 · CURSO E AULA
+   ========================================================== */
+
+.curso-head{display:flex;flex-direction:column;gap:8px}
+.curso-head h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.4rem,3vw,2rem);line-height:1.15}
+.curso-resumo{color:var(--paper-dim);max-width:70ch}
+.curso-meta{display:flex;flex-wrap:wrap;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--phosphor-dim)}
+.curso-conta{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
+
+.curso-colunas{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.curso-lado{display:flex;flex-direction:column;gap:18px}
+.ementa{display:flex;flex-direction:column;gap:7px;font-size:.88rem;color:var(--paper-dim);padding-left:16px}
+.ementa li{list-style:'› ';padding-left:4px}
+.requisitos{font-size:.88rem;color:var(--paper-dim)}
+.ligados{display:flex;flex-wrap:wrap;gap:7px}
+.elo{
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;padding:5px 9px;border-radius:4px;
+  border:1px solid var(--wire);color:var(--paper-dim);
+}
+.elo-antes{border-color:rgba(255,77,94,.35);color:var(--amber)}
+.elo-depois{border-color:var(--phosphor-dim);color:var(--phosphor)}
+.elo:hover{background:var(--ink)}
+
+.aulas{display:flex;flex-direction:column;gap:1px;counter-reset:aula}
+.aula-linha{
+  display:grid;grid-template-columns:18px 26px 1fr;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:4px;color:var(--paper);font-size:.9rem;
+}
+.aula-linha:hover{background:var(--ink)}
+.aula-marca{color:var(--phosphor);font-size:.8rem}
+.aula-num{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--phosphor-dim)}
+.aula-linha.feita .aula-tit{color:var(--paper-dim)}
+
+/* ---------- a aula ---------- */
+.tela-aula{max-width:820px}
+.migalhas{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
+.migalhas a{color:var(--phosphor)}
+.aula-titulo{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.3rem,2.8vw,1.8rem);line-height:1.18}
+
+.video-fachada{
+  position:relative;aspect-ratio:16/9;border-radius:6px;overflow:hidden;cursor:pointer;
+  background:var(--panel);border:1px solid var(--wire);
+  display:grid;place-items:center;
+}
+.video-fachada iframe{width:100%;height:100%;border:0}
+.video-play{
+  width:60px;height:60px;border-radius:50%;background:var(--phosphor);color:var(--ink);
+  font-size:1.3rem;display:grid;place-items:center;
+}
+.video-breve{font-size:.8rem}
+
+.aula-texto{min-height:96px;justify-content:center}
+.conta-ex{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--phosphor)}
+.lista-ex{display:flex;flex-direction:column;gap:16px}
+
+.aula-pe{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--wire)}
+.aula-nav{display:flex;gap:8px}
+
+/* ==========================================================
+   5 · EXERCÍCIOS — os sete tipos
+   ========================================================== */
+
+.ex{
+  background:var(--ink);border:1px solid var(--wire);border-radius:6px;
+  padding:16px 18px;display:flex;flex-direction:column;gap:12px;
+}
+.ex-topo{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.ex-tipo,.ex-dif,.ex-selo{
+  font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.08em;
+  text-transform:uppercase;padding:3px 7px;border-radius:3px;border:1px solid var(--wire);
+}
+.ex-tipo{color:var(--phosphor);border-color:var(--phosphor-dim)}
+.ex-dif{color:var(--paper-dim)}
+.ex-selo{margin-left:auto}
+.selo-forte{color:var(--phosphor);border-color:var(--phosphor-dim)}
+.selo-medio{color:var(--paper-dim)}
+.selo-fraco{color:var(--paper-dim);opacity:.7}
+
+.ex-enunciado{font-size:.95rem;line-height:1.6}
+.ex-instrucao{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
+.ex-rotulo{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
+.ex-nota{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--paper-dim)}
+.ex-nota-dom{color:var(--phosphor-dim)}
+.ex-nota-aviso{color:var(--amber)}
+.ex-erro{color:var(--amber);font-family:'IBM Plex Mono',monospace;font-size:.8rem}
+.ex code{font-family:'IBM Plex Mono',monospace;font-size:.86em;background:var(--panel);padding:1px 5px;border-radius:3px}
+
+.ex-corpo{display:flex;flex-direction:column;gap:10px}
+.ex-campo{
+  width:100%;background:var(--panel);border:1px solid var(--wire);border-radius:4px;
+  padding:10px 12px;color:var(--paper);font:inherit;resize:vertical;
+}
+.ex-campo.mono{font-family:'IBM Plex Mono',monospace;font-size:.84rem;line-height:1.5}
+.ex-campo:focus{outline:none;border-color:var(--phosphor)}
+.ex-campo.campo-certo{border-color:var(--phosphor)}
+.ex-campo.campo-errado{border-color:var(--amber)}
+
+.ex-dica{border-top:1px dashed var(--wire);padding-top:10px}
+.ex-dica summary{cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--phosphor)}
+.ex-dica p{margin-top:8px;font-size:.88rem;color:var(--paper-dim);line-height:1.55}
+
+.ex-acoes{display:flex;gap:8px;flex-wrap:wrap}
+.ex-veredito:empty{display:none}
+.ex-veredito{font-family:'IBM Plex Mono',monospace;font-size:.78rem;padding:9px 11px;border-radius:4px;border:1px solid var(--wire)}
+.v-certo{color:var(--phosphor);border-color:var(--phosphor-dim);background:rgba(91,140,255,.07)}
+.v-errado{color:var(--amber);border-color:rgba(255,77,94,.35)}
+.v-pendente,.v-vazio,.v-esperando,.v-antigo{color:var(--paper-dim)}
+.v-armadilha{display:block;margin-top:8px;color:var(--paper-dim);font-family:'IBM Plex Sans',sans-serif;font-size:.85rem;line-height:1.5}
+
+/* ---------- alternativas (quiz e múltipla escolha) ---------- */
+.alts{display:flex;flex-direction:column;gap:7px}
+.alt{
+  display:grid;grid-template-columns:16px 1fr;align-items:start;gap:10px;
+  padding:11px 13px;border:1px solid var(--wire);border-radius:5px;cursor:pointer;
+  transition:border-color .15s,background .15s;
+}
+.alt:hover{border-color:var(--phosphor-dim)}
+.alt input{grid-row:1;appearance:none;width:0;height:0;position:absolute;opacity:0}
+.alt-marca{grid-row:1;width:15px;height:15px;margin-top:3px;border:1px solid var(--wire);border-radius:50%;position:relative}
+.ex-multipla-escolha .alt-marca{border-radius:3px}
+.alt input:checked ~ .alt-marca{border-color:var(--phosphor)}
+.alt input:checked ~ .alt-marca::after{
+  content:'';position:absolute;inset:3px;border-radius:inherit;background:var(--phosphor);
+}
+.alt-txt{grid-column:2;font-size:.9rem;line-height:1.5}
+.alt-porque{
+  grid-column:2;font-size:.82rem;color:var(--paper-dim);line-height:1.5;
+  padding-top:7px;margin-top:5px;border-top:1px dashed var(--wire);
+}
+.alt-certa{border-color:var(--phosphor);background:rgba(91,140,255,.07)}
+.alt-errada{border-color:var(--amber);background:rgba(255,77,94,.06)}
+.alt-perdida{border-style:dashed}
+
+/* ---------- ordenação ---------- */
+.ord{display:flex;flex-direction:column;gap:6px;counter-reset:passo;list-style:none}
+.ord-item{
+  display:grid;grid-template-columns:16px 1fr auto;align-items:center;gap:10px;
+  padding:10px 12px;border:1px solid var(--wire);border-radius:5px;background:var(--panel);
+  cursor:grab;
+}
+.ord-item.arrastando{opacity:.45;border-style:dashed}
+.ord-item::before{counter-increment:passo}
+.ord-pega{color:var(--phosphor-dim);font-size:.9rem}
+.ord-txt{font-size:.88rem;line-height:1.45}
+.ord-setas{display:flex;flex-direction:column;gap:2px}
+.ord-seta{
+  width:22px;height:17px;display:grid;place-items:center;border-radius:3px;
+  border:1px solid var(--wire);color:var(--paper-dim);font-size:.62rem;
+}
+.ord-seta:hover:not(:disabled){border-color:var(--phosphor);color:var(--phosphor)}
+.ord-seta:disabled{opacity:.35}
+.ord-certo{border-color:var(--phosphor)}
+.ord-errado{border-color:var(--amber)}
+
+/* ---------- associação ---------- */
+.assoc{display:flex;flex-direction:column;gap:7px;list-style:none}
+.assoc-par{
+  display:grid;grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr);align-items:center;gap:10px;
+  padding:9px 11px;border:1px solid var(--wire);border-radius:5px;
+}
+.assoc-esq{font-size:.88rem;line-height:1.4}
+.assoc-liga{color:var(--phosphor-dim);text-align:center}
+.assoc-sel{
+  background:var(--panel);border:1px solid var(--wire);border-radius:4px;
+  padding:7px 9px;color:var(--paper);font:inherit;font-size:.85rem;min-width:0;
+}
+.assoc-sel:focus{outline:none;border-color:var(--phosphor)}
+.assoc-certo{border-color:var(--phosphor)}
+.assoc-errado{border-color:var(--amber)}
+.assoc-gabarito{
+  grid-column:3;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--phosphor);
+}
+
+/* ---------- código e saída esperada ---------- */
+.cod-bloco{border:1px solid var(--wire);border-radius:5px;overflow:hidden;background:var(--panel)}
+.cod-barra{padding:6px 11px;border-bottom:1px solid var(--wire);background:var(--ink)}
+.cod-ling{font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
+.cod{padding:12px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;font-size:.82rem;line-height:1.55}
+.cod-editor .ex-campo{border:0;border-radius:0;background:var(--panel)}
+.cod-area{min-height:180px;white-space:pre;overflow-wrap:normal;overflow-x:auto}
+
+.casos{display:flex;flex-direction:column;gap:10px;padding-top:4px}
+.casos-tit{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
+.caso{border:1px solid var(--wire);border-radius:5px;padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.caso-desc{font-size:.82rem;color:var(--paper-dim)}
+.caso-io{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.caso-rot{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
+.caso .cod{padding:8px;background:var(--panel);border-radius:4px;margin-top:4px}
+
+/* ---------- resposta por expressão ---------- */
+.expr-origem{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.expr-rot{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
+.expr-cod{font-family:'IBM Plex Mono',monospace;font-size:.95rem;color:var(--phosphor);background:var(--panel);padding:5px 10px;border-radius:4px}
+
+/* ==========================================================
+   6 · ENTRAR, CERTIFICADOS, CONTA
+   ========================================================== */
+
+.tela-entrar{min-height:calc(100vh - 130px);display:grid;place-items:center;max-width:none}
+.entrar-caixa{width:min(420px,100%);border:1px solid var(--wire);border-radius:6px;background:var(--panel);overflow:hidden}
+.entrar-corpo{padding:22px 24px 26px;display:flex;flex-direction:column;gap:14px}
+.entrar-corpo h1{font-family:'Space Grotesk',sans-serif;font-size:1.3rem}
+.entrar-sub{font-size:.88rem;color:var(--paper-dim)}
+.entrar-corpo form{display:flex;flex-direction:column;gap:14px}
+.entrar-aviso{font-size:.68rem}
+
+.certs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.cert{border:1px solid var(--wire);border-radius:6px;overflow:hidden;background:var(--panel)}
+.cert-corpo{padding:16px 18px;display:flex;flex-direction:column;gap:7px}
+.cert-rot{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--phosphor)}
+.cert-corpo h2{font-family:'Space Grotesk',sans-serif;font-size:1rem;line-height:1.2}
+.cert-meta,.cert-codigo{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
+
+.conta-nota{font-size:.84rem;color:var(--paper-dim);line-height:1.5}
+.conta-confirma{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:.85rem}
+.tela-conta .campo{max-width:420px}
+
+/* ==========================================================
+   7 · LARGURAS
+   ========================================================== */
+
+/* Duas colunas no curso quando cada uma ainda fica com ~440px — o mesmo
+   critério que a vitrine usa no modal, e pelo mesmo motivo: mais estreito
+   que isso, duas colunas leem pior que uma. */
+@media(min-width:1024px){
+  .curso-colunas{grid-template-columns:minmax(0,1fr) 320px}
+}
+
+/* O trilho vira gaveta em 1180px — o mesmo corte em que a barra da vitrine
+   deixa de caber numa linha, e pela mesma razão: abaixo disso não há largura
+   para chrome persistente e conteúdo ao mesmo tempo. */
+@media(max-width:1180px){
+  .portal{grid-template-columns:minmax(0,1fr)}
+  .trilho{
+    position:fixed;top:64px;left:0;bottom:0;width:min(300px,84vw);z-index:110;
+    background:var(--ink);transform:translateX(-102%);transition:transform .22s ease;
+    height:auto;
+  }
+  body.trilho-aberto .trilho{transform:none}
+  body.sem-trilho .trilho-btn{display:none}
+  .trilho-btn{display:block}
+  .trilho-veu{display:block;position:fixed;inset:64px 0 0;background:rgba(10,14,20,.6);z-index:105}
+  .nav-contexto{margin-left:14px}
+}
+
+@media(max-width:860px){
+  /* o grafo já vira lista pelo base.css; aqui só solta a altura fixa */
+  .tela-trilha .grafo-caixa{height:auto}
+  .ctx-nome{display:none}
+}
+
+@media(max-width:700px){
+  .conteudo{padding:20px 16px 48px}
+  .assoc-par{grid-template-columns:minmax(0,1fr);gap:6px}
+  .assoc-liga{display:none}
+  .aula-pe{flex-direction:column;align-items:stretch}
+  .aula-nav{justify-content:space-between}
+}
+
+@media(max-width:620px){
+  .nav-contexto{display:none}
+  .tela-head h1{font-size:1.25rem}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .trilho{transition:none}
+  .cartao:hover,.curso-no:hover{transform:none}
+}
