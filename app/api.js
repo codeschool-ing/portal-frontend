@@ -31,6 +31,28 @@ export function sair() {
   return eco(null);
 }
 
+/* FUTURO: `PATCH /conta/email`, e a troca só vale depois de confirmada no
+   endereço NOVO — senão trocar o e-mail vira a forma mais fácil de tomar uma
+   conta. Aqui vale na hora, porque não há para onde mandar a confirmação. */
+export function trocarEmail(email) {
+  estado.trocarEmail(email);
+  return eco(estado.agora().sessao);
+}
+
+/* FUTURO: `PATCH /conta/senha`, com a senha atual conferida NO SERVIDOR. A
+   senha nova não é guardada em lugar nenhum aqui — ver estado.js. */
+export function trocarSenha() {
+  estado.marcarTrocaDeSenha();
+  return eco(true);
+}
+
+/* FUTURO: o serviço de cobrança. Trocar de plano vai passar por checkout,
+   prorrateio e nota — nada disso existe, e o portal não finge que existe. */
+export function trocarPlano(planoId) {
+  estado.trocarPlano(planoId);
+  return eco(estado.planoAtual());
+}
+
 /* ---------- matrícula ---------- */
 
 export const matricula = () => eco(estado.agora().matricula);

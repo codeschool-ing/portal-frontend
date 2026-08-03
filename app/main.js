@@ -26,6 +26,7 @@ import aula from './telas/aula.js';
 import catalogo from './telas/catalogo.js';
 import certificados from './telas/certificados.js';
 import conta from './telas/conta.js';
+import planoTela from './telas/plano.js';
 import desempenho from './telas/desempenho.js';
 import refazer from './telas/refazer.js';
 import notas from './telas/notas.js';
@@ -55,6 +56,7 @@ rota('/curso/:id/aula/:ix/:sec', aula);
 rota('/catalogo', catalogo);
 rota('/certificados', certificados);
 rota('/conta', conta);
+rota('/plano', planoTela);
 rota('/desempenho', desempenho);
 rota('/refazer', refazer);
 rota('/notas', notas);
@@ -144,7 +146,8 @@ function pintarConta() {
   const s = agora().sessao;
   $('#conta-avatar').textContent = (s?.nome || '·').trim().charAt(0).toUpperCase() || '·';
   $('#conta-menu').innerHTML = s
-    ? '<a class="conta-op" href="#/conta">' + txt('Conta') + '</a>' +
+    ? '<a class="conta-op" href="#/conta">' + txt('Minha conta') + '</a>' +
+      '<a class="conta-op" href="#/plano">' + txt('Meu plano') + '</a>' +
       '<a class="conta-op" href="#/certificados">' + txt('Certificados') + '</a>' +
       '<a class="conta-op" href="https://codeschool.ing">' + txt('Ir para o site') + ' ↗</a>'
     : '<a class="conta-op" href="#/entrar">' + txt('Entrar') + '</a>';

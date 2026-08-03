@@ -43,28 +43,48 @@ function codigo(semente) {
   return 'CS-' + bloco(h) + '-' + bloco(h >>> 7) + '-' + bloco(h >>> 13);
 }
 
-/* O cartão. `exemplo` muda três coisas ao mesmo tempo — a moldura, o selo e o
-   texto do código —, e é de propósito: quem olha rápido, quem lê o rótulo e
-   quem for conferir o número recebem a mesma informação. */
+/* O CERTIFICADO NÃO É MAIS UMA JANELA DE TERMINAL.
+
+   Ele nasceu reaproveitando o `.term-bar` da vitrine — os três pontinhos e o
+   nome do arquivo —, que é a moldura certa para painel de código e a errada
+   para isto. Um certificado é o único artefato do portal que sai daqui: vai
+   para um perfil, um anexo de e-mail, uma vaga. Ele precisa parecer um
+   documento, e nenhum documento tem barra de janela em cima.
+
+   A forma agora é a de um diploma: o emissor no alto, "certifica que", o nome
+   de quem recebe em corpo grande, o que foi concluído, e um rodapé com data e
+   código. A identidade continua sendo a da escola — a mesma tipografia, o
+   mesmo fósforo, o LED da marca —, mas aplicada a um documento em vez de a uma
+   janela.
+
+   `exemplo` muda três coisas ao mesmo tempo — a moldura, o selo e o texto do
+   código —, e é de propósito: quem olha rápido, quem lê o rótulo e quem for
+   conferir o número recebem a mesma informação. */
 function cartao({ rotulo, nome, meta, quem, quando, chave, exemplo, nota }) {
   return '<article class="cert' + (exemplo ? ' cert-exemplo' : '') + '">' +
-    '<div class="term-bar">' +
-      '<span class="dot d-r"></span><span class="dot d-y"></span><span class="dot d-g"></span>' +
-      '<span class="modal-arquivo">certificado.' + esc(chave) + '</span>' +
-      (exemplo ? '<span class="cert-selo">' + txt('exemplo') + '</span>' : '') +
-    '</div>' +
-    '<div class="cert-corpo">' +
-      '<span class="cert-rot">' + txt(rotulo) + '</span>' +
-      '<h2>' + esc(nome) + '</h2>' +
-      '<p class="cert-meta">' + esc(meta) + '</p>' +
-      '<div class="cert-linha">' +
-        '<span class="cert-campo"><b>' + txt('aluno') + '</b>' + esc(quem) + '</span>' +
-        '<span class="cert-campo"><b>' + txt('emitido em') + '</b>' + esc(quando) + '</span>' +
+    '<div class="cert-folha">' +
+      '<header class="cert-topo">' +
+        '<span class="cert-marca"><span class="cert-led" aria-hidden="true"></span>codeschool<b>.ing</b></span>' +
+        (exemplo
+          ? '<span class="cert-selo">' + txt('exemplo') + '</span>'
+          : '<span class="cert-tipo">' + txt(rotulo) + '</span>') +
+      '</header>' +
+
+      '<div class="cert-miolo">' +
+        '<span class="cert-frase">' + txt('certifica que') + '</span>' +
+        '<p class="cert-aluno">' + esc(quem) + '</p>' +
+        '<span class="cert-frase">' +
+          txt(rotulo === 'trilha concluída' ? 'concluiu a trilha' : 'concluiu o curso') + '</span>' +
+        '<h2 class="cert-curso">' + esc(nome) + '</h2>' +
+        '<p class="cert-meta">' + esc(meta) + (nota ? ' · ' + esc(nota) : '') + '</p>' +
       '</div>' +
-      '<p class="cert-codigo mono dim">' +
-        (exemplo ? txt('exemplo — nenhum código foi emitido') : codigo(chave + quem)) +
-      '</p>' +
-      (nota ? '<p class="cert-nota mono dim">' + esc(nota) + '</p>' : '') +
+
+      '<footer class="cert-pe">' +
+        '<span>' + esc(quando) + '</span>' +
+        '<span class="cert-codigo">' +
+          (exemplo ? txt('exemplo — nenhum código foi emitido') : codigo(chave + quem)) +
+        '</span>' +
+      '</footer>' +
     '</div>' +
   '</article>';
 }

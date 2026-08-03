@@ -24,7 +24,8 @@ Conferir que continua de pé:
 
 ```sh
 npm i playwright
-node ferramentas/fumaca/fumaca.mjs
+node ferramentas/fumaca/fumaca.mjs      # o portal inteiro, num navegador
+node ferramentas/exemplos/conferir.mjs  # os exemplos de código realmente rodam
 ```
 
 ## Um arquivo só, para abrir do disco
@@ -185,23 +186,25 @@ a aula está feita quando todas as seções dela estão. Um registro no formato
 antigo (uma caixinha por aula) é migrado na primeira escrita, então quem já
 tinha progresso não o vê zerar.
 
-### Os dois cursos escritos
+### Os três cursos escritos
 
 Há um arquivo por curso, como o pipeline faz — `aulas-<curso>.js` e
 `exercicios-<curso>.js` —, e cada um **mescla** no objeto global em vez de
 atribuí-lo: nenhum pode depender de ser o primeiro a carregar.
 
-| curso | aulas | seções | avaliações | tipos |
+| curso | aulas escritas | seções | avaliações | o que ele exercita |
 | --- | --- | --- | --- | --- |
-| `web-fundamentos` | 11 | 38 | 11 de 11, 23 exercícios | 6 dos 7 |
-| `html-css` | 13 | 39 | 4 de 13, 8 exercícios | 4 dos 7 |
+| `web-fundamentos` | 11 de 11 | 38 | 11 de 11, 23 exercícios | prosa, diagrama inline, material |
+| `html-css` | 13 de 13 | 39 | 4 de 13, 8 exercícios | bloco de código, figura de arquivo |
+| `javascript` | 4 de 12 | 10 | 3 de 12, 9 exercícios | `exemplo` anotado, os 7 tipos |
 
-`html-css` está **pela metade de propósito**: é assim que um curso fica
-enquanto está sendo produzido, e é o que exercita a avaliação pendente no lugar
-dela — presente na estrutura, marcada, sem botão de concluir e fora do
-denominador.
+Os dois **pela metade** são de propósito: `html-css` tem as avaliações
+incompletas e `javascript` tem as aulas incompletas. É assim que um curso fica
+enquanto está sendo produzido, e é o que exercita os dois estados de lacuna —
+a avaliação pendente (presente na estrutura, marcada, fora do denominador) e a
+aula ainda sem texto (que cai no invólucro de uma seção só).
 
-**Nenhum dos dois tem `codigo`, e a ausência é informação.** Em
+**Nenhum dos dois primeiros tem `codigo`, e a ausência é informação.** Em
 `web-fundamentos`, escrever um programa exigiria o que o curso não dá — ele é o
 primeiro da escola, sem pré-requisito de linguagem, e pedi-lo violaria a regra
 do gerador de que um exercício do tópico N só pode exigir o que os tópicos 1..N
@@ -347,8 +350,10 @@ app/busca.js                   o índice da busca global — não toca no DOM
 app/painel-busca.js            o painel do ⌘K
 app/provas.js                  monta a prova do curso e a da trilha
 app/materiais.js               a lista de material para baixar
+assets/planos.js               os planos e o que cada um inclui
 assets/materiais.js            GERADO — os PDFs, como data: URI
 ferramentas/materiais/         gera assets/materiais.js
+ferramentas/exemplos/          roda os blocos `exemplo` e confere a saída
 app/telas/*.js                 uma por tela
 app/exercicios/*.js            um por tipo, mais o invólucro e a correção
 ferramentas/fumaca/            o teste de fumaça
@@ -546,6 +551,29 @@ o programa** — quem lê perde o fio de que aquilo é um arquivo só. Aqui o c�
 continua contínuo e mesmo assim cada pedaço tem a sua nota. Abaixo de 900px as
 duas colunas viram uma, com a nota *antes* do trecho.
 
+### Onde ele mais rende: o curso de JavaScript
+
+Em `web-fundamentos` o assunto é conceito e prosa dá conta. Em `html-css` o
+código aparece em pedaços curtos. Em `javascript` o assunto é uma **linguagem**,
+e linguagem se aprende lendo programa — as quatro primeiras aulas foram escritas
+quase inteiras em `exemplo`.
+
+**Todo exemplo tem de rodar**, e há uma ferramenta para garantir isso:
+
+```sh
+node ferramentas/exemplos/conferir.mjs
+```
+
+Ela concatena os `partes[].codigo` de cada bloco, executa num Node de verdade e
+compara com a `saida` escrita no conteúdo. Na primeira execução pegou dois
+defeitos reais, nenhum dos quais apareceria lendo o texto: o exemplo das arrow
+functions **estourava no meio** (`this.n` com `this` indefinido em módulo ES) e
+listava a saída de dois `console.log` que nem estavam no programa; e o exemplo
+de `this` abortava no `TypeError` antes de chegar à linha que era a lição.
+
+Exemplo com saída inventada é pior que exemplo nenhum: ensina errado com a
+autoridade de quem mostrou o resultado, e o aluno só descobre no console dele.
+
 ## Material complementar
 
 A seção referencia o material por chave (`materiais: ['wf-dns-resumo']`); o
@@ -561,6 +589,64 @@ do bundle. São PDFs escritos à mão, sem dependência, ~3 KB cada.
 
 O link usa `download`, e não `target`: abrir o PDF no visualizador embutido tira
 o aluno da aula.
+
+## O conteúdo não fica dentro de um cartão
+
+A prosa da seção era um `.bloco`: fundo, borda, canto arredondado. Isso desenha
+uma fronteira entre "a área do conteúdo" e "o resto" — e o resto não é nada, é
+a margem que sobra de centralizar. Separar texto de vazio não é uma distinção
+que valha uma linha na tela.
+
+Cartão é para o que se **compara lado a lado**: cursos, materiais, os blocos da
+página do curso. Texto corrido para ler durante meia hora quer o contrário —
+nada em volta. As figuras, o código e o vídeo mantiveram a moldura, e agora ela
+quer dizer alguma coisa ("isto aqui não é prosa"), o que não conseguia dizer
+quando estava dentro de outra moldura.
+
+O trilho também respirou: os itens tinham 2px de folga entre linhas de 8px, e
+uma lista de treze aulas com as seções abertas virava um paredão que se lê linha
+a linha. O ar entre os itens é o que faz um menu ser **consultado** em vez de
+lido.
+
+## O certificado é um documento, não uma janela
+
+Ele nasceu reaproveitando o `.term-bar` da vitrine — os três pontinhos e o nome
+do arquivo. É a moldura certa para painel de código e a errada para isto: o
+certificado é o **único artefato do portal que sai daqui**, e vai para um perfil,
+um anexo de e-mail, uma vaga. Nenhum documento tem barra de janela em cima.
+
+A forma agora é a de um diploma — emissor no alto, "certifica que", o nome de
+quem recebe em corpo grande, o que foi concluído, e um rodapé com data e código.
+A identidade continua sendo a da escola (mesma tipografia, mesmo fósforo, o LED
+da marca), aplicada a um documento em vez de a uma janela. O teste de fumaça
+guarda a regressão: `.cert .term-bar` tem de continuar valendo zero.
+
+## Conta: e-mail, senha e plano
+
+**E-mail e senha são dois formulários, não campos de um "salvar".** As duas
+operações têm consequências diferentes, confirmações diferentes e, no servidor,
+endpoints diferentes; juntá-las faria a pessoa alterar uma sem querer.
+
+Duas decisões que o código registra e a tela repete ao aluno:
+
+- **A senha não é guardada em lugar nenhum.** Não há hash no cliente que valha
+  alguma coisa, e gravá-la em `localStorage` seria pior que não ter tela: daria
+  a impressão de que existe autenticação. O que fica é a data da troca. O teste
+  procura a senha digitada dentro do armazenamento inteiro e falha se achar.
+- **A validação de e-mail é frouxa de propósito** — "tem arroba, tem ponto
+  depois dele, sem espaço". Regra estrita rejeita endereço válido (`+`, domínio
+  novo, acento) e não impede nada: quem confirma que o endereço existe é a
+  mensagem enviada para ele.
+
+**Meu Plano compara por recurso, não por cartão de preço.** Três cartões lado a
+lado com listas independentes é o formato de página de *venda*, para quem ainda
+não escolheu. Quem já assinou tem outra pergunta — "o que eu **não** tenho?" — e
+a tabela responde essa, porque alinha a mesma linha nos três planos.
+
+Os planos em `assets/planos.js` são ficção deliberada com a forma certa: preço,
+ciclo e cobrança são domínio de um serviço de pagamento. E **nada é bloqueado
+por plano hoje**: travar exige servidor, e com o estado no navegador qualquer
+trava seria teatro — bastaria editar uma chave. A tela diz isso.
 
 ## Três armadilhas que só apareceram na tela
 
