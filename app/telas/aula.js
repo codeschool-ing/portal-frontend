@@ -82,7 +82,8 @@ export default async function aula({ id, ix, sec }) {
   const rota = (v) => '#/curso/' + esc(id) + '/aula/' + v.ix + '/' + esc(v.secId);
 
   const el = document.createElement('div');
-  el.className = 'tela tela-aula';
+  const temVideoAqui = secao.tipo === 'conteudo' && secao.video !== undefined;
+  el.className = 'tela tela-aula' + (temVideoAqui ? ' aula-com-video' : ' aula-so-texto');
 
   const passos = secoes.map((s, i) => (
     '<a class="passo' + (i === pos ? ' on' : '') + (secaoConcluida(id, n, s.id) ? ' feito' : '') +
@@ -102,9 +103,43 @@ export default async function aula({ id, ix, sec }) {
       '" aria-label="' + txt(rotulo) + '">' + seta + '</a>'
     : '');
 
+  /* O QUADRO DE VÍDEO SÓ EXISTE ONDE A SEÇÃO DIZ QUE TEM VÍDEO.
+
+     Ele já esteve em toda seção de conteúdo, reservado, com o argumento de que
+     publicar os vídeos um a um não reorganizaria a tela de ninguém. O
+     argumento continua bom para a seção que VAI ter vídeo — e é péssimo para a
+     que nunca vai. Uma seção de texto com um retângulo cinza em cima promete
+     algo que não vem, e a promessa não expira.
+
+     O que resolve é a seção DECLARAR:
+
+       video: 'ID'   um vídeo publicado — toca ali
+       video: true   vai ter vídeo, ainda não tem — o espaço fica guardado
+       (ausente)     seção de texto: nenhum quadro, nenhuma promessa
+
+     A reserva não se perdeu; ela deixou de ser automática e passou a ser dita.
+
+     E a seção com vídeo TROCA DE LAYOUT: o player sobe para o topo, de ponta a
+     ponta da área de conteúdo, e o título desce para baixo dele. Vídeo é o que
+     a pessoa veio fazer ali — pôr um cabeçalho na frente empurra o play para
+     baixo da dobra em tela de notebook. */
+  const temVideo = temVideoAqui;
+  const videoPronto = temVideo && typeof secao.video === 'string' && secao.video;
+
   el.innerHTML =
     lateral(anterior && rota(anterior), 'esq', SETA_ESQ, 'seção anterior') +
     lateral(destinoProximo, 'dir', SETA_DIR, 'concluir e ir para a próxima seção', true) +
+
+    (temVideo
+      ? '<div class="video-fachada" data-video="' + esc(videoPronto || '') + '">' +
+          (videoPronto
+            ? '<button type="button" class="video-play" aria-label="' + txt('Assistir') + '">▶</button>'
+            : '<span class="video-breve mono dim">' + txt('vídeo em breve') + '</span>') +
+          (secao.duracao ? '<span class="video-duracao mono">' + esc(secao.duracao) + '</span>' : '') +
+        '</div>'
+      : '') +
+
+    '<div class="aula-miolo">' +
 
     '<nav class="migalhas">' +
       '<a href="#/curso/' + esc(id) + '">' + esc(c.nome) + '</a>' +
@@ -119,25 +154,21 @@ export default async function aula({ id, ix, sec }) {
 
     '<h2 class="secao-titulo">' + esc(secao.titulo) + '</h2>' +
 
-    (secao.tipo === 'conteudo'
-      ? '<div class="video-fachada" data-video="' + esc(secao.video || '') + '">' +
-          (secao.video
-            ? '<button type="button" class="video-play" aria-label="' + txt('Assistir') + '">▶</button>'
-            : '<span class="video-breve mono dim">' + txt('vídeo em breve') + '</span>') +
-        '</div>'
-      : '') +
-
     (secao.tipo === 'avaliacao'
       ? '<section class="bloco aula-exercicios' + (secao.pendente ? ' aval-pendente' : '') + '">' +
           (secao.pendente
             ? '<p class="mono dim">' + txt('[avaliação em preparação — os exercícios deste tópico ainda não foram produzidos]') + '</p>'
             : '') +
         '</section>'
-      : '<section class="bloco aula-texto">' +
-          (secao.corpo
-            ? prosa(secao.corpo)
-            : '<p class="mono dim">' + txt('[conteúdo da aula — entra com o material real na Etapa 2]') + '</p>') +
-        '</section>') +
+      /* Seção só de vídeo não ganha bloco de texto nenhum — nem o aviso de
+         "conteúdo a entrar", que ali seria falso: o conteúdo é o vídeo. O
+         aviso continua valendo para a aula ainda sem nada escrito. */
+      : (secao.corpo
+        ? '<section class="bloco aula-texto">' + prosa(secao.corpo) + '</section>'
+        : (temVideo
+          ? ''
+          : '<section class="bloco aula-texto"><p class="mono dim">' +
+            txt('[conteúdo da aula — entra com o material real na Etapa 2]') + '</p></section>'))) +
 
     /* O material vem DEPOIS do texto e ANTES da anotação: baixar o PDF é o que
        se faz tendo lido, e anotar é o último gesto da seção. */
@@ -158,7 +189,9 @@ export default async function aula({ id, ix, sec }) {
     '<footer class="aula-pe">' +
       (anterior ? '<a class="btn btn-ghost" href="' + rota(anterior) + '">← ' + txt('anterior') + '</a>' : '<span></span>') +
       '<a class="btn btn-primary avancar" href="' + destinoProximo + '">' + txt('próxima') + ' →</a>' +
-    '</footer>';
+    '</footer>' +
+
+    '</div>';
 
   if (secao.tipo === 'avaliacao' && !secao.pendente) {
     const exercicios = await api.exerciciosDaAula(id, a.chave);

@@ -27,7 +27,16 @@ window.AULAS = Object.assign(window.AULAS || {}, {
     /* --------------------------------------------------------------- 01 */
     'Sintaxe ES6+: let/const, arrow functions e template strings': [
       {
+        // só vídeo: a abertura do curso, sem texto para ler junto
+        id: 'apresentacao',
+        titulo: 'Apresentação do curso',
+        video: true,
+        duracao: '03 min',
+      },
+      {
         id: 'let-const',
+        video: true,
+        duracao: '09 min',
         titulo: 'let e const: o fim do var',
         corpo: [
           '`var` tem duas propriedades que ninguém pediu: ela vaza para fora do bloco onde foi declarada e pode ser redeclarada sem reclamação. `let` e `const` não fazem nem uma coisa nem outra, e por isso `var` não aparece mais em código novo.',

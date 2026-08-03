@@ -52,9 +52,15 @@
 body.sem-trilho .portal{grid-template-columns:minmax(0,1fr)}
 body.sem-trilho .trilho{display:none}
 
+/* O padding vira VARIÁVEL porque não é só padding: o vídeo de ponta a ponta o
+   cancela com margem negativa, e um número repetido em dois lugares diverge no
+   dia em que um deles muda. Foi o que aconteceu — o recuo estreito virou 16px
+   aqui e continuou 18px lá, e sobraram 2px de rolagem horizontal no celular. */
 .conteudo{
+  --pad-x:clamp(18px,3.2vw,44px);
+  --pad-y:26px;
   min-width:0;
-  padding:26px clamp(18px,3.2vw,44px) 60px;
+  padding:var(--pad-y) var(--pad-x) 60px;
 }
 .conteudo:focus{outline:none}
 
@@ -137,6 +143,8 @@ body.sem-trilho .trilho{display:none}
   padding:9px 12px 9px 30px;border-radius:4px;
   font-size:.85rem;line-height:1.45;color:var(--paper-dim);
 }
+.ts-meio{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ts-dur{font-size:.62rem;color:var(--phosphor-dim);letter-spacing:.06em}
 .trilho-secao:hover,.trilho-prova:hover{background:var(--panel);color:var(--paper)}
 .trilho-secao.on,.trilho-prova.on{color:var(--phosphor);background:var(--panel)}
 /* play para o que falta, check para o que foi feito: o ícone diz o estado sem
@@ -425,16 +433,43 @@ body.sem-trilho .trilho{display:none}
 .migalhas a{color:var(--phosphor)}
 .aula-titulo{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.3rem,2.8vw,1.8rem);line-height:1.18}
 
-/* O quadro é reservado em TODA seção de conteúdo, com vídeo ou sem — publicar
-   um a um não pode reorganizar a tela de ninguém. Ele acompanha a LARGURA DA
-   SEÇÃO: um teto de 600px devolvia altura à leitura, mas deixava o vídeo
-   desalinhado do bloco de texto logo abaixo, e desalinho custa mais atenção
-   do que os 150px valiam. */
+/* DUAS FORMAS DE SEÇÃO, E O LAYOUT SEGUE A FORMA.
+
+   A seção que TEM vídeo abre com o player de ponta a ponta da área de
+   conteúdo, e o título desce para baixo dele: vídeo é o que a pessoa veio
+   fazer ali, e um cabeçalho na frente empurra o play para baixo da dobra num
+   notebook. A seção que NÃO tem vídeo não tem quadro nenhum — nem cinza, nem
+   reservado. Ver o comentário em telas/aula.js.
+
+   O sangramento é feito cancelando o padding do `.conteudo` com margem
+   negativa, e por isso os números aqui e lá TÊM DE BATER: se um mudar sem o
+   outro, aparece uma faixa clara de um lado do vídeo. */
+.aula-com-video{max-width:none;gap:0}
+.aula-com-video .video-fachada{
+  margin:calc(-1 * var(--pad-y)) calc(-1 * var(--pad-x)) 0;
+  border-radius:0;border-left:0;border-right:0;border-top:0;
+  /* o teto de altura impede que numa tela larga o player empurre o título
+     inteiro para fora — 16/9 de 1500px são 840px, mais que a dobra */
+  max-height:min(72vh, calc(100vh - 260px));
+}
+.aula-com-video .aula-miolo{
+  max-width:1180px;margin:0 auto;padding-top:var(--pad-y);
+  display:flex;flex-direction:column;gap:22px;width:100%;
+}
+.aula-so-texto .aula-miolo{display:contents}
+
 .video-fachada{
   position:relative;aspect-ratio:16/9;
   border-radius:6px;overflow:hidden;cursor:pointer;
   background:var(--panel);border:1px solid var(--wire);
   display:grid;place-items:center;
+}
+/* A duração no canto do player, como em todo lugar que tem vídeo: ela responde
+   "dá tempo agora?", que é a pergunta que se faz antes de dar play. */
+.video-duracao{
+  position:absolute;right:12px;bottom:12px;
+  font-size:.68rem;letter-spacing:.06em;
+  background:rgba(0,0,0,.62);color:#fff;border-radius:3px;padding:3px 7px;
 }
 .video-fachada iframe{width:100%;height:100%;border:0}
 .video-play{
@@ -444,9 +479,8 @@ body.sem-trilho .trilho{display:none}
 .video-breve{font-size:.8rem}
 
 .aula-texto{min-height:0}
-/* Sem a caixa, o texto precisa do próprio respiro em cima e o vídeo do dele
-   embaixo — antes esse espaço era o `padding` do cartão. */
-.tela-aula .video-fachada{margin-bottom:6px}
+/* Sem a caixa, o texto precisa do próprio respiro em cima — antes esse espaço
+   era o `padding` do cartão. */
 .aula-texto>*:first-child{margin-top:6px}
 .conta-ex{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--phosphor)}
 .lista-ex{display:flex;flex-direction:column;gap:16px}
@@ -1059,7 +1093,7 @@ body.com-busca{overflow:hidden}
 }
 
 @media(max-width:700px){
-  .conteudo{padding:20px 16px 48px}
+  .conteudo{--pad-x:16px;--pad-y:20px;padding:var(--pad-y) var(--pad-x) 48px}
   .busca-veu{padding:0}
   .busca-caixa{width:100%;max-height:100%;height:100%;border-radius:0;border:0}
   .dsp-linha{grid-template-columns:minmax(0,1fr) auto;gap:8px}

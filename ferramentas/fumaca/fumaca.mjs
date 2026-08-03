@@ -269,15 +269,15 @@ const denominadores = await p.evaluate(() => {
   return { aulas, conta };
 });
 /* 12 aulas de javascript. Seções de CONTEÚDO: as quatro primeiras foram
-   escritas (3+3+2+2 = 10) e as outras oito ainda caem no invólucro de uma
-   seção só (8). Somam 18. AVALIAÇÕES: só as três aulas que têm exercícios
-   entram no denominador. 18 + 3 = 21.
+   escritas (4+3+2+2 = 11) e as outras oito ainda caem no invólucro de uma
+   seção só (8). Somam 19. AVALIAÇÕES: só as três aulas que têm exercícios
+   entram no denominador. 19 + 3 = 22.
 
    O número muda quando mais conteúdo é escrito, e isso é o comportamento
    certo: a aula passou mesmo a ter mais trabalho dentro. O que o teste guarda
-   é a REGRA — sem a exclusão das avaliações vazias o denominador seria 30, e
+   é a REGRA — sem a exclusão das avaliações vazias o denominador seria 31, e
    o curso nunca chegaria a 100%. */
-ok('avaliação pendente fora do denominador', /\b21\b/.test(denominadores.conta), denominadores.conta);
+ok('avaliação pendente fora do denominador', /\b22\b/.test(denominadores.conta), denominadores.conta);
 
 console.log('\n== 9. curso prático: código na prosa ==');
 await p.goto(BASE + PAGINA + '#/curso/html-css');
@@ -555,7 +555,66 @@ for (const [rota, sel] of [['#/painel', '.retomar'], ['#/catalogo', '.tela-catal
   ok('sem a tag em ' + rota, (await p.locator('.tela-head .tag').count()) === 0);
 }
 
-console.log('\n== 17. certificado, plano e conta ==');
+console.log('\n== 17. as duas formas de seção ==');
+/* A REGRESSÃO QUE ESTE BLOCO GUARDA: o quadro de vídeo já esteve em TODA seção
+   de conteúdo, reservado. Uma seção de texto com um retângulo cinza em cima
+   promete um vídeo que nunca vem — e a promessa não expira. */
+await p.goto(BASE + PAGINA + '#/curso/web-fundamentos/aula/0/papeis');
+await p.waitForSelector('.aula-texto');
+ok('seção de texto não tem quadro de vídeo', (await p.locator('.video-fachada').count()) === 0);
+ok('e o texto começa no topo', await p.evaluate(() =>
+  document.querySelector('.migalhas').getBoundingClientRect().top < 200));
+
+await p.goto(BASE + PAGINA + '#/curso/web-fundamentos/aula/0/apresentacao');
+await p.waitForSelector('.video-fachada');
+ok('seção de vídeo tem o quadro', true);
+ok('seção só de vídeo não inventa bloco de texto', (await p.locator('.aula-texto').count()) === 0);
+ok('a duração aparece no player', (await p.locator('.video-duracao').innerText()).includes('min'));
+
+/* O player sangra de ponta a ponta: a margem negativa cancela o padding do
+   `.conteudo`, e os dois números têm de continuar batendo. */
+const bleed = await p.evaluate(() => {
+  const v = document.querySelector('.video-fachada').getBoundingClientRect();
+  const c = document.querySelector('#conteudo').getBoundingClientRect();
+  return { esq: Math.abs(v.left - c.left), dir: Math.abs(v.right - c.right), topo: v.top };
+});
+ok('o player vai de ponta a ponta', bleed.esq < 2 && bleed.dir < 2,
+  bleed.esq.toFixed(1) + 'px / ' + bleed.dir.toFixed(1) + 'px');
+
+/* E o sangramento não pode virar rolagem horizontal. Ele já virou: o recuo do
+   `.conteudo` em tela estreita era 16px e a margem negativa continuou 18px,
+   e sobraram 2px. Os dois saem da mesma variável agora — este teste é o que
+   avisa se voltarem a ser dois números. */
+// estreita a MESMA aba e devolve depois: uma aba nova nasceria noutro
+// contexto, sem a sessão, e cairia em /entrar
+await p.setViewportSize({ width: 390, height: 844 });
+await p.waitForTimeout(250);
+const sobra = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+ok('o player não estoura a tela do celular', sobra <= 0, sobra + 'px de sobra');
+await p.setViewportSize({ width: 1440, height: 900 });
+await p.waitForTimeout(250);
+
+/* E o título fica ABAIXO do vídeo: pôr o cabeçalho na frente empurraria o play
+   para fora da dobra num notebook. */
+ok('o título desce para baixo do player', await p.evaluate(() => {
+  const v = document.querySelector('.video-fachada').getBoundingClientRect();
+  return document.querySelector('.aula-titulo').getBoundingClientRect().top >= v.bottom - 1;
+}));
+ok('o player cabe na tela', await p.evaluate(() =>
+  document.querySelector('.video-fachada').getBoundingClientRect().height <= window.innerHeight * 0.8));
+
+/* No trilho o ícone diz a NATUREZA da seção, não só o estado. */
+const icones = await p.evaluate(() => {
+  const linhas = [...document.querySelectorAll('.trilho-secao')];
+  return {
+    comDuracao: linhas.filter((l) => l.querySelector('.ts-dur')).length,
+    total: linhas.length,
+  };
+});
+ok('o trilho mostra a duração das seções de vídeo', icones.comDuracao === 1,
+  icones.comDuracao + ' de ' + icones.total);
+
+console.log('\n== 18. certificado, plano e conta ==');
 await p.goto(BASE + PAGINA + '#/certificados');
 await p.waitForSelector('.cert');
 /* A regressão que este teste guarda: o certificado NÃO é uma janela de
@@ -612,14 +671,14 @@ ok('senha trocada', (await p.locator('#a-senha').getAttribute('class')).includes
 ok('a senha não foi guardada em lugar nenhum',
   !(await p.evaluate(() => JSON.stringify(localStorage).includes('correta-cavalo'))));
 
-console.log('\n== 18. o menu da conta leva ao plano ==');
+console.log('\n== 19. o menu da conta leva ao plano ==');
 await p.goto(BASE + PAGINA + '#/painel');
 await p.waitForSelector('.retomar');
 await p.click('.conta-btn');
 await p.waitForTimeout(120);
 ok('há um item "Meu plano"', (await p.locator('.conta-op[href="#/plano"]').count()) === 1);
 
-console.log('\n== 19. tema claro e estreito ==');
+console.log('\n== 20. tema claro e estreito ==');
 await p.click('.idioma-btn'); await p.click('.idioma-op[lang="pt-BR"]'); await p.waitForTimeout(300);
 await p.click('#tema-btn');
 await p.waitForTimeout(250);
@@ -651,7 +710,7 @@ await p2.fill('#e-nome','X'); await p2.selectOption('#e-trilha','backend');
 await p2.click('#form-entrar button[type=submit]'); await p2.waitForTimeout(300);
 await p2.goto(BASE + PAGINA + '#/curso/javascript/aula/1/avaliacao',{waitUntil:'networkidle'});
 await p2.waitForSelector('.ex');
-console.log('\n== 20. nada revelado antes de responder ==');
+console.log('\n== 21. nada revelado antes de responder ==');
 ok('refazer escondido', (await p2.locator('.ex-refazer:visible').count()) === 0);
 ok('justificativas escondidas', (await p2.locator('.alt-porque:visible').count()) === 0);
 ok('vereditos vazios', (await p2.locator('.ex-veredito:visible').count()) === 0);

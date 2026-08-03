@@ -11,9 +11,10 @@
    contador — e a seção é uma linha comum com ícone. São duas coisas de
    naturezas diferentes e passam a parecer duas coisas.
 
-   Cada seção traz um ÍCONE DE ESTADO: play para o que falta, check verde para
-   o que foi feito. O ícone diz o estado sem depender de cor sozinha, e diz
-   também o que aquilo é — algo para percorrer, não um item de lista.
+   Cada seção traz um ÍCONE. Ele diz duas coisas ao mesmo tempo: o ESTADO
+   (check verde no que já foi feito) e a NATUREZA do que vem (play para vídeo,
+   linhas para leitura, estrela para a avaliação). Antes tudo era play, o que
+   prometia vídeo em toda seção — inclusive nas que são só texto.
 
    MAIS DE UMA AULA PODE FICAR ABERTA. A versão anterior era sanfona pura: só
    a aula atual abria. Isso obriga a fechar o que se está vendo para espiar o
@@ -46,6 +47,11 @@ const ICO_CHECK = '<svg viewBox="0 0 16 16" aria-hidden="true">' +
   'stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const ICO_CHEVRON = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" ' +
   'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6l3 3 3-3"/></svg>';
+const ICO_TEXTO = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" ' +
+  'stroke-linecap="round" aria-hidden="true"><path d="M3.5 4h9M3.5 7h9M3.5 10h6"/></svg>';
+const ICO_ESTRELA = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" ' +
+  'stroke-linejoin="round" aria-hidden="true">' +
+  '<path d="M8 2.5l1.7 3.5 3.8.5-2.8 2.7.7 3.8L8 11.2l-3.4 1.8.7-3.8L2.5 6.5l3.8-.5z"/></svg>';
 const ICO_TROFEU = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" ' +
   'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
   '<path d="M4.5 2.5h7v3a3.5 3.5 0 0 1-7 0zM4.5 3.5H3a1.5 1.5 0 0 0 1.5 3M11.5 3.5H13a1.5 1.5 0 0 1-1.5 3M8 9v2.5M6 13.5h4"/></svg>';
@@ -133,12 +139,21 @@ function doCurso(params, caminho) {
 
     const dentro = secoes.map((s) => {
       const ok = secaoConcluida(id, a.ix, s.id);
+      /* O ícone diz o que a seção É, não só o estado dela: play para o que tem
+         vídeo, folha para o que é leitura, estrela para a avaliação. Antes
+         toda seção era um play, o que prometia vídeo em todas. */
+      const marca = ok ? ICO_CHECK
+        : (s.tipo === 'avaliacao' ? ICO_ESTRELA
+          : (s.video !== undefined ? ICO_PLAY : ICO_TEXTO));
       return '<a class="trilho-secao' + (ok ? ' feita' : '') +
         (s.id === secAtual && ehAtual ? ' on' : '') +
         (s.tipo === 'avaliacao' ? ' aval' : '') + (s.pendente ? ' pendente' : '') + '" ' +
         'href="#/curso/' + esc(id) + '/aula/' + a.ix + '/' + esc(s.id) + '">' +
-        '<span class="ts-marca" aria-hidden="true">' + (ok ? ICO_CHECK : ICO_PLAY) + '</span>' +
-        '<span class="ts-tit">' + esc(s.titulo) + '</span>' +
+        '<span class="ts-marca" aria-hidden="true">' + marca + '</span>' +
+        '<span class="ts-meio">' +
+          '<span class="ts-tit">' + esc(s.titulo) + '</span>' +
+          (s.duracao ? '<span class="ts-dur mono">' + esc(s.duracao) + '</span>' : '') +
+        '</span>' +
       '</a>';
     }).join('');
 
