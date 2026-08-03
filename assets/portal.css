@@ -542,8 +542,20 @@ body.sem-trilho .trilho{display:none}
 
    Sobrou um ganho que não estava previsto: as setas de navegação moram no vão
    e não passam mais por cima da imagem. */
+/* A ALTURA VIRA LARGURA, e não um corte na altura.
+   O teto continua sendo o mesmo — um player não pode empurrar todo o resto da
+   seção para baixo da dobra —, mas agora ele limita a LARGURA, e a proporção
+   16/9 deriva a altura a partir dela. Cortar a altura de uma caixa com
+   `aspect-ratio` não encolhe a caixa: achata, e o vídeo dentro dela estica. */
 .aula-com-video .video-fachada{
-  max-height:min(64vh, calc(100vh - 300px));
+  --video-alt:min(64vh, calc(100vh - 300px));
+  --video-larg:min(100%, calc(var(--video-alt) * 16 / 9));
+  width:var(--video-larg);
+  /* Negativa só quando o player passa da coluna — aí ele cresce igual para os
+     dois lados. Quando cabe, a margem é zero e ele começa onde o texto começa:
+     centrar um vídeo mais estreito que a coluna inventaria uma margem esquerda
+     que nenhum outro elemento da aula tem. */
+  margin-left:min(0px, calc((100% - var(--video-larg)) / 2));
 }
 
 .video-fachada{
@@ -1189,6 +1201,19 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
   .exemplo{
     width:var(--amplo);
     margin-left:calc((100% - var(--amplo)) / 2);
+  }
+  /* O PLAYER ACOMPANHA O EXEMPLO quando o exemplo escapa — e só então.
+     Enquanto o bloco de código fica empilhado dentro da coluna de leitura, a
+     aula tem uma margem esquerda só e o vídeo não tem motivo para sair dela.
+     A partir daqui o exemplo já saiu, e um vídeo de 820 ao lado de um exemplo
+     de 1074 seria a terceira largura da mesma aula — que é justamente o que a
+     regra das três larguras evita. Alinhados, são duas.
+
+     O teto de altura continua valendo por dentro do `min`: onde a janela é
+     baixa, é ele quem manda, e o vídeo fica menor que o exemplo em vez de
+     comer a tela. */
+  .aula-com-video .video-fachada{
+    --video-larg:min(var(--amplo), calc(var(--video-alt) * 16 / 9));
   }
 }
 .exemplo-barra{display:flex;justify-content:flex-end;margin-bottom:5px}

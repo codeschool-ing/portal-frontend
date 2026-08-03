@@ -190,7 +190,7 @@ dobra; o preço era cair numa seção sem saber de que aula ela era.)
 | --- | --- |
 | `--trilho` | a coluna do menu |
 | `--leitura` | **todo** o conteúdo de uma seção: prosa, vídeo, figura, material, anotação |
-| `--amplo` | a exceção, e é uma só: o bloco de código anotado |
+| `--amplo` | a exceção: o bloco de código anotado — e o player, quando o bloco escapa |
 
 `--leitura` são 820px porque prosa acima de ~68 caracteres por linha cansa. O
 vídeo entra nela junto com o resto: ele já foi de ponta a ponta da área
@@ -198,6 +198,21 @@ inteira, e o efeito colateral era a aula ter **três alinhamentos diferentes
 conforme a seção** — o olho procurando a margem esquerda a cada troca. Sobrou
 um ganho que não estava previsto: as setas de navegação moram no vão e pararam
 de passar por cima da imagem.
+
+**O player acompanha o exemplo quando o exemplo escapa, e só então.** Enquanto
+o bloco de código fica empilhado dentro da coluna de leitura, os dois têm a
+largura dela e a aula tem uma margem esquerda só. A partir de 1580px o bloco
+sai, e deixar o player para trás criaria justamente a terceira largura que a
+regra evita — um vídeo de 820 ao lado de um exemplo de 1074, na mesma aula.
+Alinhados, continuam sendo duas.
+
+O teto de altura do player (`min(64vh, 100vh - 300px)`, para o play não empurrar
+o resto da seção para baixo da dobra) passou a limitar a **largura**, e a
+proporção 16/9 deriva a altura a partir dela. Cortar a altura de uma caixa com
+`aspect-ratio` não encolhe a caixa: achata, e o vídeo dentro dela estica. Em
+janela baixa o player fica menor que o exemplo — nunca deformado — e volta a
+começar onde o texto começa, porque centrar um vídeo mais estreito que a coluna
+inventaria uma margem que nenhum outro elemento da aula tem.
 
 `--amplo` existe porque o exemplo anotado não é prosa: são duas colunas, e uma
 delas é código, que não se quebra por conforto. O teto dele sai da posição da
