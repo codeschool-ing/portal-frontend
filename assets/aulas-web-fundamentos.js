@@ -28,6 +28,10 @@
 
    FORMA
      window.AULAS[cursoId][tópico em pt] = [ seção, ... ]
+
+   Há um arquivo por curso, como o pipeline faz com os exercícios, e cada um
+   MESCLA no objeto em vez de atribuí-lo: nenhum pode depender de ser o
+   primeiro a carregar.
      seção = { id, titulo, corpo, video? }
        `id`    chave curta e estável — é ela que entra na URL e no progresso
        `corpo` lista de parágrafos; um item que é lista vira <ul>
@@ -48,7 +52,7 @@
    reescreve.
    ========================================================================== */
 
-window.AULAS = {
+window.AULAS = Object.assign(window.AULAS || {}, {
 
   'web-fundamentos': {
 
@@ -469,4 +473,4 @@ window.AULAS = {
       },
     ],
   },
-};
+});

@@ -177,18 +177,54 @@ a aula está feita quando todas as seções dela estão. Um registro no formato
 antigo (uma caixinha por aula) é migrado na primeira escrita, então quem já
 tinha progresso não o vê zerar.
 
-`web-fundamentos` está escrito por inteiro — **11 aulas, 38 seções de conteúdo
-e 11 avaliações com 23 exercícios** — como exemplo de curso cheio. É conteúdo
-tecnicamente correto e **sem revisão pedagógica**: serve para avaliar a
-estrutura, e a escola reescreve.
+### Os dois cursos escritos
 
-Ele cobre **seis dos sete tipos**, e a ausência do sétimo é informação, não
-descuido: `codigo` exigiria escrever um programa, e o curso não ensina
-linguagem nenhuma — é o primeiro da escola, sem pré-requisito. Pedi-lo violaria
-a regra do gerador de que um exercício do tópico N só pode exigir o que os
-tópicos 1..N ensinaram. É o mesmo achado que `REGRAS.md` registrou em
-`arquiteto-comunicacao`, onde três dos sete tipos eram inaplicáveis. Os sete
-juntos continuam em `javascript`, aula 2.
+Há um arquivo por curso, como o pipeline faz — `aulas-<curso>.js` e
+`exercicios-<curso>.js` —, e cada um **mescla** no objeto global em vez de
+atribuí-lo: nenhum pode depender de ser o primeiro a carregar.
+
+| curso | aulas | seções | avaliações | tipos |
+| --- | --- | --- | --- | --- |
+| `web-fundamentos` | 11 | 38 | 11 de 11, 23 exercícios | 6 dos 7 |
+| `html-css` | 13 | 39 | 4 de 13, 8 exercícios | 4 dos 7 |
+
+`html-css` está **pela metade de propósito**: é assim que um curso fica
+enquanto está sendo produzido, e é o que exercita a avaliação pendente no lugar
+dela — presente na estrutura, marcada, sem botão de concluir e fora do
+denominador.
+
+**Nenhum dos dois tem `codigo`, e a ausência é informação.** Em
+`web-fundamentos`, escrever um programa exigiria o que o curso não dá — ele é o
+primeiro da escola, sem pré-requisito de linguagem, e pedi-lo violaria a regra
+do gerador de que um exercício do tópico N só pode exigir o que os tópicos 1..N
+ensinaram. Em `html-css`, o motivo é outro: o validador do pipeline executa
+python, javascript e sql, e HTML/CSS não se verificam contra casos de teste
+porque o que se verificaria é o desenho. É o mesmo achado que `REGRAS.md`
+registrou em `arquiteto-comunicacao`, onde três dos sete tipos eram
+inaplicáveis. Os sete juntos continuam em `javascript`, aula 2.
+
+**`html-css` foi quem fez a prosa crescer.** Em curso conceitual, crase no meio
+da frase basta; não há como ensinar um seletor sem mostrá-lo em três linhas com
+a indentação preservada. Daí o terceiro tipo de bloco:
+
+```js
+corpo: [
+  'texto com `código` e **negrito**',
+  ['item', 'item'],                      // vira <ul>
+  { codigo: 'css', texto: '.a { … }' },  // vira bloco de código
+]
+```
+
+A forma cresceu porque o conteúdo pediu, e só o que ele pediu. O bloco reusa
+`.cod-bloco`, o componente dos exercícios, e é escapado com `esc` e não com
+`marcado`: dentro de código, crase é crase e asterisco é asterisco.
+
+**Título de seção é texto simples.** Ele aparece no `h2`, na pastilha do passo
+e na linha do trilho, e nos dois últimos é rótulo, não prosa — marcação numa
+pastilha de 200px vira ruído.
+
+O conteúdo dos dois é tecnicamente correto e **sem revisão pedagógica**: serve
+para avaliar a estrutura, e a escola reescreve.
 
 **E o título exibido não serve de chave.** `aplicarConteudo()` reescreve
 `c.topicos` no lugar a cada troca de idioma — em inglês o tópico vira *"Types,

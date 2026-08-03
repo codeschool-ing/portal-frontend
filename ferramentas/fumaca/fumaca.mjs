@@ -226,7 +226,37 @@ const denominadores = await p.evaluate(() => {
    exclusão das avaliações pendentes o denominador seria 24. */
 ok('avaliação pendente fora do denominador', /\b15\b/.test(denominadores.conta), denominadores.conta);
 
-console.log('\n== 9. idioma ==');
+console.log('\n== 9. curso prático: código na prosa ==');
+await p.goto(BASE + PAGINA + '#/curso/html-css');
+await p.waitForSelector('.aula-linha');
+ok('html-css tem 13 aulas', (await p.locator('.aula-linha').count()) === 13);
+/* 13 aulas × 3 seções = 39, mais as 4 avaliações que já têm exercícios.
+   As 9 avaliações pendentes ficam de fora do denominador. */
+ok('denominador conta só as avaliações prontas',
+  /\b43\b/.test(await p.locator('.curso-conta').innerText()),
+  await p.locator('.curso-conta').innerText());
+
+await p.goto(BASE + PAGINA + '#/curso/html-css/aula/7/eixos');
+await p.waitForSelector('.prosa-cod');
+const bloco = await p.locator('.prosa-cod .cod').first().innerText();
+ok('bloco de código na prosa', bloco.includes('display: flex'), JSON.stringify(bloco.slice(0, 40)));
+ok('com rótulo de linguagem', (await p.locator('.prosa-cod .cod-ling').first().innerText()).toLowerCase() === 'css');
+/* O bloco NÃO passa por `marcado`: crase e asterisco dentro de código são
+   caracteres, não marcação. Um `<` mal escapado sumiria a linha inteira. */
+// o <code> de dentro não pode conter TAG NENHUMA: só texto escapado
+const html = await p.locator('.prosa-cod .cod code').first().innerHTML();
+ok('código escapado, sem marcação aplicada', !/<[a-z]/i.test(html));
+
+await p.goto(BASE + PAGINA + '#/curso/html-css/aula/0/esqueleto');
+await p.waitForSelector('.prosa-cod');
+const htmlBloco = await p.locator('.prosa-cod .cod').first().innerText();
+ok('tags HTML sobrevivem ao escape', htmlBloco.includes('<!DOCTYPE html>'), JSON.stringify(htmlBloco.slice(0, 24)));
+
+await p.goto(BASE + PAGINA + '#/curso/html-css/aula/0/avaliacao');
+await p.waitForSelector('.aval-pendente');
+ok('curso pela metade mostra avaliação pendente', (await p.locator('.marcar').count()) === 0);
+
+console.log('\n== 10. idioma ==');
 await p.goto(BASE + PAGINA + '#/painel');
 await p.waitForSelector('.retomar');
 await p.click('.idioma-btn');
@@ -236,7 +266,7 @@ const nomeEn = await p.locator('.ctx-nome').innerText();
 ok('trilha traduzida', /Back-end Development/i.test(nomeEn), nomeEn);
 ok('tela remontada no idioma novo', await p.locator('.retomar').isVisible());
 
-console.log('\n== 10. tema claro e estreito ==');
+console.log('\n== 11. tema claro e estreito ==');
 await p.click('.idioma-btn'); await p.click('.idioma-op[lang="pt-BR"]'); await p.waitForTimeout(300);
 await p.click('#tema-btn');
 await p.waitForTimeout(250);
@@ -268,7 +298,7 @@ await p2.fill('#e-nome','X'); await p2.selectOption('#e-trilha','backend');
 await p2.click('#form-entrar button[type=submit]'); await p2.waitForTimeout(300);
 await p2.goto(BASE + PAGINA + '#/curso/javascript/aula/1/avaliacao',{waitUntil:'networkidle'});
 await p2.waitForSelector('.ex');
-console.log('\n== 11. nada revelado antes de responder ==');
+console.log('\n== 12. nada revelado antes de responder ==');
 ok('refazer escondido', (await p2.locator('.ex-refazer:visible').count()) === 0);
 ok('justificativas escondidas', (await p2.locator('.alt-porque:visible').count()) === 0);
 ok('vereditos vazios', (await p2.locator('.ex-veredito:visible').count()) === 0);

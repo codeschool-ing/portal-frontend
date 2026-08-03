@@ -324,6 +324,11 @@ body.sem-trilho .trilho{display:none}
   font-family:'IBM Plex Mono',monospace;font-size:.86em;
   background:var(--ink);padding:1px 5px;border-radius:3px;color:var(--phosphor);
 }
+/* O bloco de código da prosa é o mesmo componente dos exercícios. Ele NÃO
+   respeita o limite de 68ch: código não se quebra por conforto de leitura, e
+   uma linha longa deve rolar dentro da caixa em vez de ser dobrada. */
+.prosa-cod{margin:0 0 16px;max-width:100%}
+.prosa-cod .cod{font-size:.8rem}
 .prosa-lista{max-width:68ch;display:flex;flex-direction:column;gap:8px;margin:0 0 14px;padding-left:18px}
 .prosa-lista li{list-style:'› ';padding-left:5px;line-height:1.6;color:var(--paper-dim)}
 .prosa-lista li strong{color:var(--paper)}
@@ -343,8 +348,14 @@ body.sem-trilho .trilho{display:none}
 .migalhas a{color:var(--phosphor)}
 .aula-titulo{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.3rem,2.8vw,1.8rem);line-height:1.18}
 
+/* O quadro é reservado em TODA seção de conteúdo, com vídeo ou sem — publicar
+   um a um não pode reorganizar a tela de ninguém. Mas 16/9 na largura inteira
+   da coluna dá 460px, e enquanto os vídeos não existem isso é meia tela vazia
+   antes de cada texto. O teto de 600px mantém a reserva honesta (o quadro tem
+   o mesmo tamanho antes e depois do vídeo chegar) e devolve ~150px à leitura. */
 .video-fachada{
-  position:relative;aspect-ratio:16/9;border-radius:6px;overflow:hidden;cursor:pointer;
+  position:relative;aspect-ratio:16/9;max-width:600px;
+  border-radius:6px;overflow:hidden;cursor:pointer;
   background:var(--panel);border:1px solid var(--wire);
   display:grid;place-items:center;
 }
