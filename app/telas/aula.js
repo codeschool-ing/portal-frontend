@@ -32,7 +32,7 @@
 import * as api from '../api.js';
 import { aulasDoCurso, cursoPorId } from '../catalogo.js';
 import { secoesDaAula } from '../aulas.js';
-import { secaoConcluida, visitarSecao } from '../estado.js';
+import { secaoConcluida, visitarSecao, notaDe, guardarNota } from '../estado.js';
 import { montarAvaliacao } from '../exercicios/index.js';
 import { vazio } from './comum.js';
 import { esc, prosa } from '../texto.js';
@@ -77,6 +77,7 @@ export default async function aula({ id, ix, sec }) {
   visitarSecao(id, n, secao.id);
 
   const { anterior, proxima } = vizinhas(id, n, pos);
+  const nota = notaDe(id, n, secao.id);
   const rota = (v) => '#/curso/' + esc(id) + '/aula/' + v.ix + '/' + esc(v.secId);
 
   const el = document.createElement('div');
@@ -137,6 +138,16 @@ export default async function aula({ id, ix, sec }) {
             : '<p class="mono dim">' + txt('[conteúdo da aula — entra com o material real na Etapa 2]') + '</p>') +
         '</section>') +
 
+    /* A anotação fica no FIM da seção, e não flutuando ao lado: anotar é o que
+       se faz depois de ler, não durante. Recolhida quando vazia, para não pedir
+       atenção de quem não vai usar. */
+    '<details class="nota" ' + (nota ? 'open' : '') + '>' +
+      '<summary>' + (nota ? '✎ ' + txt('sua anotação') : '＋ ' + txt('anotar esta seção')) + '</summary>' +
+      '<textarea class="nota-campo" rows="4" placeholder="' +
+        txt('o que você quer lembrar desta seção…') + '">' + esc(nota) + '</textarea>' +
+      '<span class="nota-estado mono dim" aria-live="polite"></span>' +
+    '</details>' +
+
     /* O rodapé só existe onde não há setas laterais — abaixo de 1400px. Não
        há botão de concluir: avançar é concluir. */
     '<footer class="aula-pe">' +
@@ -158,6 +169,26 @@ export default async function aula({ id, ix, sec }) {
         '?autoplay=1" title="' + esc(secao.titulo) + '" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
     });
   }
+
+  /* A nota grava sozinha, com um respiro depois da última tecla. Botão de
+     salvar seria uma chance a mais de perder o que se escreveu. */
+  const campoNota = el.querySelector('.nota-campo');
+  const aviso = el.querySelector('.nota-estado');
+  let gravarT = null;
+  campoNota.addEventListener('input', () => {
+    clearTimeout(gravarT);
+    aviso.textContent = txt('escrevendo…');
+    gravarT = setTimeout(() => {
+      guardarNota(id, n, secao.id, campoNota.value);
+      aviso.textContent = txt('anotação salva');
+      setTimeout(() => { aviso.textContent = ''; }, 1600);
+    }, 600);
+  });
+  // sair da seção não pode perder o que ainda não gravou
+  campoNota.addEventListener('blur', () => {
+    clearTimeout(gravarT);
+    guardarNota(id, n, secao.id, campoNota.value);
+  });
 
   /* Avançar conclui. A marcação é síncrona por dentro, então acontece antes de
      o navegador processar a troca de hash — não há corrida. A avaliação ainda

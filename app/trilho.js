@@ -33,6 +33,8 @@ const LINKS = [
   { href: '#/painel', rotulo: 'Painel' },
   { href: '#/trilha', rotulo: 'Minha trilha' },
   { href: '#/catalogo', rotulo: 'Catálogo' },
+  { href: '#/desempenho', rotulo: 'Desempenho' },
+  { href: '#/notas', rotulo: 'Notas' },
   { href: '#/certificados', rotulo: 'Certificados' },
 ];
 

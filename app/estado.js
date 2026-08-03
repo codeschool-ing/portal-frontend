@@ -21,6 +21,7 @@ const VAZIO = {
   sessao: null,                 // { nome, email }
   matricula: null,              // { trilhaId, escolhas: { 'backend:3': 1 } }
   progresso: {},                // { cursoId: { aulas: { ix: { secoes, exercicios } } } }
+  notas: {},                    // { cursoId: { aulaIx: { secId: texto } } }
   ultima: null,                 // { cursoId, aulaIx, secId } — o "continuar de onde parou"
 };
 
@@ -143,14 +144,70 @@ export function visitarSecao(cursoId, ix, secId) {
 export function guardarResposta(cursoId, ix, exId, veredito) {
   mudar(() => {
     const r = garantirAula(cursoId, ix);
-    const antes = r.exercicios[exId] || { tentativas: 0, acertou: false };
+    const antes = r.exercicios[exId] || { tentativas: 0, acertou: false, conferido: false };
     r.exercicios[exId] = {
       tentativas: antes.tentativas + 1,
       // uma vez acertado, continua acertado: refazer para praticar não tira o crédito
       acertou: antes.acertou || veredito.acertou === true,
+      /* `conferido` separa "errou" de "ninguém checou". Sem ele, um exercício
+         de código respondido e não executado ficava indistinguível de um erro,
+         e a tela de desempenho contaria como falha algo que nunca foi julgado —
+         a mesma confusão que "não julgado nunca vira aprovado" evita do outro
+         lado da régua. */
+      conferido: antes.conferido || veredito.acertou !== null,
       ultimaEm: new Date().toISOString(),
     };
   });
+}
+
+/* ---------- anotações ----------
+   Uma por seção, texto livre. É a única coisa no portal que o ALUNO escreve, e
+   por isso ela não se perde nem quando o conteúdo muda: a chave é a mesma do
+   progresso — curso, índice da aula, id da seção. */
+export const notaDe = (cursoId, ix, secId) =>
+  estado.notas[cursoId]?.[ix]?.[secId] || '';
+
+export function guardarNota(cursoId, ix, secId, texto) {
+  mudar(() => {
+    const limpo = String(texto || '').trim();
+    if (!limpo) {
+      // nota vazia é nota apagada: não vale ocupar espaço nem aparecer na lista
+      if (estado.notas[cursoId]?.[ix]) delete estado.notas[cursoId][ix][secId];
+      return;
+    }
+    estado.notas[cursoId] = estado.notas[cursoId] || {};
+    estado.notas[cursoId][ix] = estado.notas[cursoId][ix] || {};
+    estado.notas[cursoId][ix][secId] = limpo;
+  });
+}
+
+/* Todas as notas, achatadas, da mais recente para a mais antiga por curso.
+   A tela de notas e a busca leem daqui — duas leituras da mesma fonte. */
+export function todasAsNotas() {
+  const fora = [];
+  Object.entries(estado.notas).forEach(([cursoId, aulas]) => {
+    Object.entries(aulas).forEach(([ix, secoes]) => {
+      Object.entries(secoes).forEach(([secId, texto]) => {
+        fora.push({ cursoId, aulaIx: Number(ix), secId, texto });
+      });
+    });
+  });
+  return fora;
+}
+
+/* ---------- desempenho ----------
+   O portal já gravava tentativas e acertos de cada exercício e nunca mostrava.
+   Isto é só a leitura: quem interpreta é a tela. */
+export function respostasDadas() {
+  const fora = [];
+  Object.entries(estado.progresso).forEach(([cursoId, curso]) => {
+    Object.entries(curso.aulas || {}).forEach(([ix, aula]) => {
+      Object.entries(aula.exercicios || {}).forEach(([exId, r]) => {
+        fora.push({ cursoId, aulaIx: Number(ix), exId, ...r });
+      });
+    });
+  });
+  return fora;
 }
 
 export function opcaoAtiva(trilhaId, idx) {

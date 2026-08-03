@@ -5,6 +5,7 @@
 
 # O portal não tem build nem dependências: `node_modules` só existe quando se
 # instala o playwright para rodar o teste de fumaça.
+node_modules
 node_modules/
 
 # capturas de tela do desenvolvimento

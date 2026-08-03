@@ -26,6 +26,10 @@ import aula from './telas/aula.js';
 import catalogo from './telas/catalogo.js';
 import certificados from './telas/certificados.js';
 import conta from './telas/conta.js';
+import desempenho from './telas/desempenho.js';
+import refazer from './telas/refazer.js';
+import notas from './telas/notas.js';
+import { abrirBusca, fechar as fecharBusca, buscaAberta } from './painel-busca.js';
 
 /* ---------- o que o i18n-runtime precisa de nós ---------- */
 globalThis.ehEscolha = ehEscolha;                 // usado por aplicarConteudo()
@@ -48,6 +52,9 @@ rota('/curso/:id/aula/:ix/:sec', aula);
 rota('/catalogo', catalogo);
 rota('/certificados', certificados);
 rota('/conta', conta);
+rota('/desempenho', desempenho);
+rota('/refazer', refazer);
+rota('/notas', notas);
 
 const $ = (s) => document.querySelector(s);
 const conteudo = $('#conteudo');
@@ -198,13 +205,22 @@ $('#trilho').addEventListener('click', (e) => {
   }
   if (e.target.closest('a')) fecharTrilho();
 });
-addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharTrilho(); });
-
-/* busca: por ora leva ao catálogo, que já tem o campo. Um ⌘K de verdade entra
-   quando houver o que buscar além do catálogo (aulas, exercícios, anotações) */
-$('#busca-btn').addEventListener('click', () => irPara('/catalogo'));
 addEventListener('keydown', (e) => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); irPara('/catalogo'); }
+  if (e.key !== 'Escape') return;
+  if (buscaAberta()) fecharBusca();
+  else fecharTrilho();
+});
+
+/* A busca. O botão e o ⌘K existiam desde o primeiro dia e os dois só levavam
+   ao catálogo — um atalho que prometia busca e entregava navegação. */
+$('#busca-btn').addEventListener('click', abrirBusca);
+addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); abrirBusca(); }
+  // a barra também abre, como em quase todo lugar que tem busca — menos quando
+  // se está digitando num campo, onde "/" é só uma barra
+  else if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName)) {
+    e.preventDefault(); abrirBusca();
+  }
 });
 
 /* ---------- o estado mudou: a moldura acompanha ----------

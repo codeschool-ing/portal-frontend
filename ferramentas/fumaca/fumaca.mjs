@@ -55,7 +55,7 @@ await p.selectOption('#e-trilha', 'backend');
 await p.click('#form-entrar button[type=submit]');
 await p.waitForFunction(() => location.hash === '#/painel');
 ok('foi para o painel', true);
-ok('trilho montado', (await p.locator('.trilho-link').count()) === 4);
+ok('trilho montado', (await p.locator('.trilho-link').count()) === 6);
 ok('contexto na barra', (await p.locator('.ctx-nome').innerText()).includes('Back-end'));
 ok('cartão de retomar', await p.locator('.retomar').isVisible());
 
@@ -295,7 +295,113 @@ await p.goto(BASE + PAGINA + '#/curso/html-css/aula/0/avaliacao');
 await p.waitForSelector('.aval-pendente');
 ok('curso pela metade mostra avaliação pendente', (await p.locator('.marcar').count()) === 0);
 
-console.log('\n== 10. idioma ==');
+console.log('\n== 10. busca global ==');
+await p.goto(BASE + PAGINA + '#/painel');
+await p.waitForSelector('.retomar');
+await p.keyboard.press('Control+k');
+await p.waitForSelector('.busca-campo');
+ok('⌘K abre o painel', true);
+
+await p.fill('.busca-campo', 'ttl');
+await p.waitForTimeout(200);
+const grupos = await p.locator('.busca-grupo').count();
+ok('acha em mais de um grupo', grupos >= 2, grupos + ' grupos');
+ok('resultado traz o contexto', (await p.locator('.bi-ctx').count()) > 0);
+
+/* Sem acento tem de achar com acento: quem digita no celular quase nunca
+   acentua, e a dobra é feita dos dois lados da comparação. */
+await p.fill('.busca-campo', 'coercao');
+await p.waitForTimeout(200);
+ok('busca sem acento acha o acentuado', (await p.locator('.busca-item').count()) > 0);
+
+/* A regressão que importa: o catálogo é traduzido em runtime, então indexar só
+   o texto exibido faria as seções (que estão em português) sumirem em inglês. */
+await p.fill('.busca-campo', 'hospedagem');
+await p.waitForTimeout(200);
+ok('acha conteúdo em português com a interface em inglês',
+  (await p.locator('.busca-item').count()) > 0);
+
+/* O trecho é texto puro: a marcação mínima do corpo (crase e **) é
+   interpretada na seção, não aqui, e sobrava na tela como `**TTL**`. */
+await p.fill('.busca-campo', 'cache');
+await p.waitForTimeout(200);
+const trechos = await p.locator('.bi-ctx').allInnerTexts();
+ok('trecho sem marcação crua', trechos.every((t) => !/\*\*|`/.test(t)),
+  trechos.length + ' trechos');
+
+/* E ele não repete o título que está logo acima dele: o trecho existe para
+   mostrar o que a linha do título não mostra. */
+const repetiu = await p.locator('.busca-item').evaluateAll((els) => els.some((el) => {
+  const tit = el.querySelector('.bi-tit')?.textContent.trim() || '';
+  const tre = el.querySelector('.bi-ctx')?.textContent.trim() || '';
+  return tit.length > 8 && tre.startsWith(tit);
+}));
+ok('trecho não repete o título', !repetiu);
+
+await p.keyboard.press('ArrowDown');
+await p.keyboard.press('Enter');
+await p.waitForTimeout(400);
+ok('Enter navega para o resultado', /#\/curso\//.test(await p.evaluate(() => location.hash)),
+  await p.evaluate(() => location.hash));
+
+await p.keyboard.press('Control+k');
+await p.waitForSelector('.busca-campo');
+await p.keyboard.press('Escape');
+await p.waitForTimeout(150);
+ok('Esc fecha', (await p.locator('.busca-campo:visible').count()) === 0);
+
+console.log('\n== 11. desempenho, refazer e notas ==');
+/* Erra uma de propósito: sem erro não há o que a tela de desempenho mostre
+   nem o que a de refazer reúna, e o teste passaria sem exercitar nada. */
+await p.goto(BASE + PAGINA + '#/curso/web-fundamentos/aula/2/avaliacao');
+await p.waitForSelector('.wizard');
+await irAte('quiz');
+const errada = await p.evaluate(() =>
+  window.EXERCICIOS_EXEMPLO.find((e) => e.id === 'wf-03-quiz').alternativas.findIndex((a) => !a.correta));
+await p.locator(`.ex-quiz .alt[data-ix="${errada}"]`).click();
+await p.locator('.ex-quiz .ex-responder').click();
+await p.waitForFunction(() => document.querySelector('.ex-quiz .ex-veredito')?.className.includes('v-errado'),
+  null, { timeout: 5000 });
+ok('errou de propósito', true);
+
+await p.goto(BASE + PAGINA + '#/desempenho');
+await p.waitForSelector('.tela-desempenho, .tela-vazia');
+ok('desempenho mostra o que foi respondido', (await p.locator('.dsp-linha').count()) > 0);
+const errados = await p.locator('.dsp-errados li').count();
+ok('lista os errados', errados > 0, errados + ' errados');
+/* Errar e não-ser-conferido são estados diferentes: os tipos que precisam de
+   servidor respondem `null` e não podem contar como reprovação. */
+ok('separa "não conferido" de "errou"',
+  (await p.locator('.trilha-numeros').innerText()).includes('aguardando'));
+
+ok('há link para refazer', (await p.locator('a[href="#/refazer"]').count()) === 1);
+await p.goto(BASE + PAGINA + '#/refazer');
+await p.waitForSelector('.wizard');
+ok('refazer monta o wizard com os errados', (await p.locator('.wz-ponto').count()) === errados);
+
+// uma nota, escrita numa seção e reencontrada na tela de notas e na busca
+await p.goto(BASE + PAGINA + '#/curso/web-fundamentos/aula/8/vps');
+await p.waitForSelector('.nota summary');
+// a anotação nasce recolhida: só pede atenção de quem vai usá-la
+ok('a nota começa recolhida', (await p.locator('.nota-campo:visible').count()) === 0);
+await p.click('.nota summary');
+await p.fill('.nota-campo', 'lembrar: VPS é responsabilidade, não potência');
+await p.waitForTimeout(800);
+ok('nota é salva sozinha', (await p.locator('.nota-estado').innerText()).length > 0);
+
+await p.goto(BASE + PAGINA + '#/notas');
+await p.waitForSelector('.nota-item');
+ok('a nota aparece na tela de notas',
+  (await p.locator('.nota-texto').innerText()).includes('responsabilidade'));
+
+await p.keyboard.press('Control+k');
+await p.waitForSelector('.busca-campo');
+await p.fill('.busca-campo', 'responsabilidade, nao');
+await p.waitForTimeout(250);
+ok('a nota entra na busca', (await p.locator('.busca-grupo').allInnerTexts()).join(' ').length > 0);
+await p.keyboard.press('Escape');
+
+console.log('\n== 12. idioma ==');
 await p.goto(BASE + PAGINA + '#/painel');
 await p.waitForSelector('.retomar');
 await p.click('.idioma-btn');
@@ -305,7 +411,7 @@ const nomeEn = await p.locator('.ctx-nome').innerText();
 ok('trilha traduzida', /Back-end Development/i.test(nomeEn), nomeEn);
 ok('tela remontada no idioma novo', await p.locator('.retomar').isVisible());
 
-console.log('\n== 11. tema claro e estreito ==');
+console.log('\n== 13. tema claro e estreito ==');
 await p.click('.idioma-btn'); await p.click('.idioma-op[lang="pt-BR"]'); await p.waitForTimeout(300);
 await p.click('#tema-btn');
 await p.waitForTimeout(250);
@@ -337,7 +443,7 @@ await p2.fill('#e-nome','X'); await p2.selectOption('#e-trilha','backend');
 await p2.click('#form-entrar button[type=submit]'); await p2.waitForTimeout(300);
 await p2.goto(BASE + PAGINA + '#/curso/javascript/aula/1/avaliacao',{waitUntil:'networkidle'});
 await p2.waitForSelector('.ex');
-console.log('\n== 12. nada revelado antes de responder ==');
+console.log('\n== 14. nada revelado antes de responder ==');
 ok('refazer escondido', (await p2.locator('.ex-refazer:visible').count()) === 0);
 ok('justificativas escondidas', (await p2.locator('.alt-porque:visible').count()) === 0);
 ok('vereditos vazios', (await p2.locator('.ex-veredito:visible').count()) === 0);
