@@ -8,9 +8,12 @@
    ========================================================================== */
 
 import { aulasDoCurso, cursoPorId, trilhasDoCurso, depoisDe } from '../catalogo.js';
-import { secoesDaAula } from '../aulas.js';
+import { secoesDaAula, materiaisDoCurso } from '../aulas.js';
 import { progressoDoCurso, progressoDaAula, aulaConcluida } from '../estado.js';
 import { estadoDoCurso } from '../grafo.js';
+import { provaDoCurso } from '../provas.js';
+import { cartaoDeProva } from './prova.js';
+import { listaDeMateriais } from '../materiais.js';
 import { barra, vazio } from './comum.js';
 import { esc, marcado } from '../texto.js';
 
@@ -22,6 +25,8 @@ export default async function curso({ id }) {
   const p = progressoDoCurso(id);
   const est = estadoDoCurso(id);
   const abre = depoisDe(id);
+  const prova = provaDoCurso(id);
+  const materiais = materiaisDoCurso(id);
 
   const el = document.createElement('div');
   el.className = 'tela tela-curso';
@@ -44,6 +49,10 @@ export default async function curso({ id }) {
     '</header>' +
 
     '<div class="curso-colunas">' +
+      /* A coluna principal é UM filho da grade, não dois: a prova mora dentro
+         dela, embaixo das aulas. Solta, ela virava uma segunda coluna e
+         empurrava a barra lateral para a linha de baixo. */
+      '<div class="curso-principal">' +
       '<section class="bloco">' +
         '<div class="bloco-topo"><h2>' + txt('Aulas') + '</h2></div>' +
         '<ol class="aulas">' +
@@ -67,7 +76,20 @@ export default async function curso({ id }) {
         '</ol>' +
       '</section>' +
 
+      /* A prova fecha a coluna das aulas, e não a barra lateral: ela é o
+         último passo do curso, e o lugar dela é depois da última aula. */
+      (prova.itens.length
+        ? cartaoDeProva({
+          chave: prova.chave, href: '#/curso/' + esc(id) + '/prova', escopo: 'curso',
+          quantas: prova.itens.length, progresso: p.pct,
+        })
+        : '') +
+      '</div>' +
+
       '<aside class="curso-lado">' +
+        (materiais.length
+          ? '<section class="bloco">' + listaDeMateriais(materiais, { titulo: 'Material do curso' }) + '</section>'
+          : '') +
         (c.ementa?.length
           ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('Ementa') + '</h2></div>' +
             '<ul class="ementa">' + c.ementa.map((l) => '<li>' + esc(l) + '</li>').join('') + '</ul></section>'

@@ -411,7 +411,132 @@ const nomeEn = await p.locator('.ctx-nome').innerText();
 ok('trilha traduzida', /Back-end Development/i.test(nomeEn), nomeEn);
 ok('tela remontada no idioma novo', await p.locator('.retomar').isVisible());
 
-console.log('\n== 13. tema claro e estreito ==');
+console.log('\n== 13. figuras, código anotado e material ==');
+await p.goto(BASE + PAGINA + '#/curso/html-css/aula/7/alinhamento');
+await p.waitForSelector('.exemplo');
+const partes = await p.locator('.exemplo-par').count();
+ok('exemplo anotado, um trecho por nota', partes >= 5, partes + ' trechos');
+ok('a saída do exemplo aparece', await p.locator('.exemplo-saida').isVisible());
+ok('a nota fica ao lado do código', await p.evaluate(() => {
+  const par = document.querySelector('.exemplo-par');
+  const c = par.querySelector('.exemplo-cod').getBoundingClientRect();
+  const n = par.querySelector('.exemplo-nota').getBoundingClientRect();
+  return n.left >= c.right - 2;                     // duas colunas, não empilhado
+}));
+
+/* Material: o link tem de baixar (e não navegar), com nome de arquivo. */
+const mat = p.locator('.mat').first();
+ok('material listado na seção', await mat.isVisible());
+ok('o link baixa em vez de abrir', (await mat.getAttribute('download'))?.endsWith('.pdf'),
+  await mat.getAttribute('download'));
+ok('o PDF é mesmo um PDF', (await mat.getAttribute('href')).startsWith('data:application/pdf;base64,'));
+
+await p.goto(BASE + PAGINA + '#/curso/html-css/aula/7/eixos');
+await p.waitForSelector('.fig');
+ok('diagrama inline herda a cor do tema', await p.evaluate(() => {
+  const t = document.querySelector('.fig-svg svg text');
+  return getComputedStyle(t).fill !== 'rgb(0, 0, 0)';
+}));
+
+await p.goto(BASE + PAGINA + '#/curso/html-css/aula/3/imagens');
+await p.waitForSelector('.fig img');
+ok('figura de arquivo carregou', await p.evaluate(() => {
+  const i = document.querySelector('.fig img');
+  return i.complete && i.naturalWidth > 0;
+}));
+ok('figura tem legenda e alt', (await p.locator('.fig figcaption').count()) > 0
+  && Boolean(await p.locator('.fig img').getAttribute('alt')));
+
+console.log('\n== 14. prova do curso ==');
+await p.goto(BASE + PAGINA + '#/curso/web-fundamentos');
+await p.waitForSelector('.prova-cartao');
+ok('o curso anuncia a prova', await p.locator('.prova-cartao').isVisible());
+ok('a prova aparece no trilho', (await p.locator('.trilho-prova').count()) === 1);
+
+await p.click('.prova-cartao .btn');
+await p.waitForSelector('.wizard-prova');
+const nQ = await p.locator('.wz-ponto').count();
+ok('dez questões sorteadas', nQ === 10, nQ + ' questões');
+ok('a dica não aparece na prova', (await p.locator('.ex-dica').count()) === 0);
+ok('não há "tentar de novo" na prova', (await p.locator('.ex-refazer').count()) === 0);
+
+/* A REGRESSÃO QUE IMPORTA: numa prova o veredito fica represado. Se ele
+   aparecesse, dava para tentar até acertar e a prova pararia de medir. */
+const responderTudo = async (certo) => {
+  for (let i = 0; i < nQ; i += 1) {
+    await p.locator('.wz-ponto').nth(i).click();
+    await p.waitForTimeout(90);
+    // o id vem do DOM, não do texto: o enunciado é renderizado com marcação
+    const id = await p.locator('.ex').getAttribute('data-ex');
+    const ixs = await p.evaluate((exId) => {
+      const ex = window.EXERCICIOS_EXEMPLO.find((e) => e.id === exId);
+      if (!ex?.alternativas) return null;
+      return ex.alternativas.map((a, k) => (a.correta ? k : -1)).filter((k) => k >= 0);
+    }, id);
+    if (!ixs) continue;                       // tipo que este laço não sabe responder
+    const alvos = certo ? ixs : [ixs.includes(0) ? 1 : 0];
+    for (const k of alvos) await p.locator(`.ex .alt[data-ix="${k}"]`).click();
+    const bt = p.locator('.ex .ex-responder');
+    if (await bt.count()) await bt.click();
+    await p.waitForTimeout(130);
+  }
+};
+await responderTudo(true);
+ok('nenhum veredito de certo/errado antes de entregar',
+  (await p.locator('.ex-veredito.v-certo, .ex-veredito.v-errado').count()) === 0);
+ok('a resposta é registrada, e diz isso', (await p.locator('.v-registrado').count()) > 0);
+
+await p.locator('.wz-ponto').nth(nQ - 1).click();
+await p.locator('.wz-depois').click();               // entregar (ou pedir confirmação)
+await p.waitForTimeout(200);
+if (!(await p.locator('.wz-resultado').count())) await p.locator('.wz-depois').click();
+await p.waitForSelector('.wz-resultado');
+const nota = await p.locator('.prova-nota').innerText();
+ok('a prova fecha com uma nota', /%/.test(nota), nota);
+ok('o resultado é gravado', await p.evaluate(() =>
+  Boolean(JSON.parse(localStorage.getItem('codeschool-portal')).provas['curso:web-fundamentos'])));
+
+/* Percorre as questões uma a uma: o wizard mantém UMA no documento por vez,
+   então contar no documento inteiro mediria só a que está na tela. */
+await p.locator('.wz-voltar').click();
+await p.waitForTimeout(150);
+let abertos = 0;
+for (let i = 0; i < nQ; i += 1) {
+  await p.locator('.wz-ponto').nth(i).click();
+  await p.waitForTimeout(80);
+  abertos += await p.locator('.ex-veredito.v-certo, .ex-veredito.v-errado').count();
+}
+ok('depois de entregar, os vereditos abrem', abertos > 0, abertos + ' de ' + nQ);
+ok('nenhuma resposta ficou represada', (await p.locator('.v-registrado').count()) === 0);
+ok('depois de entregar, não dá para responder de novo',
+  await p.evaluate(() => [...document.querySelectorAll('.ex input, .ex .ex-responder')].every((e) => e.disabled)));
+
+console.log('\n== 15. prova da trilha e certificados ==');
+await p.goto(BASE + PAGINA + '#/trilha');
+await p.waitForSelector('.prova-cartao');
+ok('a trilha anuncia a prova dela', await p.locator('.prova-cartao').isVisible());
+await p.click('.prova-cartao .btn');
+await p.waitForSelector('.wizard-prova');
+const nT = await p.locator('.wz-ponto').count();
+ok('quinze questões, de mais de um curso', nT === 15, nT + ' questões');
+
+await p.goto(BASE + PAGINA + '#/certificados');
+await p.waitForSelector('.cert');
+ok('há exemplos de certificado', (await p.locator('.cert-exemplo').count()) === 2);
+ok('o exemplo se declara exemplo', (await p.locator('.cert-selo').first().innerText()).length > 0);
+ok('o exemplo não inventa código de validação',
+  !/CS-/.test(await p.locator('.cert-exemplo .cert-codigo').first().innerText()));
+ok('nenhum certificado emitido sem prova aprovada',
+  (await p.locator('.cert:not(.cert-exemplo)').count()) === 0);
+
+console.log('\n== 16. as tags // saíram ==');
+for (const [rota, sel] of [['#/painel', '.retomar'], ['#/catalogo', '.tela-catalogo'], ['#/certificados', '.cert']]) {
+  await p.goto(BASE + PAGINA + rota);
+  await p.waitForSelector(sel);
+  ok('sem a tag em ' + rota, (await p.locator('.tela-head .tag').count()) === 0);
+}
+
+console.log('\n== 17. tema claro e estreito ==');
 await p.click('.idioma-btn'); await p.click('.idioma-op[lang="pt-BR"]'); await p.waitForTimeout(300);
 await p.click('#tema-btn');
 await p.waitForTimeout(250);
@@ -443,7 +568,7 @@ await p2.fill('#e-nome','X'); await p2.selectOption('#e-trilha','backend');
 await p2.click('#form-entrar button[type=submit]'); await p2.waitForTimeout(300);
 await p2.goto(BASE + PAGINA + '#/curso/javascript/aula/1/avaliacao',{waitUntil:'networkidle'});
 await p2.waitForSelector('.ex');
-console.log('\n== 14. nada revelado antes de responder ==');
+console.log('\n== 18. nada revelado antes de responder ==');
 ok('refazer escondido', (await p2.locator('.ex-refazer:visible').count()) === 0);
 ok('justificativas escondidas', (await p2.locator('.alt-porque:visible').count()) === 0);
 ok('vereditos vazios', (await p2.locator('.ex-veredito:visible').count()) === 0);

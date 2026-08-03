@@ -31,7 +31,8 @@
 
 import * as api from '../api.js';
 import { aulasDoCurso, cursoPorId } from '../catalogo.js';
-import { secoesDaAula } from '../aulas.js';
+import { secoesDaAula, materiaisDaSecao } from '../aulas.js';
+import { listaDeMateriais } from '../materiais.js';
 import { secaoConcluida, visitarSecao, notaDe, guardarNota } from '../estado.js';
 import { montarAvaliacao } from '../exercicios/index.js';
 import { vazio } from './comum.js';
@@ -137,6 +138,10 @@ export default async function aula({ id, ix, sec }) {
             ? prosa(secao.corpo)
             : '<p class="mono dim">' + txt('[conteúdo da aula — entra com o material real na Etapa 2]') + '</p>') +
         '</section>') +
+
+    /* O material vem DEPOIS do texto e ANTES da anotação: baixar o PDF é o que
+       se faz tendo lido, e anotar é o último gesto da seção. */
+    listaDeMateriais(materiaisDaSecao(secao)) +
 
     /* A anotação fica no FIM da seção, e não flutuando ao lado: anotar é o que
        se faz depois de ler, não durante. Recolhida quando vazia, para não pedir

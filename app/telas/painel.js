@@ -60,7 +60,6 @@ export default async function painel() {
 
   el.innerHTML =
     '<header class="tela-head">' +
-      '<span class="tag">// ' + txt('painel') + '</span>' +
       '<h1>' + txt('Olá') + ', ' + esc(sessao?.nome || txt('aluno')) + '</h1>' +
     '</header>' +
 

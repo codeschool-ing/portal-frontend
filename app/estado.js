@@ -22,6 +22,7 @@ const VAZIO = {
   matricula: null,              // { trilhaId, escolhas: { 'backend:3': 1 } }
   progresso: {},                // { cursoId: { aulas: { ix: { secoes, exercicios } } } }
   notas: {},                    // { cursoId: { aulaIx: { secId: texto } } }
+  provas: {},                   // { 'curso:javascript': { tentativas, melhor, aprovado } }
   ultima: null,                 // { cursoId, aulaIx, secId } — o "continuar de onde parou"
 };
 
@@ -102,6 +103,32 @@ export const cursoConcluido = (cursoId) => {
   const p = progressoDoCurso(cursoId);
   return p.total > 0 && p.feitas === p.total;
 };
+
+/* ---------- provas ----------
+   Guarda o MELHOR resultado, não o último. Reprovar depois de já ter passado
+   não pode tirar um certificado emitido — e refazer uma prova já passada, para
+   praticar, é exatamente o que se quer incentivar.
+
+   A contagem de tentativas é o que semeia o sorteio da próxima prova: mesma
+   tentativa, mesma prova; tentativa nova, prova nova. */
+export const resultadoProva = (chave) => estado.provas[chave] || null;
+export const provaAprovada = (chave) => Boolean(estado.provas[chave]?.aprovado);
+export const tentativasDeProva = (chave) => estado.provas[chave]?.tentativas || 0;
+
+export function guardarProva(chave, { pct, aprovado, certos, total }) {
+  mudar(() => {
+    const antes = estado.provas[chave] || { tentativas: 0, melhor: 0, aprovado: false };
+    estado.provas[chave] = {
+      tentativas: antes.tentativas + 1,
+      melhor: Math.max(antes.melhor, pct),
+      aprovado: antes.aprovado || aprovado,
+      ultimoPct: pct,
+      ultimoCertos: certos,
+      ultimoTotal: total,
+      ultimaEm: new Date().toISOString(),
+    };
+  });
+}
 
 export const respostaDe = (cursoId, ix, exId) =>
   registroDaAula(cursoId, ix)?.exercicios?.[exId] || null;

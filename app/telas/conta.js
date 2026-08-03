@@ -29,7 +29,6 @@ export default async function conta() {
 
   el.innerHTML =
     '<header class="tela-head">' +
-      '<span class="tag">// ' + txt('conta') + '</span>' +
       '<h1>' + esc(sessao?.nome || txt('aluno')) + '</h1>' +
     '</header>' +
 

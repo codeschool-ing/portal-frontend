@@ -29,6 +29,7 @@ import conta from './telas/conta.js';
 import desempenho from './telas/desempenho.js';
 import refazer from './telas/refazer.js';
 import notas from './telas/notas.js';
+import { provaCurso, provaTrilha } from './telas/prova.js';
 import { abrirBusca, fechar as fecharBusca, buscaAberta } from './painel-busca.js';
 
 /* ---------- o que o i18n-runtime precisa de nós ---------- */
@@ -47,6 +48,8 @@ rota('/curso/:id', curso);
 /* Duas rotas para a mesma tela: sem a seção, cai na primeira. É o que faz um
    link antigo (ou o botão do curso) continuar funcionando depois de a aula ter
    virado várias seções. */
+rota('/curso/:id/prova', provaCurso);
+rota('/trilha/prova', provaTrilha);
 rota('/curso/:id/aula/:ix', aula);
 rota('/curso/:id/aula/:ix/:sec', aula);
 rota('/catalogo', catalogo);

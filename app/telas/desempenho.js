@@ -72,7 +72,6 @@ export default async function desempenho() {
 
   el.innerHTML =
     '<header class="tela-head">' +
-      '<span class="tag">// ' + txt('desempenho') + '</span>' +
       '<h1>' + txt('Como você está indo') + '</h1>' +
     '</header>' +
 

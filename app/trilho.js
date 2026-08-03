@@ -24,7 +24,8 @@
 
 import { aulasDoCurso, cursoPorId, caminhoDaTrilha } from './catalogo.js';
 import { secoesDaAula } from './aulas.js';
-import { aulaConcluida, secaoConcluida, progressoDaAula, progressoDoCurso, opcaoAtiva } from './estado.js';
+import { aulaConcluida, secaoConcluida, progressoDaAula, progressoDoCurso, opcaoAtiva, provaAprovada } from './estado.js';
+import { provaDoCurso } from './provas.js';
 import { estadoDoCurso } from './grafo.js';
 import { trilhaDoAluno, barra } from './telas/comum.js';
 import { esc } from './texto.js';
@@ -45,6 +46,9 @@ const ICO_CHECK = '<svg viewBox="0 0 16 16" aria-hidden="true">' +
   'stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const ICO_CHEVRON = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" ' +
   'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6l3 3 3-3"/></svg>';
+const ICO_TROFEU = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" ' +
+  'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+  '<path d="M4.5 2.5h7v3a3.5 3.5 0 0 1-7 0zM4.5 3.5H3a1.5 1.5 0 0 0 1.5 3M11.5 3.5H13a1.5 1.5 0 0 1-1.5 3M8 9v2.5M6 13.5h4"/></svg>';
 
 /* Quais aulas estão abertas, por curso. Vive em memória: é preferência de
    navegação do momento, não progresso — não merece ocupar o armazenamento
@@ -141,6 +145,21 @@ function doCurso(params, caminho) {
     return cabeca + '<div class="trilho-secoes">' + dentro + '</div>';
   }).join('');
 
+  /* A prova entra como uma linha no fim da lista, no formato de uma seção —
+     porque é isso que ela é para quem navega: o último item do curso. Só
+     aparece onde existe banco de questões, pelo mesmo motivo da avaliação
+     pendente: anunciar o que não há é ruído. */
+  const prova = provaDoCurso(id);
+  const naProva = caminho === '/curso/' + id + '/prova';
+  const passou = provaAprovada(prova.chave);
+  const linhaProva = prova.itens.length
+    ? '<a class="trilho-prova' + (passou ? ' feita' : '') + (naProva ? ' on' : '') + '" ' +
+      'href="#/curso/' + esc(id) + '/prova">' +
+      '<span class="ts-marca" aria-hidden="true">' + (passou ? ICO_CHECK : ICO_TROFEU) + '</span>' +
+      '<span class="ts-tit">' + txt('Prova final') + '</span>' +
+    '</a>'
+    : '';
+
   return (
     '<a class="trilho-voltar" href="#/trilha">← ' + txt('minha trilha') + '</a>' +
     '<div class="trilho-sec">' +
@@ -148,6 +167,7 @@ function doCurso(params, caminho) {
       barra(p.pct, p.feitas + ' de ' + p.total) +
       '<span class="trilho-conta">' + p.feitas + '/' + p.total + ' ' + txt('seções') + '</span>' +
       '<div class="trilho-aulas">' + linhas + '</div>' +
+      linhaProva +
     '</div>'
   );
 }

@@ -39,11 +39,20 @@ MODULOS.forEach((m) => m.tipos.forEach((t) => { REGISTRO[t] = m; }));
 
 export const tipoConhecido = (t) => Boolean(REGISTRO[t]);
 
-export function montarExercicio(ex, ctx, ix) {
+/* `opcoes.prova` REPRESA O FEEDBACK. Numa prova o aluno responde e segue: o
+   veredito, a justificativa e o "tentar de novo" só existem depois que a prova
+   fecha. Feedback a cada questão numa prova é o que permite tentar até acertar,
+   e aí ela para de medir. A resposta continua sendo gravada normalmente — o que
+   muda é só o que a tela conta, e quando. */
+export function montarExercicio(ex, ctx, ix, opcoes = {}) {
   const mod = REGISTRO[ex.tipo];
+  const prova = Boolean(opcoes.prova);
   const uid = ex.id || `${ex.curso}:${ex.topico}:${ix}`;
   const el = document.createElement('article');
-  el.className = 'ex ex-' + ex.tipo;
+  el.className = 'ex ex-' + ex.tipo + (prova ? ' ex-prova' : '');
+  // o id no DOM: é por ele que a resposta é gravada, e é por ele que dá para
+  // saber QUAL exercício está na tela sem depender do texto do enunciado
+  el.dataset.ex = uid;
 
   if (!mod) {
     el.innerHTML = '<p class="ex-erro">' + txt('tipo de exercício desconhecido') + ': ' + esc(ex.tipo) + '</p>';
@@ -57,12 +66,14 @@ export function montarExercicio(ex, ctx, ix) {
     '</header>' +
     '<p class="ex-enunciado">' + marcado(ex.enunciado) + '</p>' +
     '<div class="ex-corpo">' + mod.corpo(ex, uid) + '</div>' +
-    (ex.dica_socratica
+    // a dica é andaime de quem está aprendendo; numa prova ela é cola
+    (ex.dica_socratica && !prova
       ? '<details class="ex-dica"><summary>' + txt('dica') + '</summary><p>' + marcado(ex.dica_socratica) + '</p></details>'
       : '') +
     '<div class="ex-acoes">' +
-      (mod.autoConclui ? '' : '<button type="button" class="btn btn-primary ex-responder">' + txt('Responder') + '</button>') +
-      '<button type="button" class="btn btn-ghost ex-refazer" hidden>' + txt('Tentar de novo') + '</button>' +
+      (mod.autoConclui ? '' : '<button type="button" class="btn btn-primary ex-responder">' +
+        txt(prova ? 'Registrar resposta' : 'Responder') + '</button>') +
+      (prova ? '' : '<button type="button" class="btn btn-ghost ex-refazer" hidden>' + txt('Tentar de novo') + '</button>') +
     '</div>' +
     '<div class="ex-veredito" aria-live="polite"></div>';
 
@@ -83,25 +94,40 @@ export function montarExercicio(ex, ctx, ix) {
     const v = await api.avaliar(ex, resposta);
     if (ctx) guardarResposta(ctx.cursoId, ctx.aulaIx, uid, v);
 
-    mod.revelar(corpo, ex, v);
-    mostrarVeredito(el, ex, v);
-    el.querySelector('.ex-refazer').hidden = false;
+    if (prova) {
+      /* Represado. O elemento guarda como revelar depois — a prova inteira
+         abre de uma vez quando fecha, e o aluno revê o que respondeu. */
+      saida.className = 'ex-veredito v-registrado';
+      saida.innerHTML = '<strong>' + txt('resposta registrada') + '</strong> ' +
+        txt('o resultado sai no fim da prova.');
+      el.revelarProva = () => { mod.revelar(corpo, ex, v); mostrarVeredito(el, ex, v); };
+    } else {
+      mod.revelar(corpo, ex, v);
+      mostrarVeredito(el, ex, v);
+      el.querySelector('.ex-refazer').hidden = false;
+    }
     el.dispatchEvent(new CustomEvent('exercicio:respondido', { bubbles: true, detail: { ex, v } }));
   }
 
   if (mod.montar) mod.montar(corpo, { exercicio: ex, concluir: conferir });
 
-  const anterior = ctx && respostaDe(ctx.cursoId, ctx.aulaIx, uid);
+  /* "já resolvido" é memória útil numa avaliação e é entrega do gabarito numa
+     prova: a prova sorteia do mesmo banco das aulas, então quase toda questão
+     já foi vista. */
+  const anterior = !prova && ctx && respostaDe(ctx.cursoId, ctx.aulaIx, uid);
   if (anterior?.acertou) marcarJaFeito(el, anterior);
 
   const responder = el.querySelector('.ex-responder');
   if (responder) responder.addEventListener('click', () => conferir(mod.colher(corpo)));
 
-  el.querySelector('.ex-refazer').addEventListener('click', () => {
-    const novo = montarExercicio(ex, ctx, ix);
-    el.replaceWith(novo);
-    novo.dispatchEvent(new CustomEvent('exercicio:refeito', { bubbles: true }));
-  });
+  const refazer = el.querySelector('.ex-refazer');
+  if (refazer) {
+    refazer.addEventListener('click', () => {
+      const novo = montarExercicio(ex, ctx, ix, opcoes);
+      el.replaceWith(novo);
+      novo.dispatchEvent(new CustomEvent('exercicio:refeito', { bubbles: true }));
+    });
+  }
 
   return el;
 }
@@ -156,11 +182,14 @@ function marcarJaFeito(el, anterior) {
    podia ser mais rígida que ela.
    ========================================================================== */
 
-export function montarAvaliacao(exercicios, ctx) {
+export function montarAvaliacao(exercicios, ctx, opcoes = {}) {
+  const prova = Boolean(opcoes.prova);
   const el = document.createElement('div');
-  el.className = 'wizard';
+  el.className = 'wizard' + (prova ? ' wizard-prova' : '');
   const estados = exercicios.map(() => ({ respondido: false, acertou: null }));
   let atual = 0;
+  let entregue = false;
+  let confirmando = false;
 
   el.innerHTML =
     '<header class="wz-topo">' +
@@ -182,15 +211,26 @@ export function montarAvaliacao(exercicios, ctx) {
     pontos.innerHTML = estados.map((s, i) => {
       const classe = ['wz-ponto'];
       if (i === atual) classe.push('on');
-      if (s.respondido) classe.push(s.acertou === true ? 'certo' : (s.acertou === null ? 'pendente' : 'errado'));
+      /* Numa prova ainda aberta o marcador diz SE respondeu, não se acertou:
+         a cor do acerto seria o veredito que a prova está represando. */
+      if (s.respondido) {
+        classe.push(prova && !entregue
+          ? 'feito'
+          : (s.acertou === true ? 'certo' : (s.acertou === null ? 'pendente' : 'errado')));
+      }
       return '<button type="button" class="' + classe.join(' ') + '" data-ir="' + i + '" ' +
         'aria-label="' + txt('questão') + ' ' + (i + 1) + '">' + (i + 1) + '</button>';
     }).join('');
     el.querySelector('.wz-antes').disabled = atual === 0;
     const ultimo = atual === exercicios.length - 1;
-    el.querySelector('.wz-depois').textContent = ultimo
-      ? txt('ver resultado')
-      : txt('próxima') + ' →';
+    const faltam = estados.filter((s) => !s.respondido).length;
+    const depois = el.querySelector('.wz-depois');
+    if (entregue) depois.textContent = txt('prova entregue');
+    else if (!ultimo) depois.textContent = txt('próxima') + ' →';
+    else if (!prova) depois.textContent = txt('ver resultado');
+    else if (confirmando) depois.textContent = txt('Entregar com') + ' ' + faltam + ' ' + txt('em branco');
+    else depois.textContent = txt('Entregar a prova');
+    depois.classList.toggle('wz-cuidado', confirmando && !entregue);
   }
 
   /* Os elementos são GUARDADOS, não recriados. Ir à questão 3 e voltar à 1
@@ -205,7 +245,7 @@ export function montarAvaliacao(exercicios, ctx) {
 
   function mostrar(i) {
     atual = i;
-    if (!telas[i]) telas[i] = montarExercicio(exercicios[i], contexto(i), i);
+    if (!telas[i]) telas[i] = montarExercicio(exercicios[i], contexto(i), i, { prova });
     palco.textContent = '';
     palco.appendChild(telas[i]);
     pintarTopo();
@@ -215,18 +255,35 @@ export function montarAvaliacao(exercicios, ctx) {
     const certos = estados.filter((s) => s.acertou === true).length;
     const naoConferidos = estados.filter((s) => s.respondido && s.acertou === null).length;
     const semResposta = estados.filter((s) => !s.respondido).length;
+
+    /* A prova ABRE aqui: cada questão respondida revela o veredito que estava
+       represado, e responder para de ser possível. É a linha entre medir e
+       ensinar — antes dela a prova mede, depois dela ela ensina. */
+    if (prova) {
+      entregue = true;
+      telas.forEach((t) => {
+        if (!t) return;
+        if (t.revelarProva) t.revelarProva();
+        t.querySelectorAll('.ex-responder, input, textarea, select, button').forEach((b) => { b.disabled = true; });
+      });
+    }
+
     palco.textContent = '';
     const r = document.createElement('div');
     r.className = 'wz-resultado';
+    const nota = opcoes.aoEntregar ? opcoes.aoEntregar({ certos, naoConferidos, semResposta, estados }) : null;
     r.innerHTML =
-      '<span class="wz-res-rot">' + txt('resultado') + '</span>' +
-      '<p class="wz-res-nota"><strong>' + certos + '</strong>/' + exercicios.length + ' ' + txt('corretas') + '</p>' +
+      (nota ? nota.html : '') +
+      (nota ? '' : '<span class="wz-res-rot">' + txt('resultado') + '</span>' +
+        '<p class="wz-res-nota"><strong>' + certos + '</strong>/' + exercicios.length + ' ' + txt('corretas') + '</p>') +
       (naoConferidos ? '<p class="wz-res-obs">' + naoConferidos + ' ' + txt('aguardam conferência no servidor.') + '</p>' : '') +
       (semResposta ? '<p class="wz-res-obs">' + semResposta + ' ' + txt('sem resposta.') + '</p>' : '') +
-      '<button type="button" class="btn btn-ghost wz-voltar">' + txt('Rever as questões') + '</button>';
+      '<button type="button" class="btn btn-ghost wz-voltar">' +
+        txt(prova ? 'Rever a prova questão a questão' : 'Rever as questões') + '</button>';
     palco.appendChild(r);
     r.querySelector('.wz-voltar').addEventListener('click', () => mostrar(0));
     el.querySelector('.wz-depois').disabled = true;
+    pintarTopo();
     el.dispatchEvent(new CustomEvent('avaliacao:concluida', {
       bubbles: true,
       detail: { certos, total: exercicios.length },
@@ -249,8 +306,14 @@ export function montarAvaliacao(exercicios, ctx) {
   });
   el.querySelector('.wz-antes').addEventListener('click', () => mostrar(Math.max(0, atual - 1)));
   el.querySelector('.wz-depois').addEventListener('click', () => {
-    if (atual === exercicios.length - 1) resultado();
-    else mostrar(atual + 1);
+    if (atual !== exercicios.length - 1) { confirmando = false; mostrar(atual + 1); return; }
+    /* Entregar com questões em branco pede um segundo clique. Não é um modal:
+       o próprio botão diz quantas ficaram e o que vai acontecer. Entregar sem
+       perceber que faltaram três é o erro caro desta tela — depois da entrega
+       não há volta. */
+    const faltam = estados.filter((s) => !s.respondido).length;
+    if (prova && faltam && !confirmando) { confirmando = true; pintarTopo(); return; }
+    resultado();
   });
 
   mostrar(0);
