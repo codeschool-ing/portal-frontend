@@ -159,12 +159,43 @@ registrado: não há como desmarcar, e quem passar batido acumula progresso sem
 ter lido. É a troca aceita em favor de um gesto só, e combina com o resto do
 portal, que mostra e não tranca.
 
-A forma de uma aula é fixa: **[vídeo + conteúdo] × N, e avaliação no fim.**
+A forma de uma aula é fixa: **N seções de conteúdo, e avaliação no fim.**
 
-- **Toda seção de conteúdo abre com um quadro de vídeo**, reservado enquanto
-  não há id. É a decisão da vitrine e o motivo escrito lá: o espaço já fica
-  guardado, então publicar os vídeos um a um não reorganiza a tela de ninguém.
-  A avaliação não tem vídeo — ali o aluno responde, não assiste.
+### A seção declara o que ela é
+
+Nem toda seção é da mesma natureza, e o layout segue a natureza:
+
+| a seção diz | o que aparece |
+| --- | --- |
+| `video: 'ID'` | o player, tocando ali |
+| `video: true` | o quadro reservado — "vai ter, ainda não tem" |
+| (sem `video`) | nada. Nem quadro cinza, nem promessa |
+| `video` **e sem `corpo`** | seção **só de vídeo**: a abertura de aula |
+
+O quadro já esteve em **toda** seção de conteúdo, reservado, com o argumento de
+que publicar os vídeos um a um não reorganizaria a tela de ninguém. O argumento
+continua bom para a seção que *vai* ter vídeo — e é péssimo para a que nunca
+vai: uma seção de texto com um retângulo cinza em cima promete algo que não
+vem, e a promessa não expira. A reserva não se perdeu; ela deixou de ser
+automática e passou a ser **dita**.
+
+**A seção com vídeo troca de layout.** O player sobe para o topo, de ponta a
+ponta da área de conteúdo, e o título desce para baixo dele — vídeo é o que a
+pessoa veio fazer ali, e um cabeçalho na frente empurra o play para baixo da
+dobra num notebook.
+
+O sangramento cancela o recuo do `.conteudo` com margem negativa, e por isso os
+dois saem da **mesma variável** (`--pad-x`, `--pad-y`). Não saíam: o recuo
+estreito virou 16px de um lado e continuou 18px do outro, e sobraram 2px de
+rolagem horizontal no celular. Há um teste para isso agora.
+
+No trilho, o ícone diz a natureza junto com o estado: **play** para vídeo,
+**linhas** para leitura, **estrela** para a avaliação, **check** para o que já
+foi feito. Antes tudo era play, o que prometia vídeo em toda seção.
+
+### As outras regras da forma
+
+- **A avaliação nunca tem vídeo** — ali o aluno responde, não assiste.
 - **A avaliação é sempre a última seção**, tenha exercícios ou não. A estrutura
   fica previsível e a avaliação vazia diz o que vem, em vez de sumir.
 - **A avaliação é por tópico, não por seção.** Descê-la para o nível da seção
@@ -194,9 +225,9 @@ atribuí-lo: nenhum pode depender de ser o primeiro a carregar.
 
 | curso | aulas escritas | seções | avaliações | o que ele exercita |
 | --- | --- | --- | --- | --- |
-| `web-fundamentos` | 11 de 11 | 38 | 11 de 11, 23 exercícios | prosa, diagrama inline, material |
+| `web-fundamentos` | 11 de 11 | 39 | 11 de 11, 23 exercícios | prosa, diagrama inline, material, seção só de vídeo |
 | `html-css` | 13 de 13 | 39 | 4 de 13, 8 exercícios | bloco de código, figura de arquivo |
-| `javascript` | 4 de 12 | 10 | 3 de 12, 9 exercícios | `exemplo` anotado, os 7 tipos |
+| `javascript` | 4 de 12 | 11 | 3 de 12, 9 exercícios | `exemplo` anotado, os 7 tipos, seção só de vídeo |
 
 Os dois **pela metade** são de propósito: `html-css` tem as avaliações
 incompletas e `javascript` tem as aulas incompletas. É assim que um curso fica
@@ -672,7 +703,8 @@ Ficam registradas porque nenhuma aparece lendo o código:
   contêiner descartável e o CAS para `resposta-expressao`.
 - **Conteúdo real**: religar `ferramentas/exercicios` do repo da vitrine e
   ingerir os JSON aprovados, começando pelos `_verificacao: criticado`.
-- **Texto e vídeo das aulas**, hoje um quadro reservado por aula.
+- **Os vídeos.** O quadro já está reservado nas seções que declararam `video`,
+  com a duração e o layout de ponta a ponta prontos. Falta o id.
 - **A unidade INTERMEDIÁRIA de certificação.** Já existem duas: curso e trilha.
   Falta saber se existe algo entre um curso de 40h e uma trilha de 400h. O
   README da vitrine deixa quatro perguntas em aberto sobre isso — o eixo, o

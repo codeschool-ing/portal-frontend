@@ -32,11 +32,20 @@
    Há um arquivo por curso, como o pipeline faz com os exercícios, e cada um
    MESCLA no objeto em vez de atribuí-lo: nenhum pode depender de ser o
    primeiro a carregar.
-     seção = { id, titulo, corpo, video? }
-       `id`    chave curta e estável — é ela que entra na URL e no progresso
-       `corpo` lista de parágrafos; um item que é lista vira <ul>
-       `video` opcional: id do YouTube. Ausente = sem quadro de vídeo. Não se
-               reserva espaço vazio em toda seção, que seriam milhares.
+     seção = { id, titulo, corpo?, video?, duracao?, materiais? }
+       `id`      chave curta e estável — é ela que entra na URL e no progresso
+       `corpo`   lista de parágrafos; um item que é lista vira <ul>
+       `video`   id do YouTube, ou `true` para "vai ter, ainda não tem"
+       `duracao` texto curto ('08 min'), mostrado no player e no trilho
+
+     A SEÇÃO DECLARA O QUE ELA É, e o layout segue:
+
+       com `video`   o player abre a tela de ponta a ponta e o título desce
+                     para baixo dele. Sem `corpo`, é uma seção SÓ DE VÍDEO —
+                     a abertura de aula, em que não há texto para ler junto.
+       sem `video`   nenhum quadro. Nem cinza, nem reservado: uma seção de
+                     texto com um retângulo em cima promete algo que não vem,
+                     e a promessa não expira.
 
      Marcação no texto: `crase` vira código, **asteriscos** viram negrito.
      Nada além disso — é o subconjunto que o conteúdo usa.
@@ -58,6 +67,15 @@ window.AULAS = Object.assign(window.AULAS || {}, {
 
     /* --------------------------------------------------------------- 01 */
     'Cliente, servidor e host: quem pede e quem responde': [
+      {
+        /* SEÇÃO SÓ DE VÍDEO: sem `corpo`. É a forma de abertura de aula — o
+           instrutor diz o que vem pela frente, e não há texto para ler junto.
+           `video: true` reserva o quadro sem afirmar que o vídeo já existe. */
+        id: 'apresentacao',
+        titulo: 'Apresentação',
+        video: true,
+        duracao: '02 min',
+      },
       {
         id: 'papeis',
         titulo: 'Os dois papéis',
@@ -317,6 +335,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       {
         id: 'dns',
         titulo: 'DNS: a tradução de nome para endereço',
+        video: true,
+        duracao: '11 min',
         corpo: [
           'O **DNS** é o serviço que responde "qual o IP de `codeschool.ing`?". Ele é hierárquico: a pergunta sobe até quem sabe, e a resposta desce sendo guardada em cache no caminho.',
           'Os tipos de registro que se usa toda semana:',
@@ -393,6 +413,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       {
         id: 'compartilhada',
         titulo: 'Hospedagem compartilhada',
+        video: true,
+        duracao: '08 min',
         corpo: [
           'Um servidor, dezenas ou centenas de sites, todos dividindo o mesmo sistema operacional e os mesmos recursos. Você recebe um painel, uma pasta e um banco de dados; o provedor cuida do resto.',
           'É a opção mais barata e a que exige menos conhecimento — e o preço disso é o controle. Não se instala o que se quer, a versão de linguagem é a que estiver lá, e o **vizinho barulhento** é real: um site vizinho recebendo um pico de acesso derruba o desempenho do seu, sem que você tenha feito nada.',

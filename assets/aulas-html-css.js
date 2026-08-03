@@ -290,6 +290,8 @@ window.AULAS = Object.assign(window.AULAS || {}, {
       {
         id: 'eixos',
         titulo: 'Tudo depende do eixo principal',
+        video: true,
+        duracao: '14 min',
         corpo: [
           'Flexbox organiza os filhos ao longo de **um** eixo. `flex-direction` escolhe qual:',
           { codigo: 'css', texto: '.barra {\n  display: flex;\n  flex-direction: row;   /* padrão: eixo principal na horizontal */\n}' },
