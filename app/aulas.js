@@ -13,12 +13,22 @@
    - Aula sem seções escritas vira UMA seção. Assim o portal funciona igual
      para os 85 cursos que ainda não foram escritos, e o conteúdo entra curso a
      curso sem um dia de transição em que metade da tela fica quebrada.
-   - A avaliação é sempre a ÚLTIMA seção, e só existe se o tópico tiver
-     exercícios. Sem isso nasceriam 1.500 páginas de avaliação vazias.
+   - A avaliação é SEMPRE a última seção de toda aula, tenha ela exercícios ou
+     não. A estrutura da aula passa a ser previsível — conteúdo, conteúdo, …,
+     avaliação —, e a avaliação vazia diz o que vem, em vez de sumir. É o mesmo
+     princípio do quadro de vídeo reservado na vitrine: publicar um a um não
+     reorganiza a tela de ninguém.
    - A avaliação é por TÓPICO, não por seção. É o que mantém `topico` como
      chave de junção com o pipeline — descer a avaliação para o nível da seção
      obrigaria a mudar o formato que a ferramenta emite, e ela cobra o tópico
      inteiro de qualquer forma.
+
+   A CONSEQUÊNCIA DA AVALIAÇÃO SEMPRE PRESENTE, E COMO ELA É TRATADA
+   Se a avaliação vazia contasse no progresso, nenhum curso jamais chegaria a
+   100% enquanto os exercícios não existissem — e certificado nenhum sairia.
+   Por isso ela nasce com `contaProgresso: false` e sai do denominador até ter
+   exercícios. O denominador cresce quando o conteúdo chega, o que é honesto:
+   a aula passou mesmo a ter mais trabalho dentro.
    ========================================================================== */
 
 import { aulasDoCurso } from './catalogo.js';
@@ -44,16 +54,22 @@ export function secoesDaAula(cursoId, chave) {
     : [{ id: 'conteudo', titulo: 'Conteúdo', tipo: 'conteudo', corpo: null }];
 
   const exercicios = exerciciosDaAula(cursoId, chave);
-  if (exercicios.length) {
-    secoes.push({
-      id: 'avaliacao',
-      titulo: 'Avaliação',
-      tipo: 'avaliacao',
-      quantos: exercicios.length,
-    });
-  }
+  secoes.push({
+    id: 'avaliacao',
+    titulo: 'Avaliação',
+    tipo: 'avaliacao',
+    quantos: exercicios.length,
+    pendente: exercicios.length === 0,
+    contaProgresso: exercicios.length > 0,
+  });
   return secoes;
 }
+
+/* As seções que entram na conta do progresso. Uma avaliação ainda sem
+   exercícios aparece na tela, para a estrutura ser previsível, mas fica fora
+   do denominador — senão o curso nunca fecharia. */
+export const secoesContaveis = (cursoId, chave) =>
+  secoesDaAula(cursoId, chave).filter((s) => s.contaProgresso !== false);
 
 /* A aula, com as seções já resolvidas. É o que as telas consomem. */
 export function aulaCompleta(cursoId, ix) {
@@ -69,7 +85,7 @@ export const secoesDoCurso = (cursoId) =>
    Contar aulas mediria errado: uma aula pode ter uma seção ou seis, e a barra
    andaria em saltos que não correspondem ao esforço. */
 export const totalSecoes = (cursoId) =>
-  secoesDoCurso(cursoId).reduce((s, secs) => s + secs.length, 0);
+  aulasDoCurso(cursoId).reduce((s, a) => s + secoesContaveis(cursoId, a.chave).length, 0);
 
 export const indiceDaSecao = (secoes, secId) => {
   const i = secoes.findIndex((s) => s.id === secId);

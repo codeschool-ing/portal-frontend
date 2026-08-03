@@ -7,10 +7,15 @@
    Agora cada seção é uma tela, e a última — quando o tópico tem exercícios —
    é a avaliação.
 
-   O QUADRO DE VÍDEO SÓ APARECE ONDE A SEÇÃO DECLARA UM. A vitrine reserva o
-   espaço mesmo sem vídeo, para publicar um a um não reorganizar a tela; ali
-   são 86 quadros, aqui seriam milhares de retângulos vazios. Quem escreve a
-   seção decide, pondo `video` (mesmo vazio, para reservar).
+   TODA SEÇÃO DE CONTEÚDO ABRE COM UM QUADRO DE VÍDEO, reservado quando ainda
+   não há id. É a mesma decisão da vitrine, e pelo mesmo motivo escrito lá: o
+   espaço já fica guardado, então publicar os vídeos um a um não reorganiza a
+   tela de ninguém. (Numa versão anterior o quadro só aparecia onde a seção
+   declarasse `video`, para não espalhar retângulos vazios — mas isso fazia a
+   aula mudar de forma conforme o vídeo chegasse, que é exatamente o defeito
+   que reservar o espaço existe para evitar.)
+
+   A seção de avaliação não tem vídeo: ali o aluno responde, não assiste.
    ========================================================================== */
 
 import * as api from '../api.js';
@@ -68,7 +73,7 @@ export default async function aula({ id, ix, sec }) {
 
   const passos = secoes.map((s, i) => (
     '<a class="passo' + (i === pos ? ' on' : '') + (secaoConcluida(id, n, s.id) ? ' feito' : '') +
-      (s.tipo === 'avaliacao' ? ' passo-aval' : '') + '" ' +
+      (s.tipo === 'avaliacao' ? ' passo-aval' : '') + (s.pendente ? ' passo-pendente' : '') + '" ' +
       'href="#/curso/' + esc(id) + '/aula/' + n + '/' + esc(s.id) + '">' +
       '<span class="passo-n">' + (s.tipo === 'avaliacao' ? '✓' : String(i + 1).padStart(2, '0')) + '</span>' +
       '<span class="passo-tit">' + esc(s.titulo) + '</span>' +
@@ -89,7 +94,7 @@ export default async function aula({ id, ix, sec }) {
 
     '<h2 class="secao-titulo">' + esc(secao.titulo) + '</h2>' +
 
-    (secao.video !== undefined
+    (secao.tipo === 'conteudo'
       ? '<div class="video-fachada" data-video="' + esc(secao.video || '') + '">' +
           (secao.video
             ? '<button type="button" class="video-play" aria-label="' + txt('Assistir') + '">▶</button>'
@@ -98,8 +103,11 @@ export default async function aula({ id, ix, sec }) {
       : '') +
 
     (secao.tipo === 'avaliacao'
-      ? '<section class="bloco aula-exercicios">' +
-          '<p class="aval-intro">' + txt('Os exercícios cobrem o tópico inteiro, não só a última seção.') + '</p>' +
+      ? '<section class="bloco aula-exercicios' + (secao.pendente ? ' aval-pendente' : '') + '">' +
+          (secao.pendente
+            ? '<p class="mono dim">' + txt('[avaliação em preparação — os exercícios deste tópico ainda não foram produzidos]') + '</p>'
+            : '<p class="aval-intro">' + secao.quantos + ' ' +
+                txt('exercícios, cobrindo o tópico inteiro e não só a última seção.') + '</p>') +
           '<div class="lista-ex"></div>' +
         '</section>'
       : '<section class="bloco aula-texto">' +
@@ -109,9 +117,13 @@ export default async function aula({ id, ix, sec }) {
         '</section>') +
 
     '<footer class="aula-pe">' +
-      '<button type="button" class="btn ' + (feita ? 'btn-ghost' : 'btn-primary') + ' marcar">' +
-        (feita ? '✓ ' + txt('seção concluída') : txt('Marcar como concluída')) +
-      '</button>' +
+      /* Avaliação sem exercícios não se conclui: marcar "feito" o que não foi
+         feito é a forma mais barata de um portal mentir sobre progresso. */
+      (secao.pendente
+        ? '<span class="pe-nota mono dim">' + txt('nada a concluir aqui ainda') + '</span>'
+        : '<button type="button" class="btn ' + (feita ? 'btn-ghost' : 'btn-primary') + ' marcar">' +
+            (feita ? '✓ ' + txt('seção concluída') : txt('Marcar como concluída')) +
+          '</button>') +
       '<div class="aula-nav">' +
         (anterior ? '<a class="btn btn-ghost" href="' + rota(anterior) + '">← ' + txt('anterior') + '</a>' : '') +
         (proxima ? '<a class="btn btn-ghost" href="' + rota(proxima) + '">' + txt('próxima') + ' →</a>' : '') +
@@ -134,7 +146,8 @@ export default async function aula({ id, ix, sec }) {
     });
   }
 
-  el.querySelector('.marcar').addEventListener('click', async (e) => {
+  const botaoMarcar = el.querySelector('.marcar');
+  if (botaoMarcar) botaoMarcar.addEventListener('click', async (e) => {
     const agoraFeita = !secaoConcluida(id, n, secao.id);
     await api.concluirSecao(id, n, secao.id, agoraFeita);
     const b = e.currentTarget;

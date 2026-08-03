@@ -329,6 +329,15 @@ body.sem-trilho .trilho{display:none}
 .prosa-lista li strong{color:var(--paper)}
 
 .aval-intro{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--paper-dim)}
+/* A avaliação existe em toda aula, mas nem toda tem exercícios ainda. O
+   tracejado diz "isto está reservado" sem fingir que já há o que fazer. */
+.passo-aval{border-style:dashed}
+.passo-pendente{opacity:.55}
+.passo-pendente:hover{opacity:1}
+.aval-pendente{border-style:dashed}
+.pe-nota{font-size:.72rem}
+.trilho-secao.pendente{opacity:.6}
+.trilho-secao.pendente:hover{opacity:1}
 .retomar-onde{font-size:.68rem}
 .migalhas{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
 .migalhas a{color:var(--phosphor)}

@@ -95,7 +95,7 @@ function doCurso(params, caminho) {
 
     const dentro = secoes.map((s) =>
       '<a class="trilho-secao' + (secaoConcluida(id, a.ix, s.id) ? ' feita' : '') +
-        (s.id === secAtual ? ' on' : '') + (s.tipo === 'avaliacao' ? ' aval' : '') + '" ' +
+        (s.id === secAtual ? ' on' : '') + (s.tipo === 'avaliacao' ? ' aval' : '') + (s.pendente ? ' pendente' : '') + '" ' +
         'href="#/curso/' + esc(id) + '/aula/' + a.ix + '/' + esc(s.id) + '">' +
         '<span class="ts-marca" aria-hidden="true"></span>' +
         '<span class="ts-tit">' + esc(s.titulo) + '</span>' +

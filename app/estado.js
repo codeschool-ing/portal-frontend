@@ -13,7 +13,7 @@
    ========================================================================== */
 
 import { aulasDoCurso } from './catalogo.js';
-import { secoesDaAula, secoesDoCurso, totalSecoes } from './aulas.js';
+import { secoesDaAula, secoesContaveis, totalSecoes } from './aulas.js';
 
 const CHAVE = 'codeschool-portal';
 
@@ -74,7 +74,9 @@ export function secaoConcluida(cursoId, ix, secId) {
 export function progressoDaAula(cursoId, ix) {
   const a = aulasDoCurso(cursoId)[ix];
   if (!a) return { feitas: 0, total: 0, pct: 0 };
-  const secoes = secoesDaAula(cursoId, a.chave);
+  // só as contáveis: uma avaliação ainda sem exercícios aparece na tela mas
+  // não entra no denominador, senão o curso nunca fecharia
+  const secoes = secoesContaveis(cursoId, a.chave);
   const feitas = secoes.filter((s) => secaoConcluida(cursoId, ix, s.id)).length;
   return { feitas, total: secoes.length, pct: secoes.length ? Math.round((feitas / secoes.length) * 100) : 0 };
 }
@@ -87,8 +89,10 @@ export const aulaConcluida = (cursoId, ix) => {
 export function progressoDoCurso(cursoId) {
   const total = totalSecoes(cursoId);
   let feitas = 0;
-  secoesDoCurso(cursoId).forEach((secoes, ix) => {
-    secoes.forEach((s) => { if (secaoConcluida(cursoId, ix, s.id)) feitas += 1; });
+  aulasDoCurso(cursoId).forEach((a, ix) => {
+    secoesContaveis(cursoId, a.chave).forEach((s) => {
+      if (secaoConcluida(cursoId, ix, s.id)) feitas += 1;
+    });
   });
   return { feitas, total, pct: total ? Math.round((feitas / total) * 100) : 0 };
 }

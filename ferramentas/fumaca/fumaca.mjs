@@ -186,21 +186,45 @@ console.log('\n== 8. seções escritas ==');
 await p.goto(BASE + PAGINA + '#/curso/web-fundamentos/aula/8');
 await p.waitForSelector('.passo');
 const passos = await p.$$eval('.passo-tit', (e) => e.map((x) => x.textContent));
-ok('o tópico de hospedagem virou 5 seções', passos.length === 5, passos.join(' · '));
+ok('o tópico de hospedagem virou 5 seções + avaliação', passos.length === 6, passos.join(' · '));
 ok('a primeira seção é a compartilhada', /compartilhada/i.test(passos[0]), passos[0]);
+ok('a última é sempre a avaliação', /avalia/i.test(passos[passos.length - 1]), passos[passos.length - 1]);
 ok('prosa renderizada', (await p.locator('.aula-texto p').count()) >= 2);
-ok('trilho abre as seções da aula atual', (await p.locator('.trilho-secao').count()) === 5);
+ok('seção de conteúdo reserva o quadro de vídeo', await p.locator('.video-fachada').isVisible());
+ok('trilho abre as seções da aula atual', (await p.locator('.trilho-secao').count()) === 6);
 /* A regressão que importa: as seções são casadas pelo tópico EM PORTUGUÊS, e o
    título exibido é traduzido. Num navegador em inglês — que é o caso deste
    Chromium — casar pelo título devolveria zero seções. */
 ok('casou apesar de o título estar traduzido', (await p.locator('.aula-titulo').innerText()) !== '');
 
 // a última seção de uma aula leva à primeira da aula seguinte
-await p.goto(BASE + PAGINA + '#/curso/web-fundamentos/aula/8/escolher');
+await p.goto(BASE + PAGINA + '#/curso/web-fundamentos/aula/8/avaliacao');
 await p.waitForSelector('.aula-nav');
 await p.click('.aula-nav a:last-child');
 await p.waitForFunction(() => /\/aula\/9\//.test(location.hash), null, { timeout: 5000 });
 ok('a próxima atravessa a fronteira da aula', true);
+
+/* Toda aula termina em avaliação, tenha exercícios ou não. A vazia aparece —
+   a estrutura é previsível — mas não conta no progresso, senão nenhum curso
+   fecharia enquanto o conteúdo não existisse. */
+await p.goto(BASE + PAGINA + '#/curso/web-fundamentos/aula/8/avaliacao');
+await p.waitForSelector('.ex');
+ok('a avaliação de hospedagem tem exercícios', (await p.locator('.ex').count()) === 2);
+
+await p.goto(BASE + PAGINA + '#/curso/javascript/aula/3/avaliacao');
+await p.waitForSelector('.aval-pendente');
+ok('avaliação sem exercícios aparece como pendente', true);
+ok('e não oferece botão de concluir', (await p.locator('.marcar').count()) === 0);
+
+const denominadores = await p.evaluate(() => {
+  const aulas = CURSOS.find((c) => c.id === 'javascript').topicos.length;
+  const conta = document.querySelector('.trilho-conta').textContent;
+  return { aulas, conta };
+});
+/* 12 aulas de javascript: 3 têm exercícios (conteúdo + avaliação = 2 seções
+   contáveis cada) e 9 não (só o conteúdo conta). 3*2 + 9*1 = 15. Sem a
+   exclusão das avaliações pendentes o denominador seria 24. */
+ok('avaliação pendente fora do denominador', /\b15\b/.test(denominadores.conta), denominadores.conta);
 
 console.log('\n== 9. idioma ==');
 await p.goto(BASE + PAGINA + '#/painel');
