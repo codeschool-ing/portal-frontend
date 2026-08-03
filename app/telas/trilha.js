@@ -63,6 +63,27 @@ export default async function trilha() {
     if (e.target.classList?.contains('trilha-grafo')) ajustarSetasGrafo(el);
   }, true);
 
+  /* PASSAR O CURSOR POR UM CURSO ACENDE AS ARESTAS que chegam nele e saem
+     dele. Veio da vitrine (`assets/script.js`) verbatim, e o `base.css` já
+     trazia o estilo do `.aresta.on` — o portal tinha copiado a metade do CSS e
+     deixado a metade do comportamento para trás.
+
+     `mouseover`/`mouseout` e não `mouseenter`/`mouseleave`: só os primeiros
+     borbulham, e é o borbulhar que permite UM ouvinte na tela em vez de um por
+     cartão. Os cartões são refeitos a cada troca de bifurcação, e ouvinte por
+     cartão vaza a cada remontagem. */
+  el.addEventListener('mouseover', (e) => {
+    const no = e.target.closest('[data-no]');
+    if (!no) return;
+    const id = no.dataset.no;
+    el.querySelectorAll('.aresta').forEach((a) => {
+      a.classList.toggle('on', a.dataset.de === id || a.dataset.para === id);
+    });
+  });
+  el.addEventListener('mouseout', (e) => {
+    if (e.target.closest('[data-no]')) el.querySelectorAll('.aresta.on').forEach((a) => a.classList.remove('on'));
+  });
+
   const redesenhar = () => {
     clearTimeout(redesenhaT);
     redesenhaT = setTimeout(() => desenharArestas(el, t), 120);
