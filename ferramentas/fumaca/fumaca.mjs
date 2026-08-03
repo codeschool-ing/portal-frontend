@@ -673,6 +673,50 @@ ok('o título fica acima do player', await p.evaluate(() => {
 ok('o player cabe na tela', await p.evaluate(() =>
   document.querySelector('.video-fachada').getBoundingClientRect().height <= window.innerHeight * 0.8));
 
+/* ONDE O EXEMPLO ESCAPA, O PLAYER ESCAPA JUNTO. Enquanto o bloco de código
+   fica empilhado dentro da coluna de leitura, os dois têm a largura dela. A
+   partir de 1580px o bloco sai, e o player sai com ele: um vídeo de 820 ao
+   lado de um exemplo de 1074 seria a terceira largura da mesma aula. */
+for (const [larg, alt, juntos] of [[1440, 900, false], [1580, 950, true], [1920, 950, true]]) {
+  await p.setViewportSize({ width: larg, height: alt });
+  await p.goto(BASE + PAGINA + '#/curso/javascript/aula/0/let-const');
+  await p.waitForSelector('.exemplo');
+  const par = await p.evaluate(() => {
+    const r = (s) => document.querySelector(s).getBoundingClientRect();
+    const v = r('.video-fachada'); const e = r('.exemplo');
+    return {
+      v: Math.round(v.width), e: Math.round(e.width),
+      desalinho: Math.abs(v.left - e.left), proporcao: v.width / v.height,
+    };
+  });
+  ok('a ' + larg + 'px o player tem a largura do exemplo' + (juntos ? '' : ' (ambos na coluna)'),
+    Math.abs(par.v - par.e) <= 1 && par.desalinho < 2, par.v + 'px e ' + par.e + 'px');
+  ok('a ' + larg + 'px o player mantém a proporção 16/9',
+    Math.abs(par.proporcao - 16 / 9) < 0.02, par.proporcao.toFixed(2));
+}
+
+/* Janela baixa: o teto de altura passou a encolher a LARGURA, porque cortar a
+   altura de uma caixa com `aspect-ratio` não encolhe a caixa — achata, e o
+   vídeo dentro dela estica. Aqui o player fica MENOR que o exemplo, e nunca
+   deformado. */
+await p.setViewportSize({ width: 1920, height: 700 });
+await p.goto(BASE + PAGINA + '#/curso/javascript/aula/0/let-const');
+await p.waitForSelector('.video-fachada');
+const baixa = await p.evaluate(() => {
+  const v = document.querySelector('.video-fachada').getBoundingClientRect();
+  const t = document.querySelector('.aula-titulo').getBoundingClientRect();
+  return {
+    prop: v.width / v.height, larg: Math.round(v.width),
+    alt: Math.round(v.height), esq: Math.abs(v.left - t.left),
+  };
+});
+ok('em janela baixa o player encolhe sem deformar', Math.abs(baixa.prop - 16 / 9) < 0.02,
+  baixa.larg + '×' + baixa.alt);
+ok('e volta a começar onde o texto começa', baixa.esq < 2, baixa.esq.toFixed(1) + 'px de desalinho');
+await p.setViewportSize({ width: 1440, height: 900 });
+await p.goto(BASE + PAGINA + '#/curso/web-fundamentos/aula/0/apresentacao');
+await p.waitForSelector('.video-fachada');
+
 /* No trilho o ícone diz a NATUREZA da seção, não só o estado. */
 const icones = await p.evaluate(() => {
   const linhas = [...document.querySelectorAll('.trilho-secao')];
@@ -729,8 +773,12 @@ const foraDoLimite = await p.evaluate(async () => {
           if (f.classList.contains('lado-seta')) return;    // flutua, não é conteúdo
           const w = f.getBoundingClientRect().width;
           const nome = `${curso}/${sec.id}:${f.className.split(' ')[0]}`;
+          /* dois podem passar da coluna de leitura, e passam JUNTOS: o bloco de
+             código anotado, porque o código não se quebra, e o player, que
+             acompanha o bloco para a aula não ter uma terceira largura */
+          const escapa = f.classList.contains('exemplo') || f.classList.contains('video-fachada');
           if (w > amplo + 1) fora.push(nome + ' passou de --amplo (' + Math.round(w) + ')');
-          else if (w > leitura + 1 && !f.classList.contains('exemplo')) {
+          else if (w > leitura + 1 && !escapa) {
             fora.push(nome + ' passou de --leitura sem ser exemplo (' + Math.round(w) + ')');
           }
         });
