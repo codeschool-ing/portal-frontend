@@ -701,8 +701,18 @@ ok('e cresce na tela', await p.evaluate(() => {
 ok('o fundo congela', await p.evaluate(() =>
   getComputedStyle(document.documentElement).overflow === 'hidden'));
 
-/* Exemplo não compartilha: não há credencial para levar a lugar nenhum. */
-ok('o exemplo não oferece compartilhar', (await p.locator('.modal-acoes .cert-share').count()) === 0);
+/* O botão do LinkedIn existe ao lado do fechar NOS DOIS CASOS — esconder faria
+   parecer que a função não existe. No exemplo ele vem desabilitado e sem
+   `href`: visível, e incapaz de publicar uma credencial que ninguém tirou. */
+ok('o exemplo mostra o botão do LinkedIn', (await p.locator('.modal-acoes .cert-share').count()) === 1);
+ok('mas ele não leva a lugar nenhum', await p.evaluate(() => {
+  const b = document.querySelector('.modal-acoes .cert-share');
+  return b.tagName !== 'A' && b.getAttribute('aria-disabled') === 'true';
+}));
+ok('o botão fica à esquerda do fechar', await p.evaluate(() => {
+  const b = document.querySelector('.modal-acoes .cert-share').getBoundingClientRect();
+  return b.right <= document.querySelector('.modal-fechar').getBoundingClientRect().left + 1;
+}));
 await p.keyboard.press('Escape');
 await p.waitForTimeout(200);
 ok('Esc fecha o certificado', (await p.locator('.modal-cert').count()) === 0);
@@ -788,14 +798,62 @@ ok('senha trocada', (await p.locator('#a-senha').getAttribute('class')).includes
 ok('a senha não foi guardada em lugar nenhum',
   !(await p.evaluate(() => JSON.stringify(localStorage).includes('correta-cavalo'))));
 
-console.log('\n== 19. o menu da conta leva ao plano ==');
+console.log('\n== 19. o catálogo cabe na tela ==');
+await p.goto(BASE + PAGINA + '#/catalogo');
+await p.waitForSelector('.chips');
+/* São nove categorias e elas não cabem numa linha. Sem as setas, as últimas
+   ficavam cortadas na borda sem nada dizendo que havia mais. */
+const chips = await p.evaluate(() => {
+  const c = document.querySelector('.chips');
+  return { sobra: c.scrollWidth - c.clientWidth, setas: document.querySelectorAll('.abas-seta').length };
+});
+ok('há setas para rolar as categorias', chips.setas === 2, chips.setas + ' setas');
+ok('a fileira realmente transborda', chips.sobra > 0, chips.sobra + 'px escondidos');
+ok('a de voltar começa desabilitada', await p.locator('[data-rolar="-1"]').isDisabled());
+ok('a de avançar começa ativa', !(await p.locator('[data-rolar="1"]').isDisabled()));
+ok('o esmaecido avisa que há mais à direita',
+  (await p.locator('.chips').getAttribute('class')).includes('fade-dir'));
+
+await p.click('[data-rolar="1"]');
+await p.waitForTimeout(600);
+ok('a seta rola a fileira', await p.evaluate(() => document.querySelector('.chips').scrollLeft > 40));
+ok('e a de voltar habilita', !(await p.locator('[data-rolar="-1"]').isDisabled()));
+/* A página inteira nunca rola na horizontal — quem rola é a fileira. */
+ok('a página não ganhou rolagem horizontal', await p.evaluate(() =>
+  document.documentElement.scrollWidth <= window.innerWidth + 1));
+
+console.log('\n== 20. o exemplo cabe entre as setas ==');
+/* O exemplo escapa da coluna de leitura para o código não virar barra de
+   rolagem, e as setas de navegação moram no vão. Os dois disputam o mesmo
+   espaço, e o teto do exemplo é calculado a partir da posição da seta. */
+for (const larg of [1440, 1680, 1920]) {
+  await p.setViewportSize({ width: larg, height: 950 });
+  await p.goto(BASE + PAGINA + '#/curso/javascript/aula/0/arrow', { waitUntil: 'networkidle' });
+  await p.waitForSelector('.exemplo');
+  const m = await p.evaluate(() => {
+    const r = (s) => { const e = document.querySelector(s); return e && e.getBoundingClientRect(); };
+    const ex = r('.exemplo'); const esq = r('.lado-esq'); const dir = r('.lado-dir');
+    const cod = document.querySelector('.exemplo-cod');
+    return {
+      larg: Math.round(ex.width),
+      folga: Math.min(esq ? ex.left - esq.right : 999, dir ? dir.left - ex.right : 999),
+      rola: cod.scrollWidth > cod.clientWidth + 1,
+    };
+  });
+  ok('a ' + larg + 'px o exemplo não encosta na seta', m.folga >= 8,
+    m.larg + 'px de largura, ' + Math.round(m.folga) + 'px de folga');
+  ok('a ' + larg + 'px o código não vira barra de rolagem', !m.rola);
+}
+await p.setViewportSize({ width: 1440, height: 900 });
+
+console.log('\n== 21. o menu da conta leva ao plano ==');
 await p.goto(BASE + PAGINA + '#/painel');
 await p.waitForSelector('.retomar');
 await p.click('.conta-btn');
 await p.waitForTimeout(120);
 ok('há um item "Meu plano"', (await p.locator('.conta-op[href="#/plano"]').count()) === 1);
 
-console.log('\n== 20. tema claro e estreito ==');
+console.log('\n== 22. tema claro e estreito ==');
 await p.click('.idioma-btn'); await p.click('.idioma-op[lang="pt-BR"]'); await p.waitForTimeout(300);
 await p.click('#tema-btn');
 await p.waitForTimeout(250);
@@ -827,7 +885,7 @@ await p2.fill('#e-nome','X'); await p2.selectOption('#e-trilha','backend');
 await p2.click('#form-entrar button[type=submit]'); await p2.waitForTimeout(300);
 await p2.goto(BASE + PAGINA + '#/curso/javascript/aula/1/avaliacao',{waitUntil:'networkidle'});
 await p2.waitForSelector('.ex');
-console.log('\n== 21. nada revelado antes de responder ==');
+console.log('\n== 23. nada revelado antes de responder ==');
 ok('refazer escondido', (await p2.locator('.ex-refazer:visible').count()) === 0);
 ok('justificativas escondidas', (await p2.locator('.alt-porque:visible').count()) === 0);
 ok('vereditos vazios', (await p2.locator('.ex-veredito:visible').count()) === 0);

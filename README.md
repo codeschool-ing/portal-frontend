@@ -595,6 +595,18 @@ A primeira versão daqui errava em duas coisas, e as duas foram corrigidas:
 
 Abaixo de 900px as duas colunas viram uma, com a nota *antes* do trecho.
 
+**O bloco escapa da coluna de leitura.** Ela tem 820px porque prosa acima de 68
+caracteres por linha cansa; o exemplo não é prosa — são duas colunas, e uma
+delas é código, que não se quebra por conforto. Dentro de 820px sobravam ~440px
+para o programa, e qualquer linha real virava barra de rolagem.
+
+Quanto ele pode crescer não é um número escolhido: sai da **posição da seta de
+navegação**, que mora no vão ao lado. Com a seta de 44px e 16px de folga, a
+maior largura em que os dois não brigam pelo mesmo pixel tem forma fechada —
+`((100vw - trilho) + leitura) / 2 - 76`. A 1920px dá 1104px; a 1400px, 844 —
+ainda mais que a coluna de leitura, então escapar dela nunca deixa o exemplo
+mais estreito do que estava. O teste mede a folga em três larguras.
+
 **O realce de sintaxe tem três cores, e são as da marca:** vermelho para a
 estrutura da linguagem, azul para os literais, branco para o resto —
 comentário no cinza apagado. Não há uma quarta: paleta de editor com dez tons
@@ -765,6 +777,20 @@ sinal no site do LinkedIn.
 
 Certificado de **exemplo não compartilha**: no lugar dos botões, a frase que
 explica por quê.
+
+## Duas fileiras que rolam, e uma cor que separa
+
+**As categorias do catálogo ganharam setas.** São nove, e nem com o trilho
+fechado cabem numa linha: as últimas ficavam cortadas na borda sem nada dizendo
+que havia mais. A estrutura é a da vitrine — `.chips-caixa` com uma seta de cada
+lado e o esmaecido nas pontas —, e o `base.css` já trazia o estilo dos três
+pedaços. Reimplementar seria manter dois de tudo. Quando tudo cabe, as setas
+somem: seta desabilitada que nunca faz nada é ruído.
+
+**O rótulo de grupo da busca virou vermelho.** No azul ele se confundia com o
+contexto de cada resultado, que também é azul e também é monoespaçado, e a
+lista virava uma coluna só. Ele é a única linha ali que não é resultado — é a
+divisória entre eles, e merece a outra cor da marca.
 
 ## Três armadilhas que só apareceram na tela
 

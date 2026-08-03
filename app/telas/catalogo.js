@@ -26,10 +26,23 @@ export default async function catalogo() {
         '<span class="busca-ico" aria-hidden="true">⌕</span>' +
         '<input type="search" id="cat-busca" placeholder="' + txt('buscar curso...') + '" aria-label="' + txt('Buscar curso') + '" />' +
       '</div>' +
-      '<div class="chips" id="cat-chips" role="group">' +
-        categorias.map((k, i) =>
-          '<button class="chip' + (i === 0 ? ' on' : '') + '" type="button" data-cat="' + esc(k) + '">' +
-            txt(k) + '</button>').join('') +
+      /* A FILEIRA DE CATEGORIAS ROLA, E COM SETAS. São nove categorias, e nem
+         com o trilho fechado elas cabem numa linha: as últimas ficavam
+         cortadas na borda, sem nada dizendo que havia mais.
+
+         A estrutura é a da vitrine — `.chips-caixa` com uma seta de cada lado
+         e o esmaecido nas pontas —, e o `base.css` já traz o estilo dos três.
+         Reimplementar aqui seria manter dois de tudo. */
+      '<div class="chips-caixa">' +
+        '<button type="button" class="abas-seta" data-rolar="-1" aria-label="' +
+          txt('Categorias anteriores') + '">←</button>' +
+        '<div class="chips" id="cat-chips" role="group">' +
+          categorias.map((k, i) =>
+            '<button class="chip' + (i === 0 ? ' on' : '') + '" type="button" data-cat="' + esc(k) + '">' +
+              txt(k) + '</button>').join('') +
+        '</div>' +
+        '<button type="button" class="abas-seta" data-rolar="1" aria-label="' +
+          txt('Próximas categorias') + '">→</button>' +
       '</div>' +
     '</div>' +
     '<div class="cartoes" id="cat-grade"></div>' +
@@ -73,6 +86,39 @@ export default async function catalogo() {
     pintar();
   });
 
+  /* ---------- a fileira rolável ----------
+     Mesma mecânica do grafo: as setas rolam por quase uma tela cheia, e o
+     esmaecido das pontas diz de que lado ainda há coisa. Quando tudo cabe, as
+     duas somem — seta desabilitada que nunca faz nada é ruído. */
+  const chips = el.querySelector('#cat-chips');
+  const caixa = el.querySelector('.chips-caixa');
+
+  function ajustarSetas() {
+    const sobra = chips.scrollWidth - chips.clientWidth;
+    caixa.classList.toggle('sem-setas', sobra <= 1);
+    chips.classList.toggle('fade-esq', chips.scrollLeft > 4);
+    chips.classList.toggle('fade-dir', chips.scrollLeft < sobra - 4);
+    caixa.querySelector('[data-rolar="-1"]').disabled = chips.scrollLeft <= 4;
+    caixa.querySelector('[data-rolar="1"]').disabled = chips.scrollLeft >= sobra - 4;
+  }
+
+  caixa.addEventListener('click', (e) => {
+    const seta = e.target.closest('.abas-seta');
+    if (!seta) return;
+    chips.scrollBy({ left: Number(seta.dataset.rolar) * Math.max(200, chips.clientWidth - 80), behavior: 'smooth' });
+  });
+  chips.addEventListener('scroll', ajustarSetas);
+
+  let ajusteT = null;
+  const aoRedimensionar = () => { clearTimeout(ajusteT); ajusteT = setTimeout(ajustarSetas, 120); };
+  addEventListener('resize', aoRedimensionar);
+
   pintar();
-  return { titulo: txt('Catálogo'), el };
+  return {
+    titulo: txt('Catálogo'),
+    el,
+    // as medidas só existem depois de o elemento entrar no documento
+    depois: ajustarSetas,
+    aoSair: () => removeEventListener('resize', aoRedimensionar),
+  };
 }

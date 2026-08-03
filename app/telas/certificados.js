@@ -250,12 +250,18 @@ export default async function certificados() {
     const exemplo = art.classList.contains('cert-exemplo');
     const chave = art.dataset.cert;
     const nomeCert = art.querySelector('.cert-curso')?.textContent || '';
+    /* O botão do LinkedIn existe NOS DOIS CASOS, ao lado do fechar. No exemplo
+       ele vem desabilitado e dizendo por quê: esconder o botão faria a pessoa
+       achar que a função não existe, e mostrá-lo funcionando publicaria uma
+       credencial que ninguém tirou. Desabilitado com motivo é o único dos três
+       que não mente. */
     abrirModal(art.outerHTML, {
       classe: 'modal-cert',
       rotulo: txt('Certificado') + ' — ' + nomeCert,
       acoes: exemplo
-        ? '<span class="cert-share-nota mono dim">' +
-            txt('exemplo — não há o que compartilhar') + '</span>'
+        ? '<span class="cert-share-nota mono dim">' + txt('exemplo — nada a compartilhar') + '</span>' +
+          '<span class="btn btn-ghost cert-share cert-share-off" aria-disabled="true">' +
+            ICO_LINKEDIN + txt('Adicionar ao perfil') + '</span>'
         : botoesLinkedIn({ nome: nomeCert, cod: codigo(chave + quem), quando: new Date().toISOString() }),
     });
   };
