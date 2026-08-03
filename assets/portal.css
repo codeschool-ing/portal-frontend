@@ -41,9 +41,11 @@
 
 .portal{
   display:grid;
-  /* 330 e não 272: com 272 quase todo nome de aula quebrava em duas ou três
-     linhas, e uma lista de treze itens quebrados vira parede. */
-  grid-template-columns:330px minmax(0,1fr);
+  /* 380 e não 272: com 272 quase todo nome de aula quebrava em duas ou três
+     linhas, e uma lista de treze itens quebrados vira parede. Os 50px que
+     vieram depois compram a diferença entre "Front-end with React and
+     TypeScript" numa linha ou em duas. */
+  grid-template-columns:380px minmax(0,1fr);
   min-height:100vh;
   padding-top:64px;               /* a barra é fixa e tem altura fixa */
 }
@@ -126,20 +128,20 @@ body.sem-trilho .trilho{display:none}
 .ta-conta{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--phosphor-dim)}
 
 .trilho-secoes{display:flex;flex-direction:column;gap:1px;margin:1px 0 6px}
-.trilho-secao{
+.trilho-secao,.trilho-prova{
   display:grid;grid-template-columns:16px 1fr;align-items:center;gap:9px;
   padding:6px 11px 6px 28px;border-radius:4px;
   font-size:.79rem;line-height:1.35;color:var(--paper-dim);
 }
-.trilho-secao:hover{background:var(--panel);color:var(--paper)}
-.trilho-secao.on{color:var(--phosphor);background:var(--panel)}
+.trilho-secao:hover,.trilho-prova:hover{background:var(--panel);color:var(--paper)}
+.trilho-secao.on,.trilho-prova.on{color:var(--phosphor);background:var(--panel)}
 /* play para o que falta, check para o que foi feito: o ícone diz o estado sem
    depender só de cor, e diz também que aquilo é algo a percorrer */
 .ts-marca{display:grid;place-items:center;color:var(--phosphor-dim)}
 .ts-marca svg{width:14px;height:14px}
-.trilho-secao.feita .ts-marca{color:var(--phosphor)}
-.trilho-secao.on .ts-marca{color:var(--phosphor)}
-.trilho-secao.feita .ts-tit{color:var(--paper-dim)}
+.trilho-secao.feita .ts-marca,.trilho-prova.feita .ts-marca{color:var(--phosphor)}
+.trilho-secao.on .ts-marca,.trilho-prova.on .ts-marca{color:var(--phosphor)}
+.trilho-secao.feita .ts-tit,.trilho-prova.feita .ts-tit{color:var(--paper-dim)}
 .trilho-secao.aval .ts-tit{font-style:italic}
 
 /* ---------- barra do topo: só o que a vitrine não tinha ---------- */
@@ -309,7 +311,8 @@ body.sem-trilho .trilho{display:none}
 .curso-conta{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
 
 .curso-colunas{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
-.curso-lado{display:flex;flex-direction:column;gap:18px}
+.curso-principal,.curso-lado{display:flex;flex-direction:column;gap:18px}
+.curso-principal{min-width:0}
 .ementa{display:flex;flex-direction:column;gap:7px;font-size:.88rem;color:var(--paper-dim);padding-left:16px}
 .ementa li{list-style:'› ';padding-left:4px}
 .requisitos{font-size:.88rem;color:var(--paper-dim)}
@@ -437,8 +440,8 @@ body.sem-trilho .trilho{display:none}
    área útil e a seta cairia por cima do texto — aí o rodapé é o lugar certo.
 
    A posição é calculada a partir da COLUNA, não da janela: a coluna tem 820px
-   e é centrada na área que sobra do trilho (330px), então o centro dela está
-   em `50vw + 165px`. Ancorar na borda da janela deixava as setas boiando a
+   e é centrada na área que sobra do trilho (380px), então o centro dela está
+   em `50vw + 190px`. Ancorar na borda da janela deixava as setas boiando a
    150px do texto numa tela de 1600. */
 @media(min-width:1400px){
   .lado-seta{
@@ -449,7 +452,7 @@ body.sem-trilho .trilho{display:none}
   }
   .lado-seta:hover{color:var(--phosphor);border-color:var(--phosphor);background:var(--ink)}
   .lado-seta svg{width:20px;height:20px}
-  .lado-esq{left:max(342px, calc(50vw + 165px - 410px - 60px))}
+  .lado-esq{left:max(392px, calc(50vw + 190px - 410px - 60px))}
   .lado-dir{right:max(12px, calc(50vw - 575px - 60px))}
   /* com as setas nas laterais o rodapé inteiro some: ele só repetia as mesmas
      duas rotas, e repetir custa a altura que as setas foram economizar */
@@ -727,19 +730,177 @@ body.com-busca{overflow:hidden}
 .entrar-corpo form{display:flex;flex-direction:column;gap:14px}
 .entrar-aviso{font-size:.68rem}
 
-.certs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.certs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
 .cert{border:1px solid var(--wire);border-radius:6px;overflow:hidden;background:var(--panel)}
 .cert-corpo{padding:16px 18px;display:flex;flex-direction:column;gap:7px}
 .cert-rot{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--phosphor)}
 .cert-corpo h2{font-family:'Space Grotesk',sans-serif;font-size:1rem;line-height:1.2}
-.cert-meta,.cert-codigo{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
+.cert-meta,.cert-codigo,.cert-nota{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
+.cert-linha{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:4px;padding-top:10px;border-top:1px solid var(--wire)}
+.cert-campo{display:flex;flex-direction:column;gap:2px;font-size:.82rem;color:var(--paper)}
+.cert-campo b{
+  font-family:'IBM Plex Mono',monospace;font-size:.58rem;font-weight:400;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim);
+}
+.cert-codigo{letter-spacing:.08em;color:var(--phosphor-dim)}
+
+/* O exemplo tem de ser reconhecível como exemplo SEM leitura: moldura
+   tracejada, cor apagada e um selo na barra do terminal. Um certificado falso
+   parecido com um verdadeiro é um problema — não uma prévia. */
+.cert-exemplo{border-style:dashed;opacity:.72}
+.cert-exemplo .cert-rot{color:var(--paper-dim)}
+.cert-selo{
+  margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:.58rem;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim);
+  border:1px solid var(--wire);border-radius:3px;padding:1px 6px;
+}
+.cert-previa{margin-top:26px;display:flex;flex-direction:column;gap:12px}
+/* o rótulo anda junto do título, e não na outra ponta da tela: ele explica o
+   título, e explicação a um metro de distância não explica nada */
+.cert-previa .bloco-topo{align-items:baseline;justify-content:flex-start;gap:14px}
+
+.cert-falta{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+.cert-falta li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;font-size:.9rem}
 
 .conta-nota{font-size:.84rem;color:var(--paper-dim);line-height:1.5}
 .conta-confirma{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:.85rem}
 .tela-conta .campo{max-width:420px}
 
 /* ==========================================================
-   8 · LARGURAS
+   8 · FIGURAS, CÓDIGO ANOTADO E MATERIAL
+   ========================================================== */
+
+/* ---------- figura ---------- */
+.fig{margin:18px 0;display:flex;flex-direction:column;gap:8px}
+.fig img,.fig-svg{
+  width:100%;max-width:100%;border:1px solid var(--wire);border-radius:6px;
+  background:var(--panel);display:block;
+}
+.fig-svg{padding:14px}
+.fig-svg svg{width:100%;height:auto;display:block}
+.fig figcaption{
+  font-family:'IBM Plex Mono',monospace;font-size:.7rem;line-height:1.5;
+  color:var(--paper-dim);text-align:center;
+}
+
+/* ---------- código como exemplo, no estilo Go By Example ----------
+
+   Duas colunas: o programa desce inteiro pela esquerda, a nota de cada trecho
+   fica ao lado. A borda vertical entre elas é o que faz o código parecer um
+   arquivo contínuo mesmo com as notas interrompendo a leitura horizontal.
+
+   O `align-items:start` é o que segura a nota no alto do trecho a que ela se
+   refere; centralizada, ela flutuaria no meio de um bloco de dez linhas e
+   deixaria de apontar para lugar nenhum. */
+.exemplo{
+  margin:18px 0;border:1px solid var(--wire);border-radius:6px;
+  background:var(--panel);overflow:hidden;
+}
+.exemplo-barra{
+  display:flex;align-items:center;gap:10px;padding:6px 12px;
+  border-bottom:1px solid var(--wire);background:var(--ink);
+}
+.exemplo-arq{font-size:.66rem;margin-left:auto}
+.exemplo-par{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);
+  align-items:start;border-bottom:1px solid var(--wire);
+}
+.exemplo-par:last-of-type{border-bottom:0}
+.exemplo-cod{
+  margin:0;padding:12px 14px;overflow-x:auto;
+  font-family:'IBM Plex Mono',monospace;font-size:.78rem;line-height:1.65;
+  color:var(--paper);white-space:pre;
+}
+.exemplo-nota{
+  padding:12px 14px;border-left:1px solid var(--wire);
+  font-size:.82rem;line-height:1.6;color:var(--paper-dim);
+}
+.exemplo-nota code{font-size:.94em}
+.exemplo-par.sem-nota{grid-template-columns:1fr}
+.exemplo-saida{border-top:1px solid var(--wire);background:var(--ink);padding:10px 14px}
+.exemplo-saida-rot{
+  display:block;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;
+}
+.exemplo-saida .cod{margin:0;padding:0;background:none;border:0}
+
+/* Abaixo de 900px as duas colunas não cabem lado a lado sem picotar o código.
+   A nota vai para CIMA do trecho: ler a explicação e então o código é a ordem
+   que funciona quando não há alinhamento lateral para amarrar os dois. */
+@media(max-width:900px){
+  .exemplo-par{grid-template-columns:1fr}
+  .exemplo-nota{
+    order:-1;border-left:0;border-bottom:1px solid var(--wire);
+    background:var(--ink);padding:10px 14px;
+  }
+}
+
+/* ---------- material complementar ---------- */
+.materiais{margin:22px 0 0;display:flex;flex-direction:column;gap:2px}
+.materiais-topo{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
+.materiais-topo h3{font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:400}
+.materiais-topo .mono{font-size:.66rem}
+.mat{
+  display:flex;align-items:center;gap:12px;padding:10px 12px;
+  border:1px solid var(--wire);border-radius:5px;background:var(--panel);
+  transition:border-color .15s,background .15s;
+}
+.mat:hover{border-color:var(--phosphor);background:var(--ink)}
+.mat-icone,.mat-baixar{display:grid;place-items:center;flex:0 0 auto;color:var(--paper-dim)}
+.mat-icone svg{width:22px;height:22px}
+.mat-baixar{margin-left:auto}
+.mat-baixar svg{width:17px;height:17px}
+.mat:hover .mat-baixar{color:var(--phosphor)}
+.mat-meio{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mat-tit{font-size:.9rem;color:var(--paper)}
+.mat-meta{font-size:.64rem;letter-spacing:.04em}
+.curso-lado .materiais{margin:0}
+
+/* ==========================================================
+   9 · PROVAS
+   ========================================================== */
+
+/* O cartão que anuncia a prova. Ele é DELIBERADAMENTE diferente de um bloco
+   comum: a prova é a única coisa do portal que tem consequência — reprovar
+   custa uma nota registrada —, e uma peça que se parece com as outras não
+   avisa disso. */
+.prova-cartao{
+  /* `flex-direction` explícito: `.bloco` empilha em coluna, e sem esta linha o
+     cartão herdava o empilhamento e o botão caía embaixo, centralizado. */
+  display:flex;flex-direction:row;flex-wrap:wrap;
+  align-items:center;justify-content:space-between;gap:18px;
+  border-color:var(--phosphor-dim);
+}
+.prova-cartao.passou{border-color:var(--phosphor)}
+.prova-cartao-texto{display:flex;flex-direction:column;gap:5px;min-width:220px;flex:1}
+.prova-cartao-rot{
+  font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--phosphor);
+}
+.prova-cartao-texto h2{font-family:'Space Grotesk',sans-serif;font-size:1.15rem}
+.prova-cartao-texto p{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
+.prova-cartao-nota{color:var(--paper) !important}
+.prova-cartao-nota.passou{color:var(--phosphor) !important}
+.prova-cartao-acao{display:flex;flex-direction:column;gap:10px;min-width:190px}
+.prova-cartao-acao .barra{width:100%}
+
+.tela-prova .prova-regras .prosa-lista{margin:0}
+.prova-aviso,.prova-antes{
+  margin-top:12px;padding:10px 12px;border-radius:4px;font-size:.85rem;line-height:1.5;
+  background:var(--ink);border:1px solid var(--wire);color:var(--paper-dim);
+}
+.prova-antes.passou{border-color:var(--phosphor);color:var(--paper)}
+.prova-nota{font-size:2.4rem !important}
+.prova-nota.passou strong{color:var(--phosphor)}
+.prova-nota.faltou strong{color:var(--paper-dim)}
+
+/* Represado: enquanto a prova não fecha, o veredito diz só que a resposta
+   entrou. A cor é neutra de propósito — qualquer verde ou vermelho aqui
+   entregaria o resultado que a prova está segurando. */
+.v-registrado{color:var(--paper-dim) !important;border-color:var(--wire) !important}
+.wz-ponto.feito{border-color:var(--paper-dim);color:var(--paper)}
+.wz-cuidado{background:var(--panel) !important;color:var(--paper) !important;border-color:var(--phosphor) !important}
+
+/* ==========================================================
+   10 · LARGURAS
    ========================================================== */
 
 /* Duas colunas no curso quando cada uma ainda fica com ~440px — o mesmo

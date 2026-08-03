@@ -7,9 +7,11 @@
    ========================================================================== */
 
 import { montarTrilha, desenharArestas, ajustarSetasGrafo } from '../grafo.js';
-import { escolherOpcao } from '../estado.js';
+import { escolherOpcao, opcaoAtiva } from '../estado.js';
 import { irPara } from '../rotas.js';
-import { trilhaDoAluno, vazio } from './comum.js';
+import { provaDaTrilha } from '../provas.js';
+import { cartaoDeProva } from './prova.js';
+import { trilhaDoAluno, progressoDaTrilha, vazio } from './comum.js';
 
 let redesenhaT = null;
 
@@ -19,19 +21,33 @@ export default async function trilha() {
 
   const el = document.createElement('div');
   el.className = 'tela tela-trilha';
-  el.innerHTML = montarTrilha(t);
+
+  /* A prova vem DEPOIS do grafo, e é a única coisa que vem: o grafo termina no
+     nó de chegada, e a prova é o que existe depois de chegar. O cartão é
+     remontado junto com o grafo quando a bifurcação muda, porque trocar de
+     ramo troca os cursos e portanto o banco de questões. */
+  const cartao = () => {
+    const prova = provaDaTrilha(t, opcaoAtiva);
+    return prova.itens.length
+      ? cartaoDeProva({
+        chave: prova.chave, href: '#/trilha/prova', escopo: 'trilha',
+        quantas: prova.itens.length, progresso: progressoDaTrilha(t).pct,
+      })
+      : '';
+  };
+  el.innerHTML = montarTrilha(t) + cartao();
 
   // abrir um curso pelo cartão do grafo
   el.addEventListener('click', (e) => {
-    const cartao = e.target.closest('.curso-no[data-curso]');
-    if (cartao) return irPara('/curso/' + cartao.dataset.curso);
+    const cartao1 = e.target.closest('.curso-no[data-curso]');
+    if (cartao1) return irPara('/curso/' + cartao1.dataset.curso);
 
     // trocar a opção de uma etapa com bifurcação: remonta o grafo inteiro,
     // porque a escolha muda o caminho e portanto os níveis
     const aba = e.target.closest('.garfo-aba');
     if (aba) {
       escolherOpcao(t.id, Number(aba.dataset.garfo), Number(aba.dataset.opcao));
-      el.innerHTML = montarTrilha(t);
+      el.innerHTML = montarTrilha(t) + cartao();
       desenharArestas(el, t);
       return;
     }

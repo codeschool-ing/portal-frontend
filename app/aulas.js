@@ -91,3 +91,40 @@ export const indiceDaSecao = (secoes, secId) => {
   const i = secoes.findIndex((s) => s.id === secId);
   return i < 0 ? 0 : i;
 };
+
+/* ---------- material complementar ----------
+
+   A seção referencia o material por CHAVE (`materiais: ['wf-dns-resumo']`), e
+   o registro com título, tamanho e bytes mora em `window.MATERIAIS`. Duas
+   razões, e a segunda é a que importa:
+
+   1. O mesmo PDF serve mais de uma seção sem ser duplicado.
+   2. O registro é o que muda quando o arquivo sai do `data:` URI e vira URL
+      assinada de um bucket, na Etapa 2. A seção continua dizendo só a chave —
+      nenhuma linha de conteúdo precisa ser reescrita nesse dia.
+
+   Chave que não existe no registro é IGNORADA, e de propósito: material
+   removido do bucket não pode derrubar a aula inteira. */
+export const materialPorChave = (chave) => (window.MATERIAIS || {})[chave] || null;
+
+export const materiaisDaSecao = (secao) =>
+  (secao?.materiais || []).map(materialPorChave).filter(Boolean);
+
+/* Todos os materiais de um curso, sem repetir — é o que a página do curso
+   mostra, para quem quer baixar tudo de uma vez em vez de caçar seção a seção. */
+export function materiaisDoCurso(cursoId) {
+  const vistos = new Set();
+  const fora = [];
+  aulasDoCurso(cursoId).forEach((a, ix) => {
+    secoesDaAula(cursoId, a.chave).forEach((s) => {
+      (s.materiais || []).forEach((chave) => {
+        if (vistos.has(chave)) return;
+        const m = materialPorChave(chave);
+        if (!m) return;
+        vistos.add(chave);
+        fora.push({ ...m, chave, aulaIx: ix, secId: s.id, aula: a.titulo });
+      });
+    });
+  });
+  return fora;
+}

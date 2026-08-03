@@ -140,14 +140,14 @@ pede e quem responde` viraria uma seção chamada "quem pede e quem responde". A
 enumeração no título é **evidência** de que as seções são necessárias; não é
 fonte para lê-las.
 
-As seções moram em `assets/aulas.js`, e não em `dados.js`, porque aquele é cópia
+As seções moram em `assets/aulas-*.js`, e não em `dados.js`, porque aquele é cópia
 do catálogo da vitrine e o modal de lá renderiza `topicos` como lista plana.
 Ficam três arquivos com três donos e a mesma chave de junção:
 
 | arquivo | o quê | de quem |
 | --- | --- | --- |
 | `dados.js` | catálogo: cursos, trilhas, tópicos | compartilhado com a vitrine |
-| `aulas.js` | as seções e o texto delas | do portal |
+| `aulas-*.js` | as seções e o texto delas | do portal |
 | exercícios | a avaliação | do pipeline |
 
 **Avançar é concluir.** Não há botão de "marcar como concluída": ele e a seta
@@ -345,6 +345,10 @@ app/rotas.js                   roteador por hash
 app/trilho.js                  o trilho lateral
 app/busca.js                   o índice da busca global — não toca no DOM
 app/painel-busca.js            o painel do ⌘K
+app/provas.js                  monta a prova do curso e a da trilha
+app/materiais.js               a lista de material para baixar
+assets/materiais.js            GERADO — os PDFs, como data: URI
+ferramentas/materiais/         gera assets/materiais.js
 app/telas/*.js                 uma por tela
 app/exercicios/*.js            um por tipo, mais o invólucro e a correção
 ferramentas/fumaca/            o teste de fumaça
@@ -450,6 +454,114 @@ coisa do portal que não veio do catálogo nem do pipeline: é do aluno. Por iss
 tem tela própria, agrupada por curso — na hora de revisar ninguém lembra em qual
 seção anotou o quê — e entra na busca junto com o resto.
 
+## Prova de curso e prova de trilha
+
+A avaliação da aula e a prova não são a mesma coisa, e a diferença não é o
+tamanho:
+
+| | avaliação da aula | prova |
+|---|---|---|
+| para quê | praticar | medir |
+| feedback | imediato, questão a questão | só no fim |
+| dica socrática | aparece | não aparece |
+| refazer | à vontade, na hora | só refazendo a prova inteira |
+| resultado | não é registrado | vale nota, e a melhor fica |
+
+**Feedback imediato numa prova é o que permite tentar até acertar** — e aí ela
+para de medir. Por isso o wizard ganhou `modo: 'prova'`: as mesmas telas, com o
+veredito represado. Enquanto a prova está aberta, responder devolve só "resposta
+registrada", e o marcador no topo diz *se* você respondeu, nunca *se acertou*.
+Ao entregar, tudo abre de uma vez e responder para de ser possível — é a linha
+entre medir e ensinar.
+
+**As questões saem do mesmo banco das aulas, sorteadas.** Não há um banco
+separado de "questões de prova" e não deve haver enquanto o pipeline emitir um
+arquivo por tópico: manter dois bancos alinhados é trabalho recorrente, e o que
+se ganharia — questões inéditas — o sorteio já dá, porque ninguém faz os 1.503
+exercícios de uma trilha antes da prova.
+
+**O sorteio é semeado pela tentativa.** Sair da tela e voltar devolve a *mesma*
+prova; senão, fechar a aba sem querer viraria uma prova nova — a punição errada
+para o erro errado. Reprovar e tentar de novo devolve uma prova *diferente*:
+decorar a lista de dez não pode ser a estratégia.
+
+**A prova prefere os tipos que o portal sabe corrigir.** `codigo`,
+`saida-esperada` e `resposta-expressao` precisam de servidor e hoje voltam "não
+conferido" — uma prova cheia deles não teria nota. Eles entram só quando não há
+corrigíveis suficientes, e ficam fora do denominador, pela régua de sempre: não
+julgado não vira aprovado nem reprovado. Ficar em branco, ao contrário, conta
+como erro — deixar em branco é uma resposta.
+
+**Ela não tranca.** Dá para abrir a prova sem ter feito uma aula. O portal
+inteiro mostra e não tranca, e uma prova que travasse seria a única exceção. O
+que ela faz é avisar quanto do conteúdo você concluiu. Entregar com questões em
+branco pede um segundo clique, e o próprio botão diz quantas são.
+
+Mínimo para passar: **70%**. Vale sempre o melhor resultado — reprovar depois de
+já ter passado não pode tirar um certificado emitido.
+
+### O certificado passou a exigir a prova
+
+Concluir todas as seções diz que a pessoa **percorreu** o material — e como
+avançar é concluir, percorrer é quase automático. Um certificado que sai de
+percorrer não afirma nada sobre quem o recebe. A prova é o que faz o documento
+significar alguma coisa.
+
+Com a prova da trilha nasceu a **segunda unidade de certificação**: quem termina
+os cursos do caminho e passa na prova final da trilha leva um certificado da
+trilha inteira. Isso responde *em parte* a pergunta que o README da vitrine
+deixou aberta: a trilha é a unidade grande, e a dúvida de verdade — se existe
+algo entre um curso de 40h e uma trilha de 400h — continua aberta, e continua
+barata enquanto nenhum certificado tiver sido emitido para aluno real.
+
+A tela de certificados mostra **exemplos** de cada tipo que o aluno ainda não
+tem, montados com os dados reais do catálogo dele. Eles se declaram exemplo em
+três lugares ao mesmo tempo — moldura tracejada, selo na barra e, no lugar do
+código de validação, a frase "nenhum código foi emitido". Um certificado falso
+parecido com um verdadeiro é um problema, não uma prévia.
+
+## Conteúdo: imagem, diagrama e código anotado
+
+`prosa()` passou de três formas de bloco para seis. As três novas:
+
+```js
+{ imagem: url, legenda, alt }   // um arquivo — foto, captura, diagrama exportado
+{ svg: '<svg…>', legenda }      // um desenho, que entra no documento
+{ exemplo: { linguagem, arquivo, partes: [{ codigo, nota }], saida } }
+```
+
+**Por que imagem e svg são coisas separadas.** Um diagrama exportado como PNG
+nasce com um fundo, e esse fundo está errado em metade das visitas: o portal tem
+tema claro e escuro, e o aluno alterna. Diagrama de conceito — que é linha e
+rótulo — fica inline e herda a cor do tema. Foto e captura de tela continuam
+sendo arquivo. (O `svg` não é escapado: é marcação nossa, escrita no arquivo de
+conteúdo. É o campo que vai precisar de sanitização no dia em que o conteúdo
+vier de fora, e o comentário no código existe para essa pergunta não passar
+batida.)
+
+**O `exemplo` é a forma do [Go By Example](https://gobyexample.com):** o
+programa inteiro descendo pela esquerda, a explicação de cada trecho ao lado
+dele. Ela vale um bloco próprio porque **um parágrafo entre dois trechos quebra
+o programa** — quem lê perde o fio de que aquilo é um arquivo só. Aqui o código
+continua contínuo e mesmo assim cada pedaço tem a sua nota. Abaixo de 900px as
+duas colunas viram uma, com a nota *antes* do trecho.
+
+## Material complementar
+
+A seção referencia o material por chave (`materiais: ['wf-dns-resumo']`); o
+registro com título, tipo e tamanho mora em `window.MATERIAIS`. A indireção
+existe para um dia só: quando o arquivo sair do `data:` URI e virar URL assinada
+de um bucket, muda o registro — nenhuma linha de conteúdo precisa ser reescrita.
+
+Os PDFs de exemplo são **gerados**, não commitados
+(`ferramentas/materiais/gerar.py`). O texto deles é versionado e legível no
+diff; o binário é saída. E eles vêm embutidos como `data:` URI porque o portal
+tem de funcionar aberto do disco — um link para `assets/algo.pdf` morre depois
+do bundle. São PDFs escritos à mão, sem dependência, ~3 KB cada.
+
+O link usa `download`, e não `target`: abrir o PDF no visualizador embutido tira
+o aluno da aula.
+
 ## Três armadilhas que só apareceram na tela
 
 Ficam registradas porque nenhuma aparece lendo o código:
@@ -475,8 +587,11 @@ Ficam registradas porque nenhuma aparece lendo o código:
 - **Conteúdo real**: religar `ferramentas/exercicios` do repo da vitrine e
   ingerir os JSON aprovados, começando pelos `_verificacao: criticado`.
 - **Texto e vídeo das aulas**, hoje um quadro reservado por aula.
-- **A unidade intermediária de certificação.** Hoje o certificado é por curso,
-  porque é a única unidade que existe. O README da vitrine deixa quatro
-  perguntas em aberto sobre isso — o eixo, o nome, a âncora e o custo de
-  tradução — e registra a armadilha: cortar por nível repetiria o erro do caso
-  Go. O custo só salta no primeiro certificado emitido para aluno real.
+- **A unidade INTERMEDIÁRIA de certificação.** Já existem duas: curso e trilha.
+  Falta saber se existe algo entre um curso de 40h e uma trilha de 400h. O
+  README da vitrine deixa quatro perguntas em aberto sobre isso — o eixo, o
+  nome, a âncora e o custo de tradução — e registra a armadilha: cortar por
+  nível repetiria o erro do caso Go. O custo só salta no primeiro certificado
+  emitido para aluno real.
+- **Banco de questões de prova separado**, se e quando o sorteio do banco das
+  aulas deixar de bastar. Hoje ele basta e não custa manutenção nenhuma.

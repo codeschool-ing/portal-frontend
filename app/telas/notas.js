@@ -33,7 +33,6 @@ export default async function notas() {
   el.className = 'tela tela-notas';
   el.innerHTML =
     '<header class="tela-head">' +
-      '<span class="tag">// ' + txt('notas') + '</span>' +
       '<h1>' + txt('Suas anotações') + '</h1>' +
       '<p>' + lista.length + ' ' + (lista.length === 1 ? txt('nota') : txt('notas')) + '</p>' +
     '</header>' +

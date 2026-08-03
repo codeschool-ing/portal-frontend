@@ -19,7 +19,6 @@ export default async function catalogo() {
 
   el.innerHTML =
     '<header class="tela-head">' +
-      '<span class="tag">// ' + txt('catálogo') + '</span>' +
       '<h1>' + txt('Todos os cursos') + '</h1>' +
     '</header>' +
     '<div class="filtros">' +

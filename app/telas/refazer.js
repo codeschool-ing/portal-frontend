@@ -26,7 +26,6 @@ export default async function refazer() {
   el.className = 'tela tela-refazer';
   el.innerHTML =
     '<header class="tela-head">' +
-      '<span class="tag">// ' + txt('refazer') + '</span>' +
       '<h1>' + txt('Os que você errou') + '</h1>' +
       '<p>' + lista.length + ' ' + (lista.length === 1
         ? txt('exercício, do curso em que você respondeu.')
