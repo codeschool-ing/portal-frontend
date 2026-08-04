@@ -1,12 +1,13 @@
-# Saída do bundle.py: gerada a partir de index.html + assets/ + app/.
-# Serve para enviar por e-mail ou abrir do disco, não para publicar — servido,
-# o navegador cacheia cada arquivo separadamente.
+# bundle.py's output: generated from index.html + assets/ + app/.
+# It is for emailing around or opening off disk, not for publishing — when
+# served, the browser caches each file separately.
 /portal-aluno.html
 
-# O portal não tem build nem dependências: `node_modules` só existe quando se
-# instala o playwright para rodar o teste de fumaça.
+# The portal has no build and no dependencies: `node_modules` only exists when
+# playwright is installed to run the smoke suite.
 node_modules
 node_modules/
 
-# capturas de tela do desenvolvimento
+# development screenshots (the `tiro-` prefix is kept: dropping the pattern
+# would start committing whatever is already sitting in a working copy)
 tiro-*.png

@@ -1,64 +1,65 @@
 /* ==========================================================================
-   Conteúdo das aulas — as seções de cada tópico.
+   Lesson content — each topic's sections.
 
-   POR QUE ESTE ARQUIVO EXISTE, E NÃO UM CAMPO EM dados.js
-   Um tópico do catálogo não é um assunto: é um punhado deles. Metade dos 1.503
-   tópicos enumera três ou mais assuntos no próprio título ("Hospedagem:
-   compartilhada, VPS, nuvem e CDN"), e a carga média por tópico é de 4 horas —
-   que não é uma página. O autor já dividiu a aula, em prosa; o portal precisava
-   parar de ignorar isso.
+   WHY THIS FILE EXISTS, INSTEAD OF A FIELD IN dados.js
+   A catalogue topic is not one subject: it is a handful of them. Half of the
+   1,503 topics enumerate three or more subjects in the title itself
+   ("Hospedagem: compartilhada, VPS, nuvem e CDN"), and the average load per
+   topic is 4 hours — which is not one page. The author already divided the
+   lesson, in prose; the portal needed to stop ignoring that.
 
-   `dados.js` é cópia do catálogo da vitrine, e o modal de lá renderiza
-   `topicos` como lista plana. Mudar a forma daquele campo quebraria o contrato
-   entre os dois repositórios pelo único motivo que não vale — conveniência.
-   Então as seções moram aqui, com a MESMA chave de junção dos exercícios:
-   curso + o texto do tópico EM PORTUGUÊS. (O título exibido é traduzido em
-   runtime e não serve de chave — ver `aulasDoCurso` em app/catalogo.js.)
+   `dados.js` is a copy of the vitrine's catalogue, and the modal over there
+   renders `topicos` as a flat list. Changing the shape of that field would
+   break the contract between the two repositories for the one reason that is
+   never worth it — convenience. So the sections live here, with the SAME join
+   key the exercises use: course + the topic's text IN PORTUGUESE. (The
+   displayed title is translated at runtime and is not usable as a key — see
+   `courseLessons` in app/catalog.js.)
 
-   AS SEÇÕES SÃO ESCRITAS, NUNCA DERIVADAS
-   Dava para quebrar o título no `:` e nas vírgulas e ganhar 734 divisões de
-   graça. Não se faz. É heurística léxica sobre prosa autoral, e o projeto já
-   pagou para aprender que isso não funciona: em REGRAS.md, a conferência de
-   "exige tópico posterior" foi tentada assim, acusou 5 dos 48 exercícios bons e
-   foi descartada com a conclusão de que "a resposta está na autoria, não na
-   detecção". Aqui falharia igual — "Cliente, servidor e host: quem pede e quem
-   responde" viraria uma seção chamada "quem pede e quem responde".
-   A enumeração no título é evidência de que as seções são necessárias; não é
-   fonte para lê-las.
+   THE SECTIONS ARE WRITTEN, NEVER DERIVED
+   It would have been possible to split the title on the `:` and the commas and
+   get 734 divisions for free. One does not. That is lexical heuristics over
+   authored prose, and the project has already paid to learn that it does not
+   work: in REGRAS.md, the "requires a later topic" check was attempted this way,
+   flagged 5 of the 48 good exercises and was discarded with the conclusion that
+   "a resposta está na autoria, não na detecção". It would fail the same way here
+   — "Cliente, servidor e host: quem pede e quem responde" would become a section
+   called "quem pede e quem responde". The enumeration in the title is evidence
+   that the sections are needed; it is not a source for reading them.
 
-   FORMA
-     window.LESSONS[cursoId][tópico em pt] = [ seção, ... ]
+   SHAPE
+     window.LESSONS[courseId][topic in pt] = [ section, ... ]
 
-   Há um arquivo por curso, como o pipeline faz com os exercícios, e cada um
-   MESCLA no objeto em vez de atribuí-lo: nenhum pode depender de ser o
-   primeiro a carregar.
-     seção = { id, titulo, corpo?, video?, duracao?, materiais? }
-       `id`      chave curta e estável — é ela que entra na URL e no progresso
-       `corpo`   lista de parágrafos; um item que é lista vira <ul>
-       `video`   id do YouTube, ou `true` para "vai ter, ainda não tem"
-       `duracao` texto curto ('08 min'), mostrado no player e no trilho
+   There is one file per course, as the pipeline does with the exercises, and
+   each one MERGES into the object instead of assigning it: none of them may
+   depend on being the first to load.
+     section = { id, titulo, corpo?, video?, duracao?, materiais? }
+       `id`      a short, stable key — it is what enters the URL and the progress
+       `corpo`   list of paragraphs; an item that is itself a list becomes a <ul>
+       `video`   the YouTube id, or `true` for "there will be one, not yet"
+       `duracao` short text ('08 min'), shown on the player and in the rail
 
-     A SEÇÃO DECLARA O QUE ELA É, e o layout segue:
+     THE SECTION DECLARES WHAT IT IS, and the layout follows:
 
-       com `video`   o player abre a tela de ponta a ponta e o título desce
-                     para baixo dele. Sem `corpo`, é uma seção SÓ DE VÍDEO —
-                     a abertura de aula, em que não há texto para ler junto.
-       sem `video`   nenhum quadro. Nem cinza, nem reservado: uma seção de
-                     texto com um retângulo em cima promete algo que não vem,
-                     e a promessa não expira.
+       with `video`   the player opens edge to edge and the title moves below
+                      it. With no `corpo`, it is a VIDEO-ONLY section — the
+                      lesson's opening, where there is no text to read along.
+       no `video`     no frame at all. Not grey, not reserved: a text section
+                      with a rectangle on top promises something that does not
+                      come, and the promise does not expire.
 
-     Marcação no texto: `crase` vira código, **asteriscos** viram negrito.
-     Nada além disso — é o subconjunto que o conteúdo usa.
+     Markup in the text: `backticks` become code, **asterisks** become bold.
+     Nothing beyond that — it is the subset the content uses.
 
-   Aula sem entrada aqui cai numa seção única com o conteúdo que houver, então
-   o portal funciona igual para os 85 cursos que ainda não foram escritos. A
-   seção de avaliação é acrescentada pelo código quando o tópico tem
-   exercícios — não se escreve aqui, e tópico sem exercício não ganha uma
-   página vazia.
+   A lesson with no entry here falls back to a single section carrying whatever
+   content exists, so the portal works the same for the 85 courses that have not
+   been written yet. The assessment section is appended by the code when the
+   topic has exercises — it is not written here, and a topic with no exercises
+   does not get an empty page.
 
-   ESTADO: conteúdo de exemplo. Foi escrito para avaliar a estrutura e é
-   tecnicamente correto, mas não passou por revisão pedagógica. A escola
-   reescreve.
+   STATUS: sample content. It was written to evaluate the structure and is
+   technically correct, but it has had no pedagogical review. The school
+   rewrites it.
    ========================================================================== */
 
 window.LESSONS = Object.assign(window.LESSONS || {}, {
@@ -68,9 +69,9 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     /* --------------------------------------------------------------- 01 */
     'Cliente, servidor e host: quem pede e quem responde': [
       {
-        /* SEÇÃO SÓ DE VÍDEO: sem `corpo`. É a forma de abertura de aula — o
-           instrutor diz o que vem pela frente, e não há texto para ler junto.
-           `video: true` reserva o quadro sem afirmar que o vídeo já existe. */
+        /* VIDEO-ONLY SECTION: no `corpo`. It is the lesson-opening shape — the
+           instructor says what is coming, and there is no text to read along.
+           `video: true` reserves the frame without claiming the video exists. */
         id: 'apresentacao',
         titulo: 'Apresentação',
         video: true,
@@ -360,9 +361,9 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
           ],
           'A restrição do `CNAME` na raiz é a que mais aparece na prática: para apontar `codeschool.ing` (sem `www`) a um serviço hospedado, ou se usa `A` com IPs fixos, ou o provedor oferece um `ALIAS`/`ANAME`, que é uma extensão fora do padrão.',
           {
-            /* Desenhado aqui dentro, e não exportado como imagem, para herdar
-               as cores do tema: um PNG de diagrama nasce com um fundo, e esse
-               fundo está errado em metade das visitas. */
+            /* Drawn inline here, and not exported as an image, so it inherits
+               the theme's colours: a diagram PNG is born with a background, and
+               that background is wrong on half the visits. */
             svg: [
               '<svg viewBox="0 0 720 190" role="img" aria-label="A pergunta sobe do navegador ao resolvedor, e do resolvedor aos servidores raiz, de TLD e autoritativo; a resposta desce sendo guardada em cache">',
               '<g fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55">',

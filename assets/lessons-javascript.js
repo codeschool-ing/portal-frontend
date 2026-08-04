@@ -1,24 +1,25 @@
 /* ==========================================================================
-   Conteúdo das aulas — JavaScript.
+   Lesson content — JavaScript.
 
-   POR QUE ESTE CURSO É O QUE MAIS USA `exemplo`
-   Em `web-fundamentos` o assunto é conceito: o que é um pacote, por que a
-   propagação demora. Prosa dá conta. Em `html-css` o código aparece, mas em
-   pedaços curtos — um seletor, três propriedades.
+   WHY THIS COURSE USES `exemplo` THE MOST
+   In `web-fundamentos` the subject is concepts: what a packet is, why
+   propagation takes time. Prose covers it. In `html-css` the code shows up, but
+   in short fragments — one selector, three properties.
 
-   Aqui o assunto é uma LINGUAGEM, e linguagem se aprende lendo programa. Um
-   trecho de três linhas ensina a sintaxe e esconde o que importa: como as
-   partes se encaixam. O bloco `exemplo` existe para isso — o programa desce
-   inteiro pela esquerda, a explicação de cada pedaço fica ao lado, e ninguém
-   precisa quebrar o arquivo em parágrafos para poder comentá-lo.
+   Here the subject is a LANGUAGE, and a language is learned by reading programs.
+   A three-line snippet teaches the syntax and hides what matters: how the parts
+   fit together. The `exemplo` block exists for that — the program runs down the
+   left in one piece, the explanation of each fragment sits beside it, and nobody
+   has to break the file into paragraphs in order to comment on it.
 
-   A REGRA QUE VALE PARA TODO EXEMPLO DAQUI: ele tem de RODAR. Cada `saida` foi
-   escrita a partir do que o programa realmente imprime, incluindo as partes
-   que surpreendem — `0.30000000000000004`, `'11'`, `[object Object]`. Exemplo
-   com saída inventada ensina a coisa errada, e o aluno descobre no console.
+   THE RULE THAT HOLDS FOR EVERY EXAMPLE HERE: it has to RUN. Every `saida` was
+   written from what the program actually prints, including the parts that
+   surprise — `0.30000000000000004`, `'11'`, `[object Object]`. An example with
+   invented output teaches the wrong thing, and the student finds out in their
+   own console.
 
-   Chave de junção: curso + o texto do tópico EM PORTUGUÊS (ver o cabeçalho de
-   aulas-web-fundamentos.js).
+   Join key: course + the topic's text IN PORTUGUESE (see the header of
+   lessons-web-fundamentos.js).
    ========================================================================== */
 
 window.LESSONS = Object.assign(window.LESSONS || {}, {
@@ -106,7 +107,7 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
         corpo: [
           'Crase em vez de aspas, `${}` para interpolar, e a quebra de linha vale literalmente. Some a concatenação com `+`, que é onde nascem os espaços faltando.',
           { codigo: 'javascript', texto: 'const nome = "Ana";\nconst n = 3;\n\nconsole.log(`${nome} concluiu ${n} ${n === 1 ? "curso" : "cursos"}.`);\n// Ana concluiu 3 cursos.' },
-          'A interpolação aceita **qualquer expressão**, não só variável — chamada de função, ternário, operação. O que ela não deve receber é texto vindo do usuário destinado a virar HTML: aí a interpolação vira o furo, e é por isso que este portal tem um `esc()` em `app/texto.js`.',
+          'A interpolação aceita **qualquer expressão**, não só variável — chamada de função, ternário, operação. O que ela não deve receber é texto vindo do usuário destinado a virar HTML: aí a interpolação vira o furo, e é por isso que este portal tem um `esc()` em `app/text.js`.',
         ],
       },
     ],

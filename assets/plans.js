@@ -1,20 +1,20 @@
 /* ==========================================================================
-   Planos.
+   Plans.
 
-   FICÇÃO DELIBERADA, COM A FORMA CERTA. Não existe cobrança neste repositório e
-   não vai existir: preço, ciclo, cupom e nota fiscal são domínio de um serviço
-   de pagamento, e o portal só precisa saber o que o aluno assinou e o que isso
-   dá direito. O que está aqui é a FORMA desse registro — é ela que a Etapa 2
-   vai preencher com dado real.
+   DELIBERATE FICTION, WITH THE RIGHT SHAPE. There is no billing in this
+   repository and there will not be: price, cycle, coupon and invoice belong to a
+   payment service, and the portal only needs to know what the student subscribed
+   to and what that entitles them to. What is here is the SHAPE of that record —
+   it is what Stage 2 will fill in with real data.
 
-   O PORTAL NÃO TRANCA NADA POR PLANO, HOJE. A tela de plano mostra o que cada
-   um inclui, mas nenhum curso, prova ou certificado é bloqueado. Bloquear é
-   decisão de negócio e exige servidor: com o estado em localStorage, qualquer
-   trava seria teatro — bastaria editar uma chave. Melhor não fingir.
+   THE PORTAL LOCKS NOTHING BY PLAN, TODAY. The plan screen shows what each one
+   includes, but no course, exam or certificate is blocked. Blocking is a business
+   decision and requires a server: with the state in localStorage, any lock would
+   be theatre — you would only have to edit a key. Better not to pretend.
 
-   `inclui` é uma lista de CHAVES, não de frases: é por elas que o servidor vai
-   autorizar, e a frase que o aluno lê sai de `FEATURES`. Duas listas de texto
-   divergem no dia em que uma delas muda.
+   `inclui` is a list of KEYS, not of sentences: they are what the server will
+   authorise by, and the sentence the student reads comes from `FEATURES`. Two
+   lists of text diverge the day one of them changes.
    ========================================================================== */
 
 window.FEATURES = {

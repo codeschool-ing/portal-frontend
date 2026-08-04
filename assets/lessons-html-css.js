@@ -1,29 +1,30 @@
 /* ==========================================================================
-   Conteúdo das aulas de `html-css` — 13 aulas, 5,4h cada no catálogo.
+   Lesson content for `html-css` — 13 lessons, 5.4h each in the catalogue.
 
-   É o primeiro curso PRÁTICO escrito para o portal, e foi ele que obrigou a
-   prosa a ganhar bloco de código. Em `web-fundamentos`, que é conceitual,
-   crase no meio da frase bastava; aqui não há como ensinar um seletor sem
-   mostrá-lo em três linhas com a indentação preservada. A forma cresceu porque
-   o conteúdo pediu, e só o que ele pediu — ver `prosa()` em app/texto.js.
+   It is the first PRACTICAL course written for the portal, and it is what forced
+   the prose to gain a code block. In `web-fundamentos`, which is conceptual, a
+   backtick mid-sentence was enough; here there is no way to teach a selector
+   without showing it in three lines with the indentation preserved. The shape
+   grew because the content asked for it, and only as much as it asked — see
+   `prose()` in app/text.js.
 
-   ESTADO DAS AVALIAÇÕES, E ELE É DE PROPÓSITO
-   Quatro aulas têm exercícios (04, 05, 07 e 10) e nove não. É assim que um
-   curso fica de verdade enquanto está sendo produzido, e serve para ver a
-   avaliação pendente no lugar dela: ela aparece na estrutura, marcada, sem
-   botão de concluir e fora do denominador do progresso.
+   THE STATE OF THE ASSESSMENTS, AND IT IS ON PURPOSE
+   Four lessons have exercises (04, 05, 07 and 10) and nine do not. That is what
+   a course really looks like while it is being produced, and it serves to show
+   the pending assessment in its place: it appears in the structure, marked, with
+   no complete button and outside the progress denominator.
 
-   `codigo` continua sem aparecer, e pelo mesmo motivo de `web-fundamentos`,
-   por outro caminho: o validador do pipeline executa python, javascript e sql.
-   HTML e CSS não se executam contra casos de teste — o que se verificaria seria
-   o desenho, e isso nenhum interpretador julga.
+   `codigo` still does not show up, for the same reason as `web-fundamentos` by a
+   different route: the pipeline's validator executes python, javascript and sql.
+   HTML and CSS are not executed against test cases — what would be verified is
+   the rendering, and no interpreter judges that.
 
-   TÍTULO DE SEÇÃO É TEXTO SIMPLES, sem crase nem asterisco. Ele aparece em
-   três lugares — o `h2` da tela, a pastilha do passo e a linha do trilho — e
-   nos dois últimos é rótulo, não prosa: marcação ali vira ruído numa pastilha
-   de 200px. A prosa do corpo continua aceitando `código` e **negrito**.
+   A SECTION TITLE IS PLAIN TEXT, no backticks and no asterisks. It appears in
+   three places — the screen's `h2`, the step chip and the rail line — and in the
+   last two it is a label, not prose: markup there becomes noise in a 200px chip.
+   The body's prose still accepts `code` and **bold**.
 
-   ESTADO: conteúdo de exemplo, tecnicamente correto e sem revisão pedagógica.
+   STATUS: sample content, technically correct and with no pedagogical review.
    ========================================================================== */
 
 window.LESSONS = Object.assign(window.LESSONS || {}, {
@@ -165,9 +166,9 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
           { codigo: 'html', texto: '<img\n  src="foto-800.jpg"\n  srcset="foto-400.jpg 400w, foto-800.jpg 800w, foto-1600.jpg 1600w"\n  sizes="(max-width: 700px) 100vw, 700px"\n  alt="Fachada da escola vista da calçada"\n  width="800" height="600"\n  loading="lazy" />' },
           '`width` e `height` não fixam o tamanho quando há CSS — eles informam a **proporção**, e é isso que impede a página de pular quando a imagem termina de carregar. `loading="lazy"` adia o que está fora da tela.',
           {
-            /* Este é o outro caminho da figura: um ARQUIVO, e não um desenho
-               inline. Na Etapa 2 o `imagem` vira URL de um bucket; aqui é um
-               `data:` URI para o pacote de arquivo único continuar inteiro. */
+            /* This is the figure's other route: a FILE, and not an inline
+               drawing. In Stage 2 `imagem` becomes a bucket URL; here it is a
+               `data:` URI so the single-file bundle stays whole. */
             imagem: 'data:image/svg+xml,<svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20640%20200%22><g%20fill=%22none%22%20stroke=%22%238a8f98%22%20stroke-width=%221.3%22><rect%20x=%2212%22%20y=%22118%22%20width=%2270%22%20height=%2252%22%20rx=%223%22/><rect%20x=%22106%22%20y=%2284%22%20width=%22120%22%20height=%2286%22%20rx=%223%22/><rect%20x=%22250%22%20y=%2226%22%20width=%22230%22%20height=%22144%22%20rx=%223%22/></g><g%20fill=%22%238a8f98%22%20font-family=%22monospace%22%20font-size=%2211%22%20text-anchor=%22middle%22><text%20x=%2247%22%20y=%22148%22>400w</text><text%20x=%22166%22%20y=%22130%22>800w</text><text%20x=%22365%22%20y=%22102%22>1600w</text><text%20x=%2247%22%20y=%22188%22>celular</text><text%20x=%22166%22%20y=%22188%22>tablet</text><text%20x=%22365%22%20y=%22188%22>desktop</text></g><g%20fill=%22none%22%20stroke=%22%238a8f98%22%20stroke-width=%221%22%20stroke-dasharray=%223%203%22%20opacity=%22.7%22><path%20d=%22M520%2026v144%22/></g><g%20fill=%22%238a8f98%22%20font-family=%22monospace%22%20font-size=%2210%22><text%20x=%22534%22%20y=%2290%22>o%20navegador</text><text%20x=%22534%22%20y=%22106%22>escolhe%20uma,</text><text%20x=%22534%22%20y=%22122%22>n%C3%A3o%20as%20tr%C3%AAs</text></g></svg>',
             alt: 'Três retângulos de tamanhos diferentes rotulados 400w, 800w e 1600w, sob os rótulos celular, tablet e desktop',
             legenda: 'O `srcset` oferece as três; quem escolhe é o navegador, que sabe a largura da tela e a densidade dela — coisas que o servidor não sabe.',

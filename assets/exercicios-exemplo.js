@@ -1,26 +1,27 @@
 /* ==========================================================================
-   Exercícios de exemplo — conteúdo descartável, formato definitivo.
+   Sample exercises — disposable content, settled format.
 
-   Estes exercícios existem para estruturar o portal, não para ensinar ninguém.
-   Serão jogados fora quando o pipeline (`ferramentas/exercicios`, no repo da
-   vitrine) voltar a rodar e produzir conteúdo de verdade.
+   These exercises exist to give the portal structure, not to teach anyone. They
+   will be thrown away when the pipeline (`ferramentas/exercicios`, in the
+   vitrine's repo) runs again and produces real content.
 
-   O QUE NÃO É DESCARTÁVEL É O FORMATO. Os campos abaixo são exatamente os que
-   o pipeline emite — `topico`, `tipo`, `dificuldade`, `enunciado`,
+   WHAT IS NOT DISPOSABLE IS THE FORMAT. The fields below are exactly the ones
+   the pipeline emits — `topico`, `tipo`, `dificuldade`, `enunciado`,
    `dica_socratica`, `alternativas[].{texto,correta,porque}`, `itens`,
    `armadilha`, `pares[].{esquerda,direita}`, `distratores_direita`,
    `codigo_dado`, `esqueleto`, `testes[].{descricao,entrada,saida_esperada}`,
-   `expressao_gabarito`, `variaveis`, `verificacao_*`. Ignorar a ferramenta por
-   ora não custa nada; inventar um formato paralelo custaria uma migração.
+   `expressao_gabarito`, `variaveis`, `verificacao_*`. Ignoring the tool for now
+   costs nothing; inventing a parallel format would cost a migration.
 
-   Acrescentei dois campos que o pipeline não emite porque são do portal, não
-   do exercício: `id` (chave estável para guardar a resposta do aluno) e
-   `curso` (o pipeline já sabe de que curso é o arquivo; aqui tudo vive junto).
+   Two fields were added that the pipeline does not emit, because they belong to
+   the portal and not to the exercise: `id` (a stable key for storing the
+   student's answer) and `curso` (the pipeline already knows which course a file
+   belongs to; here everything lives together).
 
-   UMA IMPUREZA DELIBERADA: `resposta-expressao` numa aula de JavaScript não
-   faz sentido pedagógico — o tipo existe para matemática. Ele está aqui para
-   que a aula de demonstração exercite os sete renderizadores numa tela só. O
-   mesmo tipo aparece de novo em `estatistica`, onde ele é legítimo.
+   ONE DELIBERATE IMPURITY: `resposta-expressao` in a JavaScript lesson makes no
+   pedagogical sense — the type exists for mathematics. It is here so that the
+   demonstration lesson exercises all seven renderers on a single screen. The
+   same type turns up again in `estatistica`, where it is legitimate.
    ========================================================================== */
 
 /* Concatena em vez de atribuir: há um arquivo por curso, como no pipeline, e
