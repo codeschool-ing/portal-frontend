@@ -31,7 +31,7 @@
 
 import * as api from '../api.js';
 import { aulasDoCurso, cursoPorId } from '../catalogo.js';
-import { secoesDaAula, materiaisDaSecao } from '../aulas.js';
+import { lessonSections as secoesDaAula, sectionMaterials as materiaisDaSecao } from '../lessons.js';
 import { listaDeMateriais } from '../materiais.js';
 import { sectionDone as secaoConcluida, visitSection as visitarSecao, noteFor as notaDe, saveNote as guardarNota } from '../state.js';
 import { buildAssessment as montarAvaliacao } from '../exercises/index.js';

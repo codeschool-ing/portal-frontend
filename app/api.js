@@ -13,7 +13,7 @@
 import * as state from './state.js';
 import { aulasDoCurso as courseLessons, cursoPorId as courseById,
   trilhaPorId as trackById } from './catalogo.js';
-import { exerciciosDaAula as fetchExercises, secoesDaAula as lessonSections } from './aulas.js';
+import { lessonExercises as fetchExercises, lessonSections as lessonSections } from './lessons.js';
 import { gradeLocally, NEEDS_SERVER } from './exercises/grade.js';
 
 const echo = (v) => Promise.resolve(v);

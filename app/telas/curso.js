@@ -8,7 +8,7 @@
    ========================================================================== */
 
 import { aulasDoCurso, cursoPorId, trilhasDoCurso, depoisDe } from '../catalogo.js';
-import { secoesDaAula, materiaisDoCurso } from '../aulas.js';
+import { lessonSections as secoesDaAula, courseMaterials as materiaisDoCurso } from '../lessons.js';
 import { courseProgress as progressoDoCurso, lessonProgress as progressoDaAula, lessonDone as aulaConcluida } from '../state.js';
 import { estadoDoCurso } from '../grafo.js';
 import { provaDoCurso } from '../provas.js';

@@ -31,7 +31,7 @@
    ========================================================================== */
 
 import { aulasDoCurso, cursoPorId } from './catalogo.js';
-import { secoesDaAula, exerciciosDaAula } from './aulas.js';
+import { lessonSections as secoesDaAula, lessonExercises as exerciciosDaAula } from './lessons.js';
 import { allNotes as todasAsNotas } from './state.js';
 
 /* minúscula e sem acento, dos dois lados da comparação */

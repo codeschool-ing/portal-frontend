@@ -10,7 +10,7 @@
    ========================================================================== */
 
 import { aulasDoCurso, cursoPorId } from '../catalogo.js';
-import { secoesDaAula } from '../aulas.js';
+import { lessonSections as secoesDaAula } from '../lessons.js';
 import { allNotes as todasAsNotas } from '../state.js';
 import { vazio } from './comum.js';
 import { esc } from '../text.js';

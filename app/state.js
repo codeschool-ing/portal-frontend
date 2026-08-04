@@ -19,8 +19,7 @@
    ========================================================================== */
 
 import { aulasDoCurso as courseLessons } from './catalogo.js';
-import { secoesDaAula as lessonSections, secoesContaveis as countableSections,
-  totalSecoes as sectionCount } from './aulas.js';
+import { lessonSections as lessonSections, countableSections as countableSections, sectionCount as sectionCount } from './lessons.js';
 
 const KEY = 'codeschool-portal';
 

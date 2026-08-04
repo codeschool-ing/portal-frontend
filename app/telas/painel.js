@@ -8,7 +8,7 @@
 
 import * as api from '../api.js';
 import { aulasDoCurso, cursoPorId, caminhoDaTrilha } from '../catalogo.js';
-import { secoesDaAula } from '../aulas.js';
+import { lessonSections as secoesDaAula } from '../lessons.js';
 import { courseProgress as progressoDoCurso, activeOption as opcaoAtiva } from '../state.js';
 import { estadoDoCurso } from '../grafo.js';
 import { progressoDaTrilha, trilhaDoAluno, barra } from './comum.js';
