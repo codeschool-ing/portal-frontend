@@ -22,9 +22,9 @@
    good, it should not have been published.
    ========================================================================== */
 
-import { marcado as formatted, esc } from '../texto.js';
+import { formatted, esc } from '../text.js';
 import * as api from '../api.js';
-import { guardarResposta as saveAnswer, respostaDe as answerFor } from '../estado.js';
+import { saveAnswer, answerFor } from '../state.js';
 
 import choices from './choices.js';
 import ordering from './ordering.js';
@@ -93,7 +93,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
     out.className = 'ex-veredito v-esperando';
     out.textContent = txt('conferindo…');
 
-    const v = await api.avaliar(ex, answer);
+    const v = await api.grade(ex, answer);
     if (ctx) saveAnswer(ctx.cursoId, ctx.aulaIx, uid, v);
 
     if (exam) {

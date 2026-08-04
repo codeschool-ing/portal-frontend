@@ -8,8 +8,8 @@
    ========================================================================== */
 
 import { trilhaPorId, caminhoDaTrilha } from '../catalogo.js';
-import { progressoDoCurso, opcaoAtiva, agora } from '../estado.js';
-import { esc } from '../texto.js';
+import { courseProgress as progressoDoCurso, activeOption as opcaoAtiva, now as agora } from '../state.js';
+import { esc } from '../text.js';
 
 export const FAMILIAS = ['carreira', 'tecnologia'];
 

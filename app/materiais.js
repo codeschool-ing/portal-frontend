@@ -11,7 +11,7 @@
    atributo o arquivo salvaria como "download".
    ========================================================================== */
 
-import { esc } from './texto.js';
+import { esc } from './text.js';
 
 const ICONE = {
   pdf: 'M8 2h6l4 4v14a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM14 2v5h5',

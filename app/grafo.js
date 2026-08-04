@@ -17,8 +17,8 @@ import {
   grafoDaTrilha, cursoPorId, trilhasDoCurso, caminhoDaTrilha,
   horasDe, faixaDeHoras,
 } from './catalogo.js';
-import { cursoConcluido, progressoDoCurso, opcaoAtiva, agora } from './estado.js';
-import { esc } from './texto.js';
+import { courseDone as cursoConcluido, courseProgress as progressoDoCurso, activeOption as opcaoAtiva, now as agora } from './state.js';
+import { esc } from './text.js';
 
 /* ---------- estado de cada curso ---------- */
 

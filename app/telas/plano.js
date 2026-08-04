@@ -15,9 +15,9 @@
    — alguém acreditaria ter pago.
    ========================================================================== */
 
-import { planoAtual, contaDoAluno, trocarPlano } from '../estado.js';
+import { currentPlan as planoAtual, studentAccount as contaDoAluno, changePlan as trocarPlano } from '../state.js';
 import { despachar } from '../rotas.js';
-import { esc } from '../texto.js';
+import { esc } from '../text.js';
 
 const preco = (p) => (p.preco === 0
   ? txt('grátis')

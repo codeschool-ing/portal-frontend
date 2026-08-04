@@ -14,9 +14,9 @@
    ========================================================================== */
 
 import { aulasDoCurso, cursoPorId } from '../catalogo.js';
-import { respostasDadas } from '../estado.js';
+import { answersGiven as respostasDadas } from '../state.js';
 import { barra, vazio } from './comum.js';
-import { esc } from '../texto.js';
+import { esc } from '../text.js';
 
 /* Junta o que o aluno respondeu com o exercício correspondente. O `id` é a
    chave estável — foi para isto que ele existe. */

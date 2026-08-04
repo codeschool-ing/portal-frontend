@@ -25,10 +25,10 @@
    ========================================================================== */
 
 import { caminhoDaTrilha, cursoPorId } from '../catalogo.js';
-import { cursoConcluido, opcaoAtiva, provaAprovada, resultadoProva, agora } from '../estado.js';
+import { courseDone as cursoConcluido, activeOption as opcaoAtiva, examPassed as provaAprovada, examResult as resultadoProva, now as agora } from '../state.js';
 import { trilhaDoAluno } from './comum.js';
 import { abrirModal } from '../modal.js';
-import { esc } from '../texto.js';
+import { esc } from '../text.js';
 
 const DATA = (d) => new Intl.DateTimeFormat(document.documentElement.lang || 'pt-BR', {
   day: '2-digit', month: 'long', year: 'numeric',

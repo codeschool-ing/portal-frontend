@@ -15,7 +15,7 @@
       it needs a seed, or the order changes on every render.
    ========================================================================== */
 
-import { marcado as formatted, embaralharCom as shuffleWith } from '../texto.js';
+import { formatted, shuffleWith } from '../text.js';
 
 export default {
   types: ['quiz', 'multipla-escolha'],

@@ -9,13 +9,13 @@
 
 import { aulasDoCurso, cursoPorId, trilhasDoCurso, depoisDe } from '../catalogo.js';
 import { secoesDaAula, materiaisDoCurso } from '../aulas.js';
-import { progressoDoCurso, progressoDaAula, aulaConcluida } from '../estado.js';
+import { courseProgress as progressoDoCurso, lessonProgress as progressoDaAula, lessonDone as aulaConcluida } from '../state.js';
 import { estadoDoCurso } from '../grafo.js';
 import { provaDoCurso } from '../provas.js';
 import { cartaoDeProva } from './prova.js';
 import { listaDeMateriais } from '../materiais.js';
 import { barra, vazio } from './comum.js';
-import { esc, marcado } from '../texto.js';
+import { esc, formatted as marcado } from '../text.js';
 
 export default async function curso({ id }) {
   const c = cursoPorId(id);

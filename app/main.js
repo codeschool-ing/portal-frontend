@@ -12,11 +12,11 @@
 
 import { rota, quandoTrocar, iniciar, caminhoAtual, despachar, irPara } from './rotas.js';
 import { ehEscolha } from './catalogo.js';
-import { assinar, agora } from './estado.js';
+import { subscribe as assinar, now as agora } from './state.js';
 import { montarTrilho, alternarAula } from './trilho.js';
 import { trilhaDoAluno, progressoDaTrilha, TRILHAS_POR_FAMILIA } from './telas/comum.js';
 import * as api from './api.js';
-import { esc } from './texto.js';
+import { esc } from './text.js';
 
 import entrar from './telas/entrar.js';
 import painel from './telas/painel.js';
@@ -151,7 +151,7 @@ $('#nav-contexto').addEventListener('click', async (e) => {
   const op = e.target.closest('.ctx-op[data-trilha]');
   if (!op) return;
   caixa.classList.remove('aberto');
-  await api.matricular(op.dataset.trilha);
+  await api.enrol(op.dataset.trilha);
   irPara('/trilha');
 });
 

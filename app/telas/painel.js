@@ -9,18 +9,18 @@
 import * as api from '../api.js';
 import { aulasDoCurso, cursoPorId, caminhoDaTrilha } from '../catalogo.js';
 import { secoesDaAula } from '../aulas.js';
-import { progressoDoCurso, opcaoAtiva } from '../estado.js';
+import { courseProgress as progressoDoCurso, activeOption as opcaoAtiva } from '../state.js';
 import { estadoDoCurso } from '../grafo.js';
 import { progressoDaTrilha, trilhaDoAluno, barra } from './comum.js';
-import { esc } from '../texto.js';
+import { esc } from '../text.js';
 
 export default async function painel() {
   const el = document.createElement('div');
   el.className = 'tela tela-painel';
 
-  const sessao = await api.sessao();
+  const sessao = await api.session();
   const t = trilhaDoAluno();
-  const seguir = await api.continuarDe();
+  const seguir = await api.resumeFrom();
 
   /* O cartão aponta para a SEÇÃO, não para o topo da aula: devolver alguém ao
      começo de um tópico de quatro horas é devolvê-lo à rolagem. */

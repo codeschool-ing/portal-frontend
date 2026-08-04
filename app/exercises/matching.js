@@ -24,7 +24,7 @@
    pair cannot fall out by elimination.
    ========================================================================== */
 
-import { marcado as formatted, esc, embaralharCom as shuffleWith } from '../texto.js';
+import { formatted, esc, shuffleWith } from '../text.js';
 
 const WRONG_PAIR_PAUSE = 700;   // how long a wrong pair stays red before it lets go
 

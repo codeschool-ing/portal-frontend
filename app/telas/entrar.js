@@ -10,7 +10,7 @@
 import * as api from '../api.js';
 import { irPara } from '../rotas.js';
 import { TRILHAS_POR_FAMILIA } from './comum.js';
-import { esc } from '../texto.js';
+import { esc } from '../text.js';
 
 export default async function entrar() {
   const el = document.createElement('div');
@@ -47,8 +47,8 @@ export default async function entrar() {
     e.preventDefault();
     const nome = el.querySelector('#e-nome').value.trim();
     if (!nome) return el.querySelector('#e-nome').focus();
-    await api.entrar({ nome });
-    await api.matricular(el.querySelector('#e-trilha').value);
+    await api.signIn({ nome });
+    await api.enrol(el.querySelector('#e-trilha').value);
     irPara('/painel');
   });
 

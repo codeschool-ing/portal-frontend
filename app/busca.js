@@ -32,7 +32,7 @@
 
 import { aulasDoCurso, cursoPorId } from './catalogo.js';
 import { secoesDaAula, exerciciosDaAula } from './aulas.js';
-import { todasAsNotas } from './estado.js';
+import { allNotes as todasAsNotas } from './state.js';
 
 /* minúscula e sem acento, dos dois lados da comparação */
 const dobra = (s) => String(s || '')

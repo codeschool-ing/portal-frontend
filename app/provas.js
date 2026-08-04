@@ -36,7 +36,7 @@
 import { aulasDoCurso, cursoPorId, caminhoDaTrilha } from './catalogo.js';
 import { exerciciosDaAula } from './aulas.js';
 import { NEEDS_SERVER as PRECISA_SERVIDOR } from './exercises/grade.js';
-import { embaralharCom } from './texto.js';
+import { shuffleWith as embaralharCom } from './text.js';
 
 export const MINIMO = 70;            // % de acerto para passar
 export const QUESTOES_CURSO = 10;

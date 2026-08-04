@@ -11,9 +11,9 @@
 
 import { aulasDoCurso, cursoPorId } from '../catalogo.js';
 import { secoesDaAula } from '../aulas.js';
-import { todasAsNotas } from '../estado.js';
+import { allNotes as todasAsNotas } from '../state.js';
 import { vazio } from './comum.js';
-import { esc } from '../texto.js';
+import { esc } from '../text.js';
 
 export default async function notas() {
   const lista = todasAsNotas();

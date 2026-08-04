@@ -6,10 +6,10 @@
    ========================================================================== */
 
 import { aulasDoCurso } from '../catalogo.js';
-import { progressoDoCurso } from '../estado.js';
+import { courseProgress as progressoDoCurso } from '../state.js';
 import { estadoDoCurso } from '../grafo.js';
 import { barra } from './comum.js';
-import { esc } from '../texto.js';
+import { esc } from '../text.js';
 
 export default async function catalogo() {
   const el = document.createElement('div');

@@ -15,7 +15,7 @@
    browser.
    ========================================================================== */
 
-import { esc, marcado as formatted } from '../texto.js';
+import { esc, formatted } from '../text.js';
 
 const OP_NAME = {
   diff: 'derivada',

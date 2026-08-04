@@ -13,7 +13,7 @@
    docs already record that as the intended design, not a temporary limitation.
    ========================================================================== */
 
-import { esc, marcado as formatted } from '../texto.js';
+import { esc, formatted } from '../text.js';
 
 const SHOWN_CASES = 2;
 

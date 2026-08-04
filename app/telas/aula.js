@@ -33,10 +33,10 @@ import * as api from '../api.js';
 import { aulasDoCurso, cursoPorId } from '../catalogo.js';
 import { secoesDaAula, materiaisDaSecao } from '../aulas.js';
 import { listaDeMateriais } from '../materiais.js';
-import { secaoConcluida, visitarSecao, notaDe, guardarNota } from '../estado.js';
+import { sectionDone as secaoConcluida, visitSection as visitarSecao, noteFor as notaDe, saveNote as guardarNota } from '../state.js';
 import { buildAssessment as montarAvaliacao } from '../exercises/index.js';
 import { vazio } from './comum.js';
-import { esc, prosa } from '../texto.js';
+import { esc, prose as prosa } from '../text.js';
 
 const SETA = (d) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
   'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + d + '"/></svg>';
@@ -194,7 +194,7 @@ export default async function aula({ id, ix, sec }) {
     '</footer>';
 
   if (secao.tipo === 'avaliacao' && !secao.pendente) {
-    const exercicios = await api.exerciciosDaAula(id, a.chave);
+    const exercicios = await api.lessonExercises(id, a.chave);
     el.querySelector('.aula-exercicios').appendChild(montarAvaliacao(exercicios, { cursoId: id, aulaIx: n }));
   }
 
@@ -234,7 +234,7 @@ export default async function aula({ id, ix, sec }) {
   el.addEventListener('click', (e) => {
     if (!e.target.closest('.avancar')) return;
     if (secao.pendente) return;
-    if (!secaoConcluida(id, n, secao.id)) api.concluirSecao(id, n, secao.id, true);
+    if (!secaoConcluida(id, n, secao.id)) api.completeSection(id, n, secao.id, true);
   });
 
   return { titulo: a.titulo + ' · ' + secao.titulo, el };

@@ -13,11 +13,11 @@
    ========================================================================== */
 
 import { cursoPorId } from '../catalogo.js';
-import { progressoDoCurso, opcaoAtiva, resultadoProva, tentativasDeProva, guardarProva } from '../estado.js';
+import { courseProgress as progressoDoCurso, activeOption as opcaoAtiva, examResult as resultadoProva, examAttempts as tentativasDeProva, saveExam as guardarProva } from '../state.js';
 import { provaDoCurso, provaDaTrilha, notaDaProva, MINIMO } from '../provas.js';
 import { buildAssessment as montarAvaliacao } from '../exercises/index.js';
 import { trilhaDoAluno, progressoDaTrilha, barra, vazio } from './comum.js';
-import { esc } from '../texto.js';
+import { esc } from '../text.js';
 
 function montar(prova, progresso) {
   const anterior = resultadoProva(prova.chave);

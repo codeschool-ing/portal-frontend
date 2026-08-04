@@ -15,7 +15,7 @@
    It becomes feedback.
    ========================================================================== */
 
-import { marcado as formatted, embaralharCom as shuffleWith } from '../texto.js';
+import { formatted, shuffleWith } from '../text.js';
 
 /* SVG and not a character. The arrows used to be `↑` and `↓` and the grip was a
    braille character; without the webfont loaded they turned into empty

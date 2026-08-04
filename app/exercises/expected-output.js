@@ -15,7 +15,7 @@
    The real grading belongs to the server. Here the answer is only collected.
    ========================================================================== */
 
-import { esc } from '../texto.js';
+import { esc } from '../text.js';
 
 export default {
   types: ['saida-esperada'],

@@ -12,7 +12,7 @@
    ========================================================================== */
 
 import { procurar, trecho, ROTULO_GRUPO, esquecerIndice } from './busca.js';
-import { esc } from './texto.js';
+import { esc } from './text.js';
 
 const LUPA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
   'stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>';

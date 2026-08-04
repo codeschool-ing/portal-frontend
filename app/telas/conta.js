@@ -9,10 +9,10 @@
    ========================================================================== */
 
 import * as api from '../api.js';
-import { zerar, agora, planoAtual, contaDoAluno } from '../estado.js';
+import { reset as zerar, now as agora, currentPlan as planoAtual, studentAccount as contaDoAluno } from '../state.js';
 import { irPara } from '../rotas.js';
 import { TRILHAS_POR_FAMILIA, trilhaDoAluno, progressoDaTrilha } from './comum.js';
-import { esc } from '../texto.js';
+import { esc } from '../text.js';
 
 /* Regra de e-mail deliberadamente FROUXA: "tem arroba, tem ponto depois dele,
    e não tem espaço". Validação estrita de e-mail no cliente rejeita endereços
@@ -38,7 +38,7 @@ function forcaDaSenha(s) {
 export default async function conta() {
   const el = document.createElement('div');
   el.className = 'tela tela-conta';
-  const sessao = await api.sessao();
+  const sessao = await api.session();
   const t = trilhaDoAluno();
   const p = t ? progressoDaTrilha(t) : null;
   const plano = planoAtual();
@@ -142,7 +142,7 @@ export default async function conta() {
     '</section>';
 
   el.querySelector('#c-trilha').addEventListener('change', async (e) => {
-    await api.matricular(e.target.value);
+    await api.enrol(e.target.value);
     irPara('/trilha');
   });
 
@@ -156,7 +156,7 @@ export default async function conta() {
       avisoEmail.textContent = txt('esse endereço não parece um e-mail');
       return;
     }
-    await api.trocarEmail(valor);
+    await api.changeEmail(valor);
     avisoEmail.className = 'conta-aviso mono bom';
     avisoEmail.textContent = txt('e-mail atualizado');
   });
@@ -186,7 +186,7 @@ export default async function conta() {
     if (!forcaDaSenha(nova.value).ok) return dizer('a senha nova precisa de pelo menos 8 caracteres', false);
     if (nova.value !== rep) return dizer('as duas senhas novas não conferem', false);
     if (nova.value === atualSenha) return dizer('a senha nova é igual à atual', false);
-    await api.trocarSenha(nova.value);
+    await api.changePassword(nova.value);
     el.querySelectorAll('#f-senha input').forEach((i) => { i.value = ''; });
     medida.style.width = '0';
     rotulo.textContent = '';
@@ -197,7 +197,7 @@ export default async function conta() {
   el.querySelector('#c-zerar').addEventListener('click', () => { confirma.hidden = false; });
   el.querySelector('#c-nao').addEventListener('click', () => { confirma.hidden = true; });
   el.querySelector('#c-sim').addEventListener('click', () => { zerar(); irPara('/entrar'); });
-  el.querySelector('#c-sair').addEventListener('click', async () => { await api.sair(); irPara('/entrar'); });
+  el.querySelector('#c-sair').addEventListener('click', async () => { await api.signOut(); irPara('/entrar'); });
 
   return { titulo: txt('Conta'), el };
 }

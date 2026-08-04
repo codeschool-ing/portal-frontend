@@ -25,11 +25,11 @@
 
 import { aulasDoCurso, cursoPorId, caminhoDaTrilha } from './catalogo.js';
 import { secoesDaAula } from './aulas.js';
-import { aulaConcluida, secaoConcluida, progressoDaAula, progressoDoCurso, opcaoAtiva, provaAprovada } from './estado.js';
+import { lessonDone as aulaConcluida, sectionDone as secaoConcluida, lessonProgress as progressoDaAula, courseProgress as progressoDoCurso, activeOption as opcaoAtiva, examPassed as provaAprovada } from './state.js';
 import { provaDoCurso } from './provas.js';
 import { estadoDoCurso } from './grafo.js';
 import { trilhaDoAluno, barra } from './telas/comum.js';
-import { esc } from './texto.js';
+import { esc } from './text.js';
 
 const LINKS = [
   { href: '#/painel', rotulo: 'Painel' },

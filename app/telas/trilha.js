@@ -7,7 +7,7 @@
    ========================================================================== */
 
 import { montarTrilha, desenharArestas, ajustarSetasGrafo } from '../grafo.js';
-import { escolherOpcao, opcaoAtiva } from '../estado.js';
+import { chooseOption as escolherOpcao, activeOption as opcaoAtiva } from '../state.js';
 import { irPara } from '../rotas.js';
 import { provaDaTrilha } from '../provas.js';
 import { cartaoDeProva } from './prova.js';

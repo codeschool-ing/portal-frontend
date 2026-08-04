@@ -1,133 +1,139 @@
 /* ==========================================================================
-   API — camada de mentira, com as assinaturas que o backend real terá.
+   API — the layer of make-believe, with the signatures the real backend will
+   have.
 
-   Tudo aqui é `async` de propósito, mesmo lendo de localStorage: se as telas
-   forem escritas contra funções síncronas, trocar para `fetch` depois vira
-   uma refatoração de todas elas. Async agora custa uma palavra; síncrono
-   depois custa o portal inteiro.
+   Everything here is `async` on purpose, even when it reads from localStorage:
+   if the screens are written against synchronous functions, moving to `fetch`
+   later becomes a refactor of every one of them. Async now costs one word;
+   synchronous later costs the whole portal.
 
-   O que hoje é mentira e amanhã é servidor está marcado com FUTURO.
+   What is make-believe today and a server tomorrow is marked FUTURE.
    ========================================================================== */
 
-import * as estado from './estado.js';
-import { aulasDoCurso, cursoPorId, trilhaPorId } from './catalogo.js';
-import { exerciciosDaAula as buscarExercicios, secoesDaAula } from './aulas.js';
-import { gradeLocally as avaliarLocal, NEEDS_SERVER as PRECISA_SERVIDOR } from './exercises/grade.js';
+import * as state from './state.js';
+import { aulasDoCurso as courseLessons, cursoPorId as courseById,
+  trilhaPorId as trackById } from './catalogo.js';
+import { exerciciosDaAula as fetchExercises, secoesDaAula as lessonSections } from './aulas.js';
+import { gradeLocally, NEEDS_SERVER } from './exercises/grade.js';
 
-const eco = (v) => Promise.resolve(v);
+const echo = (v) => Promise.resolve(v);
 
-/* ---------- sessão ---------- */
+/* ---------- session ---------- */
 
-export const sessao = () => eco(estado.agora().sessao);
+export const session = () => echo(state.now().sessao);
 
-// FUTURO: autenticação de verdade. Hoje qualquer nome entra — é um esqueleto.
-export function entrar({ nome, email }) {
-  estado.mudar((e) => { e.sessao = { nome: nome || 'Aluno', email: email || '' }; });
-  return eco(estado.agora().sessao);
+// FUTURE: real authentication. Today any name gets in — it is a skeleton.
+export function signIn({ nome, email }) {
+  state.change((e) => { e.sessao = { nome: nome || 'Aluno', email: email || '' }; });
+  return echo(state.now().sessao);
 }
 
-export function sair() {
-  estado.mudar((e) => { e.sessao = null; });
-  return eco(null);
+export function signOut() {
+  state.change((e) => { e.sessao = null; });
+  return echo(null);
 }
 
-/* FUTURO: `PATCH /conta/email`, e a troca só vale depois de confirmada no
-   endereço NOVO — senão trocar o e-mail vira a forma mais fácil de tomar uma
-   conta. Aqui vale na hora, porque não há para onde mandar a confirmação. */
-export function trocarEmail(email) {
-  estado.trocarEmail(email);
-  return eco(estado.agora().sessao);
+/* FUTURE: `PATCH /conta/email`, and the change only takes effect once confirmed
+   at the NEW address — otherwise changing the e-mail becomes the easiest way to
+   take over an account. Here it takes effect right away, because there is
+   nowhere to send the confirmation. */
+export function changeEmail(email) {
+  state.changeEmail(email);
+  return echo(state.now().sessao);
 }
 
-/* FUTURO: `PATCH /conta/senha`, com a senha atual conferida NO SERVIDOR. A
-   senha nova não é guardada em lugar nenhum aqui — ver estado.js. */
-export function trocarSenha() {
-  estado.marcarTrocaDeSenha();
-  return eco(true);
+/* FUTURE: `PATCH /conta/senha`, with the current password checked ON THE
+   SERVER. The new password is not stored anywhere here — see state.js. */
+export function changePassword() {
+  state.markPasswordChange();
+  return echo(true);
 }
 
-/* FUTURO: o serviço de cobrança. Trocar de plano vai passar por checkout,
-   prorrateio e nota — nada disso existe, e o portal não finge que existe. */
-export function trocarPlano(planoId) {
-  estado.trocarPlano(planoId);
-  return eco(estado.planoAtual());
+/* FUTURE: the billing service. Changing plans will go through checkout,
+   proration and an invoice — none of that exists, and the portal does not
+   pretend it does. */
+export function changePlan(planId) {
+  state.changePlan(planId);
+  return echo(state.currentPlan());
 }
 
-/* ---------- matrícula ---------- */
+/* ---------- enrolment ---------- */
 
-export const matricula = () => eco(estado.agora().matricula);
+export const enrolment = () => echo(state.now().matricula);
 
-export function matricular(trilhaId) {
-  estado.mudar((e) => {
-    e.matricula = { trilhaId, escolhas: e.matricula?.escolhas || {} };
+export function enrol(trackId) {
+  state.change((e) => {
+    e.matricula = { trilhaId: trackId, escolhas: e.matricula?.escolhas || {} };
   });
-  return eco(estado.agora().matricula);
+  return echo(state.now().matricula);
 }
 
-/* ---------- progresso ---------- */
+/* ---------- progress ---------- */
 
-export const progresso = () => eco(estado.agora().progresso);
+export const progress = () => echo(state.now().progresso);
 
-export function concluirSecao(cursoId, ix, secId, feita = true) {
-  estado.marcarSecao(cursoId, ix, secId, feita);
-  return eco(true);
+export function completeSection(courseId, ix, secId, done = true) {
+  state.markSection(courseId, ix, secId, done);
+  return echo(true);
 }
 
-/* Onde o aluno parou — e agora com a SEÇÃO, não só a aula. Devolver o topo de
-   uma aula de quatro horas é devolver a pessoa à rolagem; é a diferença entre
-   o recurso ser útil e ser decorativo.
+/* Where the student stopped — and now with the SECTION, not just the lesson.
+   Returning the top of a four-hour lesson is returning the person to scrolling;
+   it is the difference between the feature being useful and being decorative.
 
-   Cai na primeira seção da trilha quando ainda não há histórico, em vez de
-   devolver nulo e obrigar cada tela a inventar um fallback. */
-export function continuarDe() {
-  const e = estado.agora();
-  const primeiraSecao = (cursoId, ix) => {
-    const a = aulasDoCurso(cursoId)[ix];
-    return a ? secoesDaAula(cursoId, a.chave)[0]?.id : undefined;
+   It falls back to the first section of the track when there is no history yet,
+   instead of returning null and forcing every screen to invent a fallback. */
+export function resumeFrom() {
+  const e = state.now();
+  const firstSection = (courseId, ix) => {
+    const a = courseLessons(courseId)[ix];
+    return a ? lessonSections(courseId, a.chave)[0]?.id : undefined;
   };
 
-  if (e.ultima && cursoPorId(e.ultima.cursoId)) {
+  if (e.ultima && courseById(e.ultima.cursoId)) {
     const { cursoId, aulaIx } = e.ultima;
-    return eco({ ...e.ultima, secId: e.ultima.secId || primeiraSecao(cursoId, aulaIx) });
+    return echo({ ...e.ultima, secId: e.ultima.secId || firstSection(cursoId, aulaIx) });
   }
-  const t = e.matricula && trilhaPorId(e.matricula.trilhaId);
-  if (!t) return eco(null);
-  const primeiro = t.cursos.find((i) => typeof i === 'string');
-  if (!primeiro) return eco(null);
-  return eco({ cursoId: primeiro, aulaIx: 0, secId: primeiraSecao(primeiro, 0) });
+  const t = e.matricula && trackById(e.matricula.trilhaId);
+  if (!t) return echo(null);
+  const first = t.cursos.find((i) => typeof i === 'string');
+  if (!first) return echo(null);
+  return echo({ cursoId: first, aulaIx: 0, secId: firstSection(first, 0) });
 }
 
-/* ---------- exercícios ----------
-   FUTURO: vem do banco, filtrado por `_verificacao` — a doc do pipeline diz
-   que é esse campo que decide o que o portal publica primeiro. Hoje sai do
-   arquivo de exemplos, e o filtro já existe para não ser retrofitado depois. */
-export function exerciciosDaAula(cursoId, chaveDoTopico, opcoes) {
-  return eco(buscarExercicios(cursoId, chaveDoTopico, opcoes));
+/* ---------- exercises ----------
+   FUTURE: comes from the database, filtered by `_verificacao` — the pipeline
+   docs say that field is what decides what the portal publishes first. Today it
+   comes from the sample file, and the filter already exists so it does not have
+   to be retrofitted later. */
+export function lessonExercises(courseId, topicKey, options) {
+  return echo(fetchExercises(courseId, topicKey, options));
 }
 
-/* Avaliar uma resposta.
+/* Grade one answer.
 
-   Quatro tipos corrigem no cliente porque são comparação pura. Três não:
-   `codigo` e `saida-esperada` precisam executar, e `resposta-expressao`
-   precisa de um CAS (sympy). A doc da vitrine já registra que executar código
-   de aluno exige contêiner descartável — não é atalho, é o desenho previsto.
+   Four types are graded on the client because they are pure comparison. Three
+   are not: `codigo` and `saida-esperada` have to run code, and
+   `resposta-expressao` needs a CAS (sympy). The vitrine's docs already record
+   that running student code requires a throwaway container — that is not a
+   shortcut, it is the intended design.
 
-   Os dois caminhos passam por AQUI, com o mesmo formato de veredito, então o
-   dia em que o servidor existir muda só o corpo do `if`. */
-export async function avaliar(ex, resposta) {
-  if (PRECISA_SERVIDOR.includes(ex.tipo)) return avaliarNoServidor(ex, resposta);
-  return avaliarLocal(ex, resposta);
+   Both paths go through HERE, with the same verdict shape, so the day the
+   server exists only the body of the `if` changes. */
+export async function grade(ex, answer) {
+  if (NEEDS_SERVER.includes(ex.tipo)) return gradeOnServer(ex, answer);
+  return gradeLocally(ex, answer);
 }
 
-// FUTURO: POST /avaliar → contêiner descartável (execução) ou sympy (CAS).
-async function avaliarNoServidor(ex, resposta) {
-  await new Promise((r) => setTimeout(r, 420));   // a espera é parte da UI
+// FUTURE: POST /avaliar → throwaway container (execution) or sympy (CAS).
+async function gradeOnServer(ex, answer) {
+  await new Promise((r) => setTimeout(r, 420));   // the wait is part of the UI
   return {
-    acertou: null,                                 // null = não foi conferido
+    acertou: null,                                 // null = it was not checked
     simulado: true,
     detalhe: ex.tipo === 'resposta-expressao'
       ? 'Equivalência simbólica exige o CAS no servidor.'
       : 'A execução dos casos de teste exige o contêiner no servidor.',
-    resposta,
+    resposta: answer,
   };
 }
