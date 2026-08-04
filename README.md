@@ -830,6 +830,25 @@ divergiu uma vez, no recuo do conteúdo, e custou 2px de rolagem horizontal no
 celular. É `--tela` e não `--leitura`: quando a aula alarga o vão encolhe, e uma
 seta posicionada pela coluna estreita ficaria por cima do conteúdo da larga.
 
+## A aba se chama codeschool.ing, e só
+
+O título da aba dizia onde o aluno estava — *"ES6+ syntax: let/const, arrow
+functions and template strings · codeschool.ing"*. O efeito era o contrário do
+pretendido: numa janela com várias abas, o navegador corta o título pelo fim, e
+o que sobrava era o começo do nome da aula. A marca — que é o que se procura ao
+voltar para cá — nunca aparecia.
+
+Agora o nome é constante. O `<title>` do HTML e o roteador dizem a mesma coisa,
+porque a primeira pintura vem de um e todas as outras do outro.
+
+**O nome da tela não se perdeu.** Era o `document.title` que anunciava a troca
+de tela para o leitor de tela; congelar a aba sem passar esse nome adiante
+deixaria a navegação muda para quem não enxerga. O `titulo` que cada tela devolve
+passou a nomear a região de conteúdo (`aria-label` no `<main>`), que é o que se
+anuncia quando o conteúdo troca. Um teste percorre nove rotas de naturezas
+diferentes — incluindo a de página inexistente, que sai do roteador por um
+caminho próprio — e confere as duas coisas.
+
 ## O certificado abre em grande
 
 Clicar num certificado o amplia sobre o resto da tela, com o fundo esmaecido e

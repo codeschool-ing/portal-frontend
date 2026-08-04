@@ -59,6 +59,29 @@ ok('trilho montado', (await p.locator('.trilho-link').count()) === 6);
 ok('contexto na barra', (await p.locator('.ctx-nome').innerText()).includes('Back-end'));
 ok('cartão de retomar', await p.locator('.retomar').isVisible());
 
+/* A ABA SE CHAMA codeschool.ing EM TODA TELA. Ela já dizia onde o aluno estava,
+   e o efeito era a marca ficar cortada no fim de um título comprido — a aba
+   deixava de ser reconhecível entre outras. O teste percorre telas de naturezas
+   diferentes, porque o nome da aba era escrito no roteador e uma tela que
+   escapasse do roteador escaparia da regra. */
+const titulos = [];
+for (const r of ['/entrar', '/painel', '/trilha', '/curso/javascript',
+  '/curso/javascript/aula/0/let-const', '/catalogo', '/certificados', '/plano', '/naoexiste']) {
+  await p.goto(BASE + PAGINA + '#' + r);
+  await p.waitForTimeout(140);
+  titulos.push(r + '=' + (await p.title()));
+}
+ok('a aba se chama sempre codeschool.ing',
+  titulos.every((t) => t.endsWith('=codeschool.ing')),
+  titulos.find((t) => !t.endsWith('=codeschool.ing')) || 'nas ' + titulos.length + ' telas');
+/* e o nome da tela não se perde: ele passa a nomear a região de conteúdo, que
+   é o que o leitor de tela anuncia quando o conteúdo troca */
+await p.goto(BASE + PAGINA + '#/entrar');
+await p.waitForTimeout(140);
+ok('a região de conteúdo continua nomeada',
+  ((await p.getAttribute('#conteudo', 'aria-label')) || '').length > 2,
+  await p.getAttribute('#conteudo', 'aria-label'));
+
 console.log('\n== 3. trilha: o grafo como mapa ==');
 await p.click('.trilho-link[href="#/trilha"]');
 await p.waitForSelector('.trilha-grafo');
@@ -522,9 +545,6 @@ const colunaCod = await p.evaluate(() => {
 ok('a coluna de código cabe a linha mais longa, com folga',
   colunaCod.larg >= 598 && colunaCod.sobra >= 0,
   colunaCod.larg + 'px, ' + colunaCod.sobra + 'px de sobra');
-
-await p.setViewportSize({ width: 1440, height: 900 });
-await p.waitForTimeout(250);
 
 /* O realce usa as três cores da marca. O teste procura pelo menos duas
    famílias diferentes num exemplo que tem palavra-chave e literal. */

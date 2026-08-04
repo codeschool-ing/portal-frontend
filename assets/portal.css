@@ -96,7 +96,7 @@ html[data-tema="claro"]{color-scheme:light}
 
        IBM Plex Mono a .79rem avança 7,6px por caractere (medido no navegador)
        a linha mais longa dos exemplos tem 74 caracteres → 562px
-       mais os 36px de recuo do bloco                    → 598px
+       mais os 36px de recuo do bloco                     → 598px
 
      `--cod` é 604: pouco mais que isso, e a folga são os seis pixels que
      evitam a barra aparecer por causa de um caractere. `--nota` é o conforto
@@ -524,6 +524,17 @@ body.sem-trilho .trilho{display:none}
 .aula-texto code{
   font-family:'IBM Plex Mono',monospace;font-size:.86em;
   background:var(--ink);padding:1px 5px;border-radius:3px;color:var(--phosphor);
+}
+/* O `code` DENTRO DE UM `pre` não é código inline: ali ele não leva caixa,
+   recuo, canto arredondado nem cor própria — quem manda é o bloco.
+
+   A regra de cima vinha pegando os dois, e pintava um retângulo `--ink` atrás
+   de cada linha do exemplo. Ficou muito tempo invisível por ser quase a cor do
+   painel; apareceu por acaso, num desenho de fundo que foi tentado e descartado
+   — o retângulo comia metade dele. O desenho saiu, o conserto fica: caixa atrás
+   de linha de código era erro de qualquer jeito. */
+.aula-texto pre code{
+  background:none;padding:0;border-radius:0;color:inherit;font-size:inherit;
 }
 /* O bloco de código da prosa é o mesmo componente dos exercícios: linha longa
    rola dentro da caixa em vez de ser dobrada — código não se quebra por
