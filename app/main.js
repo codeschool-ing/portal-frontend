@@ -33,7 +33,7 @@ import desempenho from './telas/desempenho.js';
 import refazer from './telas/refazer.js';
 import notas from './telas/notas.js';
 import { provaCurso, provaTrilha } from './telas/prova.js';
-import { abrirBusca, fechar as fecharBusca, buscaAberta } from './painel-busca.js';
+import { openSearch as abrirBusca, close as fecharBusca, searchOpen as buscaAberta } from './search-panel.js';
 import { closeModal as fecharModal, modalOpen as modalAberto } from './modal.js';
 
 /* ---------- o que o i18n-runtime precisa de nós ---------- */
