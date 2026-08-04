@@ -6,13 +6,14 @@
 <title>codeschool.ing</title>
 <meta name="description" content="Área do aluno da codeschool.ing: sua trilha, seus cursos e seus exercícios." />
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
-<script>/* aplica o tema salvo antes da pintura, evitando "piscada" — igual à vitrine */
+<script>/* applies the saved theme before paint, avoiding the "flash" — same as the vitrine */
 try{if(localStorage.getItem('codeschool-tema')==='claro')document.documentElement.dataset.tema='claro'}catch(e){}</script>
 
-<!-- Contêineres que o i18n NÃO deve mapear no carregamento: eles se refazem a
-     partir dos dados, chamando txt() na hora de montar. Na vitrine esta lista é
-     a exceção; aqui é quase a página inteira, e é por isso que ela saiu do
-     i18n-runtime.js e virou configuração — o arquivo continua igual ao de lá. -->
+<!-- Containers the i18n must NOT map on load: they rebuild themselves from the
+     data, calling txt() at render time. In the vitrine this list is the
+     exception; here it is nearly the whole page, and that is why it moved out
+     of i18n-runtime.js and became configuration — the file stays identical to
+     the one over there. -->
 <script>window.I18N_DINAMICOS = ['#conteudo', '#trilho', '#nav-contexto', '#conta-menu', '.drop-atual'];</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,9 +24,10 @@ try{if(localStorage.getItem('codeschool-tema')==='claro')document.documentElemen
 </head>
 <body class="portal-body">
 
-<!-- A MESMA barra da vitrine: 64px fixos, marca com LED, tema e idioma.
-     O que mudou é o miolo — os links de venda deram lugar ao contexto do
-     aluno, e "Área do aluno" deixou de ser marcador: é esta página. -->
+<!-- THE SAME bar as the vitrine: a fixed 64px, brand with LED, theme and
+     language. What changed is the middle — the sales links gave way to the
+     student's context, and "Área do aluno" stopped being a placeholder: it is
+     this page. -->
 <nav>
   <a href="#/painel" class="brand">
     <span class="led"></span><span class="brand-nome">codeschool<span class="brand-sep">.</span>ing</span>
@@ -63,16 +65,16 @@ try{if(localStorage.getItem('codeschool-tema')==='claro')document.documentElemen
 </nav>
 
 <div class="portal">
-  <!-- Trilho: responde "onde estou" e "quanto falta" sem um clique. Vira
-       gaveta abaixo de 1180px, o mesmo corte em que a barra da vitrine já
-       não cabia em uma linha. -->
+  <!-- Rail: answers "where am I" and "how much is left" without a click. It
+       becomes a drawer below 1180px, the same cut at which the vitrine's bar
+       no longer fitted on one line. -->
   <aside class="trilho" id="trilho" aria-label="Navegação"></aside>
   <div class="trilho-veu" id="trilho-veu" hidden></div>
 
   <main class="conteudo" id="conteudo" tabindex="-1"></main>
 </div>
 
-<!-- catálogo e dicionários: exatamente os arquivos da vitrine, sem alteração -->
+<!-- catalogue and dictionaries: exactly the vitrine's files, unchanged -->
 <script src="assets/dados.js"></script>
 <script src="assets/i18n.js"></script>
 <script src="assets/i18n-cursos-en.js"></script>

@@ -1,140 +1,145 @@
 /* ==========================================================================
-   codeschool.ing — Portal do Aluno
+   codeschool.ing — Student Portal
 
-   Camada sobre `base.css`, que é o CSS da vitrine copiado sem alteração. Tudo
-   o que dá identidade — cores, tipografia, a moldura de terminal, o tema
-   claro, o grafo — vem de lá e não se repete aqui. Este arquivo tem só o que
-   a vitrine não precisava ter: um shell de três zonas e as telas de estudo.
+   A layer on top of `base.css`, which is the vitrine's CSS copied with no
+   changes. Everything that gives identity — colours, typography, the terminal
+   frame, the light theme, the graph — comes from there and is not repeated
+   here. This file only has what the vitrine never needed: a three-zone shell
+   and the study screens.
 
-   O QUE NÃO ATRAVESSOU: `.screen{height:100vh}`, o fullpage. Ele pressupõe
-   narrativa linear — sete telas, você rola uma vez e chegou ao fim. Num
-   portal a rolagem é contínua e o conteúdo tem altura imprevisível.
+   WHAT DID NOT CROSS OVER: `.screen{height:100vh}`, the fullpage. It presumes
+   a linear narrative — seven screens, you scroll once and you have reached the
+   end. In a portal the scrolling is continuous and the content has
+   unpredictable height.
    ========================================================================== */
 
 /* ==========================================================
    1 · SHELL
    ========================================================== */
 
-/* O ESQUEMA DE COR PRECISA SER DECLARADO, E NÃO SÓ PINTADO.
+/* THE COLOUR SCHEME HAS TO BE DECLARED, NOT JUST PAINTED.
 
-   O portal é escuro porque o CSS pinta tudo de escuro — mas nada disso conta
-   para o NAVEGADOR, que continua achando que está numa página clara. O que ele
-   desenha por conta própria sai no tema errado: a barra de rolagem cinza-claro,
-   o `<select>`, o botãozinho de limpar do campo de busca.
+   The portal is dark because the CSS paints everything dark — but none of that
+   counts for the BROWSER, which still believes it is on a light page. What it
+   draws on its own comes out in the wrong theme: the light-grey scrollbar, the
+   `<select>`, the little clear button in the search field.
 
-   Isso não aparece igual em todo lugar, e foi assim que o defeito chegou: no
-   Firefox a barra fina é discreta o bastante para passar despercebida; no
-   Chromium (e portanto no Brave, no Chrome e no Edge) ela é uma faixa clara no
-   meio de uma tela escura.
+   It does not look the same everywhere, and that is how the defect arrived: in
+   Firefox the thin bar is discreet enough to go unnoticed; in Chromium (and
+   therefore in Brave, Chrome and Edge) it is a light strip in the middle of a
+   dark screen.
 
-   `color-scheme` é a declaração que faltava. Ele acompanha o tema, e com isso o
-   navegador desenha o que é dele no tom certo — inclusive antes de o CSS
-   carregar, o que também mata o flash branco. */
+   `color-scheme` is the declaration that was missing. It follows the theme, and
+   with that the browser draws what is its own in the right tone — including
+   before the CSS loads, which also kills the white flash. */
 :root{color-scheme:dark}
 html[data-tema="claro"]{color-scheme:light}
 
-/* `hidden` precisa vencer as classes de componente. A regra do navegador para
-   `[hidden]` tem especificidade zero, então `.btn{display:inline-flex}` a
-   atropela — e o botão "Tentar de novo" aparecia antes de existir o que
-   refazer. Vale para qualquer elemento escondido por atributo, que é como o
-   portal esconde coisa que ainda não deve ser vista (a justificativa de uma
-   alternativa, por exemplo). */
+/* `hidden` has to beat the component classes. The browser rule for `[hidden]`
+   has zero specificity, so `.btn{display:inline-flex}` runs it over — and the
+   "Try again" button showed up before there was anything to redo. It holds for
+   any element hidden by attribute, which is how the portal hides what should
+   not be seen yet (the justification of a choice, for example). */
 [hidden]{display:none !important}
 
 .portal-body{overflow-y:auto}
 
-/* O `base.css` estiliza o ELEMENTO `nav` — a vitrine tem exatamente um, que é
-   a barra fixa do topo, e nunca precisou de classe. O portal tem outros: o
-   trilho lateral e as migalhas da aula são navegação de verdade e merecem a
-   marcação certa. Sem esta regra os dois herdam `position:fixed` e viram uma
-   segunda barra por cima do conteúdo — foi o que aconteceu, e é o tipo de
-   colisão que só aparece na tela.
+/* `base.css` styles the `nav` ELEMENT — the vitrine has exactly one, the fixed
+   top bar, and it never needed a class. The portal has others: the side rail
+   and the lesson breadcrumbs are real navigation and deserve the right markup.
+   Without this rule both inherit `position:fixed` and become a second bar on
+   top of the content — which is what happened, and it is the kind of collision
+   that only shows up on screen.
 
-   A neutralização é aqui, e não lá, porque `base.css` é cópia da vitrine e
-   tem de continuar sincronizável: divergir dele custa mais que esta regra. */
+   The neutralisation lives here, and not there, because `base.css` is a copy of
+   the vitrine and has to stay syncable: diverging from it costs more than this
+   rule. */
 .portal nav{
   position:static;height:auto;padding:0;z-index:auto;
   background:none;backdrop-filter:none;border-bottom:0;align-items:stretch;
 }
 
-/* A AULA TEM UMA LARGURA SÓ, e ela tem dois valores.
+/* THE LESSON HAS ONE WIDTH, and that width has two values.
 
-     --trilho    a coluna do menu
-     --leitura   820px: a coluna estreita, onde a aula vive enquanto o bloco de
-                 código anotado couber empilhado. Prosa acima de ~68 caracteres
-                 por linha cansa, e esse é o número que dá 68.
-     --amplo     a coluna larga, onde a aula vive quando o bloco de código abre
-                 em duas colunas — ele tem uma coluna que não se quebra por
-                 conforto, e é ela quem manda no tamanho.
-     --tela      qual das duas está valendo agora. TUDO na aula usa esta: o
-                 título, as migalhas, os passos, a prosa, o player, o exemplo,
-                 o material, o rodapé.
+     --trilho    the menu column
+     --leitura   820px: the narrow column, where the lesson lives while the
+                 annotated code block still fits stacked. Prose above ~68
+                 characters per line tires the eye, and this is the number that
+                 gives 68.
+     --amplo     the wide column, where the lesson lives when the code block
+                 opens in two columns — it has one column that does not wrap for
+                 comfort, and that column is what dictates the size.
+     --tela      which of the two is in force right now. EVERYTHING in the lesson
+                 uses this one: the title, the breadcrumbs, the steps, the prose,
+                 the player, the example, the material, the footer.
 
-   Foi a terceira tentativa, e as duas primeiras erraram do mesmo jeito. A
-   primeira deixou o player sangrar de ponta a ponta enquanto o texto ficava em
-   820. A segunda soltou o exemplo (e depois o player) para `--amplo` e deixou o
-   resto em 820. As duas produziram a MESMA coisa: margens esquerdas diferentes
-   dentro de uma aula, o olho procurando onde a linha começa a cada rolagem.
+   This was the third attempt, and the first two got it wrong the same way. The
+   first let the player bleed edge to edge while the text stayed at 820. The
+   second released the example (and later the player) to `--amplo` and left the
+   rest at 820. Both produced the SAME thing: different left margins inside one
+   lesson, the eye hunting for where the line starts on every scroll.
 
-   Uma variável só resolve por construção — não há como um elemento discordar do
-   outro, nem no meio de um redimensionamento. E o teste deixou de perguntar
-   "quem passou do teto" para perguntar "todos começam na mesma coluna?", que é
-   a regra de verdade.
+   A single variable settles it by construction — there is no way for one
+   element to disagree with another, not even mid-resize. And the test stopped
+   asking "who went past the ceiling?" and started asking "do they all start in
+   the same column?", which is the real rule.
 
-   O preço está declarado: em `--amplo` a linha de prosa vai a 121ch (medido),
-   contra os 68 confortáveis. É a troca que a largura única cobra, e ela só
-   acontece em tela grande, onde a alternativa era o desalinho.
+   The price is declared: at `--amplo` the prose line reaches 121ch (measured),
+   against the comfortable 68. That is what a single width costs, and it only
+   happens on a large screen, where the alternative was the misalignment.
 
-   As setas de navegação ficam no vão que sobra, e derivam de `--tela` também:
-   quando a aula alarga, o vão encolhe e elas acompanham. */
+   The navigation arrows live in the gap that is left over, and they derive from
+   `--tela` too: when the lesson widens, the gap shrinks and they follow. */
 .portal{
   --trilho:380px;
   --leitura:820px;
-  /* O bloco de código anotado tem duas colunas, e a da direita NÃO se quebra
-     por conforto: ou o programa cabe, ou aparece barra de rolagem. Então a
-     largura dela sai da MEDIDA do conteúdo, não de um palpite.
+  /* The annotated code block has two columns, and the right one does NOT wrap
+     for comfort: either the program fits, or a scrollbar appears. So its width
+     comes from a MEASUREMENT of the content, not from a guess.
 
-       IBM Plex Mono a .79rem avança 7,6px por caractere (medido no navegador)
-       a linha mais longa dos exemplos tem 74 caracteres → 562px
-       mais os 36px de recuo do bloco                     → 598px
+       IBM Plex Mono at .79rem advances 7.6px per character (measured in the
+       browser); the longest line in the examples has 74 characters → 562px
+       plus the block's 36px of padding                             → 598px
 
-     `--cod` é 604: pouco mais que isso, e a folga são os seis pixels que
-     evitam a barra aparecer por causa de um caractere. `--nota` é o conforto
-     da coluna de texto; `--nota-min`, o mínimo abaixo do qual ela deixa de ser
-     legível e as duas colunas param de valer a pena. */
+     `--cod` is 604: a little more than that, and the slack is the six pixels
+     that keep the bar from appearing over a single character. `--nota` is the
+     comfort of the text column; `--nota-min`, the minimum below which it stops
+     being readable and the two columns stop being worth it. */
   --cod:604px;
   --nota:440px;
   --nota-min:300px;
-  /* O TETO DA COLUNA LARGA SAI DA SETA, e não de um número escolhido.
-     As setas moram no meio do vão e têm 44px; para sobrar 16px entre a seta e
-     o conteúdo, o vão de cada lado precisa de 4 × 38 = 152px no total:
+  /* THE CEILING OF THE WIDE COLUMN COMES FROM THE ARROW, not from a chosen
+     number. The arrows sit in the middle of the gap and are 44px wide; to leave
+     16px between the arrow and the content, the gap on each side needs
+     4 × 38 = 152px in total:
 
        --amplo <= 100vw - trilho - 152
 
-     Enquanto isso não bastar, quem manda é o recuo do `.conteudo`. E o piso é
-     o conteúdo do bloco: `--cod + --nota + 30`, acima do qual alargar só
-     esticaria a coluna de texto. */
+     Until that is the tighter bound, the one in charge is `.conteudo`'s
+     padding. And the floor is the block's content: `--cod + --nota + 30`, above
+     which widening would only stretch the text column. */
   --amplo:min(
     calc(var(--cod) + var(--nota) + 30px),
     calc(100vw - var(--trilho) - 2 * var(--pad-x))
   );
   --tela:var(--leitura);
   display:grid;
-  /* 380 e não 272: com 272 quase todo nome de aula quebrava em duas ou três
-     linhas, e uma lista de treze itens quebrados vira parede. Os 50px que
-     vieram depois compram a diferença entre "Front-end with React and
-     TypeScript" numa linha ou em duas. */
+  /* 380 and not 272: at 272 nearly every lesson name wrapped onto two or three
+     lines, and a list of thirteen wrapped items becomes a wall. The 50px that
+     came later buy the difference between "Front-end with React and TypeScript"
+     on one line or on two. */
   grid-template-columns:var(--trilho) minmax(0,1fr);
   min-height:100vh;
-  padding-top:64px;               /* a barra é fixa e tem altura fixa */
+  padding-top:64px;               /* the bar is fixed and has a fixed height */
 }
 body.sem-trilho .portal{grid-template-columns:minmax(0,1fr)}
 body.sem-trilho .trilho{display:none}
 
-/* O padding vira VARIÁVEL porque não é só padding: o vídeo de ponta a ponta o
-   cancela com margem negativa, e um número repetido em dois lugares diverge no
-   dia em que um deles muda. Foi o que aconteceu — o recuo estreito virou 16px
-   aqui e continuou 18px lá, e sobraram 2px de rolagem horizontal no celular. */
+/* The padding becomes a VARIABLE because it is not only padding: the edge-to-
+   edge video cancels it with a negative margin, and a number repeated in two
+   places diverges the day one of them changes. Which is what happened — the
+   narrow padding became 16px here and stayed 18px there, and 2px of horizontal
+   scrolling were left over on the phone. */
 .conteudo{
   --pad-x:clamp(18px,3.2vw,44px);
   --pad-y:26px;
@@ -143,21 +148,22 @@ body.sem-trilho .trilho{display:none}
 }
 .conteudo:focus{outline:none}
 
-/* ---------- trilho lateral ---------- */
-/* ESPAÇAMENTO É LEGIBILIDADE. A primeira versão era densa — 2px de respiro
-   entre linhas de 8px de altura — e uma lista de treze aulas com seções abertas
-   virava um paredão que se lê linha a linha em vez de se varrer com o olho. O
-   ar entre os itens é o que deixa o menu ser CONSULTADO, e não lido. */
+/* ---------- side rail ---------- */
+/* SPACING IS LEGIBILITY. The first version was dense — 2px of breathing room
+   between 8px-tall lines — and a list of thirteen lessons with their sections
+   open became a wall that is read line by line instead of being swept with the
+   eye. The air between the items is what lets the menu be CONSULTED rather than
+   read. */
 .trilho{
   position:sticky;top:64px;align-self:start;
   height:calc(100vh - 64px);overflow-y:auto;
   border-right:1px solid var(--wire);
   padding:26px 18px 48px;
-  /* `scrollbar-width` sozinho não basta: sem a COR, o Chromium usa a do
-     sistema. A vitrine sempre declara as duas juntas (ver `.cursos-rol` no
-     base.css), e o trilho tinha ficado só com a primeira metade. A regra
-     `::-webkit-` é o mesmo remendo de lá, para as versões que ainda ignoram
-     `scrollbar-color`. */
+  /* `scrollbar-width` alone is not enough: without the COLOUR, Chromium uses
+     the system one. The vitrine always declares the two together (see
+     `.cursos-rol` in base.css), and the rail had been left with only the first
+     half. The `::-webkit-` rule is the same patch from there, for the versions
+     that still ignore `scrollbar-color`. */
   scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
 }
 .trilho::-webkit-scrollbar{width:7px}
@@ -195,10 +201,11 @@ body.sem-trilho .trilho{display:none}
 .tc-marca[data-estado="atual"]{background:var(--amber);border-color:var(--amber)}
 .tc-marca[data-estado="disponivel"]{border-color:var(--phosphor)}
 
-/* AULA É CABEÇALHO, SEÇÃO É LINHA. Antes as duas eram linhas parecidas com
-   recuos diferentes, e não dava para saber qual era qual sem ler. A aula ganha
-   caixa alta monoespaçada e um contador; a seção fica em texto normal com
-   ícone. Duas naturezas diferentes, duas formas diferentes. */
+/* A LESSON IS A HEADING, A SECTION IS A LINE. Before, both were similar lines
+   with different indents, and there was no telling which was which without
+   reading. The lesson gets monospaced uppercase and a counter; the section
+   stays in normal text with an icon. Two different natures, two different
+   shapes. */
 .trilho-aulas{display:flex;flex-direction:column;gap:6px}
 .trilho-aula{
   display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:8px;
@@ -235,8 +242,9 @@ body.sem-trilho .trilho{display:none}
 .ts-dur{font-size:.62rem;color:var(--phosphor-dim);letter-spacing:.06em}
 .trilho-secao:hover,.trilho-prova:hover{background:var(--panel);color:var(--paper)}
 .trilho-secao.on,.trilho-prova.on{color:var(--phosphor);background:var(--panel)}
-/* play para o que falta, check para o que foi feito: o ícone diz o estado sem
-   depender só de cor, e diz também que aquilo é algo a percorrer */
+/* play for what is left, check for what is done: the icon states the status
+   without leaning on colour alone, and it also says that this is something to
+   go through */
 .ts-marca{display:grid;place-items:center;color:var(--phosphor-dim)}
 .ts-marca svg{width:14px;height:14px}
 .trilho-secao.feita .ts-marca,.trilho-prova.feita .ts-marca{color:var(--phosphor)}
@@ -244,7 +252,7 @@ body.sem-trilho .trilho{display:none}
 .trilho-secao.feita .ts-tit,.trilho-prova.feita .ts-tit{color:var(--paper-dim)}
 .trilho-secao.aval .ts-tit{font-style:italic}
 
-/* ---------- barra do topo: só o que a vitrine não tinha ---------- */
+/* ---------- top bar: only what the vitrine did not have ---------- */
 .nav-contexto{margin-left:26px;min-width:0;flex:1 1 auto}
 .ctx-caixa{position:relative}
 .ctx{
@@ -276,10 +284,11 @@ body.sem-trilho .trilho{display:none}
 .ctx-barra span{display:block;height:100%;background:var(--phosphor)}
 .ctx-pct{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--phosphor)}
 
-/* `base.css` NÃO reseta o elemento `button`: cada componente da vitrine declara
-   o próprio fundo (`.tema`, `.burger`, `.nav-cta`…). Todo botão novo precisa
-   declarar o dele, senão herda o cinza claro do navegador — foi o que deixou a
-   lupa, o avatar e as setas da ordenação brancos sobre o tema escuro. */
+/* `base.css` does NOT reset the `button` element: every vitrine component
+   declares its own background (`.tema`, `.burger`, `.nav-cta`…). Every new
+   button has to declare its own, otherwise it inherits the browser's light grey
+   — which is what left the magnifier, the avatar and the ordering arrows white
+   on the dark theme. */
 .nav-icone{
   display:flex;align-items:center;justify-content:center;width:32px;height:32px;
   background:none;border:0;color:var(--paper-dim);border-radius:4px;cursor:pointer;
@@ -308,7 +317,7 @@ body.sem-trilho .trilho{display:none}
 .trilho-veu{display:none}
 
 /* ==========================================================
-   2 · TELAS — blocos genéricos
+   2 · SCREENS — generic blocks
    ========================================================== */
 
 .tela{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
@@ -342,7 +351,7 @@ body.sem-trilho .trilho{display:none}
 .cartao-cat,.cartao-meta,.cartao-conta{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--paper-dim)}
 .cartao-cat{color:var(--phosphor-dim);letter-spacing:.08em;text-transform:uppercase}
 
-/* ---------- continuar de onde parou ---------- */
+/* ---------- pick up where you left off ---------- */
 .retomar{
   display:flex;flex-direction:column;gap:8px;padding:20px 22px;
   background:var(--panel);border:1px solid var(--phosphor-dim);border-radius:6px;
@@ -359,28 +368,31 @@ body.sem-trilho .trilho{display:none}
 .trilha-numeros b{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;color:var(--paper)}
 
 /* ==========================================================
-   3 · O GRAFO COMO MAPA DE PROGRESSO
+   3 · THE GRAPH AS A PROGRESS MAP
    ========================================================== */
 
-/* MAIS AR ENTRE OS NÍVEIS. A vitrine usa 48px, e lá isso basta: o grafo é uma
-   das sete telas e some depois de uma rolada. Aqui ele é a tela onde o aluno
-   volta para se situar, e com 48px as arestas passam raspando nos cartões —
-   não colidem, mas a leitura fica apertada e o olho não separa uma coluna da
-   seguinte.
+/* MORE AIR BETWEEN THE LEVELS. The vitrine uses 48px, and there that is enough:
+   the graph is one of the seven screens and disappears after a single scroll.
+   Here it is the screen the student comes back to in order to get their
+   bearings, and at 48px the edges shave past the cards — they do not collide,
+   but the reading gets cramped and the eye does not separate one column from
+   the next.
 
-   A troca é rolagem horizontal, e ela é barata: o grafo já rola, já tem as
-   setas e já tem o esmaecido nas bordas. O roteamento das arestas é medido
-   sobre as posições REAIS, então ele acompanha sem uma linha de JavaScript —
-   e o detector de colisão do teste de fumaça confirma que acompanhou.
+   The trade is horizontal scrolling, and it is cheap: the graph already
+   scrolls, already has the arrows and already has the fade at the borders. The
+   edge routing is measured over the REAL positions, so it follows along without
+   a line of JavaScript — and the smoke test's collision detector confirms that
+   it did.
 
-   Aqui e não no `base.css`, que é cópia da vitrine e tem de continuar
-   sincronizável. */
+   Here and not in `base.css`, which is a copy of the vitrine and has to stay
+   syncable. */
 .portal .grafo-niveis{gap:88px}
 .portal .nivel{gap:26px}
 .portal .subcol{gap:20px}
 
-/* `.grafo-niveis` e `.nivel` têm height:100%, então a caixa precisa de altura
-   definida — na vitrine ela vinha da seção fullpage, que aqui não existe. */
+/* `.grafo-niveis` and `.nivel` have height:100%, so the box needs a definite
+   height — in the vitrine it came from the fullpage section, which does not
+   exist here. */
 .tela-trilha .grafo-caixa{height:clamp(360px,58vh,640px)}
 .tela-trilha .trilha-topo{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-start}
 .tela-trilha .trilha-topo p{max-width:58ch;color:var(--paper-dim);font-size:.9rem}
@@ -389,8 +401,9 @@ body.sem-trilho .trilho{display:none}
 .tela-trilha .trilha-resumo b{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;color:var(--paper)}
 .tela-trilha .trilha-resumo i{font-style:normal;font-size:.64rem}
 
-/* Os quatro estados. `adiante` é o mais restritivo e MESMO ASSIM é clicável:
-   o FAQ da vitrine promete que a trilha é recomendação de ordem, não trava. */
+/* The four states. `adiante` is the most restrictive and is clickable ANYWAY:
+   the vitrine's FAQ promises that the track is a recommended order, not a
+   lock. */
 .curso-no.no-concluido{border-color:var(--phosphor-dim);background:rgba(91,140,255,.06)}
 .curso-no.no-atual{border-color:var(--amber)}
 .curso-no.no-adiante{opacity:.62}
@@ -408,7 +421,7 @@ body.sem-trilho .trilho{display:none}
 .no-barra-cheia{display:block;height:100%;background:var(--phosphor)}
 .no-conta{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--paper-dim)}
 
-/* aresta cujo pré-requisito já foi cumprido acende; o resto fica discreto */
+/* an edge whose prerequisite is already met lights up; the rest stays quiet */
 .aresta-feita .linha{stroke:var(--phosphor);opacity:.55}
 
 .grafo-legenda{display:flex;flex-wrap:wrap;gap:16px}
@@ -419,7 +432,7 @@ body.sem-trilho .trilho{display:none}
 .leg-cor.no-adiante{opacity:.5}
 
 /* ==========================================================
-   4 · CURSO E AULA
+   4 · COURSE AND LESSON
    ========================================================== */
 
 .curso-head{display:flex;flex-direction:column;gap:8px}
@@ -443,9 +456,9 @@ body.sem-trilho .trilho{display:none}
 .elo-depois{border-color:var(--phosphor-dim);color:var(--phosphor)}
 .elo:hover{background:var(--ink)}
 
-/* `list-style:none` porque a numeração é do `.aula-num`, em monoespaçada e com
-   zero à esquerda: deixar o marcador do <ol> também aparecer numerava a mesma
-   linha duas vezes ("1. 01 Cliente, servidor e host"). */
+/* `list-style:none` because the numbering belongs to `.aula-num`, monospaced
+   and zero-padded: letting the <ol> marker show up as well numbered the same
+   line twice ("1. 01 Cliente, servidor e host"). */
 .aulas{display:flex;flex-direction:column;gap:1px;list-style:none;padding:0}
 .aula-linha{
   display:grid;grid-template-columns:18px 26px 1fr auto;align-items:center;gap:4px 10px;
@@ -463,18 +476,19 @@ body.sem-trilho .trilho{display:none}
 .aula-num{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--phosphor-dim)}
 .aula-linha.feita .aula-tit{color:var(--paper-dim)}
 
-/* ---------- a aula, agora em seções ---------- */
-/* uma largura para a tela inteira, e todos os filhos herdam dela por serem
-   filhos — nenhum deles declara largura própria */
+/* ---------- the lesson, now in sections ---------- */
+/* one width for the whole screen, and every child inherits it by being a child
+   — none of them declares a width of its own */
 .tela-aula{max-width:var(--tela)}
 .aula-cabeca{display:flex;flex-direction:column;gap:12px}
 
-/* Os passos são a espinha da aula: onde estou entre as seções e quanto falta.
-   Eles QUEBRAM em várias linhas em vez de rolar na horizontal — ao contrário
-   das fileiras da vitrine, que rolam porque lá a altura é o recurso escasso e
-   há setas para navegar. Aqui não há setas, e uma fileira rolável sem
-   affordance esconde a última seção sem avisar: foi o que aconteceu com "Como
-   escolher", a quinta do tópico de hospedagem, que simplesmente não aparecia. */
+/* The steps are the lesson's spine: where I am among the sections and how much
+   is left. They WRAP onto several lines instead of scrolling horizontally —
+   unlike the vitrine's rows, which scroll because there height is the scarce
+   resource and there are arrows to navigate with. Here there are no arrows, and
+   a scrollable row with no affordance hides the last section without warning:
+   which is what happened to "Como escolher", the fifth in the hosting topic,
+   that simply did not show up. */
 .passos{display:flex;flex-wrap:wrap;gap:6px}
 .passo{
   flex:0 0 auto;display:flex;align-items:center;gap:7px;max-width:230px;
@@ -491,30 +505,33 @@ body.sem-trilho .trilho{display:none}
 
 .secao-titulo{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.1rem,2.2vw,1.4rem);line-height:1.2}
 
-/* A PROSA NÃO É UM CARTÃO.
+/* PROSE IS NOT A CARD.
 
-   Ela era: fundo `--panel`, borda, canto arredondado — uma caixa dentro da
-   página. Isso desenha uma fronteira entre "a área do conteúdo" e "o resto", e
-   o resto não é nada: é a margem que sobra de centralizar. A fronteira separa
-   texto de vazio, o que não é uma distinção que valha uma linha na tela.
+   It used to be: `--panel` background, border, rounded corner — a box inside
+   the page. That draws a border between "the content area" and "the rest", and
+   the rest is nothing: it is the margin left over from centring. The border
+   separates text from emptiness, which is not a distinction worth a line on
+   screen.
 
-   Cartão é para o que se COMPARA lado a lado — cursos, materiais, blocos da
-   página do curso. Texto corrido para ler durante meia hora quer o contrário:
-   nada em volta. As figuras, o código e o vídeo continuam com moldura, e agora
-   ela quer dizer alguma coisa — "isto aqui é outra coisa que não prosa" —, o
-   que não conseguia dizer quando estava dentro de outra moldura.
+   A card is for what gets COMPARED side by side — courses, materials, the
+   blocks on the course page. Running text meant to be read for half an hour
+   wants the opposite: nothing around it. The figures, the code and the video
+   still have a frame, and now that frame means something — "this here is
+   something other than prose" — which it could not say while it lived inside
+   another frame.
 
-   A PROSA NÃO TEM MAIS TETO PRÓPRIO — ela vai até `--tela`, como todo o resto.
+   PROSE NO LONGER HAS A CEILING OF ITS OWN — it goes to `--tela`, like
+   everything else.
 
-   Tinha: `max-width:68ch`, que é o limite clássico de linha para leitura longa.
-   O efeito era que, em `--amplo`, o parágrafo parava em 605px enquanto o
-   player e o exemplo ao lado dele iam a 1074 — a mesma margem esquerda e três
-   margens direitas, que é o desalinho pela outra ponta.
+   It used to have `max-width:68ch`, the classic line limit for long reading.
+   The effect was that, at `--amplo`, the paragraph stopped at 605px while the
+   player and the example beside it went to 1074 — the same left margin and
+   three right margins, which is the misalignment from the other end.
 
-   O preço é real e está medido: em 1074px a linha vai a 121ch, contra os 68
-   confortáveis. Foi uma escolha entre dois defeitos, e o alinhamento
-   ganhou; se a linha longa incomodar na leitura, o teto volta em `ch` e o que
-   se perde é o alinhamento à direita, não o da esquerda. */
+   The price is real and measured: at 1074px the line reaches 121ch, against the
+   comfortable 68. It was a choice between two defects, and alignment won; if
+   the long line turns out to hurt reading, the ceiling comes back in `ch` and
+   what is lost is the alignment on the right, not the one on the left. */
 .aula-texto{
   gap:0;background:none;border:0;border-radius:0;padding:0;
 }
@@ -525,20 +542,21 @@ body.sem-trilho .trilho{display:none}
   font-family:'IBM Plex Mono',monospace;font-size:.86em;
   background:var(--ink);padding:1px 5px;border-radius:3px;color:var(--phosphor);
 }
-/* O `code` DENTRO DE UM `pre` não é código inline: ali ele não leva caixa,
-   recuo, canto arredondado nem cor própria — quem manda é o bloco.
+/* A `code` INSIDE A `pre` is not inline code: there it takes no box, no
+   padding, no rounded corner and no colour of its own — the block is in charge.
 
-   A regra de cima vinha pegando os dois, e pintava um retângulo `--ink` atrás
-   de cada linha do exemplo. Ficou muito tempo invisível por ser quase a cor do
-   painel; apareceu por acaso, num desenho de fundo que foi tentado e descartado
-   — o retângulo comia metade dele. O desenho saiu, o conserto fica: caixa atrás
-   de linha de código era erro de qualquer jeito. */
+   The rule above had been catching both, and painted an `--ink` rectangle
+   behind every line of the example. It stayed invisible for a long time because
+   it is almost the colour of the panel; it turned up by accident, in a
+   background drawing that was tried and discarded — the rectangle ate half of
+   it. The drawing went away, the fix stays: a box behind a line of code was a
+   mistake either way. */
 .aula-texto pre code{
   background:none;padding:0;border-radius:0;color:inherit;font-size:inherit;
 }
-/* O bloco de código da prosa é o mesmo componente dos exercícios: linha longa
-   rola dentro da caixa em vez de ser dobrada — código não se quebra por
-   conforto de leitura. */
+/* The prose's code block is the same component the exercises use: a long line
+   scrolls inside the box instead of being folded — code does not wrap for
+   reading comfort. */
 .prosa-cod{margin:0 0 16px;max-width:100%}
 .prosa-cod .cod{font-size:.8rem}
 .prosa-lista{display:flex;flex-direction:column;gap:8px;margin:0 0 14px;padding-left:18px}
@@ -546,8 +564,9 @@ body.sem-trilho .trilho{display:none}
 .prosa-lista li strong{color:var(--paper)}
 
 .aval-intro{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--paper-dim)}
-/* A avaliação existe em toda aula, mas nem toda tem exercícios ainda. O
-   tracejado diz "isto está reservado" sem fingir que já há o que fazer. */
+/* The assessment exists in every lesson, but not every one has exercises yet.
+   The dashed border says "this is reserved" without pretending there is already
+   something to do. */
 .passo-aval{border-style:dashed}
 .passo-pendente{opacity:.55}
 .passo-pendente:hover{opacity:1}
@@ -560,20 +579,20 @@ body.sem-trilho .trilho{display:none}
 .migalhas a{color:var(--phosphor)}
 .aula-titulo{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.3rem,2.8vw,1.8rem);line-height:1.18}
 
-/* DUAS FORMAS DE SEÇÃO, E O LAYOUT SEGUE A FORMA.
+/* TWO SHAPES OF SECTION, AND THE LAYOUT FOLLOWS THE SHAPE.
 
-   A seção que TEM vídeo mostra o player logo depois do cabeçalho, na largura da
-   aula. A que NÃO tem não tem quadro nenhum — nem cinza, nem reservado: um
-   retângulo vazio promete um vídeo que nunca vem, e a promessa não expira. Ver
-   o comentário em telas/aula.js.
+   A section that HAS a video shows the player right after the header, at the
+   lesson's width. One that does NOT have a frame at all — not grey, not
+   reserved: an empty rectangle promises a video that never comes, and the
+   promise does not expire. See the comment in screens/lesson.js.
 
-   O player ocupa a largura inteira porque é isso que TODO filho da tela faz
-   agora; o que ele tem de próprio é um teto de altura, e ele vira teto de
-   LARGURA. Um player não pode empurrar o resto da seção para baixo da dobra —
-   mas cortar a altura de uma caixa com `aspect-ratio` não encolhe a caixa:
-   achata, e o vídeo dentro dela estica. Limitando a largura, a proporção 16/9
-   deriva a altura, e em janela baixa o player fica menor que o resto da aula em
-   vez de deformado. */
+   The player takes the whole width because that is what EVERY child of the
+   screen does now; what it has of its own is a height ceiling, and that becomes
+   a WIDTH ceiling. A player cannot push the rest of the section below the fold
+   — but capping the height of an `aspect-ratio` box does not shrink the box: it
+   flattens it, and the video inside stretches. By limiting the width, the 16/9
+   ratio derives the height, and in a short window the player ends up smaller
+   than the rest of the lesson instead of deformed. */
 .aula-com-video .video-fachada{
   --video-alt:min(64vh, calc(100vh - 300px));
   width:min(100%, calc(var(--video-alt) * 16 / 9));
@@ -585,8 +604,9 @@ body.sem-trilho .trilho{display:none}
   background:var(--panel);border:1px solid var(--wire);
   display:grid;place-items:center;
 }
-/* A duração no canto do player, como em todo lugar que tem vídeo: ela responde
-   "dá tempo agora?", que é a pergunta que se faz antes de dar play. */
+/* The duration in the corner of the player, as everywhere else that has video:
+   it answers "is there time right now?", which is the question one asks before
+   hitting play. */
 .video-duracao{
   position:absolute;right:12px;bottom:12px;
   font-size:.68rem;letter-spacing:.06em;
@@ -600,37 +620,38 @@ body.sem-trilho .trilho{display:none}
 .video-breve{font-size:.8rem}
 
 .aula-texto{min-height:0}
-/* Sem a caixa, o texto precisa do próprio respiro em cima — antes esse espaço
-   era o `padding` do cartão. */
+/* Without the box, the text needs breathing room of its own on top — that space
+   used to be the card's `padding`. */
 .aula-texto>*:first-child{margin-top:6px}
 .conta-ex{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--phosphor)}
 .lista-ex{display:flex;flex-direction:column;gap:16px}
 
 .aula-pe{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--wire)}
-/* AS SETAS DE NAVEGAÇÃO VÃO PARA AS LATERAIS em tela larga. A aula é presa a
-   uma coluna, então sobra espaço nos lados e falta na vertical — e cada pixel
-   gasto embaixo é texto empurrado para fora da dobra. */
+/* THE NAVIGATION ARROWS MOVE TO THE SIDES on a wide screen. The lesson is
+   pinned to one column, so there is space to spare on the sides and space
+   missing vertically — and every pixel spent below is text pushed past the
+   fold. */
 .lado-seta{display:none}
 
-/* AS SETAS FICAM NA SOBRA DA TELA, e não coladas no texto.
+/* THE ARROWS LIVE IN THE SCREEN'S LEFTOVER, not glued to the text.
 
-   A aula tem no máximo `--tela` e é centrada na área que sobra do trilho. O que
-   resta dos dois lados — o "vão" — é espaço que nenhum conteúdo usa, e é
-   exatamente onde um controle de navegação deve morar: perto o bastante para
-   ser alcançado, longe o bastante para não disputar a linha com a palavra que
-   está sendo lida.
+   The lesson is at most `--tela` wide and is centred in the area the rail
+   leaves. What remains on both sides — the "gap" — is space no content uses,
+   and it is exactly where a navigation control belongs: close enough to be
+   reached, far enough not to fight for the line with the word being read.
 
-     vão de cada lado = (100vw - trilho - tela) / 2
-     seta da esquerda  → centrada no vão entre o trilho e a coluna
-     seta da direita   → centrada no vão entre a coluna e a borda da tela
+     gap on each side = (100vw - trilho - tela) / 2
+     left arrow   → centred in the gap between the rail and the column
+     right arrow  → centred in the gap between the column and the screen edge
 
-   É `--tela`, e não `--leitura`: quando a aula alarga o vão encolhe, e uma seta
-   posicionada pela coluna estreita ficaria por cima do conteúdo da larga.
+   It is `--tela`, and not `--leitura`: when the lesson widens the gap shrinks,
+   and an arrow positioned by the narrow column would sit on top of the wide
+   one's content.
 
-   O CORTE É 1400px, e o número sai da conta: com o trilho de 380 e a coluna
-   estreita de 820, o vão de cada lado é (1400-380-820)/2 = 100px — o suficiente
-   para uma seta de 44px com folga dos dois lados. Abaixo disso não há vão, e o
-   rodapé volta a ser o lugar certo. Ele nunca deixou de existir. */
+   THE CUT IS 1400px, and the number comes out of the arithmetic: with the 380
+   rail and the 820 narrow column, the gap on each side is (1400-380-820)/2 =
+   100px — enough for a 44px arrow with slack on both sides. Below that there is
+   no gap, and the footer is the right place again. It never stopped existing. */
 @media(min-width:1400px){
   .lado-seta{
     display:grid;place-items:center;position:fixed;top:50%;
@@ -648,13 +669,14 @@ body.sem-trilho .trilho{display:none}
     right:calc((100vw - var(--trilho) - var(--tela)) / 4);
     transform:translate(50%,-50%);
   }
-  /* com as setas nas laterais o rodapé inteiro some: ele só repetia as mesmas
-     duas rotas, e repetir custa a altura que as setas foram economizar */
+  /* with the arrows at the sides the whole footer goes away: it only repeated
+     the same two routes, and repeating costs the height the arrows went there
+     to save */
   .aula-pe{display:none}
 
 }
 
-/* ---------- o wizard da avaliação ---------- */
+/* ---------- the assessment wizard ---------- */
 .wizard{display:flex;flex-direction:column;gap:14px}
 .wz-topo{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
 .wz-conta{
@@ -689,7 +711,7 @@ body.sem-trilho .trilho{display:none}
 .wz-res-obs{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--paper-dim)}
 
 /* ==========================================================
-   5 · EXERCÍCIOS — os sete tipos
+   5 · EXERCISES — the seven types
    ========================================================== */
 
 .ex{
@@ -735,7 +757,7 @@ body.sem-trilho .trilho{display:none}
 .v-pendente,.v-vazio,.v-esperando,.v-antigo{color:var(--paper-dim)}
 .v-armadilha{display:block;margin-top:8px;color:var(--paper-dim);font-family:'IBM Plex Sans',sans-serif;font-size:.85rem;line-height:1.5}
 
-/* ---------- alternativas (quiz e múltipla escolha) ---------- */
+/* ---------- choices (quiz and multiple choice) ---------- */
 .alts{display:flex;flex-direction:column;gap:7px}
 .alt{
   display:grid;grid-template-columns:16px 1fr;align-items:start;gap:10px;
@@ -759,7 +781,7 @@ body.sem-trilho .trilho{display:none}
 .alt-errada{border-color:var(--amber);background:rgba(255,77,94,.06)}
 .alt-perdida{border-style:dashed}
 
-/* ---------- ordenação ---------- */
+/* ---------- ordering ---------- */
 .ord{display:flex;flex-direction:column;gap:6px;counter-reset:passo;list-style:none}
 .ord-item{
   display:grid;grid-template-columns:16px 1fr auto;align-items:center;gap:10px;
@@ -782,7 +804,7 @@ body.sem-trilho .trilho{display:none}
 .ord-certo{border-color:var(--phosphor)}
 .ord-errado{border-color:var(--amber)}
 
-/* ---------- associação: fichas, no lugar dos selects ---------- */
+/* ---------- matching: tiles, in place of the selects ---------- */
 .assoc-colunas{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
 .assoc-col{display:flex;flex-direction:column;gap:7px}
 .ficha{
@@ -795,12 +817,12 @@ body.sem-trilho .trilho{display:none}
 .ficha.sel{border-color:var(--phosphor);background:rgba(91,140,255,.1)}
 .ficha-certa{border-color:var(--phosphor);background:rgba(91,140,255,.08);opacity:.65;cursor:default}
 .ficha-errada{border-color:var(--amber);background:rgba(255,77,94,.1)}
-.ficha.tremendo{animation:tremer .3s}
-@keyframes tremer{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.ficha.tremendo{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 .assoc-conta{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
 .assoc-erros{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--amber);margin-top:8px}
 
-/* ---------- código e saída esperada ---------- */
+/* ---------- code and expected output ---------- */
 .cod-bloco{border:1px solid var(--wire);border-radius:5px;overflow:hidden;background:var(--panel)}
 .cod-barra{padding:6px 11px;border-bottom:1px solid var(--wire);background:var(--ink)}
 .cod-ling{font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
@@ -822,21 +844,22 @@ body.sem-trilho .trilho{display:none}
 .caso-rot{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
 .caso .cod{padding:8px;background:var(--panel);border-radius:4px;margin-top:4px}
 
-/* ---------- resposta por expressão ---------- */
+/* ---------- expression answer ---------- */
 .expr-origem{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .expr-rot{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
 .expr-cod{font-family:'IBM Plex Mono',monospace;font-size:.95rem;color:var(--phosphor);background:var(--panel);padding:5px 10px;border-radius:4px}
 
 /* ==========================================================
-   6 · BUSCA, DESEMPENHO E NOTAS
+   6 · SEARCH, PERFORMANCE AND NOTES
    ========================================================== */
 
-/* ---------- o painel do ⌘K ---------- */
+/* ---------- the ⌘K panel ---------- */
 .busca-veu{
   position:fixed;inset:0;z-index:200;
   background:rgba(10,14,20,.72);backdrop-filter:blur(3px);
   display:flex;justify-content:center;align-items:flex-start;
-  /* alto, mas não colado: a caixa nasce onde o olho já está depois do atalho */
+  /* high, but not flush: the box appears where the eye already is after the
+     shortcut */
   padding:12vh 20px 20px;
 }
 body.com-busca{overflow:hidden}
@@ -857,10 +880,10 @@ body.com-busca{overflow:hidden}
   overflow-y:auto;padding:6px;
   scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
 }
-/* O rótulo do grupo em VERMELHO, e não no azul de tudo o mais: ele é a única
-   coisa da lista que não é resultado — é a divisória entre eles. No azul ele
-   se confundia com o contexto de cada item, que também é azul e também é
-   monoespaçado, e a lista virava uma coluna só. */
+/* The group label in RED, and not in the blue of everything else: it is the
+   only thing in the list that is not a result — it is the divider between them.
+   In blue it blended with each item's context, which is also blue and also
+   monospaced, and the list became a single column. */
 .busca-grupo{
   padding:12px 12px 5px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;
   letter-spacing:.14em;text-transform:uppercase;color:var(--amber);
@@ -889,10 +912,11 @@ body.com-busca{overflow:hidden}
   border:1px solid var(--wire);background:var(--ink);font-family:inherit;font-size:.9em;
 }
 
-/* ---------- desempenho ---------- */
-/* O rótulo tem largura de rótulo; quem cresce é a barra, que é o dado. Era o
-   contrário, e o resultado era um nome solto à esquerda e um traço curto a
-   meio metro dele, do outro lado da tela. */
+/* ---------- performance ---------- */
+/* The label has a label's width; what grows is the bar, which is the data. It
+   used to be the other way round, and the result was a name adrift on the left
+   and a short dash half a metre away from it, on the other side of the
+   screen. */
 .dsp-linha{display:grid;grid-template-columns:minmax(0,210px) minmax(0,1fr) auto;align-items:center;gap:14px}
 .dsp-rot{font-size:.86rem;color:var(--paper);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dsp-num{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
@@ -906,7 +930,7 @@ body.com-busca{overflow:hidden}
 .de-enunciado{font-size:.88rem;line-height:1.4;color:var(--paper)}
 .de-onde{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--phosphor-dim)}
 
-/* ---------- notas ---------- */
+/* ---------- notes ---------- */
 .nota{border-top:1px dashed var(--wire);padding-top:12px;margin-top:2px}
 .nota summary{
   cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--phosphor);
@@ -927,7 +951,7 @@ body.com-busca{overflow:hidden}
 .nota-texto{font-size:.9rem;line-height:1.6;color:var(--paper-dim);white-space:pre-wrap}
 
 /* ==========================================================
-   7 · ENTRAR, CERTIFICADOS, CONTA
+   7 · SIGN IN, CERTIFICATES, ACCOUNT
    ========================================================== */
 
 .tela-entrar{min-height:calc(100vh - 130px);display:grid;place-items:center;max-width:none}
@@ -938,15 +962,15 @@ body.com-busca{overflow:hidden}
 .entrar-corpo form{display:flex;flex-direction:column;gap:14px}
 .entrar-aviso{font-size:.68rem}
 
-/* ---------- o certificado ----------
+/* ---------- the certificate ----------
 
-   Documento, não janela. Ver o comentário em telas/certificados.js: ele é o
-   único artefato do portal que sai daqui, e precisa parecer um documento onde
-   quer que apareça.
+   A document, not a window. See the comment in screens/certificates.js: it is
+   the only artefact of the portal that leaves here, and it has to look like a
+   document wherever it turns up.
 
-   A moldura é dupla — a borda do cartão e um filete interno, que é o que dá a
-   leitura de "impresso". `--phosphor` fica só no filete e no LED da marca:
-   documento com cor demais parece anúncio. */
+   The frame is double — the card's border and an inner rule, which is what
+   gives the "printed" reading. `--phosphor` stays only on the rule and on the
+   brand LED: a document with too much colour looks like an advert. */
 .certs{display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:18px}
 .cert{
   border:1px solid var(--wire);border-radius:4px;background:var(--panel);
@@ -957,7 +981,7 @@ body.com-busca{overflow:hidden}
   border:1px solid var(--wire);border-radius:2px;
   padding:26px 30px 16px;
   display:flex;flex-direction:column;gap:22px;min-height:250px;
-  /* o brilho de canto: sugere papel sob luz, sem custar uma imagem */
+  /* the corner glow: suggests paper under light, without costing an image */
   background:
     radial-gradient(120% 90% at 100% 0%, rgba(126,231,135,.05), transparent 55%),
     radial-gradient(90% 80% at 0% 100%, rgba(126,231,135,.035), transparent 60%);
@@ -968,8 +992,8 @@ body.com-busca{overflow:hidden}
   font-family:'Space Grotesk',sans-serif;font-size:.82rem;letter-spacing:.06em;
   text-transform:uppercase;color:var(--paper);
 }
-/* o recuo negativo come o `letter-spacing` que sobra depois do "l" e cola o
-   ".ing" na marca — sem ele lê-se "CODESCHOOL .ING" */
+/* the negative indent eats the `letter-spacing` left over after the "l" and
+   glues the ".ing" to the brand — without it one reads "CODESCHOOL .ING" */
 .cert-marca b{font-weight:400;color:var(--phosphor);margin-left:-.06em}
 .cert-led{
   width:7px;height:7px;border-radius:50%;background:var(--phosphor);
@@ -986,8 +1010,9 @@ body.com-busca{overflow:hidden}
   font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.1em;
   color:var(--paper-dim);
 }
-/* O nome de quem recebe é o maior elemento do documento. É o que a pessoa
-   procura primeiro quando abre, e o que a outra pessoa lê quando recebe. */
+/* The name of whoever receives it is the largest element of the document. It is
+   what that person looks for first on opening it, and what the other person
+   reads on receiving it. */
 .cert-aluno{
   font-family:'Space Grotesk',sans-serif;font-size:clamp(1.4rem,2.6vw,1.85rem);
   line-height:1.15;color:var(--paper);margin:2px 0 12px;
@@ -1002,32 +1027,33 @@ body.com-busca{overflow:hidden}
 }
 .cert-codigo{letter-spacing:.1em;color:var(--phosphor-dim)}
 
-/* O exemplo tem de ser reconhecível como exemplo SEM leitura: moldura
-   tracejada, cor apagada e um selo no lugar do tipo. Um certificado falso
-   parecido com um verdadeiro é um problema — não uma prévia. */
+/* The sample has to be recognisable as a sample WITHOUT being read: dashed
+   frame, muted colour and a seal in place of the type. A fake certificate that
+   looks like a real one is a problem — not a preview. */
 .cert-exemplo{opacity:.66}
 .cert-exemplo .cert-folha{border-style:dashed;background:none}
 .cert-exemplo .cert-led{box-shadow:none;background:var(--wire)}
 .cert-exemplo .cert-marca b{color:var(--paper-dim)}
 
-/* ---------- o certificado ampliado ----------
-   Ele é o único artefato do portal que a pessoa quer OLHAR, e não usar. Por
-   isso o clique abre em grande, com o resto da tela apagado e congelado — o
-   mesmo modal da vitrine, com uma faixa de ações acima da caixa. */
+/* ---------- the enlarged certificate ----------
+   It is the only artefact of the portal a person wants to LOOK AT rather than
+   use. That is why the click opens it big, with the rest of the screen dimmed
+   and frozen — the vitrine's own modal, with a strip of actions above the
+   box. */
 .cert{cursor:zoom-in}
 .cert:focus-visible{outline:2px solid var(--phosphor);outline-offset:3px}
 
-/* A GRADE DO MODAL PRECISA DE UMA COLUNA DEFINIDA.
+/* THE MODAL'S GRID NEEDS A DEFINITE COLUMN.
 
-   O `.modal` do base.css é `display:grid;place-items:center`, e uma trilha
-   `auto` se dimensiona pelo max-content do que está dentro. Aí o `100%` do
-   filho resolve contra ESSA largura — que é a que ele mesmo pediu — e não
-   limita nada: no celular o certificado ficava 408px de largura dentro de uma
-   tela de 390 e era cortado dos dois lados.
+   base.css's `.modal` is `display:grid;place-items:center`, and an `auto` track
+   sizes itself by the max-content of what is inside. The child's `100%` then
+   resolves against THAT width — the one it asked for itself — and limits
+   nothing: on the phone the certificate came out 408px wide inside a 390px
+   screen and was clipped on both sides.
 
-   `minmax(0,1fr)` torna a trilha definida, e o `100%` volta a significar "a
-   célula". A vitrine nunca viu isso porque o conteúdo dela é texto, que
-   encolhe; o certificado tem largura mínima própria. */
+   `minmax(0,1fr)` makes the track definite, and `100%` goes back to meaning
+   "the cell". The vitrine never saw this because its content is text, which
+   shrinks; the certificate has a minimum width of its own. */
 .modal{grid-template-columns:minmax(0,1fr);align-items:start;overflow-y:auto}
 .modal-pilha{
   display:flex;flex-direction:column;gap:14px;
@@ -1035,15 +1061,15 @@ body.com-busca{overflow:hidden}
 }
 .modal-acoes{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px}
 .modal-cert .modal-caixa{width:100%;background:none;border:0;box-shadow:none;overflow:visible}
-/* dentro do modal o certificado é o conteúdo inteiro: sem cursor de lupa,
-   sem hover, e com o corpo maior — é para isso que ele foi ampliado */
+/* inside the modal the certificate is the whole content: no zoom cursor, no
+   hover, and with a larger body — that is what it was enlarged for */
 .modal-cert .cert{cursor:default;padding:14px}
 .modal-cert .cert-folha{min-height:min(62vh,480px);padding:46px 56px 30px;gap:30px}
 .modal-cert .cert-marca{font-size:1rem}
-/* `5vw` na fonte + `min-height` em `vh` fazem o documento crescer junto com a
-   tela; no celular os dois empurravam o certificado para fora dela. Aqui a
-   ampliação inteira volta ao tamanho do cartão da lista — ampliar num aparelho
-   onde ele já ocupa a largura toda não tem o que ampliar. */
+/* `5vw` on the font + `min-height` in `vh` make the document grow along with
+   the screen; on the phone the two pushed the certificate out of it. Here the
+   whole enlargement goes back to the size of the list card — enlarging on a
+   device where it already takes the full width has nothing to enlarge. */
 .modal-cert .cert-aluno{font-size:clamp(2.1rem,5vw,3.4rem)}
 .modal-cert .cert-curso{font-size:1.6rem}
 .modal-cert .cert-frase{font-size:.78rem}
@@ -1058,19 +1084,19 @@ body.com-busca{overflow:hidden}
   .modal-cert .cert-curso{font-size:1rem}
   .modal-cert .cert-frase{font-size:.66rem}
   .modal-cert .cert-meta,.modal-cert .cert-pe{font-size:.66rem}
-  /* a linha do rodapé empilha em vez de espremer data e código na mesma linha */
+  /* the footer line stacks instead of squeezing date and code onto one line */
   .cert-pe{flex-direction:column;gap:4px}
 }
 .cert-share{gap:8px}
 .cert-share svg{width:15px;height:15px}
 
-/* O BOTÃO DO LINKEDIN É SÓ O ÍCONE, na cor da marca deles.
+/* THE LINKEDIN BUTTON IS ONLY THE ICON, in their brand colour.
 
-   O azul oficial é #0A66C2, e ele é o que se usa no tema claro. No escuro ele
-   dá 2,5:1 de contraste contra o painel — abaixo dos 3:1 que um ícone precisa
-   para ser distinguível —, então o tema escuro clareia. Clarear a cor de uma
-   marca não é liberdade: é o que a torna visível, e invisível ela não
-   representa marca nenhuma. */
+   The official blue is #0A66C2, and that is what the light theme uses. On dark
+   it gives 2.5:1 of contrast against the panel — below the 3:1 an icon needs to
+   be distinguishable — so the dark theme lightens it. Lightening a brand's
+   colour is not a liberty: it is what makes it visible, and invisible it
+   represents no brand at all. */
 .cert-in{
   --linkedin:#3b8fd9;
   display:grid;place-items:center;width:36px;height:36px;border-radius:5px;
@@ -1080,34 +1106,36 @@ body.com-busca{overflow:hidden}
 html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
 .cert-in svg{width:21px;height:21px}
 .cert-in:hover{background:var(--panel);border-color:var(--linkedin)}
-/* desabilitado, e parecendo: o botão existe para dizer o que haverá ali */
+/* disabled, and looking it: the button exists to say what will be there */
 .cert-in-off{opacity:.35;cursor:not-allowed}
 .cert-in-off:hover{background:none;border-color:transparent}
 
 .cert-previa{margin-top:26px;display:flex;flex-direction:column;gap:12px}
-/* o rótulo anda junto do título, e não na outra ponta da tela: ele explica o
-   título, e explicação a um metro de distância não explica nada */
+/* the label travels next to the title, and not at the other end of the screen:
+   it explains the title, and an explanation a metre away explains nothing */
 .cert-previa .bloco-topo{align-items:baseline;justify-content:flex-start;gap:14px}
 
 .cert-falta{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
 .cert-falta li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;font-size:.9rem}
 
 .conta-nota{font-size:.84rem;color:var(--paper-dim);line-height:1.5}
-/* `.bloco` é uma coluna flex, e coluna flex estica os filhos: um botão solto
-   dentro dela virava uma faixa de ponta a ponta. Botão tem a largura do rótulo. */
+/* `.bloco` is a flex column, and a flex column stretches its children: a loose
+   button inside it became an edge-to-edge strip. A button has the width of its
+   label. */
 .tela-conta .bloco>.btn{align-self:flex-start}
 .conta-acao{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
 .conta-aviso{font-size:.72rem}
 .conta-aviso.bom{color:var(--phosphor)}
 .conta-aviso.ruim{color:var(--amber)}
 .tela-conta form{display:flex;flex-direction:column;gap:14px}
-/* A medida da senha fica COLADA no campo, não no rodapé do formulário: ela
-   comenta aquele campo, e um comentário longe do que comenta vira decoração. */
+/* The password meter sits FLUSH with the field, not at the foot of the form: it
+   comments on that field, and a comment far from what it comments on becomes
+   decoration. */
 .senha-medida{display:flex;align-items:center;gap:10px;margin-top:7px}
 .senha-medida .barra{flex:1;max-width:220px}
 .senha-rotulo{font-size:.66rem;min-width:8ch}
 
-/* ---------- Meu plano ---------- */
+/* ---------- My plan ---------- */
 .pl-atual-topo{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:18px}
 .pl-rot{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--phosphor)}
 .pl-atual-topo h2{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;margin-top:4px}
@@ -1119,8 +1147,8 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
 .pl-ciclo{font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--paper-dim);margin-top:4px}
 .pl-fatos{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:.7rem}
 
-/* A tabela rola dentro da própria caixa em telas estreitas — a página nunca
-   rola na horizontal, que é a regra do portal inteiro. */
+/* The table scrolls inside its own box on narrow screens — the page never
+   scrolls horizontally, which is the rule for the whole portal. */
 .pl-tabela-rolo{
   overflow-x:auto;margin:0 -4px;padding:0 4px;
   scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
@@ -1137,8 +1165,9 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
 .pl-tabela td svg{width:16px;height:16px}
 .pl-tabela td.sim{color:var(--phosphor)}
 .pl-tabela td.nao{color:var(--wire)}
-/* a coluna do plano assinado ganha um fundo contínuo: é o que deixa a leitura
-   "o que eu tenho" ser vertical, sem procurar o cabeçalho a cada linha */
+/* the subscribed plan's column gets a continuous background: it is what lets
+   the "what do I have" reading be vertical, without hunting for the header on
+   every row */
 .pl-tabela th.on,.pl-tabela td.on{background:var(--ink)}
 .pl-seu{
   display:block;font-size:.54rem;letter-spacing:.16em;text-transform:uppercase;
@@ -1147,16 +1176,17 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
 .pl-linha-acao td{padding-top:16px;border-bottom:0}
 .pl-linha-acao .btn{width:100%;justify-content:center;font-size:.78rem;padding:8px 10px}
 .pl-ja{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-dim)}
-/* o texto que só o leitor de tela usa: o ícone sozinho não diz "incluído" */
+/* the text only the screen reader uses: the icon alone does not say
+   "included" */
 .pl-oculto{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .conta-confirma{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:.85rem}
 .tela-conta .campo{max-width:420px}
 
 /* ==========================================================
-   8 · FIGURAS, CÓDIGO ANOTADO E MATERIAL
+   8 · FIGURES, ANNOTATED CODE AND MATERIAL
    ========================================================== */
 
-/* ---------- figura ---------- */
+/* ---------- figure ---------- */
 .fig{margin:18px 0;display:flex;flex-direction:column;gap:8px}
 .fig img,.fig-svg{
   width:100%;max-width:100%;border:1px solid var(--wire);border-radius:6px;
@@ -1169,34 +1199,34 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
   color:var(--paper-dim);text-align:center;
 }
 
-/* ---------- código como exemplo, no estilo Go By Example ----------
+/* ---------- code as an example, Go By Example style ----------
 
-   Duas colunas: a EXPLICAÇÃO à esquerda, o PROGRAMA à direita, cada nota na
-   altura do trecho que ela comenta. Ver o comentário em texto.js.
+   Two columns: the EXPLANATION on the left, the PROGRAM on the right, each note
+   at the height of the snippet it comments on. See the comment in text.js.
 
-   O que faz a coluna da direita parecer um arquivo, e não uma pilha de
-   pedaços: `row-gap:0`, nenhuma borda entre as linhas, e o mesmo fundo em
-   todas as células de código. Sem isso o bloco vira uma tabela — que é
-   exatamente o que ele existe para não ser.
+   What makes the right column look like a file, and not a pile of fragments:
+   `row-gap:0`, no border between the lines, and the same background on every
+   code cell. Without that the block becomes a table — which is exactly what it
+   exists in order not to be.
 
-   `align-items:start` na nota é o que a segura no alto do trecho a que se
-   refere; centralizada, ela flutuaria no meio de dez linhas de código e
-   deixaria de apontar para lugar nenhum. O `<pre>` NÃO leva start: ele estica
-   até o fim da linha da grade, e é esse esticar que emenda o fundo. */
+   `align-items:start` on the note is what holds it at the top of the snippet it
+   refers to; centred, it would float in the middle of ten lines of code and stop
+   pointing at anything. The `<pre>` does NOT take start: it stretches to the end
+   of the grid row, and it is that stretching that seams the background. */
 .exemplo{margin:24px 0}
 .exemplo-barra{display:flex;justify-content:flex-end;margin-bottom:5px}
 .exemplo-arq{font-size:.64rem;letter-spacing:.06em}
 
-/* UMA COLUNA É O PADRÃO, e duas são a exceção.
+/* ONE COLUMN IS THE DEFAULT, and two are the exception.
 
-   Foi assim que a regra se inverteu: as duas colunas só valem quando as DUAS
-   cabem — o código sem rolar e a nota ainda legível. Onde não cabem, o que
-   sobra é um código picotado ao lado de uma nota espremida, que é pior que a
-   forma empilhada em qualquer tela.
+   That is how the rule got inverted: the two columns only pay off when BOTH
+   fit — the code without scrolling and the note still readable. Where they do
+   not fit, what is left is chopped-up code next to a squeezed note, which is
+   worse than the stacked form on any screen.
 
-   Empilhado, a nota vem ANTES do trecho: ler a explicação e então o código é a
-   ordem que funciona sem o alinhamento lateral para amarrar os dois. É a forma
-   que o celular sempre teve. */
+   Stacked, the note comes BEFORE the snippet: read the explanation and then the
+   code is the order that works without the side-by-side alignment tying the two
+   together. It is the shape the phone always had. */
 .exemplo-grade{display:grid;grid-template-columns:minmax(0,1fr);row-gap:0}
 .exemplo-nota{
   padding:12px 0 8px;
@@ -1226,27 +1256,28 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
 .exemplo-saida .cod{margin:0;padding:0;background:none;border:0;font-size:.76rem;color:var(--paper-dim)}
 .exemplo-vazio{display:none}
 
-/* O CORTE ÚNICO DA AULA, e ele sai da conta, não do gosto.
+/* THE LESSON'S SINGLE CUT, and it comes out of the arithmetic, not of taste.
 
-   Aqui acontecem as duas coisas ao mesmo tempo, porque são a mesma coisa: o
-   bloco de código abre em duas colunas E a aula inteira passa para a largura
-   larga. Duas colunas precisam de `--cod` + `--nota-min` + o vão entre elas:
+   Two things happen here at the same time, because they are the same thing: the
+   code block opens into two columns AND the whole lesson moves to the wide
+   width. Two columns need `--cod` + `--nota-min` + the gap between them:
 
      604 + 300 + 30 = 934px
 
-   E `--amplo` não pode passar do que as setas deixam — `100vw - trilho - 152`.
-   Igualando as duas:
+   And `--amplo` cannot go past what the arrows allow — `100vw - trilho - 152`.
+   Equating the two:
 
      100vw - 380 - 152 >= 934   →   100vw >= 1466
 
-   Abaixo de 1466px a aula volta para 820 e o bloco fica empilhado, onde os
-   598px do código sobram com folga. Entre 1466 e 1606 a aula cresce junto com
-   a janela, de 934 até os 1074 do conteúdo; daí para cima ela para de crescer,
-   porque alargar mais só esticaria a coluna de texto. */
+   Below 1466px the lesson goes back to 820 and the block stays stacked, where
+   the code's 598px have room to spare. Between 1466 and 1606 the lesson grows
+   along with the window, from 934 up to the content's 1074; from there on it
+   stops growing, because widening further would only stretch the text
+   column. */
 @media(min-width:1466px){
   .portal{
-    /* daqui para cima quem aperta é a seta, não o recuo do `.conteudo`: 152 é
-       mais que os 88 do recuo em qualquer largura desta faixa */
+    /* from here up what squeezes is the arrow, not `.conteudo`'s padding: 152
+       is more than the padding's 88 at any width in this range */
     --amplo:min(
       calc(var(--cod) + var(--nota) + 30px),
       calc(100vw - var(--trilho) - 152px)
@@ -1254,32 +1285,32 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
     --tela:var(--amplo);
   }
   .exemplo-grade{
-    /* o código é FIXO e a nota absorve o que sobrar: encolher a coluna que não
-       quebra linha é o que produz a barra de rolagem */
+    /* the code is FIXED and the note absorbs whatever is left: shrinking the
+       column that does not wrap is what produces the scrollbar */
     grid-template-columns:minmax(var(--nota-min),1fr) var(--cod);
     column-gap:30px;
   }
   .exemplo-nota{align-self:start;padding:11px 0}
-  /* o respiro do arquivo fica nas pontas do bloco, não em cada trecho: o miolo
-     precisa emendar sem costura */
+  /* the file's breathing room goes at the block's ends, not on every snippet:
+     the middle has to join without a seam */
   .exemplo-cod{padding:0 18px}
   .exemplo-cod:first-of-type{padding-top:12px}
   .exemplo-cod:last-of-type{padding-bottom:12px}
   .exemplo-saida{grid-column:2}
 }
 
-/* ---------- as três cores do realce ----------
-   Vermelho para a estrutura da linguagem, azul para os literais, branco para
-   o resto. Comentário no cinza apagado — ele é o único que se lê como prosa,
-   e prosa dentro de código não deve competir com o código. */
+/* ---------- the three colours of the highlighting ----------
+   Red for the language's structure, blue for the literals, white for the rest.
+   Comments in the muted grey — they are the only thing read as prose, and prose
+   inside code should not compete with the code. */
 .t-pal{color:var(--amber)}
 .t-txt,.t-num{color:var(--phosphor)}
 .t-com{color:var(--paper-dim);font-style:italic}
 .t-fun,.t-pro{color:var(--paper)}
 
-/* Abaixo de 900px as duas colunas não cabem sem picotar o código. A nota vai
-   para CIMA do trecho: ler a explicação e então o código é a ordem que
-   funciona quando não há alinhamento lateral para amarrar os dois. */
+/* Below 900px the two columns do not fit without chopping up the code. The note
+   goes ABOVE the snippet: read the explanation and then the code is the order
+   that works when there is no side-by-side alignment tying the two together. */
 @media(max-width:900px){
   .exemplo-grade{grid-template-columns:1fr}
   .exemplo-nota{padding:12px 0 8px}
@@ -1289,7 +1320,7 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
   .exemplo-vazio{display:none}
 }
 
-/* ---------- material complementar ---------- */
+/* ---------- supporting material ---------- */
 .materiais{margin:22px 0 0;display:flex;flex-direction:column;gap:2px}
 .materiais-topo{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
 .materiais-topo h3{font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:400}
@@ -1311,16 +1342,17 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
 .curso-lado .materiais{margin:0}
 
 /* ==========================================================
-   9 · PROVAS
+   9 · EXAMS
    ========================================================== */
 
-/* O cartão que anuncia a prova. Ele é DELIBERADAMENTE diferente de um bloco
-   comum: a prova é a única coisa do portal que tem consequência — reprovar
-   custa uma nota registrada —, e uma peça que se parece com as outras não
-   avisa disso. */
+/* The card that announces the exam. It is DELIBERATELY different from an
+   ordinary block: the exam is the only thing in the portal that has a
+   consequence — failing costs a recorded grade — and a piece that looks like
+   all the others does not warn of that. */
 .prova-cartao{
-  /* `flex-direction` explícito: `.bloco` empilha em coluna, e sem esta linha o
-     cartão herdava o empilhamento e o botão caía embaixo, centralizado. */
+  /* explicit `flex-direction`: `.bloco` stacks in a column, and without this
+     line the card inherited the stacking and the button fell underneath,
+     centred. */
   display:flex;flex-direction:row;flex-wrap:wrap;
   align-items:center;justify-content:space-between;gap:18px;
   border-color:var(--phosphor-dim);
@@ -1347,27 +1379,27 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
 .prova-nota.passou strong{color:var(--phosphor)}
 .prova-nota.faltou strong{color:var(--paper-dim)}
 
-/* Represado: enquanto a prova não fecha, o veredito diz só que a resposta
-   entrou. A cor é neutra de propósito — qualquer verde ou vermelho aqui
-   entregaria o resultado que a prova está segurando. */
+/* Held back: while the exam is not closed, the verdict only says that the
+   answer went in. The colour is neutral on purpose — any green or red here
+   would give away the result the exam is holding. */
 .v-registrado{color:var(--paper-dim) !important;border-color:var(--wire) !important}
 .wz-ponto.feito{border-color:var(--paper-dim);color:var(--paper)}
 .wz-cuidado{background:var(--panel) !important;color:var(--paper) !important;border-color:var(--phosphor) !important}
 
 /* ==========================================================
-   10 · LARGURAS
+   10 · WIDTHS
    ========================================================== */
 
-/* Duas colunas no curso quando cada uma ainda fica com ~440px — o mesmo
-   critério que a vitrine usa no modal, e pelo mesmo motivo: mais estreito
-   que isso, duas colunas leem pior que uma. */
+/* Two columns on the course when each still gets ~440px — the same criterion
+   the vitrine uses in its modal, and for the same reason: any narrower than
+   that, and two columns read worse than one. */
 @media(min-width:1024px){
   .curso-colunas{grid-template-columns:minmax(0,1fr) 320px}
 }
 
-/* O trilho vira gaveta em 1180px — o mesmo corte em que a barra da vitrine
-   deixa de caber numa linha, e pela mesma razão: abaixo disso não há largura
-   para chrome persistente e conteúdo ao mesmo tempo. */
+/* The rail becomes a drawer at 1180px — the same cut at which the vitrine's bar
+   stops fitting on one line, and for the same reason: below that there is no
+   width for persistent chrome and content at the same time. */
 @media(max-width:1180px){
   .portal{--trilho:0px;grid-template-columns:minmax(0,1fr)}
   .trilho{
@@ -1384,7 +1416,8 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
 }
 
 @media(max-width:860px){
-  /* o grafo já vira lista pelo base.css; aqui só solta a altura fixa */
+  /* base.css already turns the graph into a list; here we only release the
+     fixed height */
   .tela-trilha .grafo-caixa{height:auto}
   .ctx-nome{display:none}
 }
@@ -1398,8 +1431,8 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
   .aula-pe{flex-direction:column;align-items:stretch}
   .aula-nav{justify-content:space-between}
   .wz-pe{flex-wrap:wrap}
-  /* as duas colunas de fichas continuam lado a lado até bem estreito: separar
-     em duas colunas É o exercício, e empilhá-las apagaria a metáfora */
+  /* the two tile columns stay side by side down to quite narrow: splitting into
+     two columns IS the exercise, and stacking them would erase the metaphor */
   .assoc-colunas{gap:7px}
   .ficha{padding:9px 10px;font-size:.8rem}
 }
@@ -1407,10 +1440,11 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
 @media(max-width:620px){
   .nav-contexto{display:none}
   .tela-head h1{font-size:1.25rem}
-  /* A busca sai antes de todo o resto — é o item mais dispensável da barra,
-     porque o Catálogo está a um toque no trilho e ele já tem o campo. Sem
-     isto o avatar da conta era cortado pela borda direita a 390px. É a mesma
-     ordem de sacrifício da vitrine, onde "Área do aluno" cede primeiro. */
+  /* Search goes before everything else — it is the most dispensable item on the
+     bar, because the Catalogue is one tap away in the rail and it already has
+     the field. Without this the account avatar was clipped by the right border
+     at 390px. It is the vitrine's own order of sacrifice, where "Área do aluno"
+     gives way first. */
   #busca-btn{display:none}
   .conta-avatar{width:28px;height:28px}
 }
