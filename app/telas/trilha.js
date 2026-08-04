@@ -6,7 +6,7 @@
    resize é o mesmo cuidado da vitrine, pelo mesmo motivo.
    ========================================================================== */
 
-import { montarTrilha, desenharArestas, ajustarSetasGrafo } from '../grafo.js';
+import { buildTrack as montarTrilha, drawEdges as desenharArestas, adjustGraphArrows as ajustarSetasGrafo } from '../graph.js';
 import { chooseOption as escolherOpcao, activeOption as opcaoAtiva } from '../state.js';
 import { goTo as irPara } from '../routes.js';
 import { trackExam as provaDaTrilha } from '../exams.js';

@@ -14,7 +14,7 @@ import {
 } from '../catalog.js';
 import { lessonSections as secoesDaAula } from '../lessons.js';
 import { courseProgress as progressoDoCurso, activeOption as opcaoAtiva } from '../state.js';
-import { estadoDoCurso } from '../grafo.js';
+import { courseState as estadoDoCurso } from '../graph.js';
 import { progressoDaTrilha, trilhaDoAluno, barra } from './comum.js';
 import { esc } from '../text.js';
 

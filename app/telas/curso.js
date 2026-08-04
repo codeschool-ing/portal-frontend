@@ -15,7 +15,7 @@ import {
 } from '../catalog.js';
 import { lessonSections as secoesDaAula, courseMaterials as materiaisDoCurso } from '../lessons.js';
 import { courseProgress as progressoDoCurso, lessonProgress as progressoDaAula, lessonDone as aulaConcluida } from '../state.js';
-import { estadoDoCurso } from '../grafo.js';
+import { courseState as estadoDoCurso } from '../graph.js';
 import { courseExam as provaDoCurso } from '../exams.js';
 import { cartaoDeProva } from './prova.js';
 import { materialList as listaDeMateriais } from '../materials.js';

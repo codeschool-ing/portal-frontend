@@ -16,9 +16,10 @@
    with the vitrine, and renaming half of a shared contract only makes the two
    repositories drift.
 
-   The shape `trackGraph` returns (`nos`, `colunas`, `nivel`) is still in
-   Portuguese too, because `grafo.js` reads it and has not been translated yet.
-   It gets renamed together with that file, in one move rather than two.
+   The shape `trackGraph` returns is English (`nodes`, `columns`, `level`) — it
+   is internal to this module and `graph.js`, and the two were renamed together.
+   A node's `kind` is still `curso` / `garfo` / `saida`, because those are the
+   values, not the field name, and they name things the catalogue declares.
    ========================================================================== */
 
 export const courseById = (id) => CURSOS.find((c) => c.id === id);
@@ -100,12 +101,12 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
 
   t.cursos.forEach((item, idx) => {
     if (!isChoice(item)) {
-      nodes.push({ id: item, tipo: 'curso', cursos: [item] });
+      nodes.push({ id: item, kind: 'curso', cursos: [item] });
       ofCourse[item] = item;
       return;
     }
     const nodeId = 'garfo:' + idx;
-    nodes.push({ id: nodeId, tipo: 'garfo', etapa: item, idx: idx, cursos: item.opcoes[activeOption(t.id, idx)].cursos });
+    nodes.push({ id: nodeId, kind: 'garfo', step: item, idx: idx, cursos: item.opcoes[activeOption(t.id, idx)].cursos });
     item.opcoes.forEach((o) => o.cursos.forEach((c) => { forkMembers[c] = nodeId; }));
     item.opcoes[activeOption(t.id, idx)].cursos.forEach((c) => { ofCourse[c] = nodeId; });
   });
@@ -135,7 +136,7 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
   // the graph does not end in loose courses with no outgoing arrow
   const hasSuccessor = {};
   nodes.forEach((n) => n.deps.forEach((d) => { hasSuccessor[d] = true; }));
-  nodes.push({ id: '@saida', tipo: 'saida', cursos: [], deps: nodes.filter((n) => !hasSuccessor[n.id]).map((n) => n.id) });
+  nodes.push({ id: '@saida', kind: 'saida', cursos: [], deps: nodes.filter((n) => !hasSuccessor[n.id]).map((n) => n.id) });
 
   const successors = {};
   nodes.forEach((n) => n.deps.forEach((d) => { (successors[d] = successors[d] || []).push(n.id); }));
@@ -336,5 +337,5 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
   best.forEach((col) => columns.push(col));
   columns.forEach((col, i) => col.forEach((n) => { level[n.id] = i; }));
 
-  return { nos: nodes, colunas: columns, nivel: level, niveisReais: columns.length - 1 };
+  return { nodes, columns, level, realLevels: columns.length - 1 };
 }

@@ -9,7 +9,7 @@ import {
   courseLessons as aulasDoCurso,
 } from '../catalog.js';
 import { courseProgress as progressoDoCurso } from '../state.js';
-import { estadoDoCurso } from '../grafo.js';
+import { courseState as estadoDoCurso } from '../graph.js';
 import { barra } from './comum.js';
 import { esc } from '../text.js';
 
