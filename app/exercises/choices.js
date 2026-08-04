@@ -7,7 +7,7 @@
 
    TWO SCHOOL RULES THE UI HAS TO RESPECT:
 
-   1. `porque` is POST-ANSWER feedback, not a visible hint. REGRAS.md writes it
+   1. `porque` is POST-ANSWER feedback, not a visible hint. `RULES.md` writes it
       down as a convention, and the critic is told to know it. If the
       justification shows up first, the whole exercise loses its point.
    2. The order of the choices in the JSON is not neutral — in the existing

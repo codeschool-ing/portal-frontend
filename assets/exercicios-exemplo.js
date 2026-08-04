@@ -2,7 +2,7 @@
    Sample exercises — disposable content, settled format.
 
    These exercises exist to give the portal structure, not to teach anyone. They
-   will be thrown away when the pipeline (`ferramentas/exercicios`, in the
+   will be thrown away when the pipeline (`tools/exercises`, in the
    vitrine's repo) runs again and produces real content.
 
    WHAT IS NOT DISPOSABLE IS THE FORMAT. The fields below are exactly the ones

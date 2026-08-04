@@ -148,9 +148,9 @@ divided into **sections**, and the last one is always the assessment.
 **The sections are written, never derived.** It would have been possible to split
 the title on the `:` and the commas and get 734 divisions for free, and it would
 have been a mistake: that is lexical heuristics over authored prose, exactly what
-`REGRAS.md` records having tried and discarded when checking "requires a later
-topic" — *"a resposta está na autoria, não na detecção"*. It would fail the same
-way here: `Cliente, servidor e host: quem pede e quem responde` would become a
+`RULES.md` records having tried and discarded when checking "requires a later
+topic" — *"the answer is in the authoring, not in the detection"*. It would fail
+the same way here: `Cliente, servidor e host: quem pede e quem responde` would become a
 section called "quem pede e quem responde". The enumeration in the title is
 **evidence** that the sections are needed; it is not a source for reading them.
 
@@ -348,7 +348,7 @@ would violate the generator's rule that an exercise from topic N may only requir
 what topics 1..N taught. In `html-css` the reason is different: the pipeline's
 validator executes python, javascript and sql, and HTML/CSS are not verified
 against test cases because what would be verified is the rendering. It is the
-same finding `REGRAS.md` recorded in `arquiteto-comunicacao`, where three of the
+same finding `RULES.md` recorded in `arquiteto-comunicacao`, where three of the
 seven types were inapplicable. All seven together are still in `javascript`,
 lesson 2.
 
@@ -1023,7 +1023,7 @@ submit callback, the exam DTO, and the `exercise:answered` event.
 
 - **A server**: authentication, per-student progress, code execution in a
   disposable container and the CAS for `resposta-expressao`.
-- **Real content**: reconnect `ferramentas/exercicios` from the vitrine's repo and
+- **Real content**: reconnect `tools/exercises` from the vitrine's repo and
   ingest the approved JSON, starting with the `_verificacao: criticado` ones.
 - **The videos.** The frame is already reserved in the sections that declared
   `video`, with the duration and the edge-to-edge layout ready. Only the id is

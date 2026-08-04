@@ -11,7 +11,7 @@
    exercise from topic N may only require what topics 1..N taught.
    `web-fundamentos` teaches no language — it is the school's first course, with
    no prerequisite — so asking for a program to be written would require what the
-   course did not give. It is the same finding REGRAS.md recorded in
+   course did not give. It is the same finding `RULES.md` recorded in
    `arquiteto-comunicacao`: in a course with no code, three of the seven types
    are inapplicable. Here only one is, because the last lesson covers the console.
 

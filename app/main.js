@@ -3,7 +3,7 @@
 
    LOAD ORDER, and it matters: `dados.js`, the dictionaries and `i18n-runtime.js`
    are CLASSIC scripts, loaded before this module by index.html. Functions
-   declared there (`txt`, `aplicarIdioma`, `guardarBase`…) live in the global
+   declared there (`txt`, `applyLanguage`, `savePtBase`…) live in the global
    scope and are visible here; the reverse is not automatic, so what the runtime
    needs from us is published by hand just below. It is the price of reusing the
    vitrine's i18n without touching it — and it is cheap next to rewriting five
@@ -38,13 +38,13 @@ import { openSearch, close as closeSearch, searchOpen } from './search-panel.js'
 import { closeModal, modalOpen } from './modal.js';
 
 /* ---------- what the i18n runtime needs from us ---------- */
-globalThis.ehEscolha = isChoice;                  // used by aplicarConteudo()
+globalThis.isChoice = isChoice;                  // used by applyContent()
 /* Switching language rebuilds the screen. The guard exists because
-   `aplicarIdioma()` is called once at boot, BEFORE the router starts: without
+   `applyLanguage()` is called once at boot, BEFORE the router starts: without
    it, the first screen would be built twice — once by the language, once by
    `start()`. */
 let booted = false;
-globalThis.redesenharTudo = () => (booted ? dispatch() : null);
+globalThis.redrawAll = () => (booted ? dispatch() : null);
 
 /* ---------- routes ---------- */
 route('/entrar', signIn);
@@ -269,9 +269,9 @@ function routeParams() {
 }
 
 /* ---------- i18n: the vitrine's sequence, in the same order ---------- */
-guardarBase();      // stores the Portuguese of CURSOS/TRILHAS/DEPOIMENTOS
-mapearTextos();     // walks the text nodes of the static skeleton
-aplicarIdioma();    // applies content + texts + selector, and rebuilds the screen
+savePtBase();     // stores the Portuguese of CURSOS/TRILHAS/DEPOIMENTOS
+mapTexts();       // walks the text nodes of the static skeleton
+applyLanguage();  // applies content + texts + selector, and rebuilds the screen
 
 paintAccount();
 booted = true;
