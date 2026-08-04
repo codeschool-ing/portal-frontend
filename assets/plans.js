@@ -13,11 +13,11 @@
    trava seria teatro — bastaria editar uma chave. Melhor não fingir.
 
    `inclui` é uma lista de CHAVES, não de frases: é por elas que o servidor vai
-   autorizar, e a frase que o aluno lê sai de `RECURSOS`. Duas listas de texto
+   autorizar, e a frase que o aluno lê sai de `FEATURES`. Duas listas de texto
    divergem no dia em que uma delas muda.
    ========================================================================== */
 
-window.RECURSOS = {
+window.FEATURES = {
   catalogo: 'Catálogo inteiro: 86 cursos e 16 trilhas',
   trilha: 'Trilha guiada com mapa de progresso',
   exercicios: 'Exercícios e avaliações de todas as aulas',
@@ -31,7 +31,7 @@ window.RECURSOS = {
   faturamento: 'Nota fiscal e faturamento por CNPJ',
 };
 
-window.PLANOS = [
+window.PLANS = [
   {
     id: 'estudante',
     nome: 'Estudante',

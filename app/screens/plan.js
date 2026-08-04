@@ -34,8 +34,8 @@ export default async function plan() {
   el.className = 'tela tela-plano';
   const current = currentPlan();
   const account = studentAccount();
-  const plans = window.PLANOS || [];
-  const features = window.RECURSOS || {};
+  const plans = window.PLANS || [];
+  const features = window.FEATURES || {};
 
   if (!current) {
     el.innerHTML = '<p class="vazio">' + txt('Nenhum plano configurado.') + '</p>';
@@ -48,7 +48,7 @@ export default async function plan() {
     : null;
 
   /* Every feature ANY plan offers becomes a row, in the order they appear in
-     RECURSOS. Listing only the current plan's would hide precisely what the
+     FEATURES. Listing only the current plan's would hide precisely what the
      person came to see. */
   const keys = Object.keys(features).filter((k) => plans.some((p) => p.inclui.includes(k)));
 

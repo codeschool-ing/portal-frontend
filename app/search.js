@@ -84,7 +84,7 @@ function buildIndex() {
       c.resumo, c.categoria, (c.ementa || []).join(' '));
 
     const lessons = courseLessons(c.id);
-    const hasContent = Boolean(window.AULAS?.[c.id]);
+    const hasContent = Boolean(window.LESSONS?.[c.id]);
 
     lessons.forEach((a) => {
       const sections = lessonSections(c.id, a.chave);

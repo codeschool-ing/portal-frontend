@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
-"""Gera os PDFs de exemplo do material complementar.
+"""Generates the sample PDFs for the supplementary material.
 
-POR QUE UM GERADOR, E NÃO PDFs COMMITADOS
+WHY A GENERATOR, AND NOT COMMITTED PDFs
 
-O portal tem de funcionar aberto do disco, como arquivo único: `bundle.py`
-achata tudo num `.html`, e um link para `assets/material.pdf` morre ali. Um
-`data:` URI atravessa — é o mesmo motivo pelo qual a vitrine embute as fontes.
+The portal has to work opened off disk, as a single file: `bundle.py` flattens
+everything into one `.html`, and a link to `assets/material.pdf` dies there. A
+`data:` URI survives — the same reason the vitrine inlines its fonts.
 
-E PDF binário no git é o tipo de arquivo que ninguém revisa e que ninguém sabe
-regerar seis meses depois. Aqui o CONTEÚDO é texto neste arquivo, versionado e
-legível no diff; o binário é saída.
+And a binary PDF in git is the kind of file nobody reviews and nobody knows how
+to regenerate six months later. Here the CONTENT is text in this file, versioned
+and readable in a diff; the binary is output.
 
-O PDF é escrito à mão, sem dependência, porque o portal inteiro não tem
-nenhuma. São ~1 KB cada: uma página, Helvetica, texto corrido. Não é para ser
-bonito — é para ser um PDF de verdade, que abre no leitor do sistema e mostra
-que o caminho do download funciona de ponta a ponta.
+The PDF is written by hand, with no dependency, because the whole portal has
+none. They are ~1 KB each: one page, Helvetica, running text. It is not meant to
+be pretty — it is meant to be a real PDF, one that opens in the system reader and
+shows that the download path works end to end.
 
-    python3 ferramentas/materiais/gerar.py     # reescreve assets/materiais.js
+    python3 tools/materials/generate.py     # rewrites assets/materials.js
 """
 
 import base64
@@ -24,14 +24,14 @@ import json
 import pathlib
 import textwrap
 
-RAIZ = pathlib.Path(__file__).resolve().parents[2]
+ROOT = pathlib.Path(__file__).resolve().parents[2]
 
-# ---------------------------------------------------------------- conteúdo
+# ----------------------------------------------------------------- content
 
-MATERIAIS = {
+MATERIALS = {
     'wf-dns-resumo': {
-        'titulo': 'DNS e propagação — folha de consulta',
-        'linhas': [
+        'title': 'DNS e propagação — folha de consulta',
+        'lines': [
             ('t', 'DNS e propagacao'),
             ('s', 'codeschool.ing - Fundamentos da Web e Internet'),
             ('', ''),
@@ -62,8 +62,8 @@ MATERIAIS = {
         ],
     },
     'wf-http-codigos': {
-        'titulo': 'Códigos de status HTTP — os que importam',
-        'linhas': [
+        'title': 'Códigos de status HTTP — os que importam',
+        'lines': [
             ('t', 'Codigos de status HTTP'),
             ('s', 'codeschool.ing - Fundamentos da Web e Internet'),
             ('', ''),
@@ -93,8 +93,8 @@ MATERIAIS = {
         ],
     },
     'js-coercao-tabela': {
-        'titulo': 'Coerção e valores falsos — tabela de bolso',
-        'linhas': [
+        'title': 'Coerção e valores falsos — tabela de bolso',
+        'lines': [
             ('t', 'Coercao e valores falsos'),
             ('s', 'codeschool.ing - JavaScript'),
             ('', ''),
@@ -125,8 +125,8 @@ MATERIAIS = {
         ],
     },
     'js-this-mapa': {
-        'titulo': 'O valor de this — mapa de decisão',
-        'linhas': [
+        'title': 'O valor de this — mapa de decisão',
+        'lines': [
             ('t', 'O valor de this'),
             ('s', 'codeschool.ing - JavaScript'),
             ('', ''),
@@ -153,8 +153,8 @@ MATERIAIS = {
         ],
     },
     'hc-flex-mapa': {
-        'titulo': 'Flexbox — mapa das propriedades',
-        'linhas': [
+        'title': 'Flexbox — mapa das propriedades',
+        'lines': [
             ('t', 'Flexbox: mapa das propriedades'),
             ('s', 'codeschool.ing - HTML e CSS'),
             ('', ''),
@@ -187,7 +187,7 @@ MATERIAIS = {
 
 # ------------------------------------------------------------------- PDF
 
-ESTILO = {
+STYLE = {
     't': ('Helvetica-Bold', 17, 26),
     's': ('Helvetica', 9.5, 22),
     'h': ('Helvetica-Bold', 11, 20),
@@ -196,87 +196,88 @@ ESTILO = {
 }
 
 
-def escapar(s):
+def escape(s):
     return s.replace('\\', r'\\').replace('(', r'\(').replace(')', r'\)')
 
 
-def pdf(linhas):
-    """Um PDF de uma página, sem compressão, escrito na mão."""
-    largura, altura, margem = 595, 842, 64
-    y = altura - margem
-    fluxo = []
-    for tipo, texto in linhas:
-        fonte, corpo, salto = ESTILO[tipo]
-        y -= salto
-        if texto:
-            cor = '0.25 0.25 0.25' if tipo == 's' else '0 0 0'
-            fluxo.append(
-                f'BT /{fonte.replace("-", "")} {corpo} Tf {cor} rg '
-                f'1 0 0 1 {margem} {y:.1f} Tm ({escapar(texto)}) Tj ET'
+def pdf(lines):
+    """A one-page PDF, uncompressed, written by hand."""
+    width, height, margin = 595, 842, 64
+    y = height - margin
+    stream = []
+    for kind, text in lines:
+        font, size, skip = STYLE[kind]
+        y -= skip
+        if text:
+            colour = '0.25 0.25 0.25' if kind == 's' else '0 0 0'
+            stream.append(
+                f'BT /{font.replace("-", "")} {size} Tf {colour} rg '
+                f'1 0 0 1 {margin} {y:.1f} Tm ({escape(text)}) Tj ET'
             )
-    conteudo = '\n'.join(fluxo).encode('latin-1', 'replace')
+    content = '\n'.join(stream).encode('latin-1', 'replace')
 
-    objetos = [
+    objects = [
         b'<< /Type /Catalog /Pages 2 0 R >>',
         b'<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
         (
-            f'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {largura} {altura}] '
+            f'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {width} {height}] '
             '/Resources << /Font << /Helvetica 5 0 R /HelveticaBold 6 0 R >> >> '
             '/Contents 4 0 R >>'
         ).encode(),
-        b'<< /Length ' + str(len(conteudo)).encode() + b' >>\nstream\n' + conteudo + b'\nendstream',
+        b'<< /Length ' + str(len(content)).encode() + b' >>\nstream\n' + content + b'\nendstream',
         b'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
         b'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',
     ]
 
-    fora = bytearray(b'%PDF-1.4\n')
-    posicoes = []
-    for i, obj in enumerate(objetos, start=1):
-        posicoes.append(len(fora))
-        fora += f'{i} 0 obj\n'.encode() + obj + b'\nendobj\n'
+    out = bytearray(b'%PDF-1.4\n')
+    offsets = []
+    for i, obj in enumerate(objects, start=1):
+        offsets.append(len(out))
+        out += f'{i} 0 obj\n'.encode() + obj + b'\nendobj\n'
 
-    xref = len(fora)
-    fora += f'xref\n0 {len(objetos) + 1}\n'.encode()
-    fora += b'0000000000 65535 f \n'
-    for p in posicoes:
-        fora += f'{p:010d} 00000 n \n'.encode()
-    fora += (
-        f'trailer\n<< /Size {len(objetos) + 1} /Root 1 0 R >>\n'
+    xref = len(out)
+    out += f'xref\n0 {len(objects) + 1}\n'.encode()
+    out += b'0000000000 65535 f \n'
+    for p in offsets:
+        out += f'{p:010d} 00000 n \n'.encode()
+    out += (
+        f'trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\n'
         f'startxref\n{xref}\n%%EOF\n'
     ).encode()
-    return bytes(fora)
+    return bytes(out)
 
 
 def main():
-    saida = {}
-    for chave, m in MATERIAIS.items():
-        binario = pdf(m['linhas'])
-        saida[chave] = {
-            'titulo': m['titulo'],
+    out = {}
+    for key, m in MATERIALS.items():
+        binary = pdf(m['lines'])
+        out[key] = {
+            'titulo': m['title'],
             'tipo': 'pdf',
-            'bytes': len(binario),
-            'arquivo': chave + '.pdf',
-            'dados': 'data:application/pdf;base64,' + base64.b64encode(binario).decode(),
+            'bytes': len(binary),
+            'arquivo': key + '.pdf',
+            'dados': 'data:application/pdf;base64,' + base64.b64encode(binary).decode(),
         }
-        print(f'  {chave:20s} {len(binario):6d} bytes')
+        print(f'  {key:20s} {len(binary):6d} bytes')
 
-    destino = RAIZ / 'assets' / 'materiais.js'
-    cabeca = textwrap.dedent('''\
+    target = ROOT / 'assets' / 'materials.js'
+    header = textwrap.dedent('''\
         /* ==========================================================================
-           Material complementar — GERADO. Não edite à mão.
+           Supplementary material — GENERATED. Do not edit by hand.
 
-           Fonte: ferramentas/materiais/gerar.py
-           Regerar: python3 ferramentas/materiais/gerar.py
+           Source: tools/materials/generate.py
+           Regenerate: python3 tools/materials/generate.py
 
-           Os PDFs vêm como `data:` URI porque o portal tem de funcionar aberto do
-           disco, como arquivo único — um link para `assets/algo.pdf` morre depois do
-           bundle. Na Etapa 2 isto vira URL assinada de um bucket, e o formato do
-           registro não muda: só o campo `dados` deixa de ser embutido.
+           The PDFs come as `data:` URIs because the portal has to work opened off
+           disk, as a single file — a link to `assets/something.pdf` dies after the
+           bundle. In Etapa 2 this becomes a signed URL from a bucket, and the shape
+           of the record does not change: only the `dados` field stops being
+           inlined.
            ========================================================================== */
 
-        window.MATERIAIS = ''')
-    destino.write_text(cabeca + json.dumps(saida, ensure_ascii=False, indent=2) + ';\n')
-    print(f'{destino}  —  {len(saida)} materiais, {destino.stat().st_size // 1024} KB')
+        window.MATERIALS = ''')
+    target.write_text(header + json.dumps(out, ensure_ascii=False, indent=2) + ';\n')
+    print(f'{target}  —  {len(out)} materials, {target.stat().st_size // 1024} KB')
 
 
 if __name__ == '__main__':

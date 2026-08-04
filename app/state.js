@@ -258,12 +258,12 @@ export function answersGiven() {
    life, and every one of them becomes an `if` nobody will ever exercise. */
 export function studentAccount() {
   const c = state.conta;
-  const planId = c?.planoId || (window.PLANOS?.[0]?.id ?? 'estudante');
+  const planId = c?.planoId || (window.PLANS?.[0]?.id ?? 'estudante');
   return { planoId: planId, desde: c?.desde || null, email: state.sessao?.email || '' };
 }
 
 export const currentPlan = () =>
-  (window.PLANOS || []).find((p) => p.id === studentAccount().planoId) || (window.PLANOS || [])[0] || null;
+  (window.PLANS || []).find((p) => p.id === studentAccount().planoId) || (window.PLANS || [])[0] || null;
 
 export function changePlan(planId) {
   change(() => {

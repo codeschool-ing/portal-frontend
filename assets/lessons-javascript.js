@@ -21,7 +21,7 @@
    aulas-web-fundamentos.js).
    ========================================================================== */
 
-window.AULAS = Object.assign(window.AULAS || {}, {
+window.LESSONS = Object.assign(window.LESSONS || {}, {
   javascript: {
 
     /* --------------------------------------------------------------- 01 */

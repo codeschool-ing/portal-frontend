@@ -27,7 +27,7 @@
    fonte para lê-las.
 
    FORMA
-     window.AULAS[cursoId][tópico em pt] = [ seção, ... ]
+     window.LESSONS[cursoId][tópico em pt] = [ seção, ... ]
 
    Há um arquivo por curso, como o pipeline faz com os exercícios, e cada um
    MESCLA no objeto em vez de atribuí-lo: nenhum pode depender de ser o
@@ -61,7 +61,7 @@
    reescreve.
    ========================================================================== */
 
-window.AULAS = Object.assign(window.AULAS || {}, {
+window.LESSONS = Object.assign(window.LESSONS || {}, {
 
   'web-fundamentos': {
 

@@ -800,7 +800,7 @@ ok('o trilho mostra a duração das seções de vídeo', icones.comDuracao === 2
    a hora de assistir. */
 const posicoes = await p.evaluate(() => {
   const fora = {};
-  Object.values(window.AULAS).forEach((curso) => {
+  Object.values(window.LESSONS).forEach((curso) => {
     Object.values(curso).forEach((secoes) => {
       secoes.forEach((s, i) => { if (s.video !== undefined) fora[i + 1] = (fora[i + 1] || 0) + 1; });
     });
@@ -825,10 +825,10 @@ await p.setViewportSize({ width: 1920, height: 1000 });
 await p.waitForTimeout(200);
 const foraDoLimite = await p.evaluate(async () => {
   const fora = [];
-  for (const curso of Object.keys(window.AULAS)) {
-    const topicos = Object.keys(window.AULAS[curso]);
+  for (const curso of Object.keys(window.LESSONS)) {
+    const topicos = Object.keys(window.LESSONS[curso]);
     for (let i = 0; i < topicos.length; i += 1) {
-      for (const sec of window.AULAS[curso][topicos[i]]) {
+      for (const sec of window.LESSONS[curso][topicos[i]]) {
         location.hash = `#/curso/${curso}/aula/${i}/${sec.id}`;
         await new Promise((r) => setTimeout(r, 50));
         const tela = document.querySelector('.tela-aula');

@@ -26,7 +26,7 @@
    ESTADO: conteúdo de exemplo, tecnicamente correto e sem revisão pedagógica.
    ========================================================================== */
 
-window.AULAS = Object.assign(window.AULAS || {}, {
+window.LESSONS = Object.assign(window.LESSONS || {}, {
 
   'html-css': {
 

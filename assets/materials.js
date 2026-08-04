@@ -1,16 +1,17 @@
 /* ==========================================================================
-   Material complementar — GERADO. Não edite à mão.
+   Supplementary material — GENERATED. Do not edit by hand.
 
-   Fonte: ferramentas/materiais/gerar.py
-   Regerar: python3 ferramentas/materiais/gerar.py
+   Source: tools/materials/generate.py
+   Regenerate: python3 tools/materials/generate.py
 
-   Os PDFs vêm como `data:` URI porque o portal tem de funcionar aberto do
-   disco, como arquivo único — um link para `assets/algo.pdf` morre depois do
-   bundle. Na Etapa 2 isto vira URL assinada de um bucket, e o formato do
-   registro não muda: só o campo `dados` deixa de ser embutido.
+   The PDFs come as `data:` URIs because the portal has to work opened off
+   disk, as a single file — a link to `assets/something.pdf` dies after the
+   bundle. In Etapa 2 this becomes a signed URL from a bucket, and the shape
+   of the record does not change: only the `dados` field stops being
+   inlined.
    ========================================================================== */
 
-window.MATERIAIS = {
+window.MATERIALS = {
   "wf-dns-resumo": {
     "titulo": "DNS e propagação — folha de consulta",
     "tipo": "pdf",

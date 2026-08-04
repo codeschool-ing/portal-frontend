@@ -50,7 +50,7 @@ export function lessonExercises(courseId, key, { minimo = 'estrutura' } = {}) {
 }
 
 export function lessonSections(courseId, key) {
-  const written = window.AULAS?.[courseId]?.[key];
+  const written = window.LESSONS?.[courseId]?.[key];
 
   const sections = written?.length
     ? written.map((s) => ({ ...s, tipo: 'conteudo' }))
@@ -100,7 +100,7 @@ export const sectionIndex = (sections, secId) => {
 /* ---------- supplementary material ----------
 
    A section refers to material by KEY (`materiais: ['wf-dns-resumo']`), and the
-   record with title, size and bytes lives in `window.MATERIAIS`. Two reasons,
+   record with title, size and bytes lives in `window.MATERIALS`. Two reasons,
    and the second is the one that matters:
 
    1. The same PDF serves more than one section without being duplicated.
@@ -110,7 +110,7 @@ export const sectionIndex = (sections, secId) => {
 
    A key that is not in the registry is IGNORED, on purpose: material removed
    from the bucket must not take the whole lesson down with it. */
-export const materialByKey = (key) => (window.MATERIAIS || {})[key] || null;
+export const materialByKey = (key) => (window.MATERIALS || {})[key] || null;
 
 export const sectionMaterials = (section) =>
   (section?.materiais || []).map(materialByKey).filter(Boolean);
