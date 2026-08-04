@@ -22,8 +22,8 @@ import { esc } from './text.js';
 
 import entrar from './screens/sign-in.js';
 import painel from './screens/dashboard.js';
-import telaTrilha from './telas/trilha.js';
-import curso from './telas/curso.js';
+import telaTrilha from './screens/track.js';
+import curso from './screens/course.js';
 import aula from './telas/aula.js';
 import catalogo from './screens/catalog.js';
 import certificados from './telas/certificados.js';
@@ -32,7 +32,7 @@ import planoTela from './screens/plan.js';
 import desempenho from './screens/performance.js';
 import refazer from './screens/redo.js';
 import notas from './screens/notes.js';
-import { provaCurso, provaTrilha } from './telas/prova.js';
+import { courseExamScreen as provaCurso, trackExamScreen as provaTrilha } from './screens/exam.js';
 import { openSearch as abrirBusca, close as fecharBusca, searchOpen as buscaAberta } from './search-panel.js';
 import { closeModal as fecharModal, modalOpen as modalAberto } from './modal.js';
 
