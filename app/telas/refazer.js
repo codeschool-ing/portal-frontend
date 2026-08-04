@@ -12,7 +12,7 @@
    aula errada, e o desempenho passaria a mentir sobre onde a pessoa melhorou.
    ========================================================================== */
 
-import { montarAvaliacao } from '../exercicios/index.js';
+import { buildAssessment as montarAvaliacao } from '../exercises/index.js';
 import { errados } from './desempenho.js';
 import { vazio } from './comum.js';
 

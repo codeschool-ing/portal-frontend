@@ -15,7 +15,7 @@
 import { cursoPorId } from '../catalogo.js';
 import { progressoDoCurso, opcaoAtiva, resultadoProva, tentativasDeProva, guardarProva } from '../estado.js';
 import { provaDoCurso, provaDaTrilha, notaDaProva, MINIMO } from '../provas.js';
-import { montarAvaliacao } from '../exercicios/index.js';
+import { buildAssessment as montarAvaliacao } from '../exercises/index.js';
 import { trilhaDoAluno, progressoDaTrilha, barra, vazio } from './comum.js';
 import { esc } from '../texto.js';
 

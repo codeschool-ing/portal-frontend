@@ -12,7 +12,7 @@
 import * as estado from './estado.js';
 import { aulasDoCurso, cursoPorId, trilhaPorId } from './catalogo.js';
 import { exerciciosDaAula as buscarExercicios, secoesDaAula } from './aulas.js';
-import { avaliarLocal, PRECISA_SERVIDOR } from './exercicios/avaliar.js';
+import { gradeLocally as avaliarLocal, NEEDS_SERVER as PRECISA_SERVIDOR } from './exercises/grade.js';
 
 const eco = (v) => Promise.resolve(v);
 

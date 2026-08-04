@@ -34,7 +34,7 @@ import { aulasDoCurso, cursoPorId } from '../catalogo.js';
 import { secoesDaAula, materiaisDaSecao } from '../aulas.js';
 import { listaDeMateriais } from '../materiais.js';
 import { secaoConcluida, visitarSecao, notaDe, guardarNota } from '../estado.js';
-import { montarAvaliacao } from '../exercicios/index.js';
+import { buildAssessment as montarAvaliacao } from '../exercises/index.js';
 import { vazio } from './comum.js';
 import { esc, prosa } from '../texto.js';
 
