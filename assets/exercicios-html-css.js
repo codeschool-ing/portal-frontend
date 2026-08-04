@@ -1,25 +1,26 @@
 /* ==========================================================================
-   Exercícios de `html-css` — quatro aulas de treze.
+   `html-css` exercises — four lessons out of thirteen.
 
-   O curso está deliberadamente PELA METADE: as aulas 04, 05, 07 e 10 têm
-   avaliação, as outras nove não. É como um curso fica enquanto está sendo
-   produzido, e serve para ver a avaliação pendente no lugar dela — presente na
-   estrutura, marcada, sem botão de concluir e fora do denominador.
+   The course is deliberately HALF DONE: lessons 04, 05, 07 and 10 have an
+   assessment, the other nine do not. That is how a course looks while it is
+   being produced, and it serves to show the pending assessment in its place —
+   present in the structure, marked, with no complete button and outside the
+   denominator.
 
-   Cinco tipos, e a ausência dos outros dois tem causa:
-   - `codigo` e `saida-esperada` precisam de interpretador. O validador do
-     pipeline executa python, javascript e sql; HTML e CSS não se verificam
-     contra casos de teste, porque o que se verificaria é o desenho — e isso
-     nenhum interpretador julga.
-   - `resposta-expressao` é para matemática simbólica. Não há nada aqui que o
-     sympy recalcule.
+   Five types, and the absence of the other two has a cause:
+   - `codigo` and `saida-esperada` need an interpreter. The pipeline's validator
+     executes python, javascript and sql; HTML and CSS are not verified against
+     test cases, because what would be verified is the rendering — and no
+     interpreter judges that.
+   - `resposta-expressao` is for symbolic mathematics. There is nothing here for
+     sympy to recompute.
 
-   ESTADO: conteúdo de exemplo, sem revisão pedagógica, marcado `estrutura`.
+   STATUS: sample content, no pedagogical review, marked `estrutura`.
    ========================================================================== */
 
 window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
 
-  /* ============================================================== aula 04 */
+  /* ============================================================== lesson 04 */
   {
     id: 'hc-04-quiz',
     curso: 'html-css',
@@ -75,7 +76,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 05 */
+  /* ============================================================== lesson 05 */
   {
     id: 'hc-05-quiz',
     curso: 'html-css',
@@ -112,7 +113,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 07 */
+  /* ============================================================== lesson 07 */
   {
     id: 'hc-07-quiz',
     curso: 'html-css',
@@ -152,7 +153,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 10 */
+  /* ============================================================== lesson 10 */
   {
     id: 'hc-10-ord',
     curso: 'html-css',

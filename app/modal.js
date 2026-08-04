@@ -1,41 +1,41 @@
 /* ==========================================================================
-   Modal — o mesmo da vitrine, reaproveitado.
+   Modal — the vitrine's, reused as is.
 
-   As classes (`.modal`, `.modal-caixa`, `html.modal-aberto`) vêm do
-   `base.css`, que é cópia da vitrine: o esmaecido, o desfoque, a animação de
-   entrada e o congelamento do fundo já estavam resolvidos lá, e resolvidos
-   pelo mesmo motivo que valeria aqui.
+   The classes (`.modal`, `.modal-caixa`, `html.modal-aberto`) come from
+   `base.css`, which is a copy of the vitrine's: the dimming, the blur, the
+   entrance animation and the frozen background were already solved there, and
+   solved for the same reason that would apply here.
 
-   O CONGELAMENTO É NO CSS, NÃO NO JAVASCRIPT, e o comentário do base.css
-   explica: prender só a roda e o toque deixava passar a barra de rolagem, a
-   inércia do trackpad e as setas dentro de um campo. `overflow:hidden` no
-   documento resolve os três, e sem reposicionar nada — a página fica
-   exatamente onde estava.
+   THE FREEZING IS IN THE CSS, NOT IN JAVASCRIPT, and the base.css comment
+   explains why: catching only the wheel and touch still let through the
+   scrollbar, trackpad inertia and the arrow keys inside a field.
+   `overflow:hidden` on the document solves all three, and without repositioning
+   anything — the page stays exactly where it was.
 
-   O QUE ESTE MÓDULO ACRESCENTA é o que um portal precisa e uma vitrine não:
-   devolver o foco a quem abriu. Quem chegou pelo teclado tem de voltar para o
-   mesmo lugar ao fechar, senão o foco cai no começo do documento e a pessoa
-   reencontra a lista rolando tudo de novo.
+   WHAT THIS MODULE ADDS is what a portal needs and a shop window does not:
+   giving focus back to whoever opened it. Someone who arrived by keyboard has to
+   return to the same place on close, or focus lands at the top of the document
+   and they have to scroll the whole list again to find where they were.
    ========================================================================== */
 
-let aberto = null;
+let open = null;
 
-export const modalAberto = () => Boolean(aberto);
+export const modalOpen = () => Boolean(open);
 
-export function fecharModal() {
-  if (!aberto) return;
-  const { el, focoAntes } = aberto;
-  aberto = null;
+export function closeModal() {
+  if (!open) return;
+  const { el, focusedBefore } = open;
+  open = null;
   el.remove();
   document.documentElement.classList.remove('modal-aberto');
-  if (focoAntes && document.contains(focoAntes)) focoAntes.focus();
+  if (focusedBefore && document.contains(focusedBefore)) focusedBefore.focus();
 }
 
-/* `conteudo` é HTML já escapado por quem chamou — este módulo não sabe o que
-   está mostrando, e não deve saber. `acoes` é o que aparece ACIMA da caixa, à
-   direita: no certificado, os botões de compartilhar. */
-export function abrirModal(conteudo, { classe = '', acoes = '', rotulo = '' } = {}) {
-  fecharModal();
+/* `content` is HTML already escaped by the caller — this module does not know
+   what it is showing, and should not know. `actions` is what appears ABOVE the
+   box, on the right: on a certificate, the sharing buttons. */
+export function openModal(content, { classe = '', acoes = '', rotulo = '' } = {}) {
+  closeModal();
 
   const el = document.createElement('div');
   el.className = 'modal' + (classe ? ' ' + classe : '');
@@ -48,18 +48,19 @@ export function abrirModal(conteudo, { classe = '', acoes = '', rotulo = '' } = 
         acoes +
         '<button type="button" class="modal-fechar" aria-label="' + txt('Fechar') + '">✕</button>' +
       '</div>' +
-      '<div class="modal-caixa">' + conteudo + '</div>' +
+      '<div class="modal-caixa">' + content + '</div>' +
     '</div>';
 
-  /* Clicar FORA fecha; clicar dentro, não. O alvo tem de ser o próprio véu —
-     `closest('.modal-caixa')` não basta, porque a pilha também é fundo. */
+  /* Clicking OUTSIDE closes; clicking inside does not. The target has to be the
+     veil itself — `closest('.modal-caixa')` is not enough, because the stack is
+     also background. */
   el.addEventListener('click', (e) => {
-    if (e.target === el || e.target.closest('.modal-fechar')) fecharModal();
+    if (e.target === el || e.target.closest('.modal-fechar')) closeModal();
   });
 
   document.body.appendChild(el);
   document.documentElement.classList.add('modal-aberto');
-  aberto = { el, focoAntes: document.activeElement };
+  open = { el, focusedBefore: document.activeElement };
   el.querySelector('.modal-fechar').focus();
   return el;
 }

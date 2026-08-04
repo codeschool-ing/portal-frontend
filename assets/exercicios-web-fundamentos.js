@@ -1,31 +1,33 @@
 /* ==========================================================================
-   Exercícios de `web-fundamentos` — um arquivo por curso, como o pipeline.
+   `web-fundamentos` exercises — one file per course, as the pipeline does.
 
-   O pipeline emite `exercicios-<curso>.json`. Aqui a extensão é `.js` porque
-   o portal ainda não tem servidor para buscar JSON (e `fetch` de `file://` é
-   bloqueado, o que quebraria o pacote de arquivo único), mas o conteúdo de
-   cada objeto é exatamente o que a ferramenta produz.
+   The pipeline emits `exercicios-<course>.json`. Here the extension is `.js`
+   because the portal has no server yet to fetch JSON from (and a `fetch` from
+   `file://` is blocked, which would break the single-file bundle), but the
+   content of each object is exactly what the tool produces.
 
-   SEIS DOS SETE TIPOS, E ISSO NÃO É DESCUIDO
-   `codigo` não aparece aqui, e a razão é uma regra do gerador: um exercício do
-   tópico N só pode exigir o que os tópicos 1..N ensinaram. `web-fundamentos`
-   não ensina nenhuma linguagem — é o primeiro curso da escola, sem
-   pré-requisito —, então pedir para escrever um programa exigiria o que o
-   curso não deu. É o mesmo achado que REGRAS.md registrou em
-   `arquiteto-comunicacao`: num curso sem código, três dos sete tipos são
-   inaplicáveis. Aqui só um é, porque a última aula fala do console.
+   SIX OF THE SEVEN TYPES, AND THAT IS NOT AN OVERSIGHT
+   `codigo` does not appear here, and the reason is a rule of the generator: an
+   exercise from topic N may only require what topics 1..N taught.
+   `web-fundamentos` teaches no language — it is the school's first course, with
+   no prerequisite — so asking for a program to be written would require what the
+   course did not give. It is the same finding REGRAS.md recorded in
+   `arquiteto-comunicacao`: in a course with no code, three of the seven types
+   are inapplicable. Here only one is, because the last lesson covers the console.
 
-   `resposta-expressao` cabe de verdade na aula 03: banda, latência e vazão são
-   uma relação algébrica, e o CAS confere a equivalência sem exigir a forma.
+   `resposta-expressao` genuinely fits in lesson 03: bandwidth, latency and
+   throughput are an algebraic relation, and the CAS checks the equivalence
+   without demanding a particular form.
 
-   ESTADO: conteúdo de exemplo, tecnicamente correto e sem revisão pedagógica.
-   Não passou pelo funil — todos estão marcados `_verificacao: 'estrutura'`,
-   que é a marca mais fraca e é a verdade sobre eles.
+   STATUS: sample content, technically correct and with no pedagogical review. It
+   did not go through the funnel — all of them are marked
+   `_verificacao: 'estrutura'`, which is the weakest mark and is the truth about
+   them.
    ========================================================================== */
 
 window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
 
-  /* ============================================================== aula 01 */
+  /* ============================================================== lesson 01 */
   {
     id: 'wf-01-quiz',
     curso: 'web-fundamentos',
@@ -81,7 +83,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 02 */
+  /* ============================================================== lesson 02 */
   {
     id: 'wf-02-quiz',
     curso: 'web-fundamentos',
@@ -134,7 +136,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 03 */
+  /* ============================================================== lesson 03 */
   {
     id: 'wf-03-quiz',
     curso: 'web-fundamentos',
@@ -184,7 +186,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 04 */
+  /* ============================================================== lesson 04 */
   {
     id: 'wf-04-mult',
     curso: 'web-fundamentos',
@@ -237,7 +239,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 05 */
+  /* ============================================================== lesson 05 */
   {
     id: 'wf-05-ord',
     curso: 'web-fundamentos',
@@ -290,7 +292,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 06 */
+  /* ============================================================== lesson 06 */
   {
     id: 'wf-06-quiz',
     curso: 'web-fundamentos',
@@ -365,7 +367,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 07 */
+  /* ============================================================== lesson 07 */
   {
     id: 'wf-07-quiz',
     curso: 'web-fundamentos',
@@ -421,7 +423,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 08 */
+  /* ============================================================== lesson 08 */
   {
     id: 'wf-08-ord',
     curso: 'web-fundamentos',
@@ -475,7 +477,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 09 */
+  /* ============================================================== lesson 09 */
   {
     id: 'wf-09-mult',
     curso: 'web-fundamentos',
@@ -528,7 +530,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 10 */
+  /* ============================================================== lesson 10 */
   {
     id: 'wf-10-ord',
     curso: 'web-fundamentos',
@@ -583,7 +585,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 11 */
+  /* ============================================================== lesson 11 */
   {
     id: 'wf-11-saida',
     curso: 'web-fundamentos',

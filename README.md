@@ -1,972 +1,1038 @@
-# portal-frontend — Portal do Aluno da codeschool.ing
+# portal-frontend — codeschool.ing's Student Portal
 
-**Etapa 2** do projeto: a área do aluno. A Etapa 1 é a vitrine
+**Stage 2** of the project: the student area. Stage 1 is the vitrine
 ([`codeschool-ing.github.io`](https://github.com/codeschool-ing/codeschool-ing.github.io)),
-que apresenta 86 cursos e 16 trilhas e capta matrícula. Aqui é onde quem se
-matriculou estuda.
+which presents 86 courses and 16 tracks and captures enrolment. This is where
+whoever enrolled actually studies.
 
-Sem build e sem dependências, como a vitrine: HTML, CSS e módulos ES puros. Abre
-de qualquer servidor estático.
+No build and no dependencies, like the vitrine: plain HTML, CSS and ES modules.
+It opens from any static server.
 
-> **Estado: esqueleto.** A estrutura está de pé e é navegável ponta a ponta, mas
-> não há autenticação, não há servidor e o conteúdo é de mentira. O que já é
-> definitivo é a **forma** — o formato dos exercícios, as assinaturas da API e o
-> contrato dos tipos. Ver "O que é esqueleto e o que é definitivo".
+> **Status: skeleton.** The structure stands up and is navigable end to end, but
+> there is no authentication, no server and the content is make-believe. What is
+> already settled is the **shape** — the exercise format, the API signatures and
+> the type contract. See "What is skeleton and what is settled".
 
-## Rodar
+## Running it
 
 ```sh
 python3 -m http.server 8899
-# abrir http://localhost:8899
+# open http://localhost:8899
 ```
 
-Conferir que continua de pé:
+Checking that it still stands:
 
 ```sh
 npm i playwright
-node ferramentas/fumaca/fumaca.mjs      # o portal inteiro, num navegador
-node ferramentas/exemplos/conferir.mjs  # os exemplos de código realmente rodam
+node tools/smoke/smoke.mjs      # the whole portal, in a browser
+node tools/examples/check.mjs   # the code examples really do run
 ```
 
-## Um arquivo só, para abrir do disco
+## A single file, to open off disk
 
 ```sh
-python3 ferramentas/bundle/bundle.py     # -> portal-aluno.html
+python3 tools/bundle/bundle.py     # -> portal-aluno.html
 ```
 
-Embute CSS, scripts, favicon e — o passo que a ferramenta equivalente da
-vitrine não precisava ter — **achata os módulos ES**. Eles não sobrevivem ao
-`file://`: `<script type="module" src="…">` dispara um fetch, e fetch de
-`file://` é bloqueado por CORS em todo navegador. A página abriria em branco,
-sem sintoma além do console. Cada módulo vira uma IIFE que devolve o que
-exportava, e os `import` viram leitura de um registro.
+It inlines the CSS, the scripts and the favicon and — the step the vitrine's
+equivalent tool never needed — **flattens the ES modules**. They do not survive
+`file://`: `<script type="module" src="…">` fires a fetch, and a fetch from
+`file://` is blocked by CORS in every browser. The page would open blank, with no
+symptom beyond the console. Each module becomes an IIFE returning what it
+exported, and the `import`s become reads from a registry.
 
-A saída continua sendo `<script type="module">`, de propósito: módulo embutido
-não faz fetch, mas mantém a execução **adiada**, que é a mesma ordem do
-`index.html` servido. Um `<script>` clássico rodaria antes da hora e o pacote
-deixaria de exercitar o que o site exercita.
+The output is still a `<script type="module">`, deliberately: an inlined module
+makes no fetch, but keeps execution **deferred**, which is the same order the
+served `index.html` has. A classic `<script>` would run too early and the bundle
+would stop exercising what the site exercises.
 
-O achatamento pressupõe o código deste repositório, e só ele — sem
-reexportação, sem ciclo de imports e sem `await` no topo de módulo. Qualquer um
-dos três para a geração com erro, em vez de produzir um pacote quebrado em
-silêncio.
+The flattening assumes this repository's code, and only it — no re-export, no
+import cycle and no top-level `await`. Any of the three stops generation with an
+error, instead of silently producing a broken bundle.
 
-O mesmo teste de fumaça roda contra o pacote, e é assim que se sabe que ele não
-regrediu:
+The same smoke suite runs against the bundle, and that is how we know it has not
+regressed:
 
 ```sh
-PORTAL="file://$PWD" PAGINA=/portal-aluno.html node ferramentas/fumaca/fumaca.mjs
+PORTAL="file://$PWD" PAGE=/portal-aluno.html node tools/smoke/smoke.mjs
 ```
 
-O portal continua sendo servido de `index.html` + `assets/` + `app/`; o pacote
-é para entregar uma cópia que abre com dois cliques.
+The portal is still served from `index.html` + `assets/` + `app/`; the bundle is
+for handing over a copy that opens with two clicks.
 
-## O que veio da vitrine, e o que não veio
+## What came from the vitrine, and what did not
 
-A identidade é a mesma escola, então quase tudo atravessa:
+The identity is the same school, so nearly everything crosses over:
 
-| o quê | como veio |
+| what | how it came |
 | --- | --- |
-| `assets/base.css` | cópia de `style.css` da vitrine, **sem alteração** |
-| `assets/dados.js` | cópia do catálogo — 86 cursos, 16 trilhas |
-| `assets/i18n*.js` | cópia dos cinco idiomas |
-| `assets/i18n-runtime.js` | cópia, com **uma** linha divergente (abaixo) |
-| o grafo de dependências | extraído para `app/catalogo.js` e `app/grafo.js` |
+| `assets/base.css` | a copy of the vitrine's `style.css`, **unchanged** |
+| `assets/dados.js` | a copy of the catalogue — 86 courses, 16 tracks |
+| `assets/i18n*.js` | a copy of the five languages |
+| `assets/i18n-runtime.js` | a copy, with **one** divergent line (below) |
+| the dependency graph | extracted into `app/catalog.js` and `app/graph.js` |
 
-**O que ficou lá: o fullpage.** Cada seção ocupando a tela e a rolagem saltando
-entre elas pressupõe narrativa linear — sete telas, você rola uma vez e chegou
-ao fim. Um portal é acesso aleatório, sessão retomada no meio, conteúdo de
-altura imprevisível. Sequestrar a roda do mouse num lugar onde a pessoa vai
-passar horas lendo é hostil. É a única decisão grande da vitrine que não veio.
+**What stayed there: the fullpage.** Each section taking the screen and the
+scroll jumping between them presumes a linear narrative — seven screens, you
+scroll once and you have reached the end. A portal is random access, a session
+resumed halfway, content of unpredictable height. Hijacking the mouse wheel
+somewhere a person will spend hours reading is hostile. It is the only large
+vitrine decision that did not come across.
 
-No lugar dele, chrome persistente: a mesma barra de 64px, um trilho lateral que
-responde "onde estou" e "quanto falta" sem clique, e conteúdo que rola normal.
+In its place, persistent chrome: the same 64px bar, a side rail that answers
+"where am I" and "how much is left" without a click, and content that scrolls
+normally.
 
-**A barra do topo é a mesma, com outro trabalho.** Ficaram a marca com o LED, o
-tema, o idioma e a moldura `.term-bar` dos painéis. Saíram os links de venda
-(Trilhas · Cursos · Planos · FAQ) e entrou o contexto do aluno. Há uma simetria
-aqui: o link "Área do aluno" da vitrine é descrito no README de lá como
-*marcador de funcionalidade futura*. Este repositório é o destino dele.
+**The top bar is the same, with a different job.** The brand with its LED, the
+theme, the language and the panels' `.term-bar` frame all stayed. The sales links
+(Trilhas · Cursos · Planos · FAQ) went, and the student's context came in. There
+is a symmetry here: the vitrine's "Área do aluno" link is described in that
+repository's README as a *placeholder for future functionality*. This repository
+is its destination.
 
-O trilho vira gaveta em **1180px** e o grafo vira lista em **861px** — os dois
-pontos de corte são os da vitrine, reaproveitados porque foram medidos lá, não
-escolhidos.
+The rail becomes a drawer at **1180px** and the graph becomes a list at **861px**
+— both cut points are the vitrine's, reused because they were measured there, not
+chosen.
 
-## O grafo virou mapa de progresso
+## The graph became a progress map
 
-É o melhor reaproveitamento do projeto, e sai quase de graça: `depende` já é,
-literalmente, uma regra de desbloqueio. O algoritmo é o mesmo — níveis por Kahn,
-ordenação de Sugiyama com custo lexicográfico de três critérios, roteamento
-geométrico das arestas com folga de 16px. O que mudou é o que o cartão diz.
+It is the project's best reuse, and it comes almost free: `depende` already is,
+literally, an unlocking rule. The algorithm is the same — levels by Kahn,
+Sugiyama ordering with a three-criterion lexicographic cost, geometric edge
+routing with 16px of clearance. What changed is what the card says.
 
-Quatro estados: **concluído · em andamento · disponível · mais adiante**.
+Four states: **completed · in progress · available · further ahead**.
 
-**Ele mostra, mas não tranca.** O FAQ da vitrine promete, por escrito: *"Não. A
-trilha é uma recomendação de ordem — se você só precisa de um curso dela,
-assista só ele."* Um cadeado aqui contradiria uma promessa já publicada. Por
-isso o estado mais restritivo se chama `adiante`, continua clicável, e o rodapé
-do cartão diz "recomendado depois de X" em vez de "bloqueado".
+**It shows, but it does not lock.** The vitrine's FAQ promises, in writing:
+*"Não. A trilha é uma recomendação de ordem — se você só precisa de um curso
+dela, assista só ele."* A padlock here would contradict an already published
+promise. That is why the most restrictive state is called `adiante`, remains
+clickable, and the card's footer says "recommended after X" instead of "locked".
 
-**O cursor acende as arestas do curso** — as que chegam nele e as que saem. Isso
-existia na vitrine e tinha ficado pelo caminho de um jeito silencioso: o
-`base.css` veio com o estilo do `.aresta.on`, e o ouvinte que põe a classe não
-veio. Metade copiada não dá erro em lugar nenhum — só não acontece. O ouvinte é
-um só, na tela, e não um por cartão: os cartões são refeitos a cada troca de
-bifurcação, e ouvinte por cartão vaza a cada remontagem.
+**The cursor lights up a course's edges** — the ones arriving at it and the ones
+leaving it. This existed in the vitrine and had fallen by the wayside quietly:
+`base.css` came with the `.aresta.on` style, and the listener that adds the class
+did not. Half a copy raises an error nowhere — it simply does not happen. There
+is a single listener, on the screen, and not one per card: the cards are rebuilt
+on every fork switch, and a per-card listener leaks on every rebuild.
 
-O teste de fumaça reproduz o detector de colisão da vitrine — 120 pontos por
-curva, conferindo se algum cai dentro de um cartão que não seja ponta daquela
-aresta. Herdar o roteamento sem herdar a conferência seria ficar com o risco e
-sem a rede. Ele também confere o realce, e ali há uma armadilha de medição: a
-espessura da linha tem `transition`, e `getComputedStyle` no meio da transição
-devolve o valor intermediário — medir na hora lê 1,5px e reprova uma regra que
-está certa.
+The smoke suite reproduces the vitrine's collision detector — 120 points per
+curve, checking whether any of them falls inside a card that is not an endpoint
+of that edge. Inheriting the routing without inheriting the check would mean
+keeping the risk and losing the net. It also checks the highlight, and there is a
+measurement trap there: the line's thickness has a `transition`, and
+`getComputedStyle` mid-transition returns the intermediate value — measuring
+immediately reads 1.5px and fails a rule that is correct.
 
-## Aula = tópico, seção = assunto
+## Lesson = topic, section = subject
 
-O catálogo não tem conceito de aula; o grão mais fino é `topicos`, e são 1.503
-deles. O portal adota **tópico como aula** em vez de inventar uma terceira
-chave: os exercícios que o pipeline emite já trazem `topico` como campo de
-primeira classe, então currículo e conteúdo já concordavam entre si.
+The catalogue has no concept of a lesson; the finest grain is `topicos`, and
+there are 1,503 of them. The portal adopts **topic as lesson** instead of
+inventing a third key: the exercises the pipeline emits already carry `topico` as
+a first-class field, so curriculum and content already agreed with each other.
 
-**Mas um tópico não é um assunto — é um punhado deles.** Os números do catálogo:
+**But a topic is not one subject — it is a handful of them.** The catalogue's
+numbers:
 
 | | |
 | --- | --- |
-| tópicos com dois-pontos (`X: a, b e c`) | **811 (54%)** |
-| tópicos que enumeram **3+ assuntos** no título | **734 (49%)** |
-| carga média por tópico | **4,0h** |
-| pior caso (`react-ts`) | **7,5h por tópico** |
+| topics with a colon (`X: a, b and c`) | **811 (54%)** |
+| topics enumerating **3+ subjects** in the title | **734 (49%)** |
+| average load per topic | **4.0h** |
+| worst case (`react-ts`) | **7.5h per topic** |
 
-Quatro horas não é uma página, e uma caixinha de "concluída" no fim delas faz a
-barra do aluno andar em saltos que não correspondem a nada. Então a aula se
-divide em **seções**, e a última é sempre a avaliação.
+Four hours is not one page, and a single "completed" checkbox at the end of them
+makes the student's bar move in jumps that correspond to nothing. So a lesson is
+divided into **sections**, and the last one is always the assessment.
 
-**As seções são escritas, nunca derivadas.** Dava para quebrar o título no `:` e
-nas vírgulas e ganhar 734 divisões de graça, e seria um erro: é heurística
-léxica sobre prosa autoral, exatamente o que `REGRAS.md` registra ter tentado e
-descartado na conferência de "exige tópico posterior" — *"a resposta está na
-autoria, não na detecção"*. Aqui falharia igual: `Cliente, servidor e host: quem
-pede e quem responde` viraria uma seção chamada "quem pede e quem responde". A
-enumeração no título é **evidência** de que as seções são necessárias; não é
-fonte para lê-las.
+**The sections are written, never derived.** It would have been possible to split
+the title on the `:` and the commas and get 734 divisions for free, and it would
+have been a mistake: that is lexical heuristics over authored prose, exactly what
+`REGRAS.md` records having tried and discarded when checking "requires a later
+topic" — *"a resposta está na autoria, não na detecção"*. It would fail the same
+way here: `Cliente, servidor e host: quem pede e quem responde` would become a
+section called "quem pede e quem responde". The enumeration in the title is
+**evidence** that the sections are needed; it is not a source for reading them.
 
-As seções moram em `assets/aulas-*.js`, e não em `dados.js`, porque aquele é cópia
-do catálogo da vitrine e o modal de lá renderiza `topicos` como lista plana.
-Ficam três arquivos com três donos e a mesma chave de junção:
+The sections live in `assets/lessons-*.js`, and not in `dados.js`, because that
+one is a copy of the vitrine's catalogue and the modal over there renders
+`topicos` as a flat list. That leaves three files with three owners and the same
+join key:
 
-| arquivo | o quê | de quem |
+| file | what | whose |
 | --- | --- | --- |
-| `dados.js` | catálogo: cursos, trilhas, tópicos | compartilhado com a vitrine |
-| `aulas-*.js` | as seções e o texto delas | do portal |
-| exercícios | a avaliação | do pipeline |
+| `dados.js` | catalogue: courses, tracks, topics | shared with the vitrine |
+| `lessons-*.js` | the sections and their text | the portal's |
+| exercises | the assessment | the pipeline's |
 
-**Avançar é concluir.** Não há botão de "marcar como concluída": ele e a seta
-de avançar faziam a mesma coisa, e juntá-los num "Concluir e continuar" só
-adiava a pergunta. Passar para a próxima seção marca a atual como feita — que é
-o que o aluno já queria dizer ao clicar em avançar. O custo é real e fica
-registrado: não há como desmarcar, e quem passar batido acumula progresso sem
-ter lido. É a troca aceita em favor de um gesto só, e combina com o resto do
-portal, que mostra e não tranca.
+**Moving on is completing.** There is no "mark as completed" button: it and the
+next arrow did the same thing, and merging them into a "Complete and continue"
+only postponed the question. Moving to the next section marks the current one as
+done — which is what the student already meant to say by clicking next. The cost
+is real and is on the record: there is no way to unmark, and whoever skims
+through accumulates progress without having read. It is the trade accepted in
+favour of a single gesture, and it fits the rest of the portal, which shows and
+does not lock.
 
-A forma de uma aula é fixa: **N seções de conteúdo, e avaliação no fim.**
+The shape of a lesson is fixed: **N content sections, and the assessment at the
+end.**
 
-### A seção declara o que ela é
+### The section declares what it is
 
-Nem toda seção é da mesma natureza, e o layout segue a natureza:
+Not every section has the same nature, and the layout follows the nature:
 
-| a seção diz | o que aparece |
+| the section says | what shows up |
 | --- | --- |
-| `video: 'ID'` | o player, tocando ali |
-| `video: true` | o quadro reservado — "vai ter, ainda não tem" |
-| (sem `video`) | nada. Nem quadro cinza, nem promessa |
-| `video` **e sem `corpo`** | seção **só de vídeo**: a abertura de aula |
+| `video: 'ID'` | the player, playing right there |
+| `video: true` | the reserved frame — "there will be one, there isn't yet" |
+| (no `video`) | nothing. No grey frame, no promise |
+| `video` **and no `corpo`** | a **video-only** section: the lesson's opening |
 
-O quadro já esteve em **toda** seção de conteúdo, reservado, com o argumento de
-que publicar os vídeos um a um não reorganizaria a tela de ninguém. O argumento
-continua bom para a seção que *vai* ter vídeo — e é péssimo para a que nunca
-vai: uma seção de texto com um retângulo cinza em cima promete algo que não
-vem, e a promessa não expira. A reserva não se perdeu; ela deixou de ser
-automática e passou a ser **dita**.
+The frame was once on **every** content section, reserved, on the argument that
+publishing the videos one at a time would not reorganise anyone's screen. The
+argument still holds for a section that *will* have a video — and it is terrible
+for one that never will: a text section with a grey rectangle on top promises
+something that does not come, and the promise does not expire. The reservation
+was not lost; it stopped being automatic and became **stated**.
 
-**O título fica acima do player**, como nas seções de texto — "onde estou" vem
-antes de "o que eu assisto", e a resposta tem de ser a mesma nas duas formas.
-(O player já esteve acima do título, para não empurrar o play para baixo da
-dobra; o preço era cair numa seção sem saber de que aula ela era.)
+**The title goes above the player**, as in the text sections — "where am I" comes
+before "what am I watching", and the answer has to be the same in both shapes.
+(The player was once above the title, so as not to push play below the fold; the
+price was landing in a section without knowing which lesson it belonged to.)
 
-### A aula tem uma largura só, e ela tem dois valores
+### The lesson has one width, and that width has two values
 
 | | |
 | --- | --- |
-| `--trilho` | a coluna do menu |
-| `--leitura` | 820px, a coluna estreita |
-| `--amplo` | 934–1074px, a coluna larga |
-| `--tela` | qual das duas está valendo agora — **tudo** na aula usa esta |
+| `--trilho` | the menu column |
+| `--leitura` | 820px, the narrow column |
+| `--amplo` | 934–1074px, the wide column |
+| `--tela` | which of the two is in force — **everything** in the lesson uses it |
 
-Foi a terceira tentativa, e as duas primeiras erraram do mesmo jeito.
+This was the third attempt, and the first two got it wrong the same way.
 
-A primeira deixou o **player** sangrar de ponta a ponta enquanto o texto ficava
-em 820. A segunda soltou o **exemplo** para `--amplo` — e depois o player junto
-com ele — e deixou o resto em 820. As duas produziram a mesma coisa: margens
-diferentes dentro de uma aula, o olho procurando onde a linha começa a cada
-rolagem. Consertar elemento por elemento não convergia, porque o defeito não
-era de nenhum elemento: era de haver mais de uma largura.
+The first let the **player** bleed edge to edge while the text stayed at 820. The
+second released the **example** to `--amplo` — and then the player along with it
+— and left the rest at 820. Both produced the same thing: different margins
+inside one lesson, the eye hunting for where the line starts on every scroll.
+Fixing it element by element did not converge, because the defect belonged to no
+element: it was that there was more than one width.
 
-Agora há `--tela`, e ela vale para o título, as migalhas, os passos, a prosa, o
-player, o exemplo, o material e o rodapé. Uma variável só resolve **por
-construção** — não há como um elemento discordar do outro, nem no meio de um
-redimensionamento.
+Now there is `--tela`, and it holds for the title, the breadcrumbs, the steps,
+the prose, the player, the example, the material and the footer. A single
+variable settles it **by construction** — there is no way for one element to
+disagree with another, not even mid-resize.
 
-**O preço está declarado.** A prosa perdeu o `max-width:68ch`, então em 1074px a
-linha vai a **121ch** (medido), contra os 68 confortáveis para leitura longa. Foi
-uma escolha entre dois defeitos e o alinhamento ganhou; se a linha longa
-incomodar, o teto volta em `ch` e o que se perde é o alinhamento à direita, não
-o da esquerda.
+**The price is declared.** The prose lost its `max-width:68ch`, so at 1074px the
+line reaches **121ch** (measured), against the 68 that are comfortable for long
+reading. It was a choice between two defects and alignment won; if the long line
+turns out to hurt, the ceiling comes back in `ch` and what is lost is the
+alignment on the right, not the one on the left.
 
-#### Os dois números, e de onde saem
+#### The two numbers, and where they come from
 
-A coluna larga foi **medida, não chutada**. A linha mais longa que existe nos
-exemplos tem 74 caracteres; IBM Plex Mono a 12,64px avança 7,601px por caractere
-— 562px, mais 36px de recuo, 598px. Daí `--cod:604px`: pouco mais do que a
-linha, não a tela inteira. A nota tem `--nota:440px` de teto e `--nota-min:300px`
-de piso, e é ela quem encolhe quando falta espaço, porque o código não pode.
+The wide column was **measured, not guessed**. The longest line that exists in
+the examples has 74 characters; IBM Plex Mono at 12.64px advances 7.601px per
+character — 562px, plus 36px of padding, 598px. Hence `--cod:604px`: a little
+more than the line, not the whole screen. The note has `--nota:440px` as its
+ceiling and `--nota-min:300px` as its floor, and it is the note that shrinks when
+space runs short, because the code cannot.
 
-O teto da coluna larga sai da **seta de navegação**, que mora no vão. Ela tem
-44px, e para sobrar 16px entre ela e o conteúdo o vão precisa de `4 × 38 = 152`:
+The wide column's ceiling comes from the **navigation arrow**, which lives in the
+gap. It is 44px wide, and to leave 16px between it and the content the gap needs
+`4 × 38 = 152`:
 
 ```
 --amplo <= 100vw - trilho - 152
 ```
 
-E o corte entre as duas colunas sai de igualar esse teto ao que as duas colunas
-do exemplo pedem — `604 + 300 + 30 = 934`:
+And the cut between the two columns comes from equating that ceiling to what the
+example's two columns ask for — `604 + 300 + 30 = 934`:
 
 ```
 100vw - 380 - 152 >= 934   →   100vw >= 1466
 ```
 
-Um corte só, e as duas coisas acontecem nele: o bloco de código abre em duas
-colunas **e** a aula inteira passa para a largura larga. Entre 1466 e 1606 a aula
-cresce junto com a janela, de 934 até 1074; daí para cima ela para, porque
-alargar mais só esticaria a coluna de texto.
+A single cut, and two things happen at it: the code block opens into two columns
+**and** the whole lesson moves to the wide width. Between 1466 and 1606 the
+lesson grows along with the window, from 934 up to 1074; from there on it stops,
+because widening further would only stretch the text column.
 
-| tela | aula | exemplo | folga até a seta |
+| screen | lesson | example | clearance to the arrow |
 | --- | --- | --- | --- |
-| 1280 | 818 | empilhado | setas no rodapé |
-| 1440 | 820 | empilhado | 38px |
-| 1466 | 934 | duas colunas | 16px |
-| 1500 | 968 | duas colunas | 16px |
-| 1606 | 1074 | duas colunas | 16px |
-| 1920 | 1074 | duas colunas | 95px |
-| 2400 | 1074 | duas colunas | 215px |
+| 1280 | 818 | stacked | arrows in the footer |
+| 1440 | 820 | stacked | 38px |
+| 1466 | 934 | two columns | 16px |
+| 1500 | 968 | two columns | 16px |
+| 1606 | 1074 | two columns | 16px |
+| 1920 | 1074 | two columns | 95px |
+| 2400 | 1074 | two columns | 215px |
 
-#### A única folga é do player, e é só para baixo
+#### The only slack belongs to the player, and only downwards
 
-O teto de altura do player (`min(64vh, 100vh - 300px)`, para o play não empurrar
-o resto da seção para baixo da dobra) limita a **largura**, e a proporção 16/9
-deriva a altura a partir dela. Cortar a altura de uma caixa com `aspect-ratio`
-não encolhe a caixa: achata, e o vídeo dentro dela estica — a 1920×700 o player
-chegou a 2,05:1 antes disso. Em janela baixa ele fica menor que o resto da aula,
-alinhado à esquerda como todos, e nunca deformado.
+The player's height ceiling (`min(64vh, 100vh - 300px)`, so that play does not
+push the rest of the section below the fold) limits the **width**, and the 16/9
+ratio derives the height from it. Capping the height of an `aspect-ratio` box
+does not shrink the box: it flattens it, and the video inside stretches — at
+1920×700 the player reached 2.05:1 before this. In a short window it ends up
+smaller than the rest of the lesson, left-aligned like everything else, and never
+deformed.
 
-#### O teste mudou de pergunta
+#### The test changed its question
 
-Antes ele perguntava *"quem passou do teto?"*, com uma lista de quem podia
-passar — e a lista crescia a cada elemento que ganhava o direito de escapar,
-enquanto o defeito real passava batido. Agora ele pergunta a regra: **todos os
-filhos da tela começam e terminam na mesma coluna**. O teste percorre as 89
-seções escritas dos três cursos, uma a uma — é caro, uma navegação por seção, e
-é o único jeito de a regra valer para o conteúdo que existe e não para a seção
-que alguém lembrou de abrir.
+It used to ask *"who went past the ceiling?"*, with a list of who was allowed to
+— and the list grew with every element that earned the right to escape, while the
+real defect slipped through. Now it asks the rule: **every child of the screen
+starts and ends in the same column**. The test walks the 89 written sections of
+the three courses, one by one — it is expensive, one navigation per section, and
+it is the only way for the rule to hold for the content that exists rather than
+for the section someone remembered to open.
 
-**Vídeo não é sinônimo de abertura de aula.** Das 26 seções com vídeo, 5 são a
-primeira da aula, 15 a segunda, 5 a terceira e 1 a quarta. Se todas fossem a
-primeira, a forma teria virado convenção sem ninguém decidir isso — e há um
-teste que reprova se as posições voltarem a se concentrar.
+**Video is not a synonym for a lesson's opening.** Of the 26 sections with video,
+5 are the first of their lesson, 15 the second, 5 the third and 1 the fourth. If
+they were all the first, the shape would have become a convention with nobody
+deciding it — and there is a test that fails if the positions cluster again.
 
-No trilho, o ícone diz a natureza junto com o estado: **play** para vídeo,
-**linhas** para leitura, **estrela** para a avaliação, **check** para o que já
-foi feito. Antes tudo era play, o que prometia vídeo em toda seção.
+In the rail, the icon states the nature along with the status: **play** for
+video, **lines** for reading, **star** for the assessment, **check** for what is
+already done. Everything used to be play, which promised video in every section.
 
-### As outras regras da forma
+### The other rules of the shape
 
-- **A avaliação nunca tem vídeo** — ali o aluno responde, não assiste.
-- **A avaliação é sempre a última seção**, tenha exercícios ou não. A estrutura
-  fica previsível e a avaliação vazia diz o que vem, em vez de sumir.
-- **A avaliação é por tópico, não por seção.** Descê-la para o nível da seção
-  obrigaria a mudar a chave que o pipeline emite — e ela cobra o tópico inteiro
-  de qualquer forma.
-- **Aula sem seções escritas vira uma seção só**, com o comportamento de antes.
-  O conteúdo entra curso a curso, sem um dia de transição em que metade do
-  portal fica quebrada.
+- **The assessment never has video** — there the student answers, does not watch.
+- **The assessment is always the last section**, whether it has exercises or not.
+  The structure stays predictable and an empty assessment says what is coming,
+  instead of disappearing.
+- **The assessment is per topic, not per section.** Pushing it down to the section
+  level would force a change to the key the pipeline emits — and it covers the
+  whole topic either way.
+- **A lesson with no written sections becomes a single section**, with the earlier
+  behaviour. Content lands course by course, with no transition day on which half
+  the portal is broken.
 
-**A avaliação vazia não conta no progresso.** Se contasse, nenhum curso jamais
-chegaria a 100% enquanto os exercícios não existissem, e certificado nenhum
-sairia. Ela aparece na tela, marcada como pendente e sem botão de concluir —
-marcar como feito o que não foi feito é a forma mais barata de um portal mentir
-sobre progresso. O denominador cresce quando os exercícios chegam, o que é
-honesto: a aula passou mesmo a ter mais trabalho dentro.
+**An empty assessment does not count towards progress.** If it did, no course
+would ever reach 100% while the exercises did not exist, and no certificate would
+ever be issued. It shows on screen, marked as pending and with no complete
+button — marking as done what was not done is the cheapest way for a portal to
+lie about progress. The denominator grows when the exercises arrive, which is
+honest: the lesson really did gain more work inside it.
 
-**A unidade de progresso passou a ser a seção.** `aulaConcluida` virou derivado:
-a aula está feita quando todas as seções dela estão. Um registro no formato
-antigo (uma caixinha por aula) é migrado na primeira escrita, então quem já
-tinha progresso não o vê zerar.
+**The unit of progress became the section.** `lessonDone` became derived: a
+lesson is done when all of its sections are. A record in the old format (one
+checkbox per lesson) is migrated on the first write, so whoever already had
+progress does not see it reset.
 
-### Os três cursos escritos
+### The three written courses
 
-Há um arquivo por curso, como o pipeline faz — `aulas-<curso>.js` e
-`exercicios-<curso>.js` —, e cada um **mescla** no objeto global em vez de
-atribuí-lo: nenhum pode depender de ser o primeiro a carregar.
+There is one file per course, as the pipeline does — `lessons-<course>.js` and
+`exercicios-<course>.js` — and each one **merges** into the global object instead
+of assigning it: none of them may depend on being the first to load.
 
-| curso | aulas escritas | seções | avaliações | o que ele exercita |
+| course | lessons written | sections | assessments | what it exercises |
 | --- | --- | --- | --- | --- |
-| `web-fundamentos` | 11 de 11 | 39 | 11 de 11, 23 exercícios | prosa, diagrama inline, material, seção só de vídeo |
-| `html-css` | 13 de 13 | 39 | 4 de 13, 8 exercícios | bloco de código, figura de arquivo |
-| `javascript` | 4 de 12 | 11 | 3 de 12, 9 exercícios | `exemplo` anotado, os 7 tipos, seção só de vídeo |
+| `web-fundamentos` | 11 of 11 | 39 | 11 of 11, 23 exercises | prose, inline diagram, material, video-only section |
+| `html-css` | 13 of 13 | 39 | 4 of 13, 8 exercises | code block, figure from a file |
+| `javascript` | 4 of 12 | 11 | 3 of 12, 9 exercises | annotated `exemplo`, all 7 types, video-only section |
 
-Os dois **pela metade** são de propósito: `html-css` tem as avaliações
-incompletas e `javascript` tem as aulas incompletas. É assim que um curso fica
-enquanto está sendo produzido, e é o que exercita os dois estados de lacuna —
-a avaliação pendente (presente na estrutura, marcada, fora do denominador) e a
-aula ainda sem texto (que cai no invólucro de uma seção só).
+The two that are **half done** are so on purpose: `html-css` has incomplete
+assessments and `javascript` has incomplete lessons. That is how a course looks
+while it is being produced, and it is what exercises the two states of a gap —
+the pending assessment (present in the structure, marked, outside the
+denominator) and the lesson with no text yet (which falls back to the
+single-section wrapper).
 
-**Nenhum dos dois primeiros tem `codigo`, e a ausência é informação.** Em
-`web-fundamentos`, escrever um programa exigiria o que o curso não dá — ele é o
-primeiro da escola, sem pré-requisito de linguagem, e pedi-lo violaria a regra
-do gerador de que um exercício do tópico N só pode exigir o que os tópicos 1..N
-ensinaram. Em `html-css`, o motivo é outro: o validador do pipeline executa
-python, javascript e sql, e HTML/CSS não se verificam contra casos de teste
-porque o que se verificaria é o desenho. É o mesmo achado que `REGRAS.md`
-registrou em `arquiteto-comunicacao`, onde três dos sete tipos eram
-inaplicáveis. Os sete juntos continuam em `javascript`, aula 2.
+**Neither of the first two has `codigo`, and the absence is information.** In
+`web-fundamentos`, writing a program would demand what the course does not give —
+it is the school's first course, with no language prerequisite, and asking for it
+would violate the generator's rule that an exercise from topic N may only require
+what topics 1..N taught. In `html-css` the reason is different: the pipeline's
+validator executes python, javascript and sql, and HTML/CSS are not verified
+against test cases because what would be verified is the rendering. It is the
+same finding `REGRAS.md` recorded in `arquiteto-comunicacao`, where three of the
+seven types were inapplicable. All seven together are still in `javascript`,
+lesson 2.
 
-**`html-css` foi quem fez a prosa crescer.** Em curso conceitual, crase no meio
-da frase basta; não há como ensinar um seletor sem mostrá-lo em três linhas com
-a indentação preservada. Daí o terceiro tipo de bloco:
+**`html-css` is what made the prose grow.** In a conceptual course, a backtick
+mid-sentence is enough; there is no way to teach a selector without showing it in
+three lines with the indentation preserved. Hence the third kind of block:
 
 ```js
 corpo: [
-  'texto com `código` e **negrito**',
-  ['item', 'item'],                      // vira <ul>
-  { codigo: 'css', texto: '.a { … }' },  // vira bloco de código
+  'text with `code` and **bold**',
+  ['item', 'item'],                      // becomes a <ul>
+  { codigo: 'css', texto: '.a { … }' },  // becomes a code block
 ]
 ```
 
-A forma cresceu porque o conteúdo pediu, e só o que ele pediu. O bloco reusa
-`.cod-bloco`, o componente dos exercícios, e é escapado com `esc` e não com
-`marcado`: dentro de código, crase é crase e asterisco é asterisco.
+The shape grew because the content asked for it, and only as much as it asked.
+The block reuses `.cod-bloco`, the exercises' component, and is escaped with
+`esc` and not with `formatted`: inside code, a backtick is a backtick and an
+asterisk is an asterisk.
 
-**Título de seção é texto simples.** Ele aparece no `h2`, na pastilha do passo
-e na linha do trilho, e nos dois últimos é rótulo, não prosa — marcação numa
-pastilha de 200px vira ruído.
+**A section title is plain text.** It appears in the `h2`, in the step chip and in
+the rail line, and in the last two it is a label, not prose — markup in a 200px
+chip becomes noise.
 
-O conteúdo dos dois é tecnicamente correto e **sem revisão pedagógica**: serve
-para avaliar a estrutura, e a escola reescreve.
+The content of both is technically correct and **has had no pedagogical review**:
+it serves to evaluate the structure, and the school rewrites it.
 
-**E o título exibido não serve de chave.** `aplicarConteudo()` reescreve
-`c.topicos` no lugar a cada troca de idioma — em inglês o tópico vira *"Types,
-coercion, strict equality and falsy values"* e nenhum exercício casa. O defeito
-aparece sem ninguém tocar em nada: basta o navegador estar configurado noutro
-idioma, que é o caso da maioria fora do Brasil. Foi assim que ele apareceu, num
-Chromium em inglês.
+**And the displayed title is not usable as a key.** `aplicarConteudo()` rewrites
+`c.topicos` in place on every language switch — in English the topic becomes
+*"Types, coercion, strict equality and falsy values"* and no exercise matches.
+The defect appears without anyone touching anything: it is enough for the browser
+to be configured in another language, which is the case for most people outside
+Brazil. That is how it turned up, in an English Chromium.
 
-A chave é o **texto em português**, guardado por `guardarBase()` no
-carregamento. É a mesma decisão do i18n da vitrine — *a chave de tradução é o
-próprio texto em português* — aplicada à junção com o conteúdo. Cada aula
-carrega as duas coisas: `titulo` para mostrar, `chave` para casar.
+The key is the **Portuguese text**, stored by `guardarBase()` on load. It is the
+vitrine's own i18n decision — *the translation key is the Portuguese text itself*
+— applied to the join with the content. Each lesson carries both things: `titulo`
+to display, `chave` to match on.
 
-## A tradução tem duas metades, e só uma atravessa intacta
+## The translation has two halves, and only one crosses intact
 
-| metade | na vitrine | no portal |
+| half | in the vitrine | in the portal |
 | --- | --- | --- |
-| `txt('texto em português')` | exceção | **caminho principal** |
-| passeio pelos nós de texto | caminho principal | só o esqueleto estático |
-| `aplicarConteudo()`, que reescreve `CURSOS`/`TRILHAS` no lugar | igual | igual |
+| `txt('texto em português')` | the exception | **the main path** |
+| the walk over the text nodes | the main path | only the static skeleton |
+| `aplicarConteudo()`, which rewrites `CURSOS`/`TRILHAS` in place | the same | the same |
 
-O passeio (`mapearTextos`) funciona na vitrine porque o HTML é estático e existe
-uma lista `DINAMICOS` com onze contêineres a ignorar. Num portal quase todo
-texto nasce em JavaScript, e essa lista viraria a página inteira. O mecanismo é
-o mesmo; o que muda é o peso de cada metade.
+The walk (`mapearTextos`) works in the vitrine because the HTML is static and
+there is a `DINAMICOS` list with eleven containers to skip. In a portal nearly
+all text is born in JavaScript, and that list would become the whole page. The
+mechanism is the same; what changes is the weight of each half.
 
-Por isso a **única divergência** entre as duas cópias de `i18n-runtime.js` é a
-lista `DINAMICOS`, que saiu do código e virou `window.I18N_DINAMICOS`, definido
-no `index.html`. Existe para que não haja outra divergência.
+That is why the **only divergence** between the two copies of `i18n-runtime.js`
+is the `DINAMICOS` list, which moved out of the code and became
+`window.I18N_DINAMICOS`, defined in `index.html`. It exists so that there is no
+other divergence.
 
-**Interface e conteúdo são coisas diferentes.** A interface traduz nos cinco
-idiomas; enunciado de exercício e texto de aula são conteúdo de banco, e na
-Etapa 2 vêm traduzidos do servidor ou não vêm. Os exercícios de exemplo estão só
-em português de propósito — e como toda chave ausente cai no português sozinha,
-navegar em inglês com exercício em português não quebra nada.
+**Interface and content are different things.** The interface translates into the
+five languages; an exercise statement and a lesson's text are database content,
+and in Stage 2 they either arrive translated from the server or they do not
+arrive. The sample exercises are in Portuguese only on purpose — and since every
+missing key falls back to Portuguese on its own, browsing in English with a
+Portuguese exercise breaks nothing.
 
-## Os sete tipos de exercício
+## The seven exercise types
 
-O contrato de um tipo é pequeno: `corpo(ex, uid)`, `montar(raiz)` (opcional),
-`colher(raiz)`, `revelar(raiz, ex, veredito)`. O invólucro comum — enunciado,
-dica, botão, veredito, selo — mora em `app/exercicios/index.js`.
+A type's contract is small: `body(ex, uid)`, `setup(root)` (optional),
+`collect(root)`, `reveal(root, ex, verdict)`. The common wrapper — statement,
+hint, button, verdict, seal — lives in `app/exercises/index.js`.
 
-O que divide os sete não é a UI, é **onde a correção pode acontecer**:
+What divides the seven is not the UI, it is **where the grading can happen**:
 
-| tipo | corrige onde | hoje |
+| type | grades where | today |
 | --- | --- | --- |
-| `quiz` · `multipla-escolha` · `ordenacao` · `associacao` | cliente — é comparação pura | **funciona de verdade** |
-| `codigo` · `saida-esperada` | servidor: execução em contêiner | veredito "não conferido" |
-| `resposta-expressao` | servidor: equivalência simbólica (sympy) | veredito "não conferido" |
+| `quiz` · `multipla-escolha` · `ordenacao` · `associacao` | client — it is pure comparison | **really works** |
+| `codigo` · `saida-esperada` | server: execution in a container | "not checked" verdict |
+| `resposta-expressao` | server: symbolic equivalence (sympy) | "not checked" verdict |
 
-Os dois caminhos passam por `api.avaliar()` com o mesmo formato de veredito,
-então o dia em que o servidor existir muda o corpo de um `if`.
+Both paths go through `api.grade()` with the same verdict shape, so the day the
+server exists changes the body of one `if`.
 
-**Não conferido nunca vira aprovado.** É regra do pipeline e vale inteira aqui:
-enquanto não há execução, o portal diz que não conferiu, em vez de dar um
-"certo" que ninguém verificou.
+**Not checked never becomes passed.** It is the pipeline's rule and it holds
+entirely here: while there is no execution, the portal says it did not check,
+instead of handing out a "correct" nobody verified.
 
-Três regras da escola que a interface respeita desde o primeiro dia, porque são
-fáceis de errar e caras de corrigir depois:
+Three of the school's rules that the interface has respected since day one,
+because they are easy to get wrong and expensive to fix later:
 
-- **`porque` é feedback pós-resposta, não pista visível.** Só aparece depois de
-  responder.
-- **A ordem do JSON é o gabarito** em `ordenacao` (os `itens` estão na ordem
-  certa) e em `associacao` (`pares[i].esquerda ↔ pares[i].direita`). As duas são
-  embaralhadas com semente, e a coluna da direita da associação sai **ordenada
-  alfabeticamente** — a mesma razão pela qual a sonda do pipeline faz isso.
-- **`armadilha` não vai para a tela** antes da resposta: ela nomeia exatamente o
-  que o exercício mede. Vira feedback depois.
+- **`porque` is post-answer feedback, not a visible hint.** It only appears after
+  answering.
+- **The JSON's order is the answer key** in `ordenacao` (the `itens` are in the
+  right order) and in `associacao` (`pares[i].esquerda ↔ pares[i].direita`). Both
+  are shuffled with a seed, and the matching exercise's right-hand column comes
+  out **alphabetically sorted** — the same reason the pipeline's probe does it.
+- **`armadilha` does not go on screen** before the answer: it names exactly what
+  the exercise measures. It becomes feedback afterwards.
 
-Em `codigo`, os primeiros casos de teste viram exemplo e o resto fica oculto:
-mostrar todos convida a construir a solução que passa nos casos sem resolver o
-problema — que é o defeito que o gerador do pipeline tem de descartar antes de
-fechar um exercício.
+In `codigo`, the first test cases become the example and the rest stay hidden:
+showing all of them invites building the solution that passes the cases without
+solving the problem — which is the defect the pipeline's generator has to discard
+before closing an exercise.
 
-## O que é esqueleto e o que é definitivo
+## What is skeleton and what is settled
 
-**Descartável:** o conteúdo de `assets/exercicios-exemplo.js`, a tela de entrar
-(qualquer nome entra), o texto das aulas, o certificado sem código de validação.
+**Disposable:** the content of `assets/exercicios-exemplo.js`, the sign-in screen
+(any name gets in), the lessons' text, the certificate with no validation code.
 
-**Definitivo:** o formato dos exercícios — os campos são exatamente os que o
-pipeline emite (`enunciado`, `dica_socratica`,
-`alternativas[].{texto,correta,porque}`, `itens`, `armadilha`, `pares`,
-`distratores_direita`, `testes[].{descricao,entrada,saida_esperada}`,
-`verificacao_*`). O portal acrescenta dois campos que são dele, não do
-exercício: `id` e `curso`.
+**Settled:** the exercise format — the fields are exactly the ones the pipeline
+emits (`enunciado`, `dica_socratica`, `alternativas[].{texto,correta,porque}`,
+`itens`, `armadilha`, `pares`, `distratores_direita`,
+`testes[].{descricao,entrada,saida_esperada}`, `verificacao_*`). The portal adds
+two fields that are its own, not the exercise's: `id` and `curso`.
 
-Ignorar a ferramenta por ora não custa nada; inventar um formato paralelo
-custaria uma migração.
+Ignoring the tool for now costs nothing; inventing a parallel format would cost a
+migration.
 
-Também definitivo: `_verificacao` (`criticado` / `execucao` / `estrutura`)
-aparece em cada exercício e já filtra em `api.exerciciosDaAula()`. A doc do
-pipeline diz que é esse campo que decide o que o portal publica primeiro —
-melhor ele existir vazio que ser retrofitado.
+Also settled: `_verificacao` (`criticado` / `execucao` / `estrutura`) appears on
+every exercise and already filters in `api.lessonExercises()`. The pipeline's
+docs say it is this field that decides what the portal publishes first — better
+for it to exist empty than to be retrofitted.
 
-## Estrutura
+## Structure
 
 ```
-index.html                     o shell: barra, trilho e <main>
-assets/base.css                CSS da vitrine, sem alteração
-assets/portal.css              só o que a vitrine não tinha
-assets/dados.js                catálogo (vira API na Etapa 2)
-assets/aulas-*.js              as seções de cada tópico e o texto delas
-assets/exercicios-*.js         um arquivo por curso, como o pipeline faz
-app/catalogo.js                leitura do catálogo e o grafo — não toca no DOM
-app/aulas.js                   do que uma aula é feita: seções + avaliação
-app/grafo.js                   o grafo como mapa de progresso
-app/estado.js                  progresso do aluno (localStorage → servidor)
-app/api.js                     camada de mentira, assinaturas do backend real
-app/rotas.js                   roteador por hash
-app/trilho.js                  o trilho lateral
-app/busca.js                   o índice da busca global — não toca no DOM
-app/painel-busca.js            o painel do ⌘K
-app/modal.js                   o modal da vitrine, reaproveitado
-app/provas.js                  monta a prova do curso e a da trilha
-app/materiais.js               a lista de material para baixar
-assets/planos.js               os planos e o que cada um inclui
-assets/materiais.js            GERADO — os PDFs, como data: URI
-ferramentas/materiais/         gera assets/materiais.js
-ferramentas/exemplos/          roda os blocos `exemplo` e confere a saída
-app/telas/*.js                 uma por tela
-app/exercicios/*.js            um por tipo, mais o invólucro e a correção
-ferramentas/fumaca/            o teste de fumaça
-ferramentas/bundle/            gera o HTML único
+index.html                     the shell: bar, rail and <main>
+assets/base.css                the vitrine's CSS, unchanged
+assets/portal.css              only what the vitrine did not have
+assets/dados.js                catalogue (becomes an API in Stage 2)
+assets/lessons-*.js            each topic's sections and their text
+assets/exercicios-*.js         one file per course, as the pipeline does
+app/catalog.js                 reading the catalogue and the graph — no DOM
+app/lessons.js                 what a lesson is made of: sections + assessment
+app/graph.js                   the graph as a progress map
+app/state.js                   the student's progress (localStorage → server)
+app/api.js                     the make-believe layer, real backend signatures
+app/routes.js                  the hash router
+app/rail.js                    the side rail
+app/search.js                  the global search index — no DOM
+app/search-panel.js            the ⌘K panel
+app/modal.js                   the vitrine's modal, reused
+app/exams.js                   builds the course exam and the track exam
+app/materials.js               the list of material to download
+assets/plans.js                the plans and what each one includes
+assets/materials.js            GENERATED — the PDFs, as data: URIs
+tools/materials/               generates assets/materials.js
+tools/examples/                runs the `exemplo` blocks and checks the output
+app/screens/*.js               one per screen
+app/exercises/*.js             one per type, plus the wrapper and the grading
+tools/smoke/                   the smoke suite
+tools/bundle/                  generates the single HTML file
 ```
 
-Ninguém fora de `estado.js` lê `localStorage`, e ninguém fora de `api.js` lê
-`estado.js` para buscar dado. Trocar a persistência é trocar um arquivo.
+Nobody outside `state.js` reads `localStorage`, and nobody outside `api.js` reads
+`state.js` to fetch data. Swapping the persistence means swapping one file.
 
-Hash e não History API: o portal é servido como arquivo estático, e `pushState`
-exigiria o servidor devolver o index em qualquer caminho.
+Hash and not the History API: the portal is served as a static file, and
+`pushState` would require the server to return the index at any path.
 
-## A avaliação é um wizard
+## The assessment is a wizard
 
-Uma questão por vez, com marcadores no topo. Empilhar sete exercícios numa
-página faz rolar para achar onde parou e mostra de uma vez um volume que
-intimida.
+One question at a time, with markers at the top. Stacking seven exercises on one
+page makes you scroll to find where you left off and shows all at once a volume
+that intimidates.
 
-Os marcadores são **clicáveis** e as telas ficam **guardadas**: voltar à
-questão 1 devolve a questão 1 como ela ficou, com veredito e justificativas à
-vista. Remontar apagaria isso, e o aluno acharia que perdeu o que fez. Travar o
-avanço até acertar também está fora — a trilha inteira é recomendação e não
-trava; a avaliação não podia ser mais rígida que ela.
+The markers are **clickable** and the screens are **kept**: going back to
+question 1 returns question 1 as it was, with the verdict and the justifications
+on view. Rebuilding would erase that, and the student would think they lost what
+they did. Blocking progress until you get it right is also out — the whole track
+is a recommendation and does not lock; the assessment could not be stricter than
+it.
 
-**A associação virou clique-a-clique, no gesto do Duolingo:** toca-se num item
-da esquerda, depois no par dele à direita, e o par é conferido na hora. Isso
-funciona igual no toque e no mouse, não esconde as opções num menu, e vira
-prática em vez de formulário.
+**Matching became click-by-click, in Duolingo's gesture:** you tap an item on the
+left, then its pair on the right, and the pair is checked right away. This works
+the same on touch and on mouse, does not hide the options in a menu, and becomes
+practice instead of a form.
 
-Mas quebra a medida, e a correção importa: **com feedback imediato o mapeamento
-final está sempre certo** — basta insistir. Se o veredito continuasse comparando
-o mapa com o gabarito, todo mundo tiraria 100%. A medida passou a ser o
-caminho: **quantos pares foram tentados errado antes de fechar**. Zero é acerto.
-É a régua do pipeline — acertar por eliminação não conta como saber — aplicada
-ao processo em vez do resultado.
+But it breaks the measurement, and the fix matters: **with immediate feedback the
+final mapping is always right** — you just have to persist. If the verdict kept
+comparing the map against the key, everyone would score 100%. The measurement
+became the path: **how many pairs were tried wrong before closing**. Zero is a
+clean answer. It is the pipeline's ruler — getting it right by elimination does
+not count as knowing — applied to the process instead of the result.
 
-**O selo de `_verificacao` saiu da tela do aluno.** Ele continua no dado e
-continua filtrando em `exerciciosDaAula`: é uma decisão de *publicação*, não uma
-informação para quem estuda. Dizer "só conferência estrutural" a um aluno é
-avisá-lo de que aquele exercício talvez não preste — e se talvez não preste, não
-devia estar publicado.
+**The `_verificacao` seal left the student's screen.** It stays in the data and
+keeps filtering in `lessonExercises`: it is a *publication* decision, not
+information for whoever is studying. Telling a student "structural check only" is
+warning them that this exercise may be no good — and if it may be no good, it
+should not be published.
 
-## Busca, desempenho e notas
+## Search, performance and notes
 
-Três telas que não inventam dado nenhum: elas mostram o que o portal já tinha e
-não exibia.
+Three screens that invent no data at all: they show what the portal already had
+and did not display.
 
-### A busca (`⌘K`, `/`, ou a lupa)
+### Search (`⌘K`, `/`, or the magnifier)
 
-A lupa e o `⌘K` existiam desde o primeiro dia e os dois levavam ao catálogo — um
-atalho que prometia busca e entregava navegação. **Ela importa mais aqui do que
-num site comum:** são 86 cursos e 1.503 aulas, e quem lembra "aquela parte sobre
-o TTL do DNS" não tinha caminho nenhum até lá — nem pelo menu, nem pelo grafo,
-nem pelo trilho.
+The magnifier and `⌘K` existed from day one and both led to the catalogue — a
+shortcut that promised search and delivered navigation. **It matters more here
+than on an ordinary site:** there are 86 courses and 1,503 lessons, and someone
+who remembers "that part about the DNS TTL" had no path there at all — not
+through the menu, not through the graph, not through the rail.
 
-Indexa cinco grupos, em ordem de utilidade decrescente: **seções** (o grão que
-se procura de verdade), **aulas**, **cursos**, **exercícios** e **as notas do
-próprio aluno**.
+It indexes five groups, in order of decreasing usefulness: **sections** (the
+grain people actually look for), **lessons**, **courses**, **exercises** and **the
+student's own notes**.
 
-Duas decisões vêm de defeitos já pagos neste projeto:
+Two decisions come from defects already paid for in this project:
 
-1. **Casa contra o texto exibido e contra o português ao mesmo tempo.** O
-   catálogo é traduzido em runtime; num navegador em inglês o título da aula é
-   "Hosting: shared, VPS, cloud and CDN", mas as seções, as notas e os
-   exercícios estão em português. Indexar só um dos dois faria metade do
-   conteúdo sumir conforme o idioma — que é exatamente o defeito que já mordeu a
-   junção dos exercícios.
-2. **Ignora acento**, dos dois lados da comparação. Quem digita no celular quase
-   nunca acentua.
+1. **It matches against the displayed text and against the Portuguese at the same
+   time.** The catalogue is translated at runtime; in an English browser the
+   lesson title is "Hosting: shared, VPS, cloud and CDN", but the sections, the
+   notes and the exercises are in Portuguese. Indexing only one of the two would
+   make half the content vanish depending on the language — which is exactly the
+   defect that already bit the exercise join.
+2. **It ignores accents**, on both sides of the comparison. People typing on a
+   phone almost never accent.
 
-O trecho ao lado de cada resultado sai do **corpo**, nunca do título: repetir
-embaixo o título que está em cima não informa nada. E ele é texto puro — a
-marcação mínima do corpo (crase e `**`) é retirada antes de indexar, senão
-aparecia crua na tela. Os dois casos estão no teste de fumaça.
+The snippet beside each result comes from the **body**, never from the title:
+repeating below the title that is above informs nothing. And it is plain text —
+the body's minimal markup (backtick and `**`) is stripped before indexing, or it
+would show up raw on screen. Both cases are in the smoke suite.
 
-Seções só entram onde o conteúdo foi escrito. Nos 84 cursos sem texto a "seção"
-é um invólucro com o nome da própria aula, e listá-la devolveria cada resultado
-duas vezes.
+Sections only enter where the content was written. In the 84 courses with no
+text, the "section" is a wrapper carrying the lesson's own name, and listing it
+would return every result twice.
 
-### Desempenho, e por que ele tem três estados
+### Performance, and why it has three states
 
-Cada resposta já gravava tentativas, acerto e se chegou a ser conferida. Isso
-morria ali: o aluno respondia, via o veredito e nunca mais reencontrava aquilo.
+Every answer already recorded attempts, correctness and whether it ever got
+checked. That died there: the student answered, saw the verdict and never met it
+again.
 
-**"Errou" e "ninguém conferiu" não viram a mesma barra.** Os tipos que precisam
-de servidor (`codigo`, `saida-esperada`, `resposta-expressao`) respondem
-`acertou: null` enquanto não houver execução, e contá-los como erro inventaria
-uma reprovação que não aconteceu. É a régua do funil do outro lado: lá, não
-julgado nunca vira aprovado; aqui, não julgado nunca vira reprovado. Eles
-aparecem como "aguardando o servidor" e ficam fora da taxa.
+**"Got it wrong" and "nobody checked" do not become the same bar.** The types
+that need a server (`codigo`, `saida-esperada`, `resposta-expressao`) answer
+`acertou: null` while there is no execution, and counting them as errors would
+invent a failure that did not happen. It is the funnel's ruler from the other
+side: there, not judged never becomes approved; here, not judged never becomes
+failed. They show up as "waiting for the server" and stay out of the rate.
 
-**Refazer os errados** monta o mesmo wizard da avaliação com o que o aluno errou
-em qualquer curso — é a única tela que reúne conteúdo de aulas diferentes, e
-faz sentido porque o critério aqui não é o currículo, é o erro. Cada exercício
-volta com **o curso e a aula de onde veio**: o wizard grava em
-`progresso[curso].aulas[ix]`, e um contexto único registraria o acerto na aula
-errada, fazendo o desempenho mentir sobre onde a pessoa melhorou.
+**Redoing the wrong ones** builds the same assessment wizard with whatever the
+student got wrong in any course — it is the only screen that gathers content from
+different lessons, and it makes sense because the criterion here is not the
+curriculum, it is the error. Each exercise comes back with **the course and the
+lesson it came from**: the wizard writes to `progresso[curso].aulas[ix]`, and a
+single context would record the correct answer against the wrong lesson, making
+the performance screen lie about where the person improved.
 
-### Notas
+### Notes
 
-Um campo recolhido no fim de cada seção, com salvamento automático. É a única
-coisa do portal que não veio do catálogo nem do pipeline: é do aluno. Por isso
-tem tela própria, agrupada por curso — na hora de revisar ninguém lembra em qual
-seção anotou o quê — e entra na busca junto com o resto.
+A collapsed field at the end of each section, with automatic saving. It is the
+only thing in the portal that came neither from the catalogue nor from the
+pipeline: it is the student's. That is why it has a screen of its own, grouped by
+course — when it is time to revise nobody remembers which section they wrote what
+in — and enters the search along with everything else.
 
-## Prova de curso e prova de trilha
+## Course exam and track exam
 
-A avaliação da aula e a prova não são a mesma coisa, e a diferença não é o
-tamanho:
+The lesson's assessment and the exam are not the same thing, and the difference
+is not the size:
 
-| | avaliação da aula | prova |
+| | lesson assessment | exam |
 |---|---|---|
-| para quê | praticar | medir |
-| feedback | imediato, questão a questão | só no fim |
-| dica socrática | aparece | não aparece |
-| refazer | à vontade, na hora | só refazendo a prova inteira |
-| resultado | não é registrado | vale nota, e a melhor fica |
+| what for | practising | measuring |
+| feedback | immediate, question by question | only at the end |
+| socratic hint | shows | does not show |
+| redo | freely, right away | only by redoing the whole exam |
+| result | not recorded | counts for a grade, and the best one stands |
 
-**Feedback imediato numa prova é o que permite tentar até acertar** — e aí ela
-para de medir. Por isso o wizard ganhou `modo: 'prova'`: as mesmas telas, com o
-veredito represado. Enquanto a prova está aberta, responder devolve só "resposta
-registrada", e o marcador no topo diz *se* você respondeu, nunca *se acertou*.
-Ao entregar, tudo abre de uma vez e responder para de ser possível — é a linha
-entre medir e ensinar.
+**Immediate feedback in an exam is what allows trying until you get it right** —
+and then it stops measuring. That is why the wizard gained `options.prova`: the
+same screens, with the verdict held back. While the exam is open, answering
+returns only "answer recorded", and the marker at the top says *whether* you
+answered, never *whether you got it right*. On submission everything opens at
+once and answering stops being possible — that is the line between measuring and
+teaching.
 
-**As questões saem do mesmo banco das aulas, sorteadas.** Não há um banco
-separado de "questões de prova" e não deve haver enquanto o pipeline emitir um
-arquivo por tópico: manter dois bancos alinhados é trabalho recorrente, e o que
-se ganharia — questões inéditas — o sorteio já dá, porque ninguém faz os 1.503
-exercícios de uma trilha antes da prova.
+**The questions come from the lessons' own bank, drawn at random.** There is no
+separate bank of "exam questions" and there should not be while the pipeline
+emits one file per topic: keeping two banks aligned is recurring work, and what
+would be gained — unseen questions — the draw already gives, because nobody does
+all 1,503 exercises of a track before the exam.
 
-**O sorteio é semeado pela tentativa.** Sair da tela e voltar devolve a *mesma*
-prova; senão, fechar a aba sem querer viraria uma prova nova — a punição errada
-para o erro errado. Reprovar e tentar de novo devolve uma prova *diferente*:
-decorar a lista de dez não pode ser a estratégia.
+**The draw is seeded by the attempt.** Leaving the screen and coming back returns
+the *same* exam; otherwise, closing the tab by accident would become a new exam —
+the wrong punishment for the wrong mistake. Failing and trying again returns a
+*different* exam: memorising the list of ten cannot be the strategy.
 
-**A prova prefere os tipos que o portal sabe corrigir.** `codigo`,
-`saida-esperada` e `resposta-expressao` precisam de servidor e hoje voltam "não
-conferido" — uma prova cheia deles não teria nota. Eles entram só quando não há
-corrigíveis suficientes, e ficam fora do denominador, pela régua de sempre: não
-julgado não vira aprovado nem reprovado. Ficar em branco, ao contrário, conta
-como erro — deixar em branco é uma resposta.
+**The exam prefers the types the portal knows how to grade.** `codigo`,
+`saida-esperada` and `resposta-expressao` need a server and today come back "not
+checked" — an exam full of them would have no grade. They only come in when there
+are not enough gradable ones, and they stay out of the denominator, by the usual
+ruler: not judged becomes neither passed nor failed. Leaving something blank, by
+contrast, counts as wrong — leaving it blank is an answer.
 
-**Ela não tranca.** Dá para abrir a prova sem ter feito uma aula. O portal
-inteiro mostra e não tranca, e uma prova que travasse seria a única exceção. O
-que ela faz é avisar quanto do conteúdo você concluiu. Entregar com questões em
-branco pede um segundo clique, e o próprio botão diz quantas são.
+**It does not lock.** You can open the exam without having done a single lesson.
+The whole portal shows and does not lock, and an exam that locked would be the
+only exception. What it does is warn you how much of the content you have
+completed. Submitting with blank questions asks for a second click, and the
+button itself says how many there are.
 
-Mínimo para passar: **70%**. Vale sempre o melhor resultado — reprovar depois de
-já ter passado não pode tirar um certificado emitido.
+Minimum to pass: **70%**. The best result always stands — failing after having
+already passed cannot take away an issued certificate.
 
-### O certificado passou a exigir a prova
+### The certificate came to require the exam
 
-Concluir todas as seções diz que a pessoa **percorreu** o material — e como
-avançar é concluir, percorrer é quase automático. Um certificado que sai de
-percorrer não afirma nada sobre quem o recebe. A prova é o que faz o documento
-significar alguma coisa.
+Completing every section says the person **went through** the material — and
+since moving on is completing, going through is nearly automatic. A certificate
+that comes from going through asserts nothing about whoever receives it. The exam
+is what makes the document mean something.
 
-Com a prova da trilha nasceu a **segunda unidade de certificação**: quem termina
-os cursos do caminho e passa na prova final da trilha leva um certificado da
-trilha inteira. Isso responde *em parte* a pergunta que o README da vitrine
-deixou aberta: a trilha é a unidade grande, e a dúvida de verdade — se existe
-algo entre um curso de 40h e uma trilha de 400h — continua aberta, e continua
-barata enquanto nenhum certificado tiver sido emitido para aluno real.
+With the track exam came the **second unit of certification**: whoever finishes
+the path's courses and passes the track's final exam takes away a certificate for
+the whole track. This answers *in part* the question the vitrine's README left
+open: the track is the large unit, and the real doubt — whether there is
+something between a 40h course and a 400h track — remains open, and remains cheap
+while no certificate has been issued to a real student.
 
-A tela de certificados mostra **exemplos** de cada tipo que o aluno ainda não
-tem, montados com os dados reais do catálogo dele. Eles se declaram exemplo em
-três lugares ao mesmo tempo — moldura tracejada, selo na barra e, no lugar do
-código de validação, a frase "nenhum código foi emitido". Um certificado falso
-parecido com um verdadeiro é um problema, não uma prévia.
+The certificates screen shows **samples** of each type the student does not have
+yet, assembled with the real data from their catalogue. They declare themselves
+samples in three places at once — dashed frame, a seal in the bar and, in place
+of the validation code, the phrase "no code has been issued". A fake certificate
+that looks like a real one is a problem, not a preview.
 
-## Conteúdo: imagem, diagrama e código anotado
+## Content: image, diagram and annotated code
 
-`prosa()` passou de três formas de bloco para seis. As três novas:
+`prose()` went from three block shapes to six. The three new ones:
 
 ```js
-{ imagem: url, legenda, alt }   // um arquivo — foto, captura, diagrama exportado
-{ svg: '<svg…>', legenda }      // um desenho, que entra no documento
+{ imagem: url, legenda, alt }   // a file — photo, screenshot, exported diagram
+{ svg: '<svg…>', legenda }      // a drawing, which enters the document
 { exemplo: { linguagem, arquivo, partes: [{ codigo, nota }], saida } }
 ```
 
-**Por que imagem e svg são coisas separadas.** Um diagrama exportado como PNG
-nasce com um fundo, e esse fundo está errado em metade das visitas: o portal tem
-tema claro e escuro, e o aluno alterna. Diagrama de conceito — que é linha e
-rótulo — fica inline e herda a cor do tema. Foto e captura de tela continuam
-sendo arquivo. (O `svg` não é escapado: é marcação nossa, escrita no arquivo de
-conteúdo. É o campo que vai precisar de sanitização no dia em que o conteúdo
-vier de fora, e o comentário no código existe para essa pergunta não passar
-batida.)
+**Why image and svg are separate things.** A diagram exported as a PNG is born
+with a background, and that background is wrong on half the visits: the portal
+has a light theme and a dark one, and the student switches. A concept diagram —
+which is lines and labels — goes inline and inherits the theme's colour. Photos
+and screenshots stay files. (The `svg` is not escaped: it is our own markup,
+written in the content file. It is the field that will need sanitising the day
+the content comes from outside, and the comment in the code exists so that
+question does not slip by.)
 
-**O `exemplo` é a forma do [Go By Example](https://gobyexample.com):** a
-explicação de um lado, o programa do outro, cada nota na altura do trecho que
-ela comenta. Ela vale um bloco próprio porque **um parágrafo entre dois trechos
-quebra o programa** — quem lê perde o fio de que aquilo é um arquivo só.
+**The `exemplo` is [Go By Example](https://gobyexample.com)'s shape:** the
+explanation on one side, the program on the other, each note at the height of the
+snippet it comments on. It earns a block of its own because **a paragraph between
+two snippets breaks the program** — the reader loses the thread that this is one
+single file.
 
-A primeira versão daqui errava em duas coisas, e as duas foram corrigidas:
+The first version here got two things wrong, and both were fixed:
 
-1. **A nota vai à esquerda, o código à direita.** Lê-se a explicação e então se
-   olha para o lado, que é a ordem em que a pessoa aprende. Com o código
-   primeiro, ela lê algo que ainda não sabe o que é.
-2. **Não há linha entre os trechos.** As bordas transformavam o programa numa
-   tabela de pedaços — exatamente o que este bloco existe para evitar. A coluna
-   da direita tem de parecer um arquivo, e continuidade é o argumento inteiro.
-   Há um teste que mede se os trechos se emendam sem folga.
+1. **The note goes on the left, the code on the right.** You read the explanation
+   and then look to the side, which is the order in which a person learns. With
+   the code first, they read something they do not yet know what it is.
+2. **There is no line between the snippets.** The borders turned the program into
+   a table of fragments — exactly what this block exists to avoid. The right
+   column has to look like a file, and continuity is the whole argument. There is
+   a test that measures whether the snippets join with no gap.
 
-Abaixo de 1466px as duas colunas viram uma, com a nota *antes* do trecho — e é
-o mesmo corte em que a aula inteira volta para a coluna estreita. Não são duas
-decisões: é a largura do bloco que define a largura da aula, pela conta descrita
-em *A aula tem uma largura só*.
+Below 1466px the two columns become one, with the note *before* the snippet — and
+it is the same cut at which the whole lesson goes back to the narrow column.
+These are not two decisions: it is the block's width that defines the lesson's
+width, by the arithmetic described in *The lesson has one width*.
 
-**O realce de sintaxe tem três cores, e são as da marca:** vermelho para a
-estrutura da linguagem, azul para os literais, branco para o resto —
-comentário no cinza apagado. Não há uma quarta: paleta de editor com dez tons
-dentro de uma página de curso compete com o conteúdo em vez de ajudar a lê-lo.
+**The syntax highlighting has three colours, and they are the brand's:** red for
+the language's structure, blue for the literals, white for the rest — comments in
+the muted grey. There is no fourth: an editor palette with ten tones inside a
+course page competes with the content instead of helping to read it.
 
-Ele **não é um parser**, e o código diz isso: é uma varredura por expressão
-regular com as alternativas em ordem de precedência — comentário antes de
-string, string antes de tudo —, para que nada seja realçado dentro de um
-literal. Erra nos casos que um parser acertaria, e erra devolvendo texto sem
-cor, nunca texto errado. Mora em `texto.js` e não num módulo próprio por uma
-razão mecânica: precisa de `esc`, e separá-los criaria um ciclo de imports que
-o `bundle.py` recusa.
+It **is not a parser**, and the code says so: it is a regular-expression sweep
+with the alternatives in order of precedence — comment before string, string
+before everything — so that nothing gets highlighted inside a literal. It gets
+wrong the cases a parser would get right, and it gets them wrong by returning
+text with no colour, never wrong text. It lives in `text.js` and not in a module
+of its own for a mechanical reason: it needs `esc`, and separating them would
+create an import cycle that `bundle.py` refuses.
 
-### Onde ele mais rende: o curso de JavaScript
+### Where it pays off most: the JavaScript course
 
-Em `web-fundamentos` o assunto é conceito e prosa dá conta. Em `html-css` o
-código aparece em pedaços curtos. Em `javascript` o assunto é uma **linguagem**,
-e linguagem se aprende lendo programa — as quatro primeiras aulas foram escritas
-quase inteiras em `exemplo`.
+In `web-fundamentos` the subject is concepts and prose is enough. In `html-css`
+the code appears in short fragments. In `javascript` the subject is a
+**language**, and a language is learned by reading programs — the first four
+lessons were written almost entirely in `exemplo`.
 
-**Todo exemplo tem de rodar**, e há uma ferramenta para garantir isso:
+**Every example has to run**, and there is a tool to guarantee that:
 
 ```sh
-node ferramentas/exemplos/conferir.mjs
+node tools/examples/check.mjs
 ```
 
-Ela concatena os `partes[].codigo` de cada bloco, executa num Node de verdade e
-compara com a `saida` escrita no conteúdo. Na primeira execução pegou dois
-defeitos reais, nenhum dos quais apareceria lendo o texto: o exemplo das arrow
-functions **estourava no meio** (`this.n` com `this` indefinido em módulo ES) e
-listava a saída de dois `console.log` que nem estavam no programa; e o exemplo
-de `this` abortava no `TypeError` antes de chegar à linha que era a lição.
+It concatenates each block's `partes[].codigo`, executes it in a real Node and
+compares against the `saida` written in the content. On its first run it caught
+two real defects, neither of which would show up by reading the text: the arrow
+functions example **blew up halfway through** (`this.n` with `this` undefined in
+an ES module) and listed the output of two `console.log` calls that were not even
+in the program; and the `this` example aborted at the `TypeError` before reaching
+the line that was the lesson.
 
-Exemplo com saída inventada é pior que exemplo nenhum: ensina errado com a
-autoridade de quem mostrou o resultado, e o aluno só descobre no console dele.
+An example with invented output is worse than no example at all: it teaches the
+wrong thing with the authority of someone who showed the result, and the student
+only finds out in their own console.
 
-## Material complementar
+## Supporting material
 
-A seção referencia o material por chave (`materiais: ['wf-dns-resumo']`); o
-registro com título, tipo e tamanho mora em `window.MATERIAIS`. A indireção
-existe para um dia só: quando o arquivo sair do `data:` URI e virar URL assinada
-de um bucket, muda o registro — nenhuma linha de conteúdo precisa ser reescrita.
+The section references material by key (`materiais: ['wf-dns-resumo']`); the
+record with title, type and size lives in `window.MATERIALS`. The indirection
+exists for one day only: when the file leaves the `data:` URI and becomes a
+signed bucket URL, the record changes — not one line of content has to be
+rewritten.
 
-Os PDFs de exemplo são **gerados**, não commitados
-(`ferramentas/materiais/gerar.py`). O texto deles é versionado e legível no
-diff; o binário é saída. E eles vêm embutidos como `data:` URI porque o portal
-tem de funcionar aberto do disco — um link para `assets/algo.pdf` morre depois
-do bundle. São PDFs escritos à mão, sem dependência, ~3 KB cada.
+The sample PDFs are **generated**, not committed
+(`tools/materials/generate.py`). Their text is versioned and readable in the
+diff; the binary is output. And they come inlined as `data:` URIs because the
+portal has to work opened off disk — a link to `assets/something.pdf` dies after
+the bundle. They are hand-written PDFs, no dependency, ~3 KB each.
 
-O link usa `download`, e não `target`: abrir o PDF no visualizador embutido tira
-o aluno da aula.
+The link uses `download`, and not `target`: opening the PDF in the built-in
+viewer takes the student out of the lesson.
 
-## O conteúdo não fica dentro de um cartão
+## The content does not live inside a card
 
-A prosa da seção era um `.bloco`: fundo, borda, canto arredondado. Isso desenha
-uma fronteira entre "a área do conteúdo" e "o resto" — e o resto não é nada, é
-a margem que sobra de centralizar. Separar texto de vazio não é uma distinção
-que valha uma linha na tela.
+The section's prose was a `.bloco`: background, border, rounded corner. That
+draws a border between "the content area" and "the rest" — and the rest is
+nothing, it is the margin left over from centring. Separating text from emptiness
+is not a distinction worth a line on screen.
 
-Cartão é para o que se **compara lado a lado**: cursos, materiais, os blocos da
-página do curso. Texto corrido para ler durante meia hora quer o contrário —
-nada em volta. As figuras, o código e o vídeo mantiveram a moldura, e agora ela
-quer dizer alguma coisa ("isto aqui não é prosa"), o que não conseguia dizer
-quando estava dentro de outra moldura.
+A card is for what gets **compared side by side**: courses, materials, the blocks
+on the course page. Running text meant to be read for half an hour wants the
+opposite — nothing around it. The figures, the code and the video kept their
+frame, and now it means something ("this here is not prose"), which it could not
+say while it lived inside another frame.
 
-O trilho também respirou: os itens tinham 2px de folga entre linhas de 8px, e
-uma lista de treze aulas com as seções abertas virava um paredão que se lê linha
-a linha. O ar entre os itens é o que faz um menu ser **consultado** em vez de
-lido.
+The rail got some air too: the items had 2px of slack between 8px lines, and a
+list of thirteen lessons with the sections open became a wall read line by line.
+The air between the items is what makes a menu **consulted** rather than read.
 
-## O certificado é um documento, não uma janela
+## The certificate is a document, not a window
 
-Ele nasceu reaproveitando o `.term-bar` da vitrine — os três pontinhos e o nome
-do arquivo. É a moldura certa para painel de código e a errada para isto: o
-certificado é o **único artefato do portal que sai daqui**, e vai para um perfil,
-um anexo de e-mail, uma vaga. Nenhum documento tem barra de janela em cima.
+It was born reusing the vitrine's `.term-bar` — the three dots and the file name.
+That is the right frame for a code panel and the wrong one for this: the
+certificate is the **only artefact of the portal that leaves here**, and it goes
+to a profile, an email attachment, a job application. No document has a window
+bar on top.
 
-A forma agora é a de um diploma — emissor no alto, "certifica que", o nome de
-quem recebe em corpo grande, o que foi concluído, e um rodapé com data e código.
-A identidade continua sendo a da escola (mesma tipografia, mesmo fósforo, o LED
-da marca), aplicada a um documento em vez de a uma janela. O teste de fumaça
-guarda a regressão: `.cert .term-bar` tem de continuar valendo zero.
+The shape is now a diploma's — issuer at the top, "certifies that", the name of
+whoever receives it in a large size, what was completed, and a footer with date
+and code. The identity is still the school's (same typography, same phosphor, the
+brand LED), applied to a document instead of to a window. The smoke suite keeps
+the regression: `.cert .term-bar` has to keep matching zero elements.
 
-## Conta: e-mail, senha e plano
+## Account: email, password and plan
 
-**E-mail e senha são dois formulários, não campos de um "salvar".** As duas
-operações têm consequências diferentes, confirmações diferentes e, no servidor,
-endpoints diferentes; juntá-las faria a pessoa alterar uma sem querer.
+**Email and password are two forms, not fields of one "save".** The two
+operations have different consequences, different confirmations and, on the
+server, different endpoints; merging them would let a person change one by
+accident.
 
-Duas decisões que o código registra e a tela repete ao aluno:
+Two decisions the code records and the screen repeats to the student:
 
-- **A senha não é guardada em lugar nenhum.** Não há hash no cliente que valha
-  alguma coisa, e gravá-la em `localStorage` seria pior que não ter tela: daria
-  a impressão de que existe autenticação. O que fica é a data da troca. O teste
-  procura a senha digitada dentro do armazenamento inteiro e falha se achar.
-- **A validação de e-mail é frouxa de propósito** — "tem arroba, tem ponto
-  depois dele, sem espaço". Regra estrita rejeita endereço válido (`+`, domínio
-  novo, acento) e não impede nada: quem confirma que o endereço existe é a
-  mensagem enviada para ele.
+- **The password is not stored anywhere.** There is no client-side hash worth
+  anything, and writing it to `localStorage` would be worse than having no screen:
+  it would give the impression that authentication exists. What stays is the date
+  of the change. The test searches the whole storage for the typed password and
+  fails if it finds it.
+- **Email validation is loose on purpose** — "has an at sign, has a dot after it,
+  no spaces". A strict rule rejects valid addresses (`+`, a new TLD, an accent)
+  and prevents nothing: what confirms that the address exists is the message sent
+  to it.
 
-**Meu Plano compara por recurso, não por cartão de preço.** Três cartões lado a
-lado com listas independentes é o formato de página de *venda*, para quem ainda
-não escolheu. Quem já assinou tem outra pergunta — "o que eu **não** tenho?" — e
-a tabela responde essa, porque alinha a mesma linha nos três planos.
+**My Plan compares by feature, not by price card.** Three cards side by side with
+independent lists is the format of a *sales* page, for someone who has not chosen
+yet. Someone who already subscribed has a different question — "what do I **not**
+have?" — and the table answers that one, because it aligns the same row across
+the three plans.
 
-Os planos em `assets/planos.js` são ficção deliberada com a forma certa: preço,
-ciclo e cobrança são domínio de um serviço de pagamento. E **nada é bloqueado
-por plano hoje**: travar exige servidor, e com o estado no navegador qualquer
-trava seria teatro — bastaria editar uma chave. A tela diz isso.
+The plans in `assets/plans.js` are deliberate fiction with the right shape: price,
+cycle and billing belong to a payment service. And **nothing is locked by plan
+today**: locking requires a server, and with the state in the browser any lock
+would be theatre — you would only have to edit a key. The screen says so.
 
-## Espaço: o grafo, as setas e a coluna de leitura
+## Space: the graph, the arrows and the reading column
 
-Três ajustes que são a mesma ideia — **deixar o vazio trabalhar**:
+Three adjustments that are the same idea — **let the emptiness do some work**:
 
-**O grafo respira.** A vitrine usa 48px entre os níveis, e lá basta: o grafo é
-uma das sete telas e some depois de uma rolada. Aqui é a tela onde o aluno
-volta para se situar, e com 48px as arestas passam raspando nos cartões. Não
-colidem — o detector de colisão do teste continua acusando zero —, mas o olho
-não separa uma coluna da seguinte. Foram para 88px, e a troca é rolagem
-horizontal, que o grafo já tinha resolvida (setas e esmaecido nas bordas).
+**The graph breathes.** The vitrine uses 48px between the levels, and there that
+is enough: the graph is one of the seven screens and disappears after a single
+scroll. Here it is the screen the student comes back to in order to get their
+bearings, and at 48px the edges shave past the cards. They do not collide — the
+test's collision detector still reports zero — but the eye does not separate one
+column from the next. They went to 88px, and the trade is horizontal scrolling,
+which the graph had already solved (arrows and a fade at the borders).
 
-**As setas de navegação foram para a sobra da tela.** A coluna de leitura tem
-820px e é centrada na área que sobra do trilho; o que resta dos dois lados é
-espaço que nenhum conteúdo usa. É exatamente onde um controle de navegação deve
-morar: perto o bastante para ser alcançado, longe o bastante para não disputar
-a linha com a palavra que está sendo lida.
+**The navigation arrows moved into the screen's leftover.** The reading column is
+820px and is centred in the area the rail leaves; what remains on both sides is
+space no content uses. It is exactly where a navigation control belongs: close
+enough to be reached, far enough not to fight for the line with the word being
+read.
 
 ```
-vão de cada lado = (100vw - trilho - coluna) / 2
-seta esquerda → centrada no vão entre o trilho e a coluna
-seta direita  → centrada no vão entre a coluna e a borda da tela
+gap on each side = (100vw - trilho - column) / 2
+left arrow  → centred in the gap between the rail and the column
+right arrow → centred in the gap between the column and the screen edge
 ```
 
-O trilho e a coluna viraram **variáveis CSS** (`--trilho`, `--tela`) porque a
-posição da seta deriva das duas — e número repetido em dois lugares diverge. Já
-divergiu uma vez, no recuo do conteúdo, e custou 2px de rolagem horizontal no
-celular. É `--tela` e não `--leitura`: quando a aula alarga o vão encolhe, e uma
-seta posicionada pela coluna estreita ficaria por cima do conteúdo da larga.
+The rail and the column became **CSS variables** (`--trilho`, `--tela`) because
+the arrow's position derives from both — and a number repeated in two places
+diverges. It already diverged once, in the content's padding, and it cost 2px of
+horizontal scrolling on the phone. It is `--tela` and not `--leitura`: when the
+lesson widens the gap shrinks, and an arrow positioned by the narrow column would
+sit on top of the wide one's content.
 
-## A aba se chama codeschool.ing, e só
+## The tab is called codeschool.ing, and nothing else
 
-O título da aba dizia onde o aluno estava — *"ES6+ syntax: let/const, arrow
-functions and template strings · codeschool.ing"*. O efeito era o contrário do
-pretendido: numa janela com várias abas, o navegador corta o título pelo fim, e
-o que sobrava era o começo do nome da aula. A marca — que é o que se procura ao
-voltar para cá — nunca aparecia.
+The tab's title used to say where the student was — *"ES6+ syntax: let/const,
+arrow functions and template strings · codeschool.ing"*. The effect was the
+opposite of the one intended: in a window with several tabs, the browser truncates
+the title from the end, and what was left was the beginning of the lesson's name.
+The brand — which is what one looks for when coming back here — never showed.
 
-Agora o nome é constante. O `<title>` do HTML e o roteador dizem a mesma coisa,
-porque a primeira pintura vem de um e todas as outras do outro.
+Now the name is constant. The HTML's `<title>` and the router say the same thing,
+because the first paint comes from one and every other from the other.
 
-**O nome da tela não se perdeu.** Era o `document.title` que anunciava a troca
-de tela para o leitor de tela; congelar a aba sem passar esse nome adiante
-deixaria a navegação muda para quem não enxerga. O `titulo` que cada tela devolve
-passou a nomear a região de conteúdo (`aria-label` no `<main>`), que é o que se
-anuncia quando o conteúdo troca. Um teste percorre nove rotas de naturezas
-diferentes — incluindo a de página inexistente, que sai do roteador por um
-caminho próprio — e confere as duas coisas.
+**The screen's name was not lost.** It was `document.title` that announced the
+screen change to the screen reader; freezing the tab without passing that name on
+would leave the navigation mute for whoever cannot see. The `title` each screen
+returns now names the content region (`aria-label` on the `<main>`), which is
+what gets announced when the content changes. A test walks nine routes of
+different natures — including the not-found page, which leaves the router by a
+path of its own — and checks both things.
 
-## O certificado abre em grande
+## The certificate opens big
 
-Clicar num certificado o amplia sobre o resto da tela, com o fundo esmaecido e
-**congelado** — o mesmo modal da vitrine, reaproveitado inteiro. O
-congelamento é `overflow:hidden` no documento e não JavaScript, pelo motivo que
-o `base.css` já registrava: prender só a roda e o toque deixava passar a barra
-de rolagem, a inércia do trackpad e as setas dentro de um campo.
+Clicking a certificate enlarges it over the rest of the screen, with the
+background dimmed and **frozen** — the vitrine's own modal, reused whole. The
+freezing is `overflow:hidden` on the document and not JavaScript, for the reason
+`base.css` already recorded: trapping only the wheel and the touch let through
+the scrollbar, the trackpad's inertia and the arrow keys inside a field.
 
-Acima da caixa, à direita, ficam as ações. São duas, e fazem coisas diferentes:
+Above the box, to the right, are the actions. There are two, and they do different
+things:
 
-| botão | o que faz |
+| button | what it does |
 | --- | --- |
-| o ícone do LinkedIn | abre o formulário de *licenças e certificados* já preenchido — nome, instituição, mês, ano e código |
-| **Compartilhar** | publica um post com o link de validação |
+| the LinkedIn icon | opens the *licenses and certifications* form pre-filled — name, institution, month, year and code |
+| **Share** | publishes a post with the validation link |
 
-O primeiro é **só o ícone**: a marca do LinkedIn é reconhecida sem legenda, e o
-rótulo ocupava metade da faixa para dizer o que o desenho já diz. O texto não
-sumiu — foi para o `aria-label` e o `title`, que é o que o leitor de tela
-anuncia e o que o cursor mostra. Um teste reprova se o botão ficar mudo.
+The first is **only the icon**: LinkedIn's brand is recognised without a caption,
+and the label took up half the strip to say what the drawing already says. The
+text did not disappear — it went to the `aria-label` and the `title`, which is
+what the screen reader announces and what the cursor shows. A test fails if the
+button goes mute.
 
-A cor é a da marca deles, `#0A66C2`, no tema claro. No escuro ela dá 2,5:1 de
-contraste contra o painel — abaixo dos 3:1 que um ícone precisa —, então o tema
-escuro clareia. Clarear a cor de uma marca não é liberdade: é o que a torna
-visível, e invisível ela não representa marca nenhuma.
+The colour is their brand's, `#0A66C2`, on the light theme. On dark it gives
+2.5:1 of contrast against the panel — below the 3:1 an icon needs — so the dark
+theme lightens it. Lightening a brand's colour is not a liberty: it is what makes
+it visible, and invisible it represents no brand at all.
 
-O primeiro é o que a pessoa realmente quer: certificado no perfil é uma
-credencial; post some do feed em dois dias.
+The first is what the person actually wants: a certificate on a profile is a
+credential; a post disappears from the feed in two days.
 
-O `certUrl` aponta para uma página de validação que **ainda não existe** — ela
-nasce com o servidor. A URL é montada no formato definitivo de propósito: o dia
-em que o servidor existir não pode ser o dia de descobrir que o formato era
-outro. Um teste confere que os sete campos que o LinkedIn espera estão lá e que
-o código na URL é o mesmo impresso no documento — uma URL malformada só daria
-sinal no site do LinkedIn.
+The `certUrl` points at a validation page that **does not exist yet** — it is born
+with the server. The URL is built in the settled format on purpose: the day the
+server exists cannot be the day of discovering that the format was different. A
+test checks that the seven fields LinkedIn expects are there and that the code in
+the URL is the same one printed on the document — a malformed URL would only give
+a signal on LinkedIn's site.
 
-Certificado de **exemplo não compartilha**. A frase que dizia isso saiu de
-dentro do modal — ela explicava, mas roubava a faixa inteira para explicar algo
-que ninguém tinha perguntado. O botão ficou, **desabilitado**, com o motivo no
-`title` e no `aria-label`. Das três saídas possíveis — esconder o botão, deixá-lo
-funcionando, desabilitá-lo com motivo — só a última não mente: esconder faz
-parecer que a função não existe, e funcionar publicaria uma credencial que
-ninguém tirou.
+A **sample certificate does not share**. The sentence that said so left the inside
+of the modal — it explained, but stole the whole strip to explain something nobody
+had asked. The button stayed, **disabled**, with the reason in the `title` and the
+`aria-label`. Of the three possible outcomes — hide the button, leave it working,
+disable it with a reason — only the last one does not lie: hiding makes it look
+like the function does not exist, and working would publish a credential nobody
+earned.
 
-## O certificado no celular
+## The certificate on a phone
 
-O modal do certificado extrapolava a tela nos dois eixos a 390px, e a causa não
-era o certificado: era o `.modal`, que é `display:grid; place-items:center` com
-a faixa em `auto`. Numa faixa `auto`, `width:min(1040px,100%)` resolve contra o
-`max-content` do próprio filho — a conta se morde e não limita nada. A faixa
-virou `minmax(0,1fr)`, que é o `0` de piso que faltava, e o alinhamento vertical
-saiu do `place-items` para `margin:auto 0` na pilha, para o documento poder
-rolar quando o certificado for mais alto do que a tela em vez de estourar por
-cima e por baixo. Abaixo de 640px o documento também aperta: menos recuo, menos
-corpo de letra, e o rodapé em duas linhas. Um teste mede a folha dentro de um
-390×844 e reprova se ela passar da largura ou sobrar por baixo.
+The certificate modal overflowed the screen on both axes at 390px, and the cause
+was not the certificate: it was `.modal`, which is `display:grid;
+place-items:center` with the track at `auto`. In an `auto` track,
+`width:min(1040px,100%)` resolves against the child's own `max-content` — the
+arithmetic bites its own tail and limits nothing. The track became
+`minmax(0,1fr)`, which is the `0` floor that was missing, and the vertical
+alignment moved out of `place-items` into `margin:auto 0` on the stack, so the
+document can scroll when the certificate is taller than the screen instead of
+bursting out top and bottom. Below 640px the document tightens up too: less
+padding, smaller type, and the footer on two lines. A test measures the sheet
+inside a 390×844 and fails if it goes past the width or hangs off the bottom.
 
-## Duas fileiras que rolam, e uma cor que separa
+## Two rows that scroll, and one colour that separates
 
-**As categorias do catálogo ganharam setas.** São nove, e nem com o trilho
-fechado cabem numa linha: as últimas ficavam cortadas na borda sem nada dizendo
-que havia mais. A estrutura é a da vitrine — `.chips-caixa` com uma seta de cada
-lado e o esmaecido nas pontas —, e o `base.css` já trazia o estilo dos três
-pedaços. Reimplementar seria manter dois de tudo. Quando tudo cabe, as setas
-somem: seta desabilitada que nunca faz nada é ruído.
+**The catalogue's categories gained arrows.** There are nine, and not even with
+the rail closed do they fit on one line: the last ones were clipped at the border
+with nothing saying there was more. The structure is the vitrine's —
+`.chips-caixa` with an arrow on each side and a fade at the ends — and `base.css`
+already carried the style for all three pieces. Reimplementing it would mean
+maintaining two of everything. When everything fits, the arrows disappear: a
+disabled arrow that never does anything is noise.
 
-**O rótulo de grupo da busca virou vermelho.** No azul ele se confundia com o
-contexto de cada resultado, que também é azul e também é monoespaçado, e a
-lista virava uma coluna só. Ele é a única linha ali que não é resultado — é a
-divisória entre eles, e merece a outra cor da marca.
+**The search's group label became red.** In blue it blended with each result's
+context, which is also blue and also monospaced, and the list became a single
+column. It is the only line there that is not a result — it is the divider
+between them, and it deserves the brand's other colour.
 
-## Quatro armadilhas que só apareceram na tela
+## Four traps that only showed up on screen
 
-Ficam registradas porque nenhuma aparece lendo o código:
+They are on the record because none of them appears by reading the code:
 
-1. **`base.css` estiliza o elemento `nav`**, não uma classe — a vitrine tem
-   exatamente um. O portal tem três (barra, trilho, migalhas), e os dois de
-   dentro herdaram `position:fixed` e viraram uma segunda barra por cima do
-   conteúdo. Neutralizado em `portal.css`, e não em `base.css`, que precisa
-   continuar sincronizável com a vitrine.
-2. **`[hidden]` perde para `.btn{display:inline-flex}`** — a regra do navegador
-   tem especificidade zero. O botão "Tentar de novo" aparecia antes de existir o
-   que refazer.
-3. **O navegador não sabe que a página é escura.** O portal é escuro porque o
-   CSS pinta tudo de escuro — e nada disso conta para o navegador, que continua
-   desenhando o que é *dele* com o tema do sistema: a barra de rolagem, o
-   `<select>`, o botão de limpar do campo de busca. Faltava `color-scheme`.
+1. **`base.css` styles the `nav` element**, not a class — the vitrine has exactly
+   one. The portal has three (bar, rail, breadcrumbs), and the two inner ones
+   inherited `position:fixed` and became a second bar on top of the content.
+   Neutralised in `portal.css`, and not in `base.css`, which has to stay syncable
+   with the vitrine.
+2. **`[hidden]` loses to `.btn{display:inline-flex}`** — the browser's rule has
+   zero specificity. The "Try again" button showed up before there was anything to
+   redo.
+3. **The browser does not know the page is dark.** The portal is dark because the
+   CSS paints everything dark — and none of that counts for the browser, which
+   keeps drawing what is *its own* with the system theme: the scrollbar, the
+   `<select>`, the search field's clear button. `color-scheme` was missing.
 
-   O sintoma não é igual em todo lugar, e foi assim que ele passou: no Firefox
-   a barra fina é discreta o bastante para ninguém reparar; no Chromium — logo
-   no Brave, no Chrome e no Edge — ela é uma faixa cinza-clara no meio da tela
-   escura. Um mesmo defeito, visível em metade dos navegadores.
+   The symptom is not the same everywhere, and that is how it slipped through: in
+   Firefox the thin bar is discreet enough that nobody notices; in Chromium — and
+   therefore in Brave, Chrome and Edge — it is a light grey strip in the middle of
+   a dark screen. One defect, visible in half the browsers.
 
-   A vitrine já sabia metade disso: onde ela deixa uma barra à mostra
-   (`.cursos-rol`), declara `scrollbar-width` **e** `scrollbar-color` juntos. O
-   trilho do portal tinha copiado só a primeira. Agora há `color-scheme` na
-   raiz seguindo o tema, a cor declarada em cada contêiner rolável, e um teste
-   que **varre a página inteira** procurando qualquer elemento que role com a
-   cor do sistema — em vez de uma lista escrita à mão que envelhece.
+   The vitrine already knew half of this: where it leaves a bar on show
+   (`.cursos-rol`), it declares `scrollbar-width` **and** `scrollbar-color`
+   together. The portal's rail had copied only the first. Now there is
+   `color-scheme` at the root following the theme, the colour declared on every
+   scrollable container, and a test that **sweeps the whole page** looking for any
+   element that scrolls with the system colour — instead of a hand-written list
+   that ages.
 
-4. **`base.css` nunca reseta o elemento `button`** — cada componente da vitrine
-   declara o próprio fundo (`.tema`, `.burger`, `.nav-cta`). Todo botão novo
-   precisa declarar o dele, senão herda o cinza claro do navegador. Foi o que
-   deixou a lupa, o avatar e as setas da ordenação brancos sobre o tema escuro:
-   um sintoma só, três lugares, uma causa.
+4. **`base.css` never resets the `button` element** — every vitrine component
+   declares its own background (`.tema`, `.burger`, `.nav-cta`). Every new button
+   has to declare its own, otherwise it inherits the browser's light grey. That is
+   what left the magnifier, the avatar and the ordering arrows white on the dark
+   theme: one symptom, three places, one cause.
 
-## O que vem depois
+## The code is in English, the data is not
 
-- **Servidor**: autenticação, progresso por aluno, execução de código em
-  contêiner descartável e o CAS para `resposta-expressao`.
-- **Conteúdo real**: religar `ferramentas/exercicios` do repo da vitrine e
-  ingerir os JSON aprovados, começando pelos `_verificacao: criticado`.
-- **Os vídeos.** O quadro já está reservado nas seções que declararam `video`,
-  com a duração e o layout de ponta a ponta prontos. Falta o id.
-- **A unidade INTERMEDIÁRIA de certificação.** Já existem duas: curso e trilha.
-  Falta saber se existe algo entre um curso de 40h e uma trilha de 400h. O
-  README da vitrine deixa quatro perguntas em aberto sobre isso — o eixo, o
-  nome, a âncora e o custo de tradução — e registra a armadilha: cortar por
-  nível repetiria o erro do caso Go. O custo só salta no primeiro certificado
-  emitido para aluno real.
-- **Banco de questões de prova separado**, se e quando o sorteio do banco das
-  aulas deixar de bastar. Hoje ele basta e não custa manutenção nenhuma.
+The whole repository — identifiers, comments and documentation — is written in
+English. Four things stay in Portuguese, and each for a reason that is not
+inertia:
+
+| what stays | why |
+| --- | --- |
+| CSS classes, `data-*`, element ids, route paths | the DOM contract shared with `base.css`, which is a verbatim copy of the vitrine |
+| catalogue fields (`cursos`, `topicos`, `depende`, `ligacoes`, `nome`, `nivel`) | `dados.js` is a verbatim copy of the vitrine's catalogue |
+| exercise fields (`tipo`, `enunciado`, `alternativas`, `itens`, `pares`, `armadilha`, `dica_socratica`, `_verificacao`) | the pipeline's contract — renaming them would cost a migration on the producing side |
+| the i18n keys and the persisted `localStorage` shape | the key *is* the Portuguese text, by design; and a renamed storage key silently resets everyone's progress |
+
+The lesson content itself is content, not code, and stays in Portuguese too —
+including the comments inside the code an `exemplo` or a `{ codigo }` block
+teaches, which the student reads.
+
+**The persisted shape reaches further than the store.** `ultima` is stored as
+`{ cursoId, aulaIx, secId }`, so that coordinate pair keeps those names
+everywhere it travels — the `ctx` the wizard writes answers with, the records
+`allNotes()` and `answersGiven()` return, the search results. Renaming it only
+where it is not persisted would leave two names for one concept in adjacent
+lines, which reads worse than one Portuguese name used consistently. The same
+holds for the exam record: `saveExam` writes `pct`, `aprovado`, `certos` and
+`total`, so those four keep their names and the fields around them that are
+never stored (`judged`, `pending`) are in English.
+
+Everything else internal was translated, including the shapes that only travel
+between two modules: the matching exercise's state and its verdict, the wizard's
+submit callback, the exam DTO, and the `exercise:answered` event.
+
+## What comes next
+
+- **A server**: authentication, per-student progress, code execution in a
+  disposable container and the CAS for `resposta-expressao`.
+- **Real content**: reconnect `ferramentas/exercicios` from the vitrine's repo and
+  ingest the approved JSON, starting with the `_verificacao: criticado` ones.
+- **The videos.** The frame is already reserved in the sections that declared
+  `video`, with the duration and the edge-to-edge layout ready. Only the id is
+  missing.
+- **The INTERMEDIATE unit of certification.** Two already exist: course and track.
+  What is missing is knowing whether there is something between a 40h course and a
+  400h track. The vitrine's README leaves four questions open about it — the axis,
+  the name, the anchor and the translation cost — and records the trap: cutting by
+  level would repeat the Go case's mistake. The cost only jumps at the first
+  certificate issued to a real student.
+- **A separate exam question bank**, if and when drawing from the lessons' bank
+  stops being enough. Today it is enough and costs no maintenance at all.
