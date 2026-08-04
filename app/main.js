@@ -21,14 +21,14 @@ import * as api from './api.js';
 import { esc } from './text.js';
 
 import entrar from './screens/sign-in.js';
-import painel from './telas/painel.js';
+import painel from './screens/dashboard.js';
 import telaTrilha from './telas/trilha.js';
 import curso from './telas/curso.js';
 import aula from './telas/aula.js';
-import catalogo from './telas/catalogo.js';
+import catalogo from './screens/catalog.js';
 import certificados from './telas/certificados.js';
 import conta from './telas/conta.js';
-import planoTela from './telas/plano.js';
+import planoTela from './screens/plan.js';
 import desempenho from './screens/performance.js';
 import refazer from './screens/redo.js';
 import notas from './screens/notes.js';
