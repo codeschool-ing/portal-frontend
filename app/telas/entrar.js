@@ -8,7 +8,7 @@
    ========================================================================== */
 
 import * as api from '../api.js';
-import { irPara } from '../rotas.js';
+import { goTo as irPara } from '../routes.js';
 import { TRILHAS_POR_FAMILIA } from './comum.js';
 import { esc } from '../text.js';
 

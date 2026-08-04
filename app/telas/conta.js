@@ -10,7 +10,7 @@
 
 import * as api from '../api.js';
 import { reset as zerar, now as agora, currentPlan as planoAtual, studentAccount as contaDoAluno } from '../state.js';
-import { irPara } from '../rotas.js';
+import { goTo as irPara } from '../routes.js';
 import { TRILHAS_POR_FAMILIA, trilhaDoAluno, progressoDaTrilha } from './comum.js';
 import { esc } from '../text.js';
 

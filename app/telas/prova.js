@@ -16,7 +16,7 @@ import {
   courseById as cursoPorId,
 } from '../catalog.js';
 import { courseProgress as progressoDoCurso, activeOption as opcaoAtiva, examResult as resultadoProva, examAttempts as tentativasDeProva, saveExam as guardarProva } from '../state.js';
-import { provaDoCurso, provaDaTrilha, notaDaProva, MINIMO } from '../provas.js';
+import { courseExam as provaDoCurso, trackExam as provaDaTrilha, examScore as notaDaProva, PASS_MARK as MINIMO } from '../exams.js';
 import { buildAssessment as montarAvaliacao } from '../exercises/index.js';
 import { trilhaDoAluno, progressoDaTrilha, barra, vazio } from './comum.js';
 import { esc } from '../text.js';

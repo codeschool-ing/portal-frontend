@@ -16,7 +16,7 @@
    ========================================================================== */
 
 import { currentPlan as planoAtual, studentAccount as contaDoAluno, changePlan as trocarPlano } from '../state.js';
-import { despachar } from '../rotas.js';
+import { dispatch as despachar } from '../routes.js';
 import { esc } from '../text.js';
 
 const preco = (p) => (p.preco === 0

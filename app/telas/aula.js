@@ -35,7 +35,7 @@ import {
   courseById as cursoPorId,
 } from '../catalog.js';
 import { lessonSections as secoesDaAula, sectionMaterials as materiaisDaSecao } from '../lessons.js';
-import { listaDeMateriais } from '../materiais.js';
+import { materialList as listaDeMateriais } from '../materials.js';
 import { sectionDone as secaoConcluida, visitSection as visitarSecao, noteFor as notaDe, saveNote as guardarNota } from '../state.js';
 import { buildAssessment as montarAvaliacao } from '../exercises/index.js';
 import { vazio } from './comum.js';

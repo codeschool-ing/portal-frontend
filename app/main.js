@@ -10,7 +10,7 @@
    barato perto de reescrever cinco idiomas.
    ========================================================================== */
 
-import { rota, quandoTrocar, iniciar, caminhoAtual, despachar, irPara } from './rotas.js';
+import { route as rota, whenChanged as quandoTrocar, start as iniciar, currentPath as caminhoAtual, dispatch as despachar, goTo as irPara } from './routes.js';
 import {
   isChoice as ehEscolha,
 } from './catalog.js';
@@ -34,7 +34,7 @@ import refazer from './telas/refazer.js';
 import notas from './telas/notas.js';
 import { provaCurso, provaTrilha } from './telas/prova.js';
 import { abrirBusca, fechar as fecharBusca, buscaAberta } from './painel-busca.js';
-import { fecharModal, modalAberto } from './modal.js';
+import { closeModal as fecharModal, modalOpen as modalAberto } from './modal.js';
 
 /* ---------- o que o i18n-runtime precisa de nós ---------- */
 globalThis.ehEscolha = ehEscolha;                 // usado por aplicarConteudo()

@@ -30,7 +30,7 @@ import {
 } from './catalog.js';
 import { lessonSections as secoesDaAula } from './lessons.js';
 import { lessonDone as aulaConcluida, sectionDone as secaoConcluida, lessonProgress as progressoDaAula, courseProgress as progressoDoCurso, activeOption as opcaoAtiva, examPassed as provaAprovada } from './state.js';
-import { provaDoCurso } from './provas.js';
+import { courseExam as provaDoCurso } from './exams.js';
 import { estadoDoCurso } from './grafo.js';
 import { trilhaDoAluno, barra } from './telas/comum.js';
 import { esc } from './text.js';

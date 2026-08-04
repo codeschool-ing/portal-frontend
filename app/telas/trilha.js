@@ -8,8 +8,8 @@
 
 import { montarTrilha, desenharArestas, ajustarSetasGrafo } from '../grafo.js';
 import { chooseOption as escolherOpcao, activeOption as opcaoAtiva } from '../state.js';
-import { irPara } from '../rotas.js';
-import { provaDaTrilha } from '../provas.js';
+import { goTo as irPara } from '../routes.js';
+import { trackExam as provaDaTrilha } from '../exams.js';
 import { cartaoDeProva } from './prova.js';
 import { trilhaDoAluno, progressoDaTrilha, vazio } from './comum.js';
 
