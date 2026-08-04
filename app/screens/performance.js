@@ -6,8 +6,8 @@
    the verdict and never met it again. This screen closes the loop.
 
    THREE STATES, NOT TWO. "Got it wrong" and "nobody checked" cannot become the
-   same bar: the types that need a server (`codigo`, `saida-esperada`,
-   `resposta-expressao`) answer `acertou: null` while there is no execution, and
+   same bar: the types that need a server (`code`, `expected-output`,
+   `expression-answer`) answer `acertou: null` while there is no execution, and
    counting them as mistakes would invent a failure that never happened. It is
    the funnel's rule, from the other side: there, unjudged never becomes passed;
    here, unjudged never becomes failed.
@@ -92,7 +92,7 @@ export default async function performance() {
 
     '<section class="bloco">' +
       '<div class="bloco-topo"><h2>' + txt('Por tipo de exercício') + '</h2></div>' +
-      groupBy((r) => r.ex.tipo).map(([k, d]) => row(txt(k), d)).join('') +
+      groupBy((r) => r.ex.type).map(([k, d]) => row(txt(k), d)).join('') +
     '</section>' +
 
     '<section class="bloco">' +
@@ -114,8 +114,8 @@ export default async function performance() {
               const a = courseLessons(r.cursoId)[r.aulaIx];
               const c = courseById(r.cursoId);
               return '<li><a href="#/curso/' + esc(r.cursoId) + '/aula/' + r.aulaIx + '/avaliacao">' +
-                '<span class="de-tipo">' + txt(r.ex.tipo) + '</span>' +
-                '<span class="de-enunciado">' + esc(r.ex.enunciado) + '</span>' +
+                '<span class="de-tipo">' + txt(r.ex.type) + '</span>' +
+                '<span class="de-enunciado">' + esc(r.ex.statement) + '</span>' +
                 '<span class="de-onde">' + esc(c ? c.nome : r.cursoId) + (a ? ' · ' + esc(a.titulo) : '') + '</span>' +
               '</a></li>';
             }).join('') +

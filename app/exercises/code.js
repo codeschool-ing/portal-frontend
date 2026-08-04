@@ -1,5 +1,5 @@
 /* ==========================================================================
-   `codigo` — the student writes the solution, graded by running it.
+   `code` — the student writes the solution, graded by running it.
 
    The test cases are NOT all shown. The first ones become examples — the
    student needs to understand the input and output format — and the rest stay
@@ -18,19 +18,19 @@ import { esc, formatted } from '../text.js';
 const SHOWN_CASES = 2;
 
 export default {
-  types: ['codigo'],
+  types: ['code'],
 
   body(ex, uid) {
-    const tests = ex.testes || [];
+    const tests = ex.tests || [];
     const shown = tests.slice(0, SHOWN_CASES);
     const hidden = Math.max(0, tests.length - shown.length);
 
     const cases = shown.map((t) => (
       '<div class="caso">' +
-        '<span class="caso-desc">' + formatted(t.descricao || '') + '</span>' +
+        '<span class="caso-desc">' + formatted(t.description || '') + '</span>' +
         '<div class="caso-io">' +
-          '<div><span class="caso-rot">' + txt('entrada') + '</span><pre class="cod"><code>' + esc(t.entrada) + '</code></pre></div>' +
-          '<div><span class="caso-rot">' + txt('saída') + '</span><pre class="cod"><code>' + esc(t.saida_esperada) + '</code></pre></div>' +
+          '<div><span class="caso-rot">' + txt('entrada') + '</span><pre class="cod"><code>' + esc(t.input) + '</code></pre></div>' +
+          '<div><span class="caso-rot">' + txt('saída') + '</span><pre class="cod"><code>' + esc(t.expected_output) + '</code></pre></div>' +
         '</div>' +
       '</div>'
     )).join('');
@@ -38,9 +38,9 @@ export default {
     return (
       '<label class="ex-rotulo" for="cod-' + uid + '">' + txt('sua solução') + '</label>' +
       '<div class="cod-bloco cod-editor">' +
-        '<div class="cod-barra"><span class="cod-ling">' + esc(ex.linguagem || '') + '</span></div>' +
+        '<div class="cod-barra"><span class="cod-ling">' + esc(ex.language || '') + '</span></div>' +
         '<textarea id="cod-' + uid + '" class="ex-campo mono cod-area" rows="10" spellcheck="false" ' +
-          'autocapitalize="off" autocorrect="off">' + esc(ex.esqueleto || '') + '</textarea>' +
+          'autocapitalize="off" autocorrect="off">' + esc(ex.skeleton || '') + '</textarea>' +
       '</div>' +
       (cases
         ? '<div class="casos"><span class="casos-tit">' + txt('exemplos') + '</span>' + cases +

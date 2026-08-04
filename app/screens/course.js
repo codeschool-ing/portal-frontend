@@ -78,10 +78,10 @@ export default async function course({ id }) {
 
       /* The exam closes the lesson column, not the sidebar: it is the last step
          of the course, and its place is after the last lesson. */
-      (exam.itens.length
+      (exam.items.length
         ? examCard({
           chave: exam.chave, href: '#/curso/' + esc(id) + '/prova', scope: 'curso',
-          count: exam.itens.length, progress: p.pct,
+          count: exam.items.length, progress: p.pct,
         })
         : '') +
       '</div>' +

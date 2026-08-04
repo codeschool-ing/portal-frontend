@@ -170,7 +170,7 @@ function courseRail(params, path) {
   const exam = courseExam(id);
   const onExam = path === '/curso/' + id + '/prova';
   const passed = examPassed(exam.chave);
-  const examRow = exam.itens.length
+  const examRow = exam.items.length
     ? '<a class="trilho-prova' + (passed ? ' feita' : '') + (onExam ? ' on' : '') + '" ' +
       'href="#/curso/' + esc(id) + '/prova">' +
       '<span class="ts-marca" aria-hidden="true">' + (passed ? ICON_CHECK : ICON_TROPHY) + '</span>' +

@@ -20,10 +20,11 @@
    It would have been possible to split the title on the `:` and the commas and
    get 734 divisions for free. One does not. That is lexical heuristics over
    authored prose, and the project has already paid to learn that it does not
-   work: in REGRAS.md, the "requires a later topic" check was attempted this way,
-   flagged 5 of the 48 good exercises and was discarded with the conclusion that
-   "a resposta está na autoria, não na detecção". It would fail the same way here
-   — "Cliente, servidor e host: quem pede e quem responde" would become a section
+   work: in `RULES.md`, the "requires a later topic" check was attempted this
+   way, flagged 5 of the 48 good exercises and was discarded with the conclusion
+   that "the answer is in the authoring, not in the detection". It would fail the
+   same way here — "Cliente, servidor e host: quem pede e quem responde" would
+   become a section
    called "quem pede e quem responde". The enumeration in the title is evidence
    that the sections are needed; it is not a source for reading them.
 

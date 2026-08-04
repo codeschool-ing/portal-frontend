@@ -110,7 +110,7 @@ function buildIndex() {
          "ordenacao", and as the item's body it became a one-word excerpt under
          every exercise. */
       lessonExercises(c.id, a.chave).forEach((ex) => {
-        add('exercicios', ex.enunciado, c.nome + ' · ' + a.titulo,
+        add('exercicios', ex.statement, c.nome + ' · ' + a.titulo,
           '#/curso/' + c.id + '/aula/' + a.ix + '/avaliacao');
       });
     });
@@ -156,7 +156,7 @@ export function search(term, { porGrupo = PER_GROUP } = {}) {
   const out = [];
   GROUPS.forEach((g) => {
     const ofGroup = hits.filter((a) => a.grupo === g).slice(0, porGrupo);
-    if (ofGroup.length) out.push({ grupo: g, itens: ofGroup });
+    if (ofGroup.length) out.push({ grupo: g, items: ofGroup });
   });
   return out;
 }

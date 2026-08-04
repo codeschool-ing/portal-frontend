@@ -28,10 +28,10 @@ export default async function track() {
      switching branches switches the courses and therefore the question bank. */
   const card = () => {
     const exam = trackExam(t, activeOption);
-    return exam.itens.length
+    return exam.items.length
       ? examCard({
         chave: exam.chave, href: '#/trilha/prova', scope: 'trilha',
-        count: exam.itens.length, progress: trackProgress(t).pct,
+        count: exam.items.length, progress: trackProgress(t).pct,
       })
       : '';
   };

@@ -767,7 +767,7 @@ body.sem-trilho .trilho{display:none}
 .alt:hover{border-color:var(--phosphor-dim)}
 .alt input{grid-row:1;appearance:none;width:0;height:0;position:absolute;opacity:0}
 .alt-marca{grid-row:1;width:15px;height:15px;margin-top:3px;border:1px solid var(--wire);border-radius:50%;position:relative}
-.ex-multipla-escolha .alt-marca{border-radius:3px}
+.ex-multiple-choice .alt-marca{border-radius:3px}
 .alt input:checked ~ .alt-marca{border-color:var(--phosphor)}
 .alt input:checked ~ .alt-marca::after{
   content:'';position:absolute;inset:3px;border-radius:inherit;background:var(--phosphor);

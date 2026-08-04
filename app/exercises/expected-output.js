@@ -1,5 +1,5 @@
 /* ==========================================================================
-   `saida-esperada` — the student types what the snippet prints.
+   `expected-output` — the student types what the snippet prints.
 
    It is the strongest type of the set: the grader is the interpreter, comparing
    byte for byte. Two consequences for the screen:
@@ -18,13 +18,13 @@
 import { esc } from '../text.js';
 
 export default {
-  types: ['saida-esperada'],
+  types: ['expected-output'],
 
   body(ex, uid) {
     return (
       '<div class="cod-bloco">' +
-        '<div class="cod-barra"><span class="cod-ling">' + esc(ex.linguagem || 'texto') + '</span></div>' +
-        '<pre class="cod"><code>' + esc(ex.codigo_dado) + '</code></pre>' +
+        '<div class="cod-barra"><span class="cod-ling">' + esc(ex.language || 'texto') + '</span></div>' +
+        '<pre class="cod"><code>' + esc(ex.given_code) + '</code></pre>' +
       '</div>' +
       '<label class="ex-rotulo" for="saida-' + uid + '">' + txt('o que aparece na tela') + '</label>' +
       '<textarea id="saida-' + uid + '" class="ex-campo mono" rows="4" spellcheck="false" ' +
@@ -41,7 +41,7 @@ export default {
   reveal(root, ex, v) {
     root.querySelector('.ex-campo').disabled = true;
     if (v && v.simulado) return;      // no server: claim nothing
-    const matches = root.querySelector('.ex-campo').value.replace(/\s+$/, '') === String(ex.resposta).replace(/\s+$/, '');
+    const matches = root.querySelector('.ex-campo').value.replace(/\s+$/, '') === String(ex.answer).replace(/\s+$/, '');
     root.querySelector('.ex-campo').classList.toggle('campo-certo', matches);
     root.querySelector('.ex-campo').classList.toggle('campo-errado', !matches);
   },

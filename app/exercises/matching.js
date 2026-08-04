@@ -1,5 +1,5 @@
 /* ==========================================================================
-   `associacao` — pairing by clicking, with immediate feedback.
+   `matching` — pairing by clicking, with immediate feedback.
 
    The per-row <select> was replaced by two columns of tiles: you click one on
    the left, then one on the right, and the pair is checked ON THE SPOT — green
@@ -18,9 +18,9 @@
    and not on the result.
 
    The right-hand column stays SORTED ALPHABETICALLY. In the JSON the correct
-   pair is `pares[i].esquerda ↔ pares[i].direita`, and presenting it in written
+   pair is `pairs[i].left ↔ pairs[i].right`, and presenting it in written
    order would hand over the key by position. It is the same reason the
-   pipeline's probe sorts. The `distratores_direita` go in with it, so the last
+   pipeline's probe sorts. The `right_distractors` go in with it, so the last
    pair cannot fall out by elimination.
    ========================================================================== */
 
@@ -29,17 +29,17 @@ import { formatted, esc, shuffleWith } from '../text.js';
 const WRONG_PAIR_PAUSE = 700;   // how long a wrong pair stays red before it lets go
 
 export default {
-  types: ['associacao'],
+  types: ['matching'],
 
   /* This type finishes on its own: when the last pair closes there is nothing
      left to "answer". The wrapper hides the button and waits for the signal. */
   selfCompleting: true,
 
   body(ex, uid) {
-    const left = shuffleWith(uid + ':e', ex.pares.map((p) => p.esquerda));
-    const right = [...ex.pares.map((p) => p.direita), ...(ex.distratores_direita || [])]
+    const left = shuffleWith(uid + ':e', ex.pairs.map((p) => p.left));
+    const right = [...ex.pairs.map((p) => p.right), ...(ex.right_distractors || [])]
       .sort((a, b) => a.localeCompare(b, 'pt'));
-    const spare = right.length - ex.pares.length;
+    const spare = right.length - ex.pairs.length;
 
     const tile = (text, side) =>
       '<button type="button" class="ficha ficha-' + side + '" data-valor="' + esc(text) + '">' +
@@ -55,16 +55,16 @@ export default {
         '<div class="assoc-col assoc-col-esq">' + left.map((t) => tile(t, 'esq')).join('') + '</div>' +
         '<div class="assoc-col assoc-col-dir">' + right.map((t) => tile(t, 'dir')).join('') + '</div>' +
       '</div>' +
-      '<p class="assoc-conta"><span class="assoc-feitos">0</span>/' + ex.pares.length + ' ' + txt('pares') + '</p>'
+      '<p class="assoc-conta"><span class="assoc-feitos">0</span>/' + ex.pairs.length + ' ' + txt('pares') + '</p>'
     );
   },
 
   setup(root, { exercicio, concluir }) {
     const key = {};
-    exercicio.pares.forEach((p) => { key[p.esquerda] = p.direita; });
+    exercicio.pairs.forEach((p) => { key[p.left] = p.right; });
 
     const state = { left: null, wrong: 0, done: 0, map: {}, locked: false };
-    const total = exercicio.pares.length;
+    const total = exercicio.pairs.length;
 
     const clear = () => {
       root.querySelectorAll('.ficha.sel').forEach((f) => f.classList.remove('sel'));

@@ -150,7 +150,7 @@ function annotatedExample(ex) {
 
 /* Seeded shuffling: the presentation order cannot change on every render (the
    student would lose whatever they had already dragged), nor be the JSON order,
-   which in the `ordenacao` and `associacao` types IS the answer key. */
+   which in the `ordering` and `matching` types IS the answer key. */
 export function shuffleWith(seed, list) {
   let s = 0;
   for (let i = 0; i < String(seed).length; i += 1) s = (s * 31 + String(seed).charCodeAt(i)) & 0x7fffffff;

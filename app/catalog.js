@@ -66,20 +66,20 @@ export function hoursRange(t) {
    portal adopts the topic as the lesson, and does not invent a third key — the
    pipeline's exercises are already indexed by `topico`.
 
-   BUT THE DISPLAYED TITLE CANNOT BE THE KEY. `aplicarConteudo()` rewrites
+   BUT THE DISPLAYED TITLE CANNOT BE THE KEY. `applyContent()` rewrites
    `c.topicos` in place on every language switch, so in English the title becomes
    "Types, coercion, strict equality and falsy values" and no exercise matches.
    The defect shows up without anyone touching anything: the browser only has to
    be set to another language, which is the case for most people outside Brazil.
 
-   The key is the PORTUGUESE text, stored by `guardarBase()` at load time. It is
+   The key is the PORTUGUESE text, stored by `savePtBase()` at load time. It is
    the same decision as the vitrine's i18n — the translation key is the
    Portuguese text itself — applied to the join with the content. Hence each
    lesson carrying both: `titulo` to show, `chave` to match. */
 export function courseLessons(id) {
   const c = courseById(id);
   if (!c) return [];
-  const inPt = (typeof BASE_PT !== 'undefined' && BASE_PT.cursos?.[id]?.topicos) || c.topicos || [];
+  const inPt = (typeof PT_BASE !== 'undefined' && PT_BASE.cursos?.[id]?.topicos) || c.topicos || [];
   return (c.topicos || []).map((titulo, ix) => ({
     cursoId: id,
     ix,

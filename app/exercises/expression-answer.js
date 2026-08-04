@@ -1,5 +1,5 @@
 /* ==========================================================================
-   `resposta-expressao` — the student writes an expression, compared by
+   `expression-answer` — the student writes an expression, compared by
    SYMBOLIC EQUIVALENCE rather than by text: `2*x`, `x*2` and `x+x` are the same
    answer, and on an integral the `+ C` is accepted.
 
@@ -24,17 +24,17 @@ const OP_NAME = {
 };
 
 export default {
-  types: ['resposta-expressao'],
+  types: ['expression-answer'],
 
   body(ex, uid) {
-    const vars = ex.variaveis || [];
+    const vars = ex.variables || [];
     const assumptions = vars.filter((v) => String(v).includes(':'));
 
     return (
-      (ex.verificacao_origem
+      (ex.check_source
         ? '<div class="expr-origem">' +
-            '<span class="expr-rot">' + txt(OP_NAME[ex.verificacao_operacao] || 'expressão') + ' ' + txt('de') + '</span>' +
-            '<code class="expr-cod">' + esc(ex.verificacao_origem) + '</code>' +
+            '<span class="expr-rot">' + txt(OP_NAME[ex.check_operation] || 'expressão') + ' ' + txt('de') + '</span>' +
+            '<code class="expr-cod">' + esc(ex.check_source) + '</code>' +
           '</div>'
         : '') +
       '<label class="ex-rotulo" for="expr-' + uid + '">' + txt('sua resposta') + '</label>' +
@@ -47,7 +47,7 @@ export default {
         ? '<p class="ex-nota ex-nota-dom">' + txt('Suposições de domínio') + ': <code>' +
             esc(assumptions.join(', ')) + '</code></p>'
         : '') +
-      (ex.verificacao_operacao === 'nenhuma'
+      (ex.check_operation === 'none'
         ? '<p class="ex-nota ex-nota-aviso">' + formatted(txt('Este exercício não declara recálculo — o gabarito não foi conferido por ninguém.')) + '</p>'
         : '')
     );

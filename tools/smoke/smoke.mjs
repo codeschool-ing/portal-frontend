@@ -216,19 +216,19 @@ const answer = async (sel, fn, expected) => {
 
 // quiz: ticks the correct choice by its data-ix
 await answer('.ex-quiz', async (ex) => {
-  const ix = await p.evaluate(() => window.EXERCICIOS_EXEMPLO.find((e) => e.tipo === 'quiz').alternativas.findIndex((a) => a.correta));
+  const ix = await p.evaluate(() => window.EXERCICIOS_EXEMPLO.find((e) => e.type === 'quiz').options.findIndex((a) => a.correct));
   await ex.locator(`.alt[data-ix="${ix}"]`).click();
 }, 'v-certo');
 
-await answer('.ex-multipla-escolha', async (ex) => {
-  const ixs = await p.evaluate(() => window.EXERCICIOS_EXEMPLO.find((e) => e.tipo === 'multipla-escolha')
-    .alternativas.map((a, i) => (a.correta ? i : -1)).filter((i) => i >= 0));
+await answer('.ex-multiple-choice', async (ex) => {
+  const ixs = await p.evaluate(() => window.EXERCICIOS_EXEMPLO.find((e) => e.type === 'multiple-choice')
+    .options.map((a, i) => (a.correct ? i : -1)).filter((i) => i >= 0));
   for (const i of ixs) await ex.locator(`.alt[data-ix="${i}"]`).click();
 }, 'v-certo');
 
 // ordering: reorders through the DOM into the right order using the arrows
-await answer('.ex-ordenacao', async (ex) => {
-  const right = await p.evaluate(() => window.EXERCICIOS_EXEMPLO.find((e) => e.tipo === 'ordenacao').itens);
+await answer('.ex-ordering', async (ex) => {
+  const right = await p.evaluate(() => window.EXERCICIOS_EXEMPLO.find((e) => e.type === 'ordering').items);
   for (let target = 0; target < right.length; target += 1) {
     for (let step = 0; step < 8; step += 1) {
       const current = await ex.locator('.ord-item').allTextContents();
@@ -243,19 +243,19 @@ await answer('.ex-ordenacao', async (ex) => {
    gesture. Since a wrong pair comes undone, the final map is always right — the
    verdict now measures the MISTAKES along the way, and passing means closing
    with none. */
-await answer('.ex-associacao', async (ex) => {
-  const pairs = await p.evaluate(() => window.EXERCICIOS_EXEMPLO.find((e) => e.tipo === 'associacao').pares);
+await answer('.ex-matching', async (ex) => {
+  const pairs = await p.evaluate(() => window.EXERCICIOS_EXEMPLO.find((e) => e.type === 'matching').pairs);
   for (const pair of pairs) {
-    await ex.locator('.ficha-esq').filter({ hasText: pair.esquerda.replace(/`/g, '') }).first().click();
-    await ex.locator('.ficha-dir').filter({ hasText: pair.direita.replace(/`/g, '') }).first().click();
+    await ex.locator('.ficha-esq').filter({ hasText: pair.left.replace(/`/g, '') }).first().click();
+    await ex.locator('.ficha-dir').filter({ hasText: pair.right.replace(/`/g, '') }).first().click();
     await p.waitForTimeout(80);
   }
 }, 'v-certo');
 
 // the three that need a server: the verdict has to be "not checked"
-await answer('.ex-saida-esperada', async (ex) => ex.locator('.ex-campo').fill('false\ntrue\nnumber\n'), 'v-pendente');
-await answer('.ex-codigo', async (ex) => ex.locator('.cod-area').fill('console.log(1)'), 'v-pendente');
-await answer('.ex-resposta-expressao', async (ex) => ex.locator('.ex-campo').fill('3*x**2'), 'v-pendente');
+await answer('.ex-expected-output', async (ex) => ex.locator('.ex-campo').fill('false\ntrue\nnumber\n'), 'v-pendente');
+await answer('.ex-code', async (ex) => ex.locator('.cod-area').fill('console.log(1)'), 'v-pendente');
+await answer('.ex-expression-answer', async (ex) => ex.locator('.ex-campo').fill('3*x**2'), 'v-pendente');
 
 console.log('\n== 6. the wizard keeps what was answered ==');
 /* Going back to an answered question has to give it back as it was: with the
@@ -437,7 +437,7 @@ await p.goto(BASE + PAGE + '#/curso/web-fundamentos/aula/2/avaliacao');
 await p.waitForSelector('.wizard');
 await goToType('quiz');
 const wrongIx = await p.evaluate(() =>
-  window.EXERCICIOS_EXEMPLO.find((e) => e.id === 'wf-03-quiz').alternativas.findIndex((a) => !a.correta));
+  window.EXERCICIOS_EXEMPLO.find((e) => e.id === 'wf-03-quiz').options.findIndex((a) => !a.correct));
 await p.locator(`.ex-quiz .alt[data-ix="${wrongIx}"]`).click();
 await p.locator('.ex-quiz .ex-responder').click();
 await p.waitForFunction(() => document.querySelector('.ex-quiz .ex-veredito')?.className.includes('v-errado'),
@@ -631,8 +631,8 @@ const answerEverything = async (correctly) => {
     const id = await p.locator('.ex').getAttribute('data-ex');
     const ixs = await p.evaluate((exId) => {
       const ex = window.EXERCICIOS_EXEMPLO.find((e) => e.id === exId);
-      if (!ex?.alternativas) return null;
-      return ex.alternativas.map((a, k) => (a.correta ? k : -1)).filter((k) => k >= 0);
+      if (!ex?.options) return null;
+      return ex.options.map((a, k) => (a.correct ? k : -1)).filter((k) => k >= 0);
     }, id);
     if (!ixs) continue;                       // a type this loop cannot answer
     const targets = correctly ? ixs : [ixs.includes(0) ? 1 : 0];
