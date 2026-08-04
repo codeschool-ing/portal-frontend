@@ -19,7 +19,7 @@ import { esc, formatted } from '../text.js';
 
 export default async function course({ id }) {
   const c = courseById(id);
-  if (!c) return { titulo: txt('Curso'), el: empty(txt('Curso não encontrado.')) };
+  if (!c) return { title: txt('Curso'), el: empty(txt('Curso não encontrado.')) };
 
   const lessons = courseLessons(id);
   const p = courseProgress(id);
@@ -88,7 +88,7 @@ export default async function course({ id }) {
 
       '<aside class="curso-lado">' +
         (materials.length
-          ? '<section class="bloco">' + materialList(materials, { titulo: 'Material do curso' }) + '</section>'
+          ? '<section class="bloco">' + materialList(materials, { title: 'Material do curso' }) + '</section>'
           : '') +
         (c.ementa?.length
           ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('Ementa') + '</h2></div>' +
@@ -109,7 +109,7 @@ export default async function course({ id }) {
       '</aside>' +
     '</div>';
 
-  return { titulo: c.nome, el };
+  return { title: c.nome, el };
 }
 
 function link(id, dir) {

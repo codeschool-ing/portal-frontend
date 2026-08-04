@@ -51,5 +51,5 @@ export default async function signIn() {
     goTo('/painel');
   });
 
-  return { titulo: txt('Entrar'), el, depois: () => el.querySelector('#e-nome').focus() };
+  return { title: txt('Entrar'), el, after: () => el.querySelector('#e-nome').focus() };
 }

@@ -6,12 +6,10 @@
    `history.pushState` requires the server to return the index at any path. A
    hash works anywhere, including opening the file straight off disk.
 
-   A screen is a function `async (params) => { titulo, el, depois? }`.
-   `depois` runs AFTER the element enters the document — the graph measures real
-   positions and cannot be measured outside the tree.
-
-   The keys of that returned object stay in Portuguese for now: fourteen screens
-   still speak them, and they get renamed when those screens are translated.
+   A screen is a function `async (params) => { title, el, after?, onLeave? }`.
+   `after` runs AFTER the element enters the document — the graph measures real
+   positions and cannot be measured outside the tree. `onLeave` undoes whatever
+   the screen registered outside its own element, such as a resize listener.
    ========================================================================== */
 
 const routes = [];
@@ -23,7 +21,7 @@ export function route(pattern, load) {
     names.push(n);
     return '([^/]+)';
   }) + '$');
-  routes.push({ re, nomes: names, carregar: load });
+  routes.push({ re, names, load });
 }
 
 export const goTo = (path) => { location.hash = '#' + path; };
@@ -38,7 +36,7 @@ function match(path) {
     const m = path.match(r.re);
     if (!m) continue;
     const params = {};
-    r.nomes.forEach((n, i) => { params[n] = decodeURIComponent(m[i + 1]); });
+    r.names.forEach((n, i) => { params[n] = decodeURIComponent(m[i + 1]); });
     return { r, params };
   }
   return null;

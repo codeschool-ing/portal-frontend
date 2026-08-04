@@ -17,7 +17,7 @@ let redrawT = null;
 
 export default async function track() {
   const t = studentTrack();
-  if (!t) return { titulo: txt('Trilha'), el: empty(txt('Você ainda não escolheu uma trilha.')) };
+  if (!t) return { title: txt('Trilha'), el: empty(txt('Você ainda não escolheu uma trilha.')) };
 
   const el = document.createElement('div');
   el.className = 'tela tela-trilha';
@@ -91,13 +91,13 @@ export default async function track() {
   addEventListener('resize', redraw);
 
   return {
-    titulo: t.nome,
+    title: t.nome,
     el,
-    depois: () => {
+    after: () => {
       drawEdges(el, t);
       // fonts change the height of the cards and therefore the measured positions
       if (document.fonts?.ready) document.fonts.ready.then(() => drawEdges(el, t));
     },
-    aoSair: () => removeEventListener('resize', redraw),
+    onLeave: () => removeEventListener('resize', redraw),
   };
 }

@@ -20,7 +20,7 @@ export default async function notes() {
   const list = allNotes();
   if (!list.length) {
     return {
-      titulo: txt('Notas'),
+      title: txt('Notas'),
       el: empty(txt('Você ainda não escreveu nenhuma nota. Elas ficam no fim de cada seção.')),
     };
   }
@@ -58,5 +58,5 @@ export default async function notes() {
       '</section>';
     }).join('');
 
-  return { titulo: txt('Notas'), el };
+  return { title: txt('Notas'), el };
 }

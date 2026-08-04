@@ -39,7 +39,7 @@ export default async function plan() {
 
   if (!current) {
     el.innerHTML = '<p class="vazio">' + txt('Nenhum plano configurado.') + '</p>';
-    return { titulo: txt('Meu plano'), el };
+    return { title: txt('Meu plano'), el };
   }
 
   const since = account.desde
@@ -119,5 +119,5 @@ export default async function plan() {
     dispatch();
   });
 
-  return { titulo: txt('Meu plano'), el };
+  return { title: txt('Meu plano'), el };
 }

@@ -102,5 +102,5 @@ export default async function dashboard() {
         '</section>'
       : '');
 
-  return { titulo: txt('Painel'), el };
+  return { title: txt('Painel'), el };
 }

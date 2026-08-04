@@ -37,7 +37,7 @@ export default async function performance() {
 
   if (!all.length) {
     return {
-      titulo: txt('Desempenho'),
+      title: txt('Desempenho'),
       el: empty(txt('Você ainda não respondeu nenhum exercício. Faça uma avaliação e volte aqui.')),
     };
   }
@@ -123,5 +123,5 @@ export default async function performance() {
         '</section>'
       : '<section class="bloco"><p class="vazio">' + txt('Nenhum erro pendente. Bom trabalho.') + '</p></section>');
 
-  return { titulo: txt('Desempenho'), el };
+  return { title: txt('Desempenho'), el };
 }

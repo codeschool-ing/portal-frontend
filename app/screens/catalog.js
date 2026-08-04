@@ -117,10 +117,10 @@ export default async function catalogue() {
 
   paint();
   return {
-    titulo: txt('Catálogo'),
+    title: txt('Catálogo'),
     el,
     // the measurements only exist once the element is in the document
-    depois: adjustArrows,
-    aoSair: () => removeEventListener('resize', onResize),
+    after: adjustArrows,
+    onLeave: () => removeEventListener('resize', onResize),
   };
 }

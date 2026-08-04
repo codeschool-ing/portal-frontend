@@ -20,7 +20,7 @@ import { empty } from './common.js';
 export default async function redo() {
   const list = wrongOnes();
   if (!list.length) {
-    return { titulo: txt('Refazer'), el: empty(txt('Não há nada errado para refazer.')) };
+    return { title: txt('Refazer'), el: empty(txt('Não há nada errado para refazer.')) };
   }
 
   const el = document.createElement('div');
@@ -41,5 +41,5 @@ export default async function redo() {
     buildAssessment(list.map((r) => r.ex), contextByIndex),
   );
 
-  return { titulo: txt('Refazer'), el };
+  return { title: txt('Refazer'), el };
 }

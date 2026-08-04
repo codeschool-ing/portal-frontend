@@ -115,16 +115,16 @@ function build(exam, progress) {
 
 export async function courseExamScreen({ id }) {
   const c = courseById(id);
-  if (!c) return { titulo: txt('Prova'), el: empty(txt('Curso não encontrado.')) };
+  if (!c) return { title: txt('Prova'), el: empty(txt('Curso não encontrado.')) };
   const exam = courseExam(id, examAttempts('curso:' + id));
-  return { titulo: txt('Prova') + ' · ' + c.nome, el: build(exam, courseProgress(id)) };
+  return { title: txt('Prova') + ' · ' + c.nome, el: build(exam, courseProgress(id)) };
 }
 
 export async function trackExamScreen() {
   const t = studentTrack();
-  if (!t) return { titulo: txt('Prova'), el: empty(txt('Você ainda não escolheu uma trilha.')) };
+  if (!t) return { title: txt('Prova'), el: empty(txt('Você ainda não escolheu uma trilha.')) };
   const exam = trackExam(t, activeOption, examAttempts('trilha:' + t.id));
-  return { titulo: txt('Prova') + ' · ' + t.nome, el: build(exam, trackProgress(t)) };
+  return { title: txt('Prova') + ' · ' + t.nome, el: build(exam, trackProgress(t)) };
 }
 
 /* The card that announces the exam, at the end of the course page and of the
