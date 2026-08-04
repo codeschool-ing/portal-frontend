@@ -513,15 +513,53 @@ ok('o código é contínuo, sem costura entre os trechos', await p.evaluate(() =
 
 /* A LARGURA DA COLUNA DE CÓDIGO SAI DA MEDIDA DO CONTEÚDO: a linha mais longa
    dos exemplos tem 74 caracteres, que a .79rem da IBM Plex Mono dão 562px;
-   com os 36px de recuo, 598. A coluna tem 604 — pouco mais, de propósito. */
+   com os 44px de recuo (18 + 26 da espiral), 606. A coluna tem 612 — pouco
+   mais, de propósito. */
 const colunaCod = await p.evaluate(() => {
   const c = document.querySelector('.exemplo-cod');
   return { larg: Math.round(c.getBoundingClientRect().width),
     sobra: Math.round(c.getBoundingClientRect().width - c.scrollWidth) };
 });
 ok('a coluna de código cabe a linha mais longa, com folga',
-  colunaCod.larg >= 598 && colunaCod.sobra >= 0,
+  colunaCod.larg >= 606 && colunaCod.sobra >= 0,
   colunaCod.larg + 'px, ' + colunaCod.sobra + 'px de sobra');
+
+/* OS ARAMES DE CADERNO. Eles são fundo, não elemento — então o teste não pode
+   contá-los no DOM. O que dá para conferir é a aritmética que os mantém
+   alinhados, e é ela que quebra em silêncio:
+
+     · o ladrilho tem a altura de UMA linha de código (um furo por linha);
+     · os recuos verticais são múltiplos dessa altura, senão o segundo trecho
+       nasce deslocado e a espiral entorta no meio do arquivo;
+     · o texto começa depois do arame, e não por cima dele. */
+const espiral = await p.evaluate(() => {
+  const cods = [...document.querySelectorAll('.exemplo-cod')];
+  const cs = getComputedStyle(cods[0]);
+  const px = (v) => parseFloat(v);
+  const tile = px(cs.getPropertyValue('--passo'));
+  const linha = px(cs.lineHeight);
+  /* o começo do texto: a primeira caixa de caractere de verdade */
+  const no = document.createTreeWalker(cods[0], NodeFilter.SHOW_TEXT).nextNode();
+  const rg = document.createRange(); rg.setStart(no, 0); rg.setEnd(no, 1);
+  const textoEm = rg.getBoundingClientRect().left - cods[0].getBoundingClientRect().left;
+  /* o arame mais à direita: centro + semieixo, a partir da caixa de recuo */
+  const arameAte = px(cs.borderLeftWidth)
+    + px(cs.getPropertyValue('--arame-x')) + px(cs.getPropertyValue('--arame-r'));
+  return {
+    tile, linha, textoEm, arameAte,
+    recuos: cods.map((c) => {
+      const e = getComputedStyle(c);
+      return [px(e.paddingTop), px(e.paddingBottom)];
+    }).flat(),
+  };
+});
+ok('o ladrilho da espiral tem a altura de uma linha', espiral.tile === espiral.linha,
+  espiral.tile + 'px de ladrilho, ' + espiral.linha + 'px de linha');
+ok('os recuos são múltiplos do ladrilho, senão a espiral entorta',
+  espiral.recuos.every((r) => r % espiral.tile === 0),
+  espiral.recuos.join('/') + ' sobre ' + espiral.tile);
+ok('o texto começa depois do arame', espiral.textoEm >= espiral.arameAte + 4,
+  Math.round(espiral.textoEm) + 'px contra ' + espiral.arameAte + 'px');
 
 await p.setViewportSize({ width: 1440, height: 900 });
 await p.waitForTimeout(250);
@@ -711,15 +749,15 @@ ok('o player cabe na tela', await p.evaluate(() =>
   document.querySelector('.video-fachada').getBoundingClientRect().height <= window.innerHeight * 0.8));
 
 /* A AULA TEM UMA LARGURA SÓ, e ela vale para o título, a prosa, o player e o
-   exemplo ao mesmo tempo. O corte é 1466px: abaixo dele a aula fica em 820 com
-   o bloco de código empilhado; acima, os quatro crescem juntos até 1074.
+   exemplo ao mesmo tempo. O corte é 1474px: abaixo dele a aula fica em 820 com
+   o bloco de código empilhado; acima, os quatro crescem juntos até 1082.
 
    Duas tentativas anteriores soltaram um elemento de cada vez — primeiro o
    player, depois o exemplo — e as duas produziram margens diferentes dentro da
    mesma aula. Por isso o teste mede os quatro juntos, e não um contra o outro. */
 for (const [larg, alt, esperado] of [
-  [1280, 900, 818], [1440, 900, 820], [1466, 950, 934], [1580, 950, 1048],
-  [1700, 950, 1074], [1920, 950, 1074],
+  [1280, 900, 818], [1440, 900, 820], [1474, 950, 942], [1580, 950, 1048],
+  [1700, 950, 1082], [1920, 950, 1082],
 ]) {
   await p.setViewportSize({ width: larg, height: alt });
   await p.goto(BASE + PAGINA + '#/curso/javascript/aula/0/let-const');
@@ -1029,8 +1067,8 @@ console.log('\n== 20. a aula cabe entre as setas ==');
    navegação moram no vão que sobra. Os dois disputam o mesmo espaço: o teto da
    aula é `100vw - trilho - 152`, que é exatamente o que deixa 16px entre a seta
    de 44px e o conteúdo. A varredura confere a conta em oito larguras, incluindo
-   as duas bordas do corte (1466) e a largura em que a aula para de crescer. */
-for (const larg of [1280, 1440, 1466, 1500, 1606, 1700, 1920, 2400]) {
+   as duas bordas do corte (1474) e a largura em que a aula para de crescer. */
+for (const larg of [1280, 1440, 1474, 1500, 1614, 1700, 1920, 2400]) {
   await p.setViewportSize({ width: larg, height: 950 });
   await p.goto(BASE + PAGINA + '#/curso/javascript/aula/0/arrow', { waitUntil: 'networkidle' });
   await p.waitForSelector('.exemplo');

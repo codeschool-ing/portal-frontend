@@ -200,7 +200,7 @@ dobra; o preço era cair numa seção sem saber de que aula ela era.)
 | --- | --- |
 | `--trilho` | a coluna do menu |
 | `--leitura` | 820px, a coluna estreita |
-| `--amplo` | 934–1074px, a coluna larga |
+| `--amplo` | 942–1082px, a coluna larga |
 | `--tela` | qual das duas está valendo agora — **tudo** na aula usa esta |
 
 Foi a terceira tentativa, e as duas primeiras erraram do mesmo jeito.
@@ -217,7 +217,7 @@ player, o exemplo, o material e o rodapé. Uma variável só resolve **por
 construção** — não há como um elemento discordar do outro, nem no meio de um
 redimensionamento.
 
-**O preço está declarado.** A prosa perdeu o `max-width:68ch`, então em 1074px a
+**O preço está declarado.** A prosa perdeu o `max-width:68ch`, então em 1082px a
 linha vai a **121ch** (medido), contra os 68 confortáveis para leitura longa. Foi
 uma escolha entre dois defeitos e o alinhamento ganhou; se a linha longa
 incomodar, o teto volta em `ch` e o que se perde é o alinhamento à direita, não
@@ -227,7 +227,8 @@ o da esquerda.
 
 A coluna larga foi **medida, não chutada**. A linha mais longa que existe nos
 exemplos tem 74 caracteres; IBM Plex Mono a 12,64px avança 7,601px por caractere
-— 562px, mais 36px de recuo, 598px. Daí `--cod:604px`: pouco mais do que a
+— 562px, mais 44px de recuo (18 à direita, 26 à esquerda para os arames), 606px.
+Daí `--cod:612px`: pouco mais do que a
 linha, não a tela inteira. A nota tem `--nota:440px` de teto e `--nota-min:300px`
 de piso, e é ela quem encolhe quando falta espaço, porque o código não pode.
 
@@ -239,26 +240,26 @@ O teto da coluna larga sai da **seta de navegação**, que mora no vão. Ela tem
 ```
 
 E o corte entre as duas colunas sai de igualar esse teto ao que as duas colunas
-do exemplo pedem — `604 + 300 + 30 = 934`:
+do exemplo pedem — `612 + 300 + 30 = 942`:
 
 ```
-100vw - 380 - 152 >= 934   →   100vw >= 1466
+100vw - 380 - 152 >= 942   →   100vw >= 1474
 ```
 
 Um corte só, e as duas coisas acontecem nele: o bloco de código abre em duas
-colunas **e** a aula inteira passa para a largura larga. Entre 1466 e 1606 a aula
-cresce junto com a janela, de 934 até 1074; daí para cima ela para, porque
+colunas **e** a aula inteira passa para a largura larga. Entre 1474 e 1614 a aula
+cresce junto com a janela, de 942 até 1082; daí para cima ela para, porque
 alargar mais só esticaria a coluna de texto.
 
 | tela | aula | exemplo | folga até a seta |
 | --- | --- | --- | --- |
 | 1280 | 818 | empilhado | setas no rodapé |
 | 1440 | 820 | empilhado | 38px |
-| 1466 | 934 | duas colunas | 16px |
+| 1474 | 942 | duas colunas | 16px |
 | 1500 | 968 | duas colunas | 16px |
-| 1606 | 1074 | duas colunas | 16px |
-| 1920 | 1074 | duas colunas | 95px |
-| 2400 | 1074 | duas colunas | 215px |
+| 1614 | 1082 | duas colunas | 16px |
+| 1920 | 1082 | duas colunas | 91px |
+| 2400 | 1082 | duas colunas | 211px |
 
 #### A única folga é do player, e é só para baixo
 
@@ -686,10 +687,46 @@ A primeira versão daqui errava em duas coisas, e as duas foram corrigidas:
    da direita tem de parecer um arquivo, e continuidade é o argumento inteiro.
    Há um teste que mede se os trechos se emendam sem folga.
 
-Abaixo de 1466px as duas colunas viram uma, com a nota *antes* do trecho — e é
+Abaixo de 1474px as duas colunas viram uma, com a nota *antes* do trecho — e é
 o mesmo corte em que a aula inteira volta para a coluna estreita. Não são duas
 decisões: é a largura do bloco que define a largura da aula, pela conta descrita
 em *A aula tem uma largura só*.
+
+### Os arames de caderno
+
+O bloco de código é encadernado: uma espiral desenhada na margem esquerda, com
+**um arame por linha de código** — não a cada tantos pixels. É essa escolha que
+faz o detalhe parecer intencional em vez de decorativo; o arame acompanha o
+texto como a pauta de um caderno acompanha a escrita. É fundo, não elemento: um
+`radial-gradient` de elipse deitada, ladrilhado em `repeat-y`. Elipse e não
+círculo — o arame de uma espiral é visto de lado, achatado, e o círculo perfeito
+lia como furo de fichário.
+
+Para o arame casar com a linha, a entrelinha deixou de ser `1.7` (um múltiplo do
+corpo, que dá 21,488px e depende do arredondamento do navegador) e virou **22px
+fixos**, que é também a altura do ladrilho. Furo e linha coincidem por
+construção, em qualquer zoom.
+
+**O alinhamento entre trechos é o que custa caro se for ignorado.** Com duas
+colunas os vários `<pre>` se empilham sem costura para parecerem um arquivo — e
+um fundo ladrilhado recomeça no topo de cada elemento. Se os recuos verticais não
+forem múltiplos de 22, o segundo trecho nasce deslocado e a espiral entorta no
+meio do arquivo. Por isso o respiro das pontas passou de 12px para 22px: não é
+gosto, é a única folga que mantém a conta fechada. Há um teste que confere os três
+invariantes — ladrilho igual à linha, recuos múltiplos dele, e o texto começando
+depois do arame em vez de por cima.
+
+O arame custou 8px de recuo à esquerda, e esses 8px atravessaram o modelo de
+largura inteiro: `--cod` foi de 604 para 612, o corte de 1466 para 1474, o teto
+da aula de 1074 para 1082. Nenhum desses números foi reescrito à mão — todos
+saem das mesmas contas, e foram os testes que disseram quais tinham mudado.
+
+**Um defeito que só apareceu por causa do desenho.** A regra de código *inline*
+(`.aula-texto code`) também pegava o `<code>` de dentro do `<pre>`, e pintava uma
+caixa `--ink` atrás de cada linha do exemplo. Ninguém tinha visto: era quase a
+mesma cor do painel. Só ficou óbvio quando a espiral foi desenhada no fundo e a
+caixa comeu a metade direita de cada arame — os anéis viraram "C". Código dentro
+de `pre` não é código inline, e agora a regra diz isso.
 
 **O realce de sintaxe tem três cores, e são as da marca:** vermelho para a
 estrutura da linguagem, azul para os literais, branco para o resto —
