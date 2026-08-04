@@ -24,12 +24,12 @@
    same type turns up again in `estatistica`, where it is legitimate.
    ========================================================================== */
 
-/* Concatena em vez de atribuir: há um arquivo por curso, como no pipeline, e
-   nenhum deles pode depender de ser o primeiro a carregar. */
+/* Concatenates instead of assigning: there is one file per course, as in the
+   pipeline, and none of them may depend on being the first to load. */
 window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
 
-  /* ================= aula de demonstração: os sete tipos ================= */
-  /* javascript · tópico 1 · "Tipos, coerção, igualdade estrita e valores falsos" */
+  /* ================= demonstration lesson: the seven types ================ */
+  /* javascript · topic 1 · "Tipos, coerção, igualdade estrita e valores falsos" */
 
   {
     id: 'js-coercao-quiz-1',
@@ -159,7 +159,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
   },
 
   {
-    /* fora de contexto de propósito — ver o cabeçalho deste arquivo */
+    /* out of context on purpose — see this file's header */
     id: 'js-demo-expressao-1',
     curso: 'javascript',
     topico: 'Tipos, coerção, igualdade estrita e valores falsos',
@@ -175,7 +175,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ================= outras aulas, para o curso não ficar oco ============ */
+  /* ============ other lessons, so the course is not hollow =============== */
 
   {
     id: 'js-sintaxe-quiz-1',
@@ -234,7 +234,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
   },
 
   {
-    /* aqui `resposta-expressao` está no lugar certo: curso de estatística */
+    /* here `resposta-expressao` is in the right place: a statistics course */
     id: 'est-derivada-1',
     curso: 'estatistica',
     topico: 'Medidas de tendência central: média, mediana e moda',

@@ -85,7 +85,7 @@ export default async function lesson({ id, ix, sec }) {
 
   const steps = sections.map((s, i) => (
     '<a class="passo' + (i === pos ? ' on' : '') + (sectionDone(id, n, s.id) ? ' feito' : '') +
-      (s.tipo === 'avaliacao' ? ' passo-aval' : '') + (s.pendente ? ' passo-pendente' : '') + '" ' +
+      (s.tipo === 'avaliacao' ? ' passo-aval' : '') + (s.pending ? ' passo-pendente' : '') + '" ' +
       'href="#/curso/' + esc(id) + '/aula/' + n + '/' + esc(s.id) + '">' +
       '<span class="passo-n">' + (s.tipo === 'avaliacao' ? '★' : String(i + 1).padStart(2, '0')) + '</span>' +
       '<span class="passo-tit">' + esc(s.titulo) + '</span>' +
@@ -151,8 +151,8 @@ export default async function lesson({ id, ix, sec }) {
       : '') +
 
     (section.tipo === 'avaliacao'
-      ? '<section class="bloco aula-exercicios' + (section.pendente ? ' aval-pendente' : '') + '">' +
-          (section.pendente
+      ? '<section class="bloco aula-exercicios' + (section.pending ? ' aval-pendente' : '') + '">' +
+          (section.pending
             ? '<p class="mono dim">' + txt('[avaliação em preparação — os exercícios deste tópico ainda não foram produzidos]') + '</p>'
             : '') +
         '</section>'
@@ -187,7 +187,7 @@ export default async function lesson({ id, ix, sec }) {
       '<a class="btn btn-primary avancar" href="' + nextTarget + '">' + txt('próxima') + ' →</a>' +
     '</footer>';
 
-  if (section.tipo === 'avaliacao' && !section.pendente) {
+  if (section.tipo === 'avaliacao' && !section.pending) {
     const exercises = await api.lessonExercises(id, a.chave);
     el.querySelector('.aula-exercicios').appendChild(buildAssessment(exercises, { cursoId: id, aulaIx: n }));
   }
@@ -227,7 +227,7 @@ export default async function lesson({ id, ix, sec }) {
      no exercises yet stays out: there is nothing to complete in it. */
   el.addEventListener('click', (e) => {
     if (!e.target.closest('.avancar')) return;
-    if (section.pendente) return;
+    if (section.pending) return;
     if (!sectionDone(id, n, section.id)) api.completeSection(id, n, section.id, true);
   });
 

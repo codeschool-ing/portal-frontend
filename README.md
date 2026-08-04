@@ -1001,7 +1001,23 @@ inertia:
 | exercise fields (`tipo`, `enunciado`, `alternativas`, `itens`, `pares`, `armadilha`, `dica_socratica`, `_verificacao`) | the pipeline's contract — renaming them would cost a migration on the producing side |
 | the i18n keys and the persisted `localStorage` shape | the key *is* the Portuguese text, by design; and a renamed storage key silently resets everyone's progress |
 
-The lesson content itself is content, not code, and stays in Portuguese too.
+The lesson content itself is content, not code, and stays in Portuguese too —
+including the comments inside the code an `exemplo` or a `{ codigo }` block
+teaches, which the student reads.
+
+**The persisted shape reaches further than the store.** `ultima` is stored as
+`{ cursoId, aulaIx, secId }`, so that coordinate pair keeps those names
+everywhere it travels — the `ctx` the wizard writes answers with, the records
+`allNotes()` and `answersGiven()` return, the search results. Renaming it only
+where it is not persisted would leave two names for one concept in adjacent
+lines, which reads worse than one Portuguese name used consistently. The same
+holds for the exam record: `saveExam` writes `pct`, `aprovado`, `certos` and
+`total`, so those four keep their names and the fields around them that are
+never stored (`judged`, `pending`) are in English.
+
+Everything else internal was translated, including the shapes that only travel
+between two modules: the matching exercise's state and its verdict, the wizard's
+submit callback, the exam DTO, and the `exercise:answered` event.
 
 ## What comes next
 

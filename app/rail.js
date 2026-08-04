@@ -31,7 +31,7 @@ import {
 } from './state.js';
 import { courseExam } from './exams.js';
 import { courseState } from './graph.js';
-import { studentTrack as trilhaDoAluno, bar as barra } from './screens/common.js';
+import { studentTrack, bar } from './screens/common.js';
 import { esc } from './text.js';
 
 const LINKS = [
@@ -77,7 +77,7 @@ export function buildRail(el, path, params) {
 }
 
 function globalRail(path) {
-  const t = trilhaDoAluno();
+  const t = studentTrack();
   const links = LINKS.map((l) =>
     '<a class="trilho-link' + (path === l.href.slice(1) ? ' on' : '') + '" href="' + l.href + '">' +
       txt(l.rotulo) + '</a>').join('');
@@ -150,7 +150,7 @@ function courseRail(params, path) {
           : (s.video !== undefined ? ICON_PLAY : ICON_TEXT));
       return '<a class="trilho-secao' + (ok ? ' feita' : '') +
         (s.id === currentSec && isCurrent ? ' on' : '') +
-        (s.tipo === 'avaliacao' ? ' aval' : '') + (s.pendente ? ' pendente' : '') + '" ' +
+        (s.tipo === 'avaliacao' ? ' aval' : '') + (s.pending ? ' pendente' : '') + '" ' +
         'href="#/curso/' + esc(id) + '/aula/' + a.ix + '/' + esc(s.id) + '">' +
         '<span class="ts-marca" aria-hidden="true">' + mark + '</span>' +
         '<span class="ts-meio">' +
@@ -182,7 +182,7 @@ function courseRail(params, path) {
     '<a class="trilho-voltar" href="#/trilha">← ' + txt('minha trilha') + '</a>' +
     '<div class="trilho-sec">' +
       '<span class="trilho-tit">' + esc(c.nome) + '</span>' +
-      barra(p.pct, p.feitas + ' de ' + p.total) +
+      bar(p.pct, p.feitas + ' de ' + p.total) +
       '<span class="trilho-conta">' + p.feitas + '/' + p.total + ' ' + txt('seções') + '</span>' +
       '<div class="trilho-aulas">' + rows + '</div>' +
       examRow +

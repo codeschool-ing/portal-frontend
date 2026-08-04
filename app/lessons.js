@@ -27,7 +27,7 @@
    THE CONSEQUENCE OF THE ALWAYS-PRESENT ASSESSMENT, AND HOW IT IS HANDLED
    If an empty assessment counted towards progress, no course would ever reach
    100% while the exercises did not exist — and no certificate would ever be
-   issued. So it is born with `contaProgresso: false` and stays out of the
+   issued. So it is born with `countsTowardsProgress: false` and stays out of the
    denominator until it has exercises. The denominator grows when the content
    arrives, which is honest: the lesson really did gain more work inside it.
    ========================================================================== */
@@ -62,8 +62,8 @@ export function lessonSections(courseId, key) {
     titulo: 'Avaliação',
     tipo: 'avaliacao',
     quantos: exercises.length,
-    pendente: exercises.length === 0,
-    contaProgresso: exercises.length > 0,
+    pending: exercises.length === 0,
+    countsTowardsProgress: exercises.length > 0,
   });
   return sections;
 }
@@ -72,7 +72,7 @@ export function lessonSections(courseId, key) {
    shows on screen, so the structure stays predictable, but stays out of the
    denominator — otherwise the course would never close. */
 export const countableSections = (courseId, key) =>
-  lessonSections(courseId, key).filter((s) => s.contaProgresso !== false);
+  lessonSections(courseId, key).filter((s) => s.countsTowardsProgress !== false);
 
 /* The lesson with its sections already resolved. This is what the screens
    consume. */

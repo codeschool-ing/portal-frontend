@@ -74,10 +74,10 @@ export function courseExam(courseId, attempt = 0) {
   const bank = courseBank(courseId);
   return {
     chave: 'curso:' + courseId,
-    escopo: 'curso',
+    scope: 'curso',
     alvo: courseId,
     titulo: c ? c.nome : courseId,
-    voltarPara: '#/curso/' + courseId,
+    backTo: '#/curso/' + courseId,
     itens: draw(bank, COURSE_QUESTIONS, courseId + ':' + attempt),
     banco: bank.length,
   };
@@ -88,10 +88,10 @@ export function trackExam(track, activeOption, attempt = 0) {
   const bank = path.flatMap((id) => courseBank(id));
   return {
     chave: 'trilha:' + track.id,
-    escopo: 'trilha',
+    scope: 'trilha',
     alvo: track.id,
     titulo: track.nome,
-    voltarPara: '#/trilha',
+    backTo: '#/trilha',
     itens: draw(bank, TRACK_QUESTIONS, track.id + ':' + attempt),
     banco: bank.length,
     cursos: path.length,
@@ -102,12 +102,12 @@ export function trackExam(track, activeOption, attempt = 0) {
    checked yet, never what was left blank. Leaving it blank is an answer, and it
    is a wrong one; not having been checked is not an answer at all. */
 export function examScore(states) {
-  const judged = states.filter((s) => s.acertou !== null || !s.respondido);
+  const judged = states.filter((s) => s.acertou !== null || !s.answered);
   const right = states.filter((s) => s.acertou === true).length;
   const pending = states.length - judged.length;
   const pct = judged.length ? Math.round((right / judged.length) * 100) : 0;
   return {
-    certos: right, julgadas: judged.length, pendentes: pending, pct,
+    certos: right, judged: judged.length, pending, pct,
     aprovado: judged.length > 0 && pct >= PASS_MARK,
   };
 }

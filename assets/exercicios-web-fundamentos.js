@@ -27,7 +27,7 @@
 
 window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
 
-  /* ============================================================== aula 01 */
+  /* ============================================================== lesson 01 */
   {
     id: 'wf-01-quiz',
     curso: 'web-fundamentos',
@@ -83,7 +83,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 02 */
+  /* ============================================================== lesson 02 */
   {
     id: 'wf-02-quiz',
     curso: 'web-fundamentos',
@@ -136,7 +136,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 03 */
+  /* ============================================================== lesson 03 */
   {
     id: 'wf-03-quiz',
     curso: 'web-fundamentos',
@@ -186,7 +186,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 04 */
+  /* ============================================================== lesson 04 */
   {
     id: 'wf-04-mult',
     curso: 'web-fundamentos',
@@ -239,7 +239,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 05 */
+  /* ============================================================== lesson 05 */
   {
     id: 'wf-05-ord',
     curso: 'web-fundamentos',
@@ -292,7 +292,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 06 */
+  /* ============================================================== lesson 06 */
   {
     id: 'wf-06-quiz',
     curso: 'web-fundamentos',
@@ -367,7 +367,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 07 */
+  /* ============================================================== lesson 07 */
   {
     id: 'wf-07-quiz',
     curso: 'web-fundamentos',
@@ -423,7 +423,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 08 */
+  /* ============================================================== lesson 08 */
   {
     id: 'wf-08-ord',
     curso: 'web-fundamentos',
@@ -477,7 +477,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 09 */
+  /* ============================================================== lesson 09 */
   {
     id: 'wf-09-mult',
     curso: 'web-fundamentos',
@@ -530,7 +530,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 10 */
+  /* ============================================================== lesson 10 */
   {
     id: 'wf-10-ord',
     curso: 'web-fundamentos',
@@ -585,7 +585,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 11 */
+  /* ============================================================== lesson 11 */
   {
     id: 'wf-11-saida',
     curso: 'web-fundamentos',

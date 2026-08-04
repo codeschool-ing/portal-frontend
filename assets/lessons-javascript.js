@@ -28,7 +28,7 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     /* --------------------------------------------------------------- 01 */
     'Sintaxe ES6+: let/const, arrow functions e template strings': [
       {
-        // só vídeo: a abertura do curso, sem texto para ler junto
+        // video only: the course's opening, with no text to read along
         id: 'apresentacao',
         titulo: 'Apresentação do curso',
         video: true,

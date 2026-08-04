@@ -53,12 +53,12 @@ export function gradeLocally(ex, answer) {
          before it closed. Zero mistakes is a pass. It is the pipeline's
          yardstick applied to the process — getting there by elimination does
          not count as knowing. */
-      if (!answer || answer.parcial) return verdict(false, { parcial: true });
-      return verdict(answer.erros === 0, { erros: answer.erros, total: ex.pares.length });
+      if (!answer || answer.partial) return verdict(false, { partial: true });
+      return verdict(answer.wrong === 0, { wrong: answer.wrong, total: ex.pares.length });
     }
 
     default:
-      return verdict(null, { erro: 'type without local grading: ' + ex.tipo });
+      return verdict(null, { error: 'type without local grading: ' + ex.tipo });
   }
 }
 

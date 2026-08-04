@@ -20,7 +20,7 @@
 
 window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
 
-  /* ============================================================== aula 04 */
+  /* ============================================================== lesson 04 */
   {
     id: 'hc-04-quiz',
     curso: 'html-css',
@@ -76,7 +76,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 05 */
+  /* ============================================================== lesson 05 */
   {
     id: 'hc-05-quiz',
     curso: 'html-css',
@@ -113,7 +113,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 07 */
+  /* ============================================================== lesson 07 */
   {
     id: 'hc-07-quiz',
     curso: 'html-css',
@@ -153,7 +153,7 @@ window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
     _verificacao: 'estrutura',
   },
 
-  /* ============================================================== aula 10 */
+  /* ============================================================== lesson 10 */
   {
     id: 'hc-10-ord',
     curso: 'html-css',

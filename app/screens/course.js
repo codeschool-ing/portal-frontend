@@ -80,8 +80,8 @@ export default async function course({ id }) {
          of the course, and its place is after the last lesson. */
       (exam.itens.length
         ? examCard({
-          chave: exam.chave, href: '#/curso/' + esc(id) + '/prova', escopo: 'curso',
-          quantas: exam.itens.length, progresso: p.pct,
+          chave: exam.chave, href: '#/curso/' + esc(id) + '/prova', scope: 'curso',
+          count: exam.itens.length, progress: p.pct,
         })
         : '') +
       '</div>' +

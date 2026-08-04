@@ -109,7 +109,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
       showVerdict(el, ex, v);
       el.querySelector('.ex-refazer').hidden = false;
     }
-    el.dispatchEvent(new CustomEvent('exercicio:respondido', { bubbles: true, detail: { ex, v } }));
+    el.dispatchEvent(new CustomEvent('exercise:answered', { bubbles: true, detail: { ex, v } }));
   }
 
   if (mod.setup) mod.setup(body, { exercicio: ex, concluir: check });
@@ -155,8 +155,8 @@ function showVerdict(el, ex, v) {
 
   out.className = 'ex-veredito v-errado';
   let extra = '';
-  if (v.parcial) extra = ' ' + txt('faltou fechar todos os pares.');
-  else if (typeof v.erros === 'number' && v.erros > 0) extra = '';
+  if (v.partial) extra = ' ' + txt('faltou fechar todos os pares.');
+  else if (typeof v.wrong === 'number' && v.wrong > 0) extra = '';
   /* The `armadilha` of an ordering exercise is what the exercise measures:
      which neighbouring pair gets swapped, and why. As feedback it is worth a
      lot; any earlier, it would be the answer. */
@@ -192,7 +192,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
   const exam = Boolean(options.prova);
   const el = document.createElement('div');
   el.className = 'wizard' + (exam ? ' wizard-prova' : '');
-  const states = exercises.map(() => ({ respondido: false, acertou: null }));
+  const states = exercises.map(() => ({ answered: false, acertou: null }));
   let current = 0;
   let submitted = false;
   let confirming = false;
@@ -220,7 +220,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
       /* In an exam that is still open the marker says WHETHER it was answered,
          not whether it was right: the colour of a correct answer would be the
          verdict the exam is holding back. */
-      if (s.respondido) {
+      if (s.answered) {
         cls.push(exam && !submitted
           ? 'feito'
           : (s.acertou === true ? 'certo' : (s.acertou === null ? 'pendente' : 'errado')));
@@ -230,7 +230,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
     }).join('');
     el.querySelector('.wz-antes').disabled = current === 0;
     const last = current === exercises.length - 1;
-    const blank = states.filter((s) => !s.respondido).length;
+    const blank = states.filter((s) => !s.answered).length;
     const next = el.querySelector('.wz-depois');
     if (submitted) next.textContent = txt('prova entregue');
     else if (!last) next.textContent = txt('próxima') + ' →';
@@ -260,8 +260,8 @@ export function buildAssessment(exercises, ctx, options = {}) {
 
   function finish() {
     const right = states.filter((s) => s.acertou === true).length;
-    const unchecked = states.filter((s) => s.respondido && s.acertou === null).length;
-    const unanswered = states.filter((s) => !s.respondido).length;
+    const unchecked = states.filter((s) => s.answered && s.acertou === null).length;
+    const unanswered = states.filter((s) => !s.answered).length;
 
     /* The exam OPENS here: every answered question reveals the verdict that was
        held back, and answering stops being possible. It is the line between
@@ -279,8 +279,8 @@ export function buildAssessment(exercises, ctx, options = {}) {
     stage.textContent = '';
     const r = document.createElement('div');
     r.className = 'wz-resultado';
-    const grade = options.aoEntregar
-      ? options.aoEntregar({ certos: right, naoConferidos: unchecked, semResposta: unanswered, estados: states })
+    const grade = options.onSubmit
+      ? options.onSubmit({ right, unchecked, unanswered, states })
       : null;
     r.innerHTML =
       (grade ? grade.html : '') +
@@ -300,12 +300,12 @@ export function buildAssessment(exercises, ctx, options = {}) {
     }));
   }
 
-  el.addEventListener('exercicio:respondido', (e) => {
-    states[current] = { respondido: true, acertou: e.detail.v.acertou };
+  el.addEventListener('exercise:answered', (e) => {
+    states[current] = { answered: true, acertou: e.detail.v.acertou };
     paintHeader();
   });
   el.addEventListener('exercicio:refeito', () => {
-    states[current] = { respondido: false, acertou: null };
+    states[current] = { answered: false, acertou: null };
     screens[current] = stage.firstElementChild;   // "try again" swaps the element
     paintHeader();
   });
@@ -321,7 +321,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
        modal: the button itself says how many are left and what will happen.
        Submitting without noticing that three were missed is the expensive
        mistake on this screen — after submitting there is no way back. */
-    const blank = states.filter((s) => !s.respondido).length;
+    const blank = states.filter((s) => !s.answered).length;
     if (exam && blank && !confirming) { confirming = true; paintHeader(); return; }
     finish();
   });

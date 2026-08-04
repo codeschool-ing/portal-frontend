@@ -43,20 +43,20 @@ function build(exam, progress) {
 
   el.innerHTML =
     '<nav class="migalhas">' +
-      '<a href="' + exam.voltarPara + '">' + esc(exam.titulo) + '</a>' +
+      '<a href="' + exam.backTo + '">' + esc(exam.titulo) + '</a>' +
       '<span aria-hidden="true">›</span>' +
-      '<span>' + txt(exam.escopo === 'trilha' ? 'prova da trilha' : 'prova final') + '</span>' +
+      '<span>' + txt(exam.scope === 'trilha' ? 'prova da trilha' : 'prova final') + '</span>' +
     '</nav>' +
 
     '<header class="tela-head">' +
-      '<h1>' + txt(exam.escopo === 'trilha' ? 'Prova da trilha' : 'Prova final do curso') + '</h1>' +
+      '<h1>' + txt(exam.scope === 'trilha' ? 'Prova da trilha' : 'Prova final do curso') + '</h1>' +
       '<p>' + esc(exam.titulo) + '</p>' +
     '</header>' +
 
     '<section class="bloco prova-regras">' +
       '<ul class="prosa-lista">' +
         '<li>' + exam.itens.length + ' ' + txt('questões, sorteadas do banco do') + ' ' +
-          txt(exam.escopo === 'trilha' ? 'conjunto de cursos da trilha.' : 'curso.') + '</li>' +
+          txt(exam.scope === 'trilha' ? 'conjunto de cursos da trilha.' : 'curso.') + '</li>' +
         '<li>' + txt('O resultado de cada questão só aparece no fim — aqui a prova mede, não ensina.') + '</li>' +
         '<li>' + txt('Mínimo para passar:') + ' <strong>' + PASS_MARK + '%</strong>.</li>' +
         '<li>' + txt('Refazer sorteia uma prova diferente. Vale o melhor resultado.') + '</li>' +
@@ -83,10 +83,10 @@ function build(exam, progress) {
 
   /* The exam's result is written BY THE SCREEN, not by the wizard: this is where
      "passed" means something, and this is where it gets stored. */
-  const onSubmit = ({ estados }) => {
-    const n = examScore(estados);
+  const onSubmit = ({ states }) => {
+    const n = examScore(states);
     saveExam(exam.chave, {
-      pct: n.pct, aprovado: n.aprovado, certos: n.certos, total: n.julgadas,
+      pct: n.pct, aprovado: n.aprovado, certos: n.certos, total: n.judged,
     });
     return {
       html:
@@ -94,7 +94,7 @@ function build(exam, progress) {
         '<p class="wz-res-nota prova-nota' + (n.aprovado ? ' passou' : ' faltou') + '">' +
           '<strong>' + n.pct + '%</strong>' +
         '</p>' +
-        '<p class="wz-res-obs">' + n.certos + ' ' + txt('de') + ' ' + n.julgadas + ' ' +
+        '<p class="wz-res-obs">' + n.certos + ' ' + txt('de') + ' ' + n.judged + ' ' +
           txt('questões corrigidas') + ' · ' + txt('mínimo') + ' ' + PASS_MARK + '%</p>' +
         (n.aprovado
           ? '<p class="wz-res-obs">' + txt('O certificado sai na tela de Certificados.') + '</p>'
@@ -106,7 +106,7 @@ function build(exam, progress) {
     buildAssessment(
       exam.itens.map((i) => i.ex),
       exam.itens.map((i) => i.ctx),
-      { prova: true, aoEntregar: onSubmit },
+      { prova: true, onSubmit },
     ),
   );
 
@@ -130,15 +130,15 @@ export async function trackExamScreen() {
 /* The card that announces the exam, at the end of the course page and of the
    track page. It is the same piece in both places because it is the same
    promise. */
-export function examCard({ chave, href, escopo, quantas, progresso }) {
+export function examCard({ chave, href, scope, count, progress }) {
   const r = examResult(chave);
   const state = r?.aprovado ? 'passou' : (r ? 'tentou' : 'novo');
   return '<section class="bloco prova-cartao ' + state + '">' +
     '<div class="prova-cartao-texto">' +
       '<span class="prova-cartao-rot mono">' +
-        txt(escopo === 'trilha' ? 'fim da trilha' : 'fim do curso') + '</span>' +
-      '<h2>' + txt(escopo === 'trilha' ? 'Prova da trilha' : 'Prova final') + '</h2>' +
-      '<p>' + quantas + ' ' + txt('questões sorteadas') + ' · ' + txt('mínimo') + ' ' + PASS_MARK + '% · ' +
+        txt(scope === 'trilha' ? 'fim da trilha' : 'fim do curso') + '</span>' +
+      '<h2>' + txt(scope === 'trilha' ? 'Prova da trilha' : 'Prova final') + '</h2>' +
+      '<p>' + count + ' ' + txt('questões sorteadas') + ' · ' + txt('mínimo') + ' ' + PASS_MARK + '% · ' +
         txt('resultado só no fim') + '</p>' +
       (r
         ? '<p class="prova-cartao-nota' + (r.aprovado ? ' passou' : '') + '">' +
@@ -146,7 +146,7 @@ export function examCard({ chave, href, escopo, quantas, progresso }) {
         : '') +
     '</div>' +
     '<div class="prova-cartao-acao">' +
-      (progresso !== undefined ? bar(progresso, progresso + '%') : '') +
+      (progress !== undefined ? bar(progress, progress + '%') : '') +
       '<a class="btn btn-primary" href="' + href + '">' +
         txt(r ? 'Refazer a prova' : 'Fazer a prova') + ' →</a>' +
     '</div>' +

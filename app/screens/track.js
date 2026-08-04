@@ -30,8 +30,8 @@ export default async function track() {
     const exam = trackExam(t, activeOption);
     return exam.itens.length
       ? examCard({
-        chave: exam.chave, href: '#/trilha/prova', escopo: 'trilha',
-        quantas: exam.itens.length, progresso: trackProgress(t).pct,
+        chave: exam.chave, href: '#/trilha/prova', scope: 'trilha',
+        count: exam.itens.length, progress: trackProgress(t).pct,
       })
       : '';
   };
