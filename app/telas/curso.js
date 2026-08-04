@@ -7,7 +7,12 @@
    sincronizado com duas pontas que já concordam entre si.
    ========================================================================== */
 
-import { aulasDoCurso, cursoPorId, trilhasDoCurso, depoisDe } from '../catalogo.js';
+import {
+  courseLessons as aulasDoCurso,
+  courseById as cursoPorId,
+  tracksWithCourse as trilhasDoCurso,
+  unlockedBy as depoisDe,
+} from '../catalog.js';
 import { lessonSections as secoesDaAula, courseMaterials as materiaisDoCurso } from '../lessons.js';
 import { courseProgress as progressoDoCurso, lessonProgress as progressoDaAula, lessonDone as aulaConcluida } from '../state.js';
 import { estadoDoCurso } from '../grafo.js';

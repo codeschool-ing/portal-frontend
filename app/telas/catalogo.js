@@ -5,7 +5,9 @@
    vitrine. Curso novo com categoria nova aparece sozinho no filtro.
    ========================================================================== */
 
-import { aulasDoCurso } from '../catalogo.js';
+import {
+  courseLessons as aulasDoCurso,
+} from '../catalog.js';
 import { courseProgress as progressoDoCurso } from '../state.js';
 import { estadoDoCurso } from '../grafo.js';
 import { barra } from './comum.js';

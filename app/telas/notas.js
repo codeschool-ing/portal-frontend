@@ -9,7 +9,10 @@
    Elas também entram na busca global, no grupo "suas notas".
    ========================================================================== */
 
-import { aulasDoCurso, cursoPorId } from '../catalogo.js';
+import {
+  courseLessons as aulasDoCurso,
+  courseById as cursoPorId,
+} from '../catalog.js';
 import { lessonSections as secoesDaAula } from '../lessons.js';
 import { allNotes as todasAsNotas } from '../state.js';
 import { vazio } from './comum.js';

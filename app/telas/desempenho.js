@@ -13,7 +13,10 @@
    julgado nunca vira reprovado.
    ========================================================================== */
 
-import { aulasDoCurso, cursoPorId } from '../catalogo.js';
+import {
+  courseLessons as aulasDoCurso,
+  courseById as cursoPorId,
+} from '../catalog.js';
 import { answersGiven as respostasDadas } from '../state.js';
 import { barra, vazio } from './comum.js';
 import { esc } from '../text.js';

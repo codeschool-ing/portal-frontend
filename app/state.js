@@ -18,8 +18,10 @@
    see.
    ========================================================================== */
 
-import { aulasDoCurso as courseLessons } from './catalogo.js';
-import { lessonSections as lessonSections, countableSections as countableSections, sectionCount as sectionCount } from './lessons.js';
+import {
+  courseLessons,
+} from './catalog.js';
+import { lessonSections, countableSections, sectionCount } from './lessons.js';
 
 const KEY = 'codeschool-portal';
 

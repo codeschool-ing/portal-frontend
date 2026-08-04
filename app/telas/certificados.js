@@ -24,7 +24,10 @@
    certificado de verdade daquele tipo.
    ========================================================================== */
 
-import { caminhoDaTrilha, cursoPorId } from '../catalogo.js';
+import {
+  trackPath as caminhoDaTrilha,
+  courseById as cursoPorId,
+} from '../catalog.js';
 import { courseDone as cursoConcluido, activeOption as opcaoAtiva, examPassed as provaAprovada, examResult as resultadoProva, now as agora } from '../state.js';
 import { trilhaDoAluno } from './comum.js';
 import { abrirModal } from '../modal.js';

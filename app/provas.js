@@ -33,7 +33,11 @@
    sempre: não julgado não vira aprovado nem reprovado.
    ========================================================================== */
 
-import { aulasDoCurso, cursoPorId, caminhoDaTrilha } from './catalogo.js';
+import {
+  courseLessons as aulasDoCurso,
+  courseById as cursoPorId,
+  trackPath as caminhoDaTrilha,
+} from './catalog.js';
 import { lessonExercises as exerciciosDaAula } from './lessons.js';
 import { NEEDS_SERVER as PRECISA_SERVIDOR } from './exercises/grade.js';
 import { shuffleWith as embaralharCom } from './text.js';

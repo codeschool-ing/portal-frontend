@@ -30,7 +30,10 @@
    ========================================================================== */
 
 import * as api from '../api.js';
-import { aulasDoCurso, cursoPorId } from '../catalogo.js';
+import {
+  courseLessons as aulasDoCurso,
+  courseById as cursoPorId,
+} from '../catalog.js';
 import { lessonSections as secoesDaAula, sectionMaterials as materiaisDaSecao } from '../lessons.js';
 import { listaDeMateriais } from '../materiais.js';
 import { sectionDone as secaoConcluida, visitSection as visitarSecao, noteFor as notaDe, saveNote as guardarNota } from '../state.js';

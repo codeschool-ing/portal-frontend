@@ -7,7 +7,10 @@
    todas leem a mesma fonte.
    ========================================================================== */
 
-import { trilhaPorId, caminhoDaTrilha } from '../catalogo.js';
+import {
+  trackById as trilhaPorId,
+  trackPath as caminhoDaTrilha,
+} from '../catalog.js';
 import { courseProgress as progressoDoCurso, activeOption as opcaoAtiva, now as agora } from '../state.js';
 import { esc } from '../text.js';
 

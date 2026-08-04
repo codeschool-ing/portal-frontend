@@ -7,7 +7,11 @@
    ========================================================================== */
 
 import * as api from '../api.js';
-import { aulasDoCurso, cursoPorId, caminhoDaTrilha } from '../catalogo.js';
+import {
+  courseLessons as aulasDoCurso,
+  courseById as cursoPorId,
+  trackPath as caminhoDaTrilha,
+} from '../catalog.js';
 import { lessonSections as secoesDaAula } from '../lessons.js';
 import { courseProgress as progressoDoCurso, activeOption as opcaoAtiva } from '../state.js';
 import { estadoDoCurso } from '../grafo.js';

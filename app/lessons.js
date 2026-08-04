@@ -32,7 +32,9 @@
    arrives, which is honest: the lesson really did gain more work inside it.
    ========================================================================== */
 
-import { aulasDoCurso as courseLessons } from './catalogo.js';
+import {
+  courseLessons,
+} from './catalog.js';
 
 /* How strong the pipeline's verification marks are, in order. `criticado` went
    through probes and a judge; `execucao` had its answer key confirmed by the

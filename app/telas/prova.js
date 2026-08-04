@@ -12,7 +12,9 @@
    decisão do aluno, mas tem de ser uma decisão informada.
    ========================================================================== */
 
-import { cursoPorId } from '../catalogo.js';
+import {
+  courseById as cursoPorId,
+} from '../catalog.js';
 import { courseProgress as progressoDoCurso, activeOption as opcaoAtiva, examResult as resultadoProva, examAttempts as tentativasDeProva, saveExam as guardarProva } from '../state.js';
 import { provaDoCurso, provaDaTrilha, notaDaProva, MINIMO } from '../provas.js';
 import { buildAssessment as montarAvaliacao } from '../exercises/index.js';

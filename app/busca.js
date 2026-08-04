@@ -30,7 +30,10 @@
       celular quase sempre digita sem acento.
    ========================================================================== */
 
-import { aulasDoCurso, cursoPorId } from './catalogo.js';
+import {
+  courseLessons as aulasDoCurso,
+  courseById as cursoPorId,
+} from './catalog.js';
 import { lessonSections as secoesDaAula, lessonExercises as exerciciosDaAula } from './lessons.js';
 import { allNotes as todasAsNotas } from './state.js';
 

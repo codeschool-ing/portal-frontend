@@ -14,9 +14,13 @@
    ========================================================================== */
 
 import {
-  grafoDaTrilha, cursoPorId, trilhasDoCurso, caminhoDaTrilha,
-  horasDe, faixaDeHoras,
-} from './catalogo.js';
+  trackGraph as grafoDaTrilha,
+  courseById as cursoPorId,
+  tracksWithCourse as trilhasDoCurso,
+  trackPath as caminhoDaTrilha,
+  hoursOf as horasDe,
+  hoursRange as faixaDeHoras,
+} from './catalog.js';
 import { courseDone as cursoConcluido, courseProgress as progressoDoCurso, activeOption as opcaoAtiva, now as agora } from './state.js';
 import { esc } from './text.js';
 

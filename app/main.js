@@ -11,7 +11,9 @@
    ========================================================================== */
 
 import { rota, quandoTrocar, iniciar, caminhoAtual, despachar, irPara } from './rotas.js';
-import { ehEscolha } from './catalogo.js';
+import {
+  isChoice as ehEscolha,
+} from './catalog.js';
 import { subscribe as assinar, now as agora } from './state.js';
 import { montarTrilho, alternarAula } from './trilho.js';
 import { trilhaDoAluno, progressoDaTrilha, TRILHAS_POR_FAMILIA } from './telas/comum.js';
