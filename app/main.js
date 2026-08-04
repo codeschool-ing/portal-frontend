@@ -77,6 +77,7 @@ quandoTrocar(async (caminho, achado) => {
 
   if (!achado) {
     conteudo.innerHTML = '<div class="tela"><p class="vazio">' + txt('página não encontrada') + '</p></div>';
+    conteudo.setAttribute('aria-label', txt('página não encontrada'));
     return;
   }
 
@@ -84,7 +85,19 @@ quandoTrocar(async (caminho, achado) => {
   conteudo.textContent = '';
   conteudo.appendChild(el);
   conteudo.scrollTop = 0;
-  document.title = titulo + ' · codeschool.ing';
+
+  /* A ABA NÃO MUDA DE NOME. Ela dizia onde o aluno estava — "ES6+ syntax:
+     let/const… · codeschool.ing" — e o efeito era o contrário do pretendido:
+     com o portal aberto ao lado de outras abas, a marca ficava cortada no fim
+     de um título comprido e a aba deixava de ser reconhecível de relance. O
+     nome da escola cabe inteiro e é o que se procura ao voltar para cá.
+
+     O `titulo` de cada tela não morre com isso: ele passa a nomear a região de
+     conteúdo. Era o `document.title` que anunciava a troca de tela para o
+     leitor de tela; congelar a aba sem passar esse nome adiante deixaria a
+     navegação muda para quem não enxerga. */
+  document.title = 'codeschool.ing';
+  conteudo.setAttribute('aria-label', titulo);
   if (depois) depois();
   saindo = aoSair || null;
 

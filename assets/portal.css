@@ -96,13 +96,13 @@ html[data-tema="claro"]{color-scheme:light}
 
        IBM Plex Mono a .79rem avança 7,6px por caractere (medido no navegador)
        a linha mais longa dos exemplos tem 74 caracteres → 562px
-       mais os 44px de recuo do bloco (18 + 26 da espiral) → 606px
+       mais os 36px de recuo do bloco                     → 598px
 
-     `--cod` é 612: pouco mais que isso, e a folga são os seis pixels que
+     `--cod` é 604: pouco mais que isso, e a folga são os seis pixels que
      evitam a barra aparecer por causa de um caractere. `--nota` é o conforto
      da coluna de texto; `--nota-min`, o mínimo abaixo do qual ela deixa de ser
      legível e as duas colunas param de valer a pena. */
-  --cod:612px;
+  --cod:604px;
   --nota:440px;
   --nota-min:300px;
   /* O TETO DA COLUNA LARGA SAI DA SETA, e não de um número escolhido.
@@ -528,10 +528,11 @@ body.sem-trilho .trilho{display:none}
 /* O `code` DENTRO DE UM `pre` não é código inline: ali ele não leva caixa,
    recuo, canto arredondado nem cor própria — quem manda é o bloco.
 
-   A regra de cima vinha pegando os dois, e pintava um retângulo atrás de cada
-   linha do exemplo. Ninguém tinha visto em dois meses porque a caixa era
-   `--ink` sobre `--panel`, quase a mesma cor. Só apareceu quando a espiral foi
-   desenhada no fundo e o retângulo comeu a metade direita de cada arame. */
+   A regra de cima vinha pegando os dois, e pintava um retângulo `--ink` atrás
+   de cada linha do exemplo. Ficou muito tempo invisível por ser quase a cor do
+   painel; apareceu por acaso, num desenho de fundo que foi tentado e descartado
+   — o retângulo comia metade dele. O desenho saiu, o conserto fica: caixa atrás
+   de linha de código era erro de qualquer jeito. */
 .aula-texto pre code{
   background:none;padding:0;border-radius:0;color:inherit;font-size:inherit;
 }
@@ -1208,52 +1209,13 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
 }
 .exemplo-nota strong{color:var(--paper)}
 
-/* OS ARAMES DE CADERNO, e a aritmética que os mantém alinhados.
-
-   O bloco de código ganha uma encadernação espiral na margem esquerda: um furo
-   por LINHA de código, e não a cada tantos pixels. É essa escolha que faz o
-   detalhe parecer intencional em vez de decorativo — o arame acompanha o texto,
-   como a pauta de um caderno acompanha a escrita.
-
-   Para isso a entrelinha deixou de ser `1.7` (um múltiplo do corpo, que dá
-   21,488px e depende do arredondamento do navegador) e virou `22px` fixos. O
-   ladrilho do fundo tem exatamente essa altura, então furo e linha coincidem
-   por construção, em qualquer zoom.
-
-   O ALINHAMENTO ENTRE TRECHOS é o detalhe que custa caro se for ignorado. Com
-   duas colunas, os vários `<pre>` se empilham sem costura para parecerem UM
-   arquivo — e um fundo ladrilhado recomeça no topo de cada elemento. Se os
-   recuos verticais não forem múltiplos de 22, o segundo trecho nasce com os
-   furos deslocados e a espiral entorta no meio do arquivo. Por isso o recuo de
-   cima e o de baixo são 22px, e não os 12px de antes: não é gosto, é a única
-   folga que mantém a conta fechada.
-
-   `background-position` desloca os furos meio ladrilho para baixo do recuo, que
-   é onde fica o meio da primeira linha de texto. */
 .exemplo-cod{
-  /* a geometria do arame em variáveis: a regra usa, e o teste confere que o
-     texto começa depois dele em vez de por cima */
-  --espiral:#7f8ea3;
-  --arame-x:10px;                 /* centro do arame, a partir da borda */
-  --arame-r:7.5px;                /* semieixo maior */
-  --passo:22px;                   /* altura do ladrilho = altura da linha */
-  margin:0;padding:11px 18px 11px 26px;overflow-x:auto;
+  margin:0;padding:10px 18px;overflow-x:auto;
   scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
-  /* A elipse é DEITADA, e não um círculo: o arame de uma espiral é visto de
-     lado, achatado, e o círculo perfeito lia como furo de fichário. */
-  background:
-    radial-gradient(
-      ellipse var(--arame-r) 4.4px at var(--arame-x) 11px,
-      var(--ink) 0 58%,          /* o furo: mostra o fundo da página */
-      var(--espiral) 58% 100%,   /* o arame em volta dele */
-      transparent 100%
-    ) 0 11px / var(--passo) var(--passo) repeat-y,
-    var(--panel);
-  border-left:2px solid var(--wire);
-  font-family:'IBM Plex Mono',monospace;font-size:.79rem;line-height:var(--passo);
+  background:var(--panel);border-left:2px solid var(--wire);
+  font-family:'IBM Plex Mono',monospace;font-size:.79rem;line-height:1.7;
   color:var(--paper);white-space:pre;
 }
-html[data-tema="claro"] .exemplo-cod{--espiral:#aab3c2}
 .exemplo-saida{
   margin-top:10px;padding:9px 16px;
   background:var(--ink);border:1px solid var(--wire);border-radius:4px;
@@ -1270,18 +1232,18 @@ html[data-tema="claro"] .exemplo-cod{--espiral:#aab3c2}
    bloco de código abre em duas colunas E a aula inteira passa para a largura
    larga. Duas colunas precisam de `--cod` + `--nota-min` + o vão entre elas:
 
-     612 + 300 + 30 = 942px
+     604 + 300 + 30 = 934px
 
    E `--amplo` não pode passar do que as setas deixam — `100vw - trilho - 152`.
    Igualando as duas:
 
-     100vw - 380 - 152 >= 942   →   100vw >= 1474
+     100vw - 380 - 152 >= 934   →   100vw >= 1466
 
-   Abaixo de 1474px a aula volta para 820 e o bloco fica empilhado, onde os
-   606px do código sobram com folga. Entre 1474 e 1614 a aula cresce junto com
-   a janela, de 942 até os 1082 do conteúdo; daí para cima ela para de crescer,
+   Abaixo de 1466px a aula volta para 820 e o bloco fica empilhado, onde os
+   598px do código sobram com folga. Entre 1466 e 1606 a aula cresce junto com
+   a janela, de 934 até os 1074 do conteúdo; daí para cima ela para de crescer,
    porque alargar mais só esticaria a coluna de texto. */
-@media(min-width:1474px){
+@media(min-width:1466px){
   .portal{
     /* daqui para cima quem aperta é a seta, não o recuo do `.conteudo`: 152 é
        mais que os 88 do recuo em qualquer largura desta faixa */
@@ -1299,12 +1261,10 @@ html[data-tema="claro"] .exemplo-cod{--espiral:#aab3c2}
   }
   .exemplo-nota{align-self:start;padding:11px 0}
   /* o respiro do arquivo fica nas pontas do bloco, não em cada trecho: o miolo
-     precisa emendar sem costura. 22px e não 12: é a altura do ladrilho da
-     espiral, e só um múltiplo dela mantém os furos alinhados de um trecho para
-     o seguinte. */
-  .exemplo-cod{padding:0 18px 0 26px;background-position:0 0}
-  .exemplo-cod:first-of-type{padding-top:22px;background-position:0 22px}
-  .exemplo-cod:last-of-type{padding-bottom:22px}
+     precisa emendar sem costura */
+  .exemplo-cod{padding:0 18px}
+  .exemplo-cod:first-of-type{padding-top:12px}
+  .exemplo-cod:last-of-type{padding-bottom:12px}
   .exemplo-saida{grid-column:2}
 }
 
