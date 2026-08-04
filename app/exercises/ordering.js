@@ -1,7 +1,7 @@
 /* ==========================================================================
-   `ordenacao` — putting steps in the right order.
+   `ordering` — putting steps in the right order.
 
-   `itens` in the JSON IS ALREADY in the correct order: it is the answer key.
+   `items` in the JSON IS ALREADY in the correct order: it is the answer key.
    Rendering in file order would hand the answer over, so it is shuffled with a
    seed.
 
@@ -10,7 +10,7 @@
    keyboard and screen reader. An exercise type that only works with a mouse
    excludes students, and the list is short (4 to 7 items) — the cost is small.
 
-   The `armadilha` field does NOT reach the screen: it names which neighbouring
+   The `trap` field does NOT reach the screen: it names which neighbouring
    pair students tend to swap, and that is exactly what the exercise measures.
    It becomes feedback.
    ========================================================================== */
@@ -30,10 +30,10 @@ const ARROW_DOWN = svg('<path d="M4 6l4 4 4-4"/>');
 const GRIP = svg('<path d="M3 5h10M3 8h10M3 11h10"/>');
 
 export default {
-  types: ['ordenacao'],
+  types: ['ordering'],
 
   body(ex, uid) {
-    const shuffled = shuffleWith(uid, ex.itens);
+    const shuffled = shuffleWith(uid, ex.items);
     const rows = shuffled.map((item) => (
       '<li class="ord-item" draggable="true" data-item="' + encodeURIComponent(item) + '">' +
         '<span class="ord-pega" aria-hidden="true">' + GRIP + '</span>' +
@@ -90,7 +90,7 @@ export default {
 
   reveal(root, ex) {
     root.querySelectorAll('.ord-item').forEach((li, i) => {
-      const right = decodeURIComponent(li.dataset.item) === ex.itens[i];
+      const right = decodeURIComponent(li.dataset.item) === ex.items[i];
       li.classList.toggle('ord-certo', right);
       li.classList.toggle('ord-errado', !right);
       li.draggable = false;

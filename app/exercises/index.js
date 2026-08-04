@@ -14,7 +14,7 @@
      collect(root)                       → the answer, or null if unanswered
      reveal(root, ex, verdict)           → marks what was right, AFTERWARDS
 
-   THE `_verificacao` BADGE LEFT THE STUDENT'S SCREEN. It is still in the data
+   THE `_verification` BADGE LEFT THE STUDENT'S SCREEN. It is still in the data
    and still filters in `lessonExercises` — the pipeline docs say it is what
    decides what the portal publishes first, and that is a publishing decision,
    not information for someone who is studying. Telling a student "structural
@@ -47,30 +47,30 @@ export const isKnownType = (t) => Boolean(REGISTRY[t]);
    is still recorded normally — what changes is only what the screen says, and
    when. */
 export function buildExercise(ex, ctx, ix, options = {}) {
-  const mod = REGISTRY[ex.tipo];
+  const mod = REGISTRY[ex.type];
   const exam = Boolean(options.prova);
-  const uid = ex.id || `${ex.curso}:${ex.topico}:${ix}`;
+  const uid = ex.id || `${ex.course}:${ex.topic}:${ix}`;
   const el = document.createElement('article');
-  el.className = 'ex ex-' + ex.tipo + (exam ? ' ex-prova' : '');
+  el.className = 'ex ex-' + ex.type + (exam ? ' ex-prova' : '');
   // the DOM id: answers are stored under it, and it is how you can tell WHICH
   // exercise is on screen without depending on the prompt text
   el.dataset.ex = uid;
 
   if (!mod) {
-    el.innerHTML = '<p class="ex-erro">' + txt('tipo de exercício desconhecido') + ': ' + esc(ex.tipo) + '</p>';
+    el.innerHTML = '<p class="ex-erro">' + txt('tipo de exercício desconhecido') + ': ' + esc(ex.type) + '</p>';
     return el;
   }
 
   el.innerHTML =
     '<header class="ex-topo">' +
-      '<span class="ex-tipo">' + txt(ex.tipo) + '</span>' +
-      (ex.dificuldade ? '<span class="ex-dif">' + txt(ex.dificuldade) + '</span>' : '') +
+      '<span class="ex-tipo">' + txt(ex.type) + '</span>' +
+      (ex.difficulty ? '<span class="ex-dif">' + txt(ex.difficulty) + '</span>' : '') +
     '</header>' +
-    '<p class="ex-enunciado">' + formatted(ex.enunciado) + '</p>' +
+    '<p class="ex-enunciado">' + formatted(ex.statement) + '</p>' +
     '<div class="ex-corpo">' + mod.body(ex, uid) + '</div>' +
     // the hint is scaffolding for someone learning; in an exam it is a cheat sheet
-    (ex.dica_socratica && !exam
-      ? '<details class="ex-dica"><summary>' + txt('dica') + '</summary><p>' + formatted(ex.dica_socratica) + '</p></details>'
+    (ex.socratic_hint && !exam
+      ? '<details class="ex-dica"><summary>' + txt('dica') + '</summary><p>' + formatted(ex.socratic_hint) + '</p></details>'
       : '') +
     '<div class="ex-acoes">' +
       (mod.selfCompleting ? '' : '<button type="button" class="btn btn-primary ex-responder">' +
@@ -157,11 +157,11 @@ function showVerdict(el, ex, v) {
   let extra = '';
   if (v.partial) extra = ' ' + txt('faltou fechar todos os pares.');
   else if (typeof v.wrong === 'number' && v.wrong > 0) extra = '';
-  /* The `armadilha` of an ordering exercise is what the exercise measures:
+  /* The `trap` of an ordering exercise is what the exercise measures:
      which neighbouring pair gets swapped, and why. As feedback it is worth a
      lot; any earlier, it would be the answer. */
-  if (ex.tipo === 'ordenacao' && ex.armadilha) {
-    extra += '<span class="v-armadilha">' + formatted(ex.armadilha) + '</span>';
+  if (ex.type === 'ordering' && ex.trap) {
+    extra += '<span class="v-armadilha">' + formatted(ex.trap) + '</span>';
   }
   out.innerHTML = '<strong>' + txt('ainda não') + '</strong>' + extra;
 }

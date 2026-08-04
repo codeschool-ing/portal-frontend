@@ -105,7 +105,7 @@ export function resumeFrom() {
 }
 
 /* ---------- exercises ----------
-   FUTURE: comes from the database, filtered by `_verificacao` — the pipeline
+   FUTURE: comes from the database, filtered by `_verification` — the pipeline
    docs say that field is what decides what the portal publishes first. Today it
    comes from the sample file, and the filter already exists so it does not have
    to be retrofitted later. */
@@ -116,15 +116,15 @@ export function lessonExercises(courseId, topicKey, options) {
 /* Grade one answer.
 
    Four types are graded on the client because they are pure comparison. Three
-   are not: `codigo` and `saida-esperada` have to run code, and
-   `resposta-expressao` needs a CAS (sympy). The vitrine's docs already record
+   are not: `code` and `expected-output` have to run code, and
+   `expression-answer` needs a CAS (sympy). The vitrine's docs already record
    that running student code requires a throwaway container — that is not a
    shortcut, it is the intended design.
 
    Both paths go through HERE, with the same verdict shape, so the day the
    server exists only the body of the `if` changes. */
 export async function grade(ex, answer) {
-  if (NEEDS_SERVER.includes(ex.tipo)) return gradeOnServer(ex, answer);
+  if (NEEDS_SERVER.includes(ex.type)) return gradeOnServer(ex, answer);
   return gradeLocally(ex, answer);
 }
 
@@ -134,7 +134,7 @@ async function gradeOnServer(ex, answer) {
   return {
     acertou: null,                                 // null = it was not checked
     simulado: true,
-    detalhe: ex.tipo === 'resposta-expressao'
+    detalhe: ex.type === 'expression-answer'
       ? 'Equivalência simbólica exige o CAS no servidor.'
       : 'A execução dos casos de teste exige o contêiner no servidor.',
     resposta: answer,

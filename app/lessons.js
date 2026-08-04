@@ -39,13 +39,13 @@ import {
 /* How strong the pipeline's verification marks are, in order. `criticado` went
    through probes and a judge; `execucao` had its answer key confirmed by the
    interpreter; `estrutura` only passed the mechanical checks. */
-const STRENGTH = { estrutura: 0, execucao: 1, criticado: 2 };
+const STRENGTH = { structure: 0, execution: 1, critiqued: 2 };
 
-export function lessonExercises(courseId, key, { minimo = 'estrutura' } = {}) {
+export function lessonExercises(courseId, key, { minimum = 'structure' } = {}) {
   return (window.EXERCICIOS_EXEMPLO || []).filter(
-    (e) => e.curso === courseId
-      && e.topico === key
-      && STRENGTH[e._verificacao ?? 'estrutura'] >= STRENGTH[minimo],
+    (e) => e.course === courseId
+      && e.topic === key
+      && STRENGTH[e._verification ?? 'structure'] >= STRENGTH[minimum],
   );
 }
 

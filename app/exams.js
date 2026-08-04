@@ -28,8 +28,8 @@
    which is the wrong punishment for the wrong mistake). Failing and trying again
    gives a DIFFERENT exam — memorising the list of ten cannot be the strategy.
 
-   IT PREFERS THE TYPES THE PORTAL CAN GRADE. `codigo`, `saida-esperada` and
-   `resposta-expressao` need a server and today come back "unchecked" — an exam
+   IT PREFERS THE TYPES THE PORTAL CAN GRADE. `code`, `expected-output` and
+   `expression-answer` need a server and today come back "unchecked" — an exam
    full of them would have no score. They only come in when there are not enough
    gradable ones, and they stay out of the denominator, by the usual rule:
    unjudged becomes neither passed nor failed.
@@ -58,7 +58,7 @@ export function courseBank(courseId) {
   return out;
 }
 
-const gradable = (item) => !NEEDS_SERVER.includes(item.ex.tipo);
+const gradable = (item) => !NEEDS_SERVER.includes(item.ex.type);
 
 /* Draws while keeping the preference for the gradable ones: it shuffles the two
    groups separately and only then concatenates, so the order inside each group
@@ -78,7 +78,7 @@ export function courseExam(courseId, attempt = 0) {
     alvo: courseId,
     titulo: c ? c.nome : courseId,
     backTo: '#/curso/' + courseId,
-    itens: draw(bank, COURSE_QUESTIONS, courseId + ':' + attempt),
+    items: draw(bank, COURSE_QUESTIONS, courseId + ':' + attempt),
     banco: bank.length,
   };
 }
@@ -92,7 +92,7 @@ export function trackExam(track, activeOption, attempt = 0) {
     alvo: track.id,
     titulo: track.nome,
     backTo: '#/trilha',
-    itens: draw(bank, TRACK_QUESTIONS, track.id + ':' + attempt),
+    items: draw(bank, TRACK_QUESTIONS, track.id + ':' + attempt),
     banco: bank.length,
     cursos: path.length,
   };

@@ -423,9 +423,9 @@ What divides the seven is not the UI, it is **where the grading can happen**:
 
 | type | grades where | today |
 | --- | --- | --- |
-| `quiz` · `multipla-escolha` · `ordenacao` · `associacao` | client — it is pure comparison | **really works** |
-| `codigo` · `saida-esperada` | server: execution in a container | "not checked" verdict |
-| `resposta-expressao` | server: symbolic equivalence (sympy) | "not checked" verdict |
+| `quiz` · `multiple-choice` · `ordering` · `matching` | client — it is pure comparison | **really works** |
+| `code` · `expected-output` | server: execution in a container | "not checked" verdict |
+| `expression-answer` | server: symbolic equivalence (sympy) | "not checked" verdict |
 
 Both paths go through `api.grade()` with the same verdict shape, so the day the
 server exists changes the body of one `if`.
@@ -439,11 +439,11 @@ because they are easy to get wrong and expensive to fix later:
 
 - **`porque` is post-answer feedback, not a visible hint.** It only appears after
   answering.
-- **The JSON's order is the answer key** in `ordenacao` (the `itens` are in the
-  right order) and in `associacao` (`pares[i].esquerda ↔ pares[i].direita`). Both
+- **The JSON's order is the answer key** in `ordering` (the `items` are in the
+  right order) and in `matching` (`pairs[i].left ↔ pairs[i].right`). Both
   are shuffled with a seed, and the matching exercise's right-hand column comes
   out **alphabetically sorted** — the same reason the pipeline's probe does it.
-- **`armadilha` does not go on screen** before the answer: it names exactly what
+- **`trap` does not go on screen** before the answer: it names exactly what
   the exercise measures. It becomes feedback afterwards.
 
 In `codigo`, the first test cases become the example and the rest stay hidden:
@@ -457,15 +457,15 @@ before closing an exercise.
 (any name gets in), the lessons' text, the certificate with no validation code.
 
 **Settled:** the exercise format — the fields are exactly the ones the pipeline
-emits (`enunciado`, `dica_socratica`, `alternativas[].{texto,correta,porque}`,
-`itens`, `armadilha`, `pares`, `distratores_direita`,
-`testes[].{descricao,entrada,saida_esperada}`, `verificacao_*`). The portal adds
+emits (`statement`, `socratic_hint`, `options[].{text,correct,why}`, `items`,
+`trap`, `pairs`, `right_distractors`,
+`tests[].{description,input,expected_output}`, `check_*`). The portal adds
 two fields that are its own, not the exercise's: `id` and `curso`.
 
 Ignoring the tool for now costs nothing; inventing a parallel format would cost a
 migration.
 
-Also settled: `_verificacao` (`criticado` / `execucao` / `estrutura`) appears on
+Also settled: `_verification` (`critiqued` / `execution` / `structure`) appears on
 every exercise and already filters in `api.lessonExercises()`. The pipeline's
 docs say it is this field that decides what the portal publishes first — better
 for it to exist empty than to be retrofitted.
@@ -532,7 +532,7 @@ became the path: **how many pairs were tried wrong before closing**. Zero is a
 clean answer. It is the pipeline's ruler — getting it right by elimination does
 not count as knowing — applied to the process instead of the result.
 
-**The `_verificacao` seal left the student's screen.** It stays in the data and
+**The `_verification` seal left the student's screen.** It stays in the data and
 keeps filtering in `lessonExercises`: it is a *publication* decision, not
 information for whoever is studying. Telling a student "structural check only" is
 warning them that this exercise may be no good — and if it may be no good, it
@@ -582,7 +582,7 @@ checked. That died there: the student answered, saw the verdict and never met it
 again.
 
 **"Got it wrong" and "nobody checked" do not become the same bar.** The types
-that need a server (`codigo`, `saida-esperada`, `resposta-expressao`) answer
+that need a server (`code`, `expected-output`, `expression-answer`) answer
 `acertou: null` while there is no execution, and counting them as errors would
 invent a failure that did not happen. It is the funnel's ruler from the other
 side: there, not judged never becomes approved; here, not judged never becomes
@@ -637,7 +637,7 @@ the wrong punishment for the wrong mistake. Failing and trying again returns a
 *different* exam: memorising the list of ten cannot be the strategy.
 
 **The exam prefers the types the portal knows how to grade.** `codigo`,
-`saida-esperada` and `resposta-expressao` need a server and today come back "not
+`expected-output` and `expression-answer` need a server and today come back "not
 checked" — an exam full of them would have no grade. They only come in when there
 are not enough gradable ones, and they stay out of the denominator, by the usual
 ruler: not judged becomes neither passed nor failed. Leaving something blank, by
@@ -998,7 +998,7 @@ inertia:
 | --- | --- |
 | CSS classes, `data-*`, element ids, route paths | the DOM contract shared with `base.css`, which is a verbatim copy of the vitrine |
 | catalogue fields (`cursos`, `topicos`, `depende`, `ligacoes`, `nome`, `nivel`) | `dados.js` is a verbatim copy of the vitrine's catalogue |
-| exercise fields (`tipo`, `enunciado`, `alternativas`, `itens`, `pares`, `armadilha`, `dica_socratica`, `_verificacao`) | the pipeline's contract — renaming them would cost a migration on the producing side |
+| ~~exercise fields~~ — **no longer**: the pipeline renamed its schema to English and the portal followed (`type`, `statement`, `options`, `items`, `pairs`, `trap`, `socratic_hint`, `_verification`) | it was the pipeline's contract, and the contract moved |
 | the i18n keys and the persisted `localStorage` shape | the key *is* the Portuguese text, by design; and a renamed storage key silently resets everyone's progress |
 
 The lesson content itself is content, not code, and stays in Portuguese too —
@@ -1022,9 +1022,9 @@ submit callback, the exam DTO, and the `exercise:answered` event.
 ## What comes next
 
 - **A server**: authentication, per-student progress, code execution in a
-  disposable container and the CAS for `resposta-expressao`.
+  disposable container and the CAS for `expression-answer`.
 - **Real content**: reconnect `tools/exercises` from the vitrine's repo and
-  ingest the approved JSON, starting with the `_verificacao: criticado` ones.
+  ingest the approved JSON, starting with the `_verification: critiqued` ones.
 - **The videos.** The frame is already reserved in the sections that declared
   `video`, with the duration and the edge-to-edge layout ready. Only the id is
   missing.

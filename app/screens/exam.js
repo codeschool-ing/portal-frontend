@@ -30,7 +30,7 @@ function build(exam, progress) {
   const el = document.createElement('div');
   el.className = 'tela tela-prova';
 
-  if (!exam.itens.length) {
+  if (!exam.items.length) {
     el.innerHTML =
       '<header class="tela-head">' +
         '<h1>' + txt('Prova') + ' · ' + esc(exam.titulo) + '</h1>' +
@@ -55,7 +55,7 @@ function build(exam, progress) {
 
     '<section class="bloco prova-regras">' +
       '<ul class="prosa-lista">' +
-        '<li>' + exam.itens.length + ' ' + txt('questões, sorteadas do banco do') + ' ' +
+        '<li>' + exam.items.length + ' ' + txt('questões, sorteadas do banco do') + ' ' +
           txt(exam.scope === 'trilha' ? 'conjunto de cursos da trilha.' : 'curso.') + '</li>' +
         '<li>' + txt('O resultado de cada questão só aparece no fim — aqui a prova mede, não ensina.') + '</li>' +
         '<li>' + txt('Mínimo para passar:') + ' <strong>' + PASS_MARK + '%</strong>.</li>' +
@@ -104,8 +104,8 @@ function build(exam, progress) {
 
   el.querySelector('.prova-palco').appendChild(
     buildAssessment(
-      exam.itens.map((i) => i.ex),
-      exam.itens.map((i) => i.ctx),
+      exam.items.map((i) => i.ex),
+      exam.items.map((i) => i.ctx),
       { prova: true, onSubmit },
     ),
   );

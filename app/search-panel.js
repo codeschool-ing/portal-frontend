@@ -63,7 +63,7 @@ function create() {
 
 function flat() {
   // the groups become one list so the arrows walk between them without stopping
-  return hits.flatMap((g) => g.itens);
+  return hits.flatMap((g) => g.items);
 }
 
 function paint() {
@@ -83,7 +83,7 @@ function paint() {
   let i = -1;
   list.innerHTML = hits.map((g) =>
     '<div class="busca-grupo">' + txt(GROUP_LABEL[g.grupo]) + '</div>' +
-    g.itens.map((it) => {
+    g.items.map((it) => {
       i += 1;
       const ctx = excerpt(it, term);
       return '<button type="button" class="busca-item' + (i === 0 ? ' on' : '') + '" ' +
