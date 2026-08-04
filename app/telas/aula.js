@@ -38,7 +38,7 @@ import { lessonSections as secoesDaAula, sectionMaterials as materiaisDaSecao } 
 import { materialList as listaDeMateriais } from '../materials.js';
 import { sectionDone as secaoConcluida, visitSection as visitarSecao, noteFor as notaDe, saveNote as guardarNota } from '../state.js';
 import { buildAssessment as montarAvaliacao } from '../exercises/index.js';
-import { vazio } from './comum.js';
+import { empty as vazio } from '../screens/common.js';
 import { esc, prose as prosa } from '../text.js';
 
 const SETA = (d) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +

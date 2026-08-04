@@ -19,7 +19,7 @@ import { courseState as estadoDoCurso } from '../graph.js';
 import { courseExam as provaDoCurso } from '../exams.js';
 import { cartaoDeProva } from './prova.js';
 import { materialList as listaDeMateriais } from '../materials.js';
-import { barra, vazio } from './comum.js';
+import { bar as barra, empty as vazio } from '../screens/common.js';
 import { esc, formatted as marcado } from '../text.js';
 
 export default async function curso({ id }) {

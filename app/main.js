@@ -16,11 +16,11 @@ import {
 } from './catalog.js';
 import { subscribe as assinar, now as agora } from './state.js';
 import { buildRail as montarTrilho, toggleLesson as alternarAula } from './rail.js';
-import { trilhaDoAluno, progressoDaTrilha, TRILHAS_POR_FAMILIA } from './telas/comum.js';
+import { studentTrack as trilhaDoAluno, trackProgress as progressoDaTrilha, TRACKS_BY_FAMILY as TRILHAS_POR_FAMILIA } from './screens/common.js';
 import * as api from './api.js';
 import { esc } from './text.js';
 
-import entrar from './telas/entrar.js';
+import entrar from './screens/sign-in.js';
 import painel from './telas/painel.js';
 import telaTrilha from './telas/trilha.js';
 import curso from './telas/curso.js';
@@ -29,9 +29,9 @@ import catalogo from './telas/catalogo.js';
 import certificados from './telas/certificados.js';
 import conta from './telas/conta.js';
 import planoTela from './telas/plano.js';
-import desempenho from './telas/desempenho.js';
-import refazer from './telas/refazer.js';
-import notas from './telas/notas.js';
+import desempenho from './screens/performance.js';
+import refazer from './screens/redo.js';
+import notas from './screens/notes.js';
 import { provaCurso, provaTrilha } from './telas/prova.js';
 import { openSearch as abrirBusca, close as fecharBusca, searchOpen as buscaAberta } from './search-panel.js';
 import { closeModal as fecharModal, modalOpen as modalAberto } from './modal.js';

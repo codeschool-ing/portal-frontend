@@ -29,7 +29,7 @@ import {
   courseById as cursoPorId,
 } from '../catalog.js';
 import { courseDone as cursoConcluido, activeOption as opcaoAtiva, examPassed as provaAprovada, examResult as resultadoProva, now as agora } from '../state.js';
-import { trilhaDoAluno } from './comum.js';
+import { studentTrack as trilhaDoAluno } from '../screens/common.js';
 import { openModal as abrirModal } from '../modal.js';
 import { esc } from '../text.js';
 

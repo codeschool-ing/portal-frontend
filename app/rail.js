@@ -31,7 +31,7 @@ import {
 } from './state.js';
 import { courseExam } from './exams.js';
 import { courseState } from './graph.js';
-import { trilhaDoAluno, barra } from './telas/comum.js';
+import { studentTrack as trilhaDoAluno, bar as barra } from './screens/common.js';
 import { esc } from './text.js';
 
 const LINKS = [

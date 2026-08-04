@@ -11,7 +11,7 @@ import { chooseOption as escolherOpcao, activeOption as opcaoAtiva } from '../st
 import { goTo as irPara } from '../routes.js';
 import { trackExam as provaDaTrilha } from '../exams.js';
 import { cartaoDeProva } from './prova.js';
-import { trilhaDoAluno, progressoDaTrilha, vazio } from './comum.js';
+import { studentTrack as trilhaDoAluno, trackProgress as progressoDaTrilha, empty as vazio } from '../screens/common.js';
 
 let redesenhaT = null;
 

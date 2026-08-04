@@ -1,24 +1,23 @@
 /* ==========================================================================
-   Entrar.
+   Sign in.
 
-   FUTURO: autenticação de verdade. Hoje qualquer nome entra — a tela existe
-   para que o resto do portal possa assumir que existe uma sessão, não para
-   proteger coisa alguma. Está escrito na própria tela, para ninguém confundir
-   esqueleto com segurança.
+   FUTURE: real authentication. Today any name gets in — the screen exists so the
+   rest of the portal can assume a session exists, not to protect anything. It
+   says so on the screen itself, so nobody confuses a skeleton with security.
    ========================================================================== */
 
 import * as api from '../api.js';
-import { goTo as irPara } from '../routes.js';
-import { TRILHAS_POR_FAMILIA } from './comum.js';
+import { goTo } from '../routes.js';
+import { TRACKS_BY_FAMILY } from './common.js';
 import { esc } from '../text.js';
 
-export default async function entrar() {
+export default async function signIn() {
   const el = document.createElement('div');
   el.className = 'tela tela-entrar';
 
-  const opcoes = TRILHAS_POR_FAMILIA().map(([familia, lista]) =>
-    '<optgroup label="' + txt('trilhas por ' + familia) + '">' +
-      lista.map((t) => '<option value="' + esc(t.id) + '">' + esc(t.nome) + '</option>').join('') +
+  const options = TRACKS_BY_FAMILY().map(([family, list]) =>
+    '<optgroup label="' + txt('trilhas por ' + family) + '">' +
+      list.map((t) => '<option value="' + esc(t.id) + '">' + esc(t.nome) + '</option>').join('') +
     '</optgroup>').join('');
 
   el.innerHTML =
@@ -34,7 +33,7 @@ export default async function entrar() {
           '<div class="campo"><label for="e-nome">' + txt('nome') + '</label>' +
             '<input id="e-nome" type="text" required autocomplete="name" placeholder="' + txt('seu nome') + '" /></div>' +
           '<div class="campo"><label for="e-trilha">' + txt('sua trilha') + '</label>' +
-            '<select id="e-trilha">' + opcoes + '</select></div>' +
+            '<select id="e-trilha">' + options + '</select></div>' +
           '<button type="submit" class="btn btn-primary">' + txt('Entrar') + '</button>' +
         '</form>' +
         '<p class="entrar-aviso mono dim">' +
@@ -45,11 +44,11 @@ export default async function entrar() {
 
   el.querySelector('#form-entrar').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const nome = el.querySelector('#e-nome').value.trim();
-    if (!nome) return el.querySelector('#e-nome').focus();
-    await api.signIn({ nome });
+    const name = el.querySelector('#e-nome').value.trim();
+    if (!name) return el.querySelector('#e-nome').focus();
+    await api.signIn({ nome: name });
     await api.enrol(el.querySelector('#e-trilha').value);
-    irPara('/painel');
+    goTo('/painel');
   });
 
   return { titulo: txt('Entrar'), el, depois: () => el.querySelector('#e-nome').focus() };

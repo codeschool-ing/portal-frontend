@@ -11,7 +11,7 @@
 import * as api from '../api.js';
 import { reset as zerar, now as agora, currentPlan as planoAtual, studentAccount as contaDoAluno } from '../state.js';
 import { goTo as irPara } from '../routes.js';
-import { TRILHAS_POR_FAMILIA, trilhaDoAluno, progressoDaTrilha } from './comum.js';
+import { TRACKS_BY_FAMILY as TRILHAS_POR_FAMILIA, studentTrack as trilhaDoAluno, trackProgress as progressoDaTrilha } from '../screens/common.js';
 import { esc } from '../text.js';
 
 /* Regra de e-mail deliberadamente FROUXA: "tem arroba, tem ponto depois dele,

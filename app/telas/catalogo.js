@@ -10,7 +10,7 @@ import {
 } from '../catalog.js';
 import { courseProgress as progressoDoCurso } from '../state.js';
 import { courseState as estadoDoCurso } from '../graph.js';
-import { barra } from './comum.js';
+import { bar as barra } from '../screens/common.js';
 import { esc } from '../text.js';
 
 export default async function catalogo() {
