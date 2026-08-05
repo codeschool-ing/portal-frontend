@@ -61,34 +61,34 @@ function code(seed) {
    `exemplo` changes three things at once — the frame, the seal and the code text
    — and that is deliberate: whoever glances, whoever reads the label and whoever
    goes to check the number all get the same information. */
-function card({ rotulo, nome, meta, quem, quando, chave, exemplo, nota }) {
+function card({ label, name, meta, who, when, key, sample, grade }) {
   /* The whole certificate is a button. There is no "view larger" beside it: the
      target the person wants to click is the document, and a smaller control next
      to it would be a worse target for the same intention. */
-  return '<article class="cert' + (exemplo ? ' cert-exemplo' : '') + '" ' +
-      'tabindex="0" role="button" data-cert="' + esc(chave) + '" ' +
+  return '<article class="cert' + (sample ? ' cert-exemplo' : '') + '" ' +
+      'tabindex="0" role="button" data-cert="' + esc(key) + '" ' +
       'aria-label="' + txt('Ver o certificado em tamanho grande') + '">' +
     '<div class="cert-folha">' +
       '<header class="cert-topo">' +
         '<span class="cert-marca"><span class="cert-led" aria-hidden="true"></span>codeschool<b>.ing</b></span>' +
-        (exemplo
+        (sample
           ? '<span class="cert-selo">' + txt('exemplo') + '</span>'
-          : '<span class="cert-tipo">' + txt(rotulo) + '</span>') +
+          : '<span class="cert-tipo">' + txt(label) + '</span>') +
       '</header>' +
 
       '<div class="cert-miolo">' +
         '<span class="cert-frase">' + txt('certifica que') + '</span>' +
-        '<p class="cert-aluno">' + esc(quem) + '</p>' +
+        '<p class="cert-aluno">' + esc(who) + '</p>' +
         '<span class="cert-frase">' +
-          txt(rotulo === 'trilha concluída' ? 'concluiu a trilha' : 'concluiu o curso') + '</span>' +
-        '<h2 class="cert-curso">' + esc(nome) + '</h2>' +
-        '<p class="cert-meta">' + esc(meta) + (nota ? ' · ' + esc(nota) : '') + '</p>' +
+          txt(label === 'trilha concluída' ? 'concluiu a trilha' : 'concluiu o curso') + '</span>' +
+        '<h2 class="cert-curso">' + esc(name) + '</h2>' +
+        '<p class="cert-meta">' + esc(meta) + (grade ? ' · ' + esc(grade) : '') + '</p>' +
       '</div>' +
 
       '<footer class="cert-pe">' +
-        '<span>' + esc(quando) + '</span>' +
+        '<span>' + esc(when) + '</span>' +
         '<span class="cert-codigo">' +
-          (exemplo ? txt('exemplo — nenhum código foi emitido') : code(chave + quem)) +
+          (sample ? txt('exemplo — nenhum código foi emitido') : code(key + who)) +
         '</span>' +
       '</footer>' +
     '</div>' +
@@ -112,24 +112,24 @@ function card({ rotulo, nome, meta, quem, quando, chave, exemplo, nota }) {
    cannot be the day we find out the format was something else. And the button
    says so, instead of pretending. */
 const LINKEDIN = 'https://www.linkedin.com';
-const validationUrl = (cod) => 'https://codeschool.ing/certificado/' + encodeURIComponent(cod);
+const validationUrl = (c) => 'https://codeschool.ing/certificado/' + encodeURIComponent(c);
 
-function linkedInButtons({ nome, cod, quando }) {
-  const d = new Date(quando);
+function linkedInButtons({ name, code: certCode, when }) {
+  const d = new Date(when);
   const q = (o) => Object.entries(o)
     .filter(([, v]) => v !== undefined && v !== '')
     .map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&');
 
   const profile = LINKEDIN + '/profile/add?' + q({
     startTask: 'CERTIFICATION_NAME',
-    name: nome,
+    name,
     organizationName: 'codeschool.ing',
     issueYear: d.getFullYear(),
     issueMonth: d.getMonth() + 1,
-    certId: cod,
-    certUrl: validationUrl(cod),
+    certId: certCode,
+    certUrl: validationUrl(certCode),
   });
-  const post = LINKEDIN + '/sharing/share-offsite/?' + q({ url: validationUrl(cod) });
+  const post = LINKEDIN + '/sharing/share-offsite/?' + q({ url: validationUrl(certCode) });
 
   /* Icon only. The LinkedIn mark is recognised without a caption, and the label
      took up half the action bar to say what the drawing already says. The text
@@ -167,24 +167,24 @@ export default async function certificates() {
   const issued =
     (trackReady
       ? card({
-        rotulo: 'trilha concluída',
-        nome: t.nome,
+        label: 'trilha concluída',
+        name: t.nome,
         meta: onPath.length + ' ' + txt('cursos') + ' · ' +
           onPath.reduce((s, id) => s + (courseById(id)?.horas || 0), 0) + 'h',
-        quem: who,
-        quando: today,
-        chave: 'trilha.' + t.id,
-        nota: txt('prova da trilha:') + ' ' + examResult('trilha:' + t.id).melhor + '%',
+        who: who,
+        when: today,
+        key: 'trilha.' + t.id,
+        grade: txt('prova da trilha:') + ' ' + examResult('trilha:' + t.id).melhor + '%',
       })
       : '') +
     done.map((c) => card({
-      rotulo: 'curso concluído',
-      nome: c.nome,
+      label: 'curso concluído',
+      name: c.nome,
       meta: c.horas + 'h · ' + txt(c.nivel) + (onPath.includes(c.id) && t ? ' · ' + t.nome : ''),
-      quem: who,
-      quando: today,
-      chave: c.id,
-      nota: txt('prova final:') + ' ' + examResult('curso:' + c.id).melhor + '%',
+      who: who,
+      when: today,
+      key: c.id,
+      grade: txt('prova final:') + ' ' + examResult('curso:' + c.id).melhor + '%',
     })).join('');
 
   /* The examples: one of each kind the student does not have yet. Someone who
@@ -198,25 +198,25 @@ export default async function certificates() {
   const model = courseById(onPath[0]) || CURSOS[0];
   const examples =
     (done.length ? '' : card({
-      rotulo: 'curso concluído',
-      nome: model.nome,
+      label: 'curso concluído',
+      name: model.nome,
       meta: model.horas + 'h · ' + txt(model.nivel) + (t ? ' · ' + t.nome : ''),
-      quem: who,
-      quando: today,
-      chave: 'exemplo.curso',
-      exemplo: true,
-      nota: txt('prova final:') + ' 90%',
+      who: who,
+      when: today,
+      key: 'exemplo.curso',
+      sample: true,
+      grade: txt('prova final:') + ' 90%',
     })) +
     (trackReady ? '' : card({
-      rotulo: 'trilha concluída',
-      nome: t ? t.nome : TRILHAS[0].nome,
+      label: 'trilha concluída',
+      name: t ? t.nome : TRILHAS[0].nome,
       meta: (onPath.length || 10) + ' ' + txt('cursos') + ' · ' +
         (onPath.reduce((s, id) => s + (courseById(id)?.horas || 0), 0) || 380) + 'h',
-      quem: who,
-      quando: today,
-      chave: 'exemplo.trilha',
-      exemplo: true,
-      nota: txt('prova da trilha:') + ' 84%',
+      who: who,
+      when: today,
+      key: 'exemplo.trilha',
+      sample: true,
+      grade: txt('prova da trilha:') + ' 84%',
     }));
 
   el.innerHTML =
@@ -263,13 +263,13 @@ export default async function certificates() {
        the only one of the three that does not lie. */
     openModal(art.outerHTML, {
       classe: 'modal-cert',
-      rotulo: txt('Certificado') + ' — ' + certName,
+      label: txt('Certificado') + ' — ' + certName,
       acoes: isExample
         ? '<span class="cert-in cert-in-off" aria-disabled="true" ' +
             'title="' + txt('exemplo — não há certificado para adicionar') + '" ' +
             'aria-label="' + txt('exemplo — não há certificado para adicionar') + '">' +
             ICON_LINKEDIN + '</span>'
-        : linkedInButtons({ nome: certName, cod: code(key + who), quando: new Date().toISOString() }),
+        : linkedInButtons({ name: certName, code: code(key + who), when: new Date().toISOString() }),
     });
   };
 

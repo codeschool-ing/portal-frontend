@@ -18,7 +18,7 @@
    STATUS: sample content, no pedagogical review, marked `structure`.
    ========================================================================== */
 
-window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
+window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
 
   /* ============================================================== lesson 04 */
   {

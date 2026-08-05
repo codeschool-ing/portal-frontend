@@ -12,50 +12,50 @@
    decision and requires a server: with the state in localStorage, any lock would
    be theatre — you would only have to edit a key. Better not to pretend.
 
-   `inclui` is a list of KEYS, not of sentences: they are what the server will
+   `includes` is a list of KEYS, not of sentences: they are what the server will
    authorise by, and the sentence the student reads comes from `FEATURES`. Two
    lists of text diverge the day one of them changes.
    ========================================================================== */
 
 window.FEATURES = {
-  catalogo: 'Catálogo inteiro: 86 cursos e 16 trilhas',
-  trilha: 'Trilha guiada com mapa de progresso',
-  exercicios: 'Exercícios e avaliações de todas as aulas',
-  provas: 'Provas finais de curso e de trilha',
-  certificado: 'Certificado de curso e de trilha',
+  catalogue: 'Catálogo inteiro: 86 cursos e 16 trilhas',
+  track: 'Trilha guiada com mapa de progresso',
+  exercises: 'Exercícios e avaliações de todas as aulas',
+  exams: 'Provas finais de curso e de trilha',
+  certificate: 'Certificado de curso e de trilha',
   material: 'Material complementar para baixar',
   offline: 'Aulas para assistir sem conexão',
-  mentoria: 'Mentoria em grupo, toda semana',
+  mentoring: 'Mentoria em grupo, toda semana',
   forum: 'Fórum com resposta de instrutor',
-  relatorios: 'Relatórios de turma e exportação',
-  faturamento: 'Nota fiscal e faturamento por CNPJ',
+  reports: 'Relatórios de turma e exportação',
+  invoicing: 'Nota fiscal e faturamento por CNPJ',
 };
 
 window.PLANS = [
   {
     id: 'estudante',
-    nome: 'Estudante',
-    resumo: 'Para experimentar a escola inteira antes de decidir.',
-    preco: 0,
-    ciclo: 'para sempre',
-    inclui: ['catalogo', 'trilha', 'exercicios'],
+    name: 'Estudante',
+    summary: 'Para experimentar a escola inteira antes de decidir.',
+    price: 0,
+    cycle: 'para sempre',
+    includes: ['catalogue', 'track', 'exercises'],
   },
   {
     id: 'pro',
-    nome: 'Pro',
-    resumo: 'O plano de quem está estudando para trabalhar com isto.',
-    preco: 49,
-    ciclo: 'por mês',
-    destaque: true,
-    inclui: ['catalogo', 'trilha', 'exercicios', 'provas', 'certificado', 'material', 'offline', 'forum'],
+    name: 'Pro',
+    summary: 'O plano de quem está estudando para trabalhar com isto.',
+    price: 49,
+    cycle: 'por mês',
+    highlight: true,
+    includes: ['catalogue', 'track', 'exercises', 'exams', 'certificate', 'material', 'offline', 'forum'],
   },
   {
     id: 'equipe',
-    nome: 'Equipe',
-    resumo: 'Para times e escolas, com acompanhamento de turma.',
-    preco: 39,
-    ciclo: 'por aluno/mês',
-    inclui: ['catalogo', 'trilha', 'exercicios', 'provas', 'certificado', 'material', 'offline',
-      'forum', 'mentoria', 'relatorios', 'faturamento'],
+    name: 'Equipe',
+    summary: 'Para times e escolas, com acompanhamento de turma.',
+    price: 39,
+    cycle: 'por aluno/mês',
+    includes: ['catalogue', 'track', 'exercises', 'exams', 'certificate', 'material', 'offline',
+      'forum', 'mentoring', 'reports', 'invoicing'],
   },
 ];

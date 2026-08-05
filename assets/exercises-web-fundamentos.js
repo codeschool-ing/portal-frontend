@@ -1,7 +1,7 @@
 /* ==========================================================================
    `web-fundamentos` exercises — one file per course, as the pipeline does.
 
-   The pipeline emits `exercicios-<course>.json`. Here the extension is `.js`
+   The pipeline emits `exercises-<course>.json`. Here the extension is `.js`
    because the portal has no server yet to fetch JSON from (and a `fetch` from
    `file://` is blocked, which would break the single-file bundle), but the
    content of each object is exactly what the tool produces.
@@ -25,7 +25,7 @@
    them.
    ========================================================================== */
 
-window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
+window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
 
   /* ============================================================== lesson 01 */
   {

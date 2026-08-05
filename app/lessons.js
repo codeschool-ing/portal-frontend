@@ -42,7 +42,7 @@ import {
 const STRENGTH = { structure: 0, execution: 1, critiqued: 2 };
 
 export function lessonExercises(courseId, key, { minimum = 'structure' } = {}) {
-  return (window.EXERCICIOS_EXEMPLO || []).filter(
+  return (window.SAMPLE_EXERCISES || []).filter(
     (e) => e.course === courseId
       && e.topic === key
       && STRENGTH[e._verification ?? 'structure'] >= STRENGTH[minimum],
@@ -61,7 +61,7 @@ export function lessonSections(courseId, key) {
     id: 'avaliacao',
     titulo: 'Avaliação',
     tipo: 'avaliacao',
-    quantos: exercises.length,
+    count: exercises.length,
     pending: exercises.length === 0,
     countsTowardsProgress: exercises.length > 0,
   });

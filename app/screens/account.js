@@ -72,8 +72,8 @@ export default async function account() {
         '<a class="bloco-link" href="#/plano">' + txt('ver detalhes do plano') + ' →</a>' +
       '</div>' +
       '<p class="conta-nota">' +
-        '<strong>' + esc(plan ? plan.nome : '—') + '</strong> · ' +
-        (plan && plan.preco === 0 ? txt('grátis') : 'R$ ' + (plan?.preco ?? 0) + ' ' + txt(plan?.ciclo || '')) +
+        '<strong>' + esc(plan ? plan.name : '—') + '</strong> · ' +
+        (plan && plan.price === 0 ? txt('grátis') : 'R$ ' + (plan?.price ?? 0) + ' ' + txt(plan?.cycle || '')) +
       '</p>' +
     '</section>' +
 
