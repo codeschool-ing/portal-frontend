@@ -824,8 +824,36 @@ body.sem-trilho .trilho{display:none}
 
 /* ---------- code and expected output ---------- */
 .cod-bloco{border:1px solid var(--wire);border-radius:5px;overflow:hidden;background:var(--panel)}
-.cod-barra{padding:6px 11px;border-bottom:1px solid var(--wire);background:var(--ink)}
+/* The bar became a row: the language on the left, the copy button on the right.
+   It is `min-height` and not a fixed height because the language may be absent —
+   the bar still has to hold the button at the same size either way. */
+.cod-barra{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:3px 5px 3px 11px;min-height:28px;
+  border-bottom:1px solid var(--wire);background:var(--ink);
+}
 .cod-ling{font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
+
+/* THE COPY BUTTON IS QUIET UNTIL IT IS WANTED. It sits at ~55% opacity and
+   comes up to full on hover or focus anywhere in the block — present enough to
+   be found, faint enough not to compete with the first line of code, which is
+   what the eye goes to. It never hides completely: a control that appears only
+   on hover does not exist on a touch screen, and the phone is where copying a
+   snippet is most annoying to do by hand. */
+.cod-copiar{
+  flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;
+  background:none;border:0;border-radius:4px;padding:0;cursor:pointer;
+  color:var(--paper-dim);opacity:.55;
+  transition:opacity .15s,color .15s,background .15s;
+}
+.cod-copiar svg{width:15px;height:15px}
+.cod-bloco:hover .cod-copiar,.exemplo:hover .cod-copiar,.cod-copiar:focus-visible{opacity:1}
+.cod-copiar:hover{color:var(--phosphor);background:var(--panel)}
+.cod-copiar:focus-visible{outline:2px solid var(--phosphor);outline-offset:1px}
+/* Copied is the brand's green; failed is the amber the portal already uses for
+   "this did not go well". Both hold for a moment and then let go — see copy.js */
+.cod-copiar.copiado{opacity:1;color:var(--phosphor)}
+.cod-copiar.falhou{opacity:1;color:var(--amber)}
 .cod{
   padding:12px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;font-size:.82rem;line-height:1.55;
   scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
@@ -1214,8 +1242,16 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
    pointing at anything. The `<pre>` does NOT take start: it stretches to the end
    of the grid row, and it is that stretching that seams the background. */
 .exemplo{margin:24px 0}
-.exemplo-barra{display:flex;justify-content:flex-end;margin-bottom:5px}
+/* The file name was alone on the right; now the copy button joins it. They stay
+   together at the right end, over the code column, because that is the column
+   the button acts on — put it at the far left and it would sit over the notes,
+   which are not what gets copied. */
+.exemplo-barra{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:5px}
 .exemplo-arq{font-size:.64rem;letter-spacing:.06em}
+/* In the example the bar is outside the block's frame, so the button gives back
+   the 5px the `.cod-barra` padding provides there — otherwise it would hang
+   past the right edge of the code column. */
+.exemplo-barra .cod-copiar{margin-right:-4px}
 
 /* ONE COLUMN IS THE DEFAULT, and two are the exception.
 

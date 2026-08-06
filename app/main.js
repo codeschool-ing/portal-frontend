@@ -36,6 +36,7 @@ import notes from './screens/notes.js';
 import { courseExamScreen, trackExamScreen } from './screens/exam.js';
 import { openSearch, close as closeSearch, searchOpen } from './search-panel.js';
 import { closeModal, modalOpen } from './modal.js';
+import { wireCopy } from './copy.js';
 
 /* ---------- what the i18n runtime needs from us ---------- */
 globalThis.isChoice = isChoice;                  // used by applyContent()
@@ -267,6 +268,9 @@ function routeParams() {
   const m = currentPath().match(/^\/curso\/([^/]+)/);
   return m ? { id: decodeURIComponent(m[1]) } : null;
 }
+
+/* One listener for every code block on every screen — see copy.js. */
+wireCopy();
 
 /* ---------- i18n: the vitrine's sequence, in the same order ---------- */
 savePtBase();     // stores the Portuguese of CURSOS/TRILHAS/DEPOIMENTOS
