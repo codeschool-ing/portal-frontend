@@ -495,6 +495,10 @@ await p.waitForSelector('.note summary');
 // the note is born collapsed: it only asks for attention from whoever will use it
 ok('the note starts collapsed', (await p.locator('.note-field:visible').count()) === 0);
 await p.click('.note summary');
+/* The note is written in Portuguese ON PURPOSE, and it is the only fixture that
+   is: it is a STUDENT's text, and it carries an accent the search is then asked
+   to find without one, two blocks below. The portal is English; what a student
+   types is not, and folding has to work on what they typed. */
 await p.fill('.note-field', 'lembrar: VPS é responsabilidade, não potência');
 await p.waitForTimeout(800);
 ok('the note saves itself', (await p.locator('.note-status').innerText()).length > 0);
@@ -992,7 +996,8 @@ ok('the certificate opens in a modal', await p.locator('.modal-cert .cert-sheet'
 /* THE DIALOG HAS TO HAVE AN ACCESSIBLE NAME. `role="dialog"` with no name is
    announced as just "dialog", and the person cannot tell what opened. This is
    checked because it broke once and nothing noticed: a rename left the caller
-   passing `label` while openModal still destructured `rotulo`, so the attribute
+   passing `label` while openModal still destructured the old Portuguese name,
+   so the attribute
    silently stopped being set. Every screen looked right — the only symptom was
    on a screen reader. */
 ok('and the dialog is named', /Certificate/.test(await p.locator('.modal-cert').getAttribute('aria-label') || ''),
@@ -1116,7 +1121,7 @@ await p.fill('#c-email', 'nao-e-email');
 await p.click('#f-email button[type=submit]');
 await p.waitForTimeout(150);
 ok('an implausible e-mail is refused', (await p.locator('#a-email').getAttribute('class')).includes('bad'));
-await p.fill('#c-email', 'aluno@codeschool.ing');
+await p.fill('#c-email', 'student@codeschool.ing');
 await p.click('#f-email button[type=submit]');
 await p.waitForTimeout(150);
 ok('a plausible e-mail is accepted', (await p.locator('#a-email').getAttribute('class')).includes('good'));
@@ -1124,18 +1129,18 @@ ok('a plausible e-mail is accepted', (await p.locator('#a-email').getAttribute('
 /* The new password must NOT be stored anywhere: there is no authentication, and
    storing it would give the opposite impression. The test looks for the string
    across the whole storage. */
-await p.fill('#c-password-current', 'antiga123');
-await p.fill('#c-password-new', 'correta-cavalo-bateria-grampo');
-await p.fill('#c-password-repeat', 'outra-coisa');
+await p.fill('#c-password-current', 'old-one-123');
+await p.fill('#c-password-new', 'correct-horse-battery-staple');
+await p.fill('#c-password-repeat', 'something-else');
 await p.click('#f-password button[type=submit]');
 await p.waitForTimeout(150);
 ok('passwords that do not match are refused', (await p.locator('#a-password').getAttribute('class')).includes('bad'));
-await p.fill('#c-password-repeat', 'correta-cavalo-bateria-grampo');
+await p.fill('#c-password-repeat', 'correct-horse-battery-staple');
 await p.click('#f-password button[type=submit]');
 await p.waitForTimeout(150);
 ok('password changed', (await p.locator('#a-password').getAttribute('class')).includes('good'));
 ok('the password was not stored anywhere',
-  !(await p.evaluate(() => JSON.stringify(localStorage).includes('correta-cavalo'))));
+  !(await p.evaluate(() => JSON.stringify(localStorage).includes('correct-horse'))));
 
 console.log('\n== 19. the catalogue fits on screen ==');
 await p.goto(BASE + PAGE + '#/catalog');
@@ -1318,7 +1323,7 @@ await p3.waitForFunction(() => location.hash === '#/dashboard');
 await p3.goto(BASE + PAGE + '#/course/javascript/lesson/0/let-const');
 await p3.waitForSelector('.lesson-text p');
 
-const SENTINEL = 'SENTINEL-do-teste';
+const SENTINEL = 'SENTINEL-for-the-test';
 await p3.evaluate((v) => navigator.clipboard.writeText(v), SENTINEL);
 await p3.evaluate(() => {
   const el = document.querySelector('.lesson-text p');
@@ -1342,17 +1347,17 @@ ok('but the code button still does', throughButton !== SENTINEL && throughButton
    here was considered and left out — it breaks password managers and stops
    someone pasting work they wrote in their own editor. */
 await p3.locator('.note summary').first().click();
-await p3.locator('.note-field').first().fill('minha anotação');
+await p3.locator('.note-field').first().fill('a note of my own');
 ok('what the student writes stays selectable',
   (await p3.evaluate(() => getComputedStyle(document.querySelector('.note-field')).userSelect)) === 'text');
 await p3.locator('.note-field').first().selectText();
 await p3.keyboard.press('Control+c');
 await p3.waitForTimeout(200);
-ok('and copyable', (await p3.evaluate(() => navigator.clipboard.readText())) === 'minha anotação');
+ok('and copyable', (await p3.evaluate(() => navigator.clipboard.readText())) === 'a note of my own');
 await p3.locator('.note-field').first().fill('');
 await p3.keyboard.press('Control+v');
 await p3.waitForTimeout(200);
-ok('and pasteable', (await p3.locator('.note-field').first().inputValue()) === 'minha anotação');
+ok('and pasteable', (await p3.locator('.note-field').first().inputValue()) === 'a note of my own');
 await b3.close();
 
 console.log(failures ? `\n${failures} FAILURE(S)` : '\neverything passed');
