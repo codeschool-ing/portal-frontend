@@ -107,7 +107,7 @@ function card({ label, name, meta, who, when, key, sample, grade }) {
    credential, not a post that vanishes from the feed in two days.
 
    The `certUrl` points at a validation page that DOES NOT EXIST YET — it is born
-   with the server, in Etapa 2. The URL is built in its final format on purpose:
+   with the server, in Stage 2. The URL is built in its final format on purpose:
    it is the shape that has to be right now, because the day the server exists
    cannot be the day we find out the format was something else. And the button
    says so, instead of pretending. */
@@ -262,9 +262,9 @@ export default async function certificates() {
        working would publish a credential nobody earned. Disabled with a reason is
        the only one of the three that does not lie. */
     openModal(art.outerHTML, {
-      classe: 'modal-cert',
+      className: 'modal-cert',
       label: txt('Certificado') + ' — ' + certName,
-      acoes: isExample
+      actions: isExample
         ? '<span class="cert-in cert-in-off" aria-disabled="true" ' +
             'title="' + txt('exemplo — não há certificado para adicionar') + '" ' +
             'aria-label="' + txt('exemplo — não há certificado para adicionar') + '">' +

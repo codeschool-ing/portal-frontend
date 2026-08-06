@@ -1,7 +1,7 @@
 /* ==========================================================================
    Student state.
 
-   Today it lives in localStorage; in Etapa 2 it lives on the server. That is
+   Today it lives in localStorage; in Stage 2 it lives on the server. That is
    why nobody outside this module reads `localStorage` directly — whoever needs
    data calls `api.js`, which calls in here. Swapping the persistence is
    swapping one file.
@@ -281,7 +281,7 @@ export function changeEmail(email) {
    writing the password to localStorage would be worse than having no screen at
    all: it would give the impression that authentication exists. What stays is
    the DATE of the change — which is what the student needs to see, and what the
-   server will confirm in Etapa 2. */
+   server will confirm in Stage 2. */
 export function markPasswordChange() {
   change(() => {
     state.conta = { ...(state.conta || {}), senhaEm: new Date().toISOString() };

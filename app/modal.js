@@ -34,18 +34,18 @@ export function closeModal() {
 /* `content` is HTML already escaped by the caller — this module does not know
    what it is showing, and should not know. `actions` is what appears ABOVE the
    box, on the right: on a certificate, the sharing buttons. */
-export function openModal(content, { classe = '', acoes = '', rotulo = '' } = {}) {
+export function openModal(content, { className = '', actions = '', label = '' } = {}) {
   closeModal();
 
   const el = document.createElement('div');
-  el.className = 'modal' + (classe ? ' ' + classe : '');
+  el.className = 'modal' + (className ? ' ' + className : '');
   el.setAttribute('role', 'dialog');
   el.setAttribute('aria-modal', 'true');
-  if (rotulo) el.setAttribute('aria-label', rotulo);
+  if (label) el.setAttribute('aria-label', label);
   el.innerHTML =
     '<div class="modal-pilha">' +
       '<div class="modal-acoes">' +
-        acoes +
+        actions +
         '<button type="button" class="modal-fechar" aria-label="' + txt('Fechar') + '">✕</button>' +
       '</div>' +
       '<div class="modal-caixa">' + content + '</div>' +

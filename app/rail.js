@@ -61,7 +61,7 @@ const ICON_TROPHY = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" 
 
 /* Which lessons are open, per course. It lives in memory: it is a navigation
    preference of the moment, not progress — it does not deserve storage, nor a
-   trip to the server in Etapa 2. */
+   trip to the server in Stage 2. */
 const opened = {};
 const openKey = (courseId, ix) => courseId + ':' + ix;
 export const toggleLesson = (courseId, ix) => {

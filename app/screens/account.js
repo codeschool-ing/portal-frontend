@@ -17,7 +17,7 @@ import { esc } from '../text.js';
 /* The e-mail rule is deliberately LOOSE: "there is an at sign, a dot after it,
    and no spaces". Strict client-side e-mail validation rejects valid addresses
    (`+`, new domains, accents) and prevents nothing — what confirms the address
-   exists is the message sent to it, in Etapa 2. */
+   exists is the message sent to it, in Stage 2. */
 const plausibleEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || '').trim());
 
 /* Password strength by BANDS, not by prohibitive rules. A long passphrase is

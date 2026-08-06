@@ -897,6 +897,14 @@ ok('the example does not invent a code', !/CS-/.test(await p.locator('.cert-exem
 await p.locator('.cert').first().click();
 await p.waitForSelector('.modal-cert');
 ok('the certificate opens in a modal', await p.locator('.modal-cert .cert-folha').isVisible());
+/* THE DIALOG HAS TO HAVE AN ACCESSIBLE NAME. `role="dialog"` with no name is
+   announced as just "dialog", and the person cannot tell what opened. This is
+   checked because it broke once and nothing noticed: a rename left the caller
+   passing `label` while openModal still destructured `rotulo`, so the attribute
+   silently stopped being set. Every screen looked right — the only symptom was
+   on a screen reader. */
+ok('and the dialog is named', /Certificado/.test(await p.locator('.modal-cert').getAttribute('aria-label') || ''),
+  await p.locator('.modal-cert').getAttribute('aria-label'));
 ok('and it grows on screen', await p.evaluate(() => {
   const inside = document.querySelector('.modal-cert .cert-aluno').getBoundingClientRect().height;
   const outside = document.querySelector('.tela-certificados .cert-aluno').getBoundingClientRect().height;
