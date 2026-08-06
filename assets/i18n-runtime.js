@@ -134,7 +134,7 @@ function missingTranslations() {
    language now and Portuguese is the fifth translation, in
    assets/i18n-courses-pt.js. The mechanism did not change — only the language
    the fallback lands on. */
-const BASE = { courses: {}, tracks: {}, lessons: {}, exercises: {} };
+const BASE = { courses: {}, tracks: {}, lessons: {}, exercises: {}, plans: {}, features: {} };
 
 /* The lesson sections and the exercises join the same mechanism. They were
    authored in Portuguese and are English at the source now, so their
@@ -145,6 +145,7 @@ const BASE = { courses: {}, tracks: {}, lessons: {}, exercises: {} };
    translated `correct` flag or expected output is a translation quietly
    marking right answers wrong. */
 const LESSON_FIELDS = ['title', 'body'];
+const PLAN_FIELDS = ['name', 'summary', 'cycle'];
 const EXERCISE_FIELDS = ['prompt', 'socraticHint', 'instruction', 'note', 'referenceExpression'];
 
 function eachSection(fn) {
@@ -178,6 +179,12 @@ function saveBase() {
     BASE.lessons[course][topic] = BASE.lessons[course][topic] || {};
     BASE.lessons[course][topic][section.id] = kept;
   });
+  (window.PLANS || []).forEach((plan) => {
+    const kept = {};
+    PLAN_FIELDS.forEach((f) => { if (typeof plan[f] === 'string') kept[f] = plan[f]; });
+    BASE.plans[plan.id] = kept;
+  });
+  Object.entries(window.FEATURES || {}).forEach(([k, v]) => { BASE.features[k] = v; });
   (window.SAMPLE_EXERCISES || []).forEach((ex) => {
     const kept = {};
     EXERCISE_FIELDS.forEach((f) => { if (typeof ex[f] === 'string') kept[f] = ex[f]; });
@@ -204,6 +211,18 @@ function applyContent() {
   });
 
   const dl = dic.lessons || {}, de = dic.exercises || {};
+  const dp = dic.plans || {}, df = dic.features || {};
+
+  /* The plans and the feature sentences: `includes` is a list of KEYS and is
+     never touched — it is what a server will authorise by. */
+  (window.PLANS || []).forEach((plan) => {
+    const base = BASE.plans[plan.id] || {}, tr = dp[plan.id] || {};
+    PLAN_FIELDS.forEach((f) => {
+      if (base[f] === undefined) return;
+      plan[f] = tr[f] !== undefined ? tr[f] : base[f];
+    });
+  });
+  Object.keys(BASE.features).forEach((k) => { window.FEATURES[k] = df[k] || BASE.features[k]; });
   eachSection((section, course, topic) => {
     const base = BASE.lessons[course][topic][section.id];
     const tr = ((dl[course] || {})[topic] || {})[section.id] || {};
