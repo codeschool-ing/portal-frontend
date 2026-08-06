@@ -88,18 +88,26 @@ export function prose(body) {
       if (block.example) return annotatedExample(block.example);
       if (block.image || block.svg) return figure(block);
       if (block.text !== undefined) {
-        // `esc` and not `formatted`: inside a code block a backtick is a
-        // backtick and an asterisk is an asterisk — marking them up would eat
-        // the code itself
-        /* The bar now renders even with no language to show: it carries the
-           copy button, and a block you cannot copy because its author left the
-           label out would be an odd thing to explain. */
+        /* NOT `formatted`: inside a code block a backtick is a backtick and an
+           asterisk is an asterisk — marking them up would eat the code itself.
+
+           It goes through `highlight()` for the same reason the `example` block
+           does, and it did not before. The effect of that was one course being
+           coloured and another not: JavaScript is taught in `example` blocks,
+           which were highlighted, while HTML and CSS are taught in these, which
+           were not — thirty snippets in one grey. `highlight()` escapes what it
+           returns, and falls back to plain escaped text for a language it does
+           not know, so a block with no label is exactly what it was.
+
+           The bar renders even with no language to show: it carries the copy
+           button, and a block you cannot copy because its author left the label
+           out would be an odd thing to explain. */
         return '<div class="code-block prose-code">' +
           '<div class="code-bar">' +
             '<span class="code-lang">' + esc(block.code || '') + '</span>' +
             copyButton() +
           '</div>' +
-          '<pre class="code"><code>' + esc(block.text) + '</code></pre>' +
+          '<pre class="code"><code>' + highlight(block.text, block.code) + '</code></pre>' +
         '</div>';
       }
     }
@@ -253,8 +261,13 @@ const RULES = {
   ],
   html: [
     ['com', /<!--[\s\S]*?-->/],
+    /* `<!DOCTYPE` is in the tag alternative rather than a rule of its own,
+       because a second rule would need a second group named `kw` and duplicate
+       named groups are not portable. Without it the first line of every HTML
+       lesson was the one uncoloured thing on the screen: `<!\w` does not match
+       `</?[\w-]`, so only the closing `>` was picked up. */
     ['str', /"(?:[^"\n])*"|'(?:[^'\n])*'/],
-    ['kw', /<\/?[\w-]+|\/?>/],
+    ['kw', /<!\s*[\w-]+|<\/?[\w-]+|\/?>/],
     ['prop', /\b[\w-]+(?==)/],
   ],
 };

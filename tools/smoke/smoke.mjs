@@ -373,10 +373,24 @@ ok('a code block inside prose', block.includes('display: flex'), JSON.stringify(
 ok('with a language label', (await p.locator('.prose-code .code-lang').first().innerText()).toLowerCase() === 'css');
 /* The block does NOT go through `formatted`: a backtick or an asterisk inside
    code is a character, not markup. A badly escaped `<` would swallow the whole
-   line. */
-// the inner <code> must contain NO TAGS AT ALL: escaped text only
+   line.
+
+   This used to assert the inner <code> held no tags at all, which was a proxy
+   for "escaped" and stopped being true when the block started going through
+   `highlight()`. The invariant it was standing in for is checked directly
+   instead, and it is the stronger of the two: whatever the highlighter wraps,
+   the characters that come back out have to be the characters the author
+   typed, and the only tags allowed are its own. */
 const blockHtml = await p.locator('.prose-code .code code').first().innerHTML();
-ok('code is escaped, with no markup applied', !/<[a-z]/i.test(blockHtml));
+ok('the only markup inside the code is the highlighter\'s',
+  [...blockHtml.matchAll(/<(\/?)([a-z][\w-]*)([^>]*)>/gi)]
+    .every(([, close, tag, attrs]) => tag === 'span' && (close ? !attrs.trim() : /^ class="t-\w+"$/.test(attrs))),
+  (blockHtml.match(/<(?!\/?span)[a-z][\w-]*/gi) || []).join(' ') || 'only spans');
+ok('and the text survives the highlighting unchanged', await p.evaluate(() => {
+  const el = document.querySelector('.prose-code .code code');
+  // The authored snippet, as the copy button reads it back.
+  return el.textContent.includes('display: flex') && !el.textContent.includes('<span');
+}));
 
 await p.goto(BASE + PAGE + '#/course/html-css/lesson/0/skeleton');
 await p.waitForSelector('.prose-code');
