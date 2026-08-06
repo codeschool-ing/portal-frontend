@@ -166,7 +166,7 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
     queue.push(n.id);
   });
   if (stuck.length && window.console) {
-    console.warn('track "' + t.name + '": dependência circular em ' + stuck.map((n) => n.id).join(', '));
+    console.warn('track "' + t.name + '": circular dependency at ' + stuck.map((n) => n.id).join(', '));
   }
 
   // group by level, leaving no gap in the sequence of columns

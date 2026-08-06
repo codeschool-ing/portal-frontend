@@ -134,7 +134,26 @@ function missingTranslations() {
    language now and Portuguese is the fifth translation, in
    assets/i18n-courses-pt.js. The mechanism did not change — only the language
    the fallback lands on. */
-const BASE = { courses: {}, tracks: {} };
+const BASE = { courses: {}, tracks: {}, lessons: {}, exercises: {} };
+
+/* The lesson sections and the exercises join the same mechanism. They were
+   authored in Portuguese and are English at the source now, so their
+   Portuguese is a dictionary — assets/lessons-pt.js and
+   assets/exercises-pt.js — read exactly like the catalogue's.
+
+   Only what a student READS is translated. The grading fields stay put: a
+   translated `correct` flag or expected output is a translation quietly
+   marking right answers wrong. */
+const LESSON_FIELDS = ['title', 'body'];
+const EXERCISE_FIELDS = ['prompt', 'socraticHint', 'instruction', 'note', 'referenceExpression'];
+
+function eachSection(fn) {
+  Object.entries(window.LESSONS || {}).forEach(([course, topics]) => {
+    Object.entries(topics).forEach(([topic, sections]) => {
+      sections.forEach((section) => fn(section, course, topic));
+    });
+  });
+}
 
 function saveBase() {
   COURSES.forEach((c) => {
@@ -152,6 +171,23 @@ function saveBase() {
     });
     BASE.tracks[tr.id] = { name: tr.name, goal: tr.goal, outcome: tr.outcome, steps };
   });
+  eachSection((section, course, topic) => {
+    const kept = {};
+    LESSON_FIELDS.forEach((f) => { if (section[f] !== undefined) kept[f] = section[f]; });
+    BASE.lessons[course] = BASE.lessons[course] || {};
+    BASE.lessons[course][topic] = BASE.lessons[course][topic] || {};
+    BASE.lessons[course][topic][section.id] = kept;
+  });
+  (window.SAMPLE_EXERCISES || []).forEach((ex) => {
+    const kept = {};
+    EXERCISE_FIELDS.forEach((f) => { if (typeof ex[f] === 'string') kept[f] = ex[f]; });
+    if (ex.choices) kept.choices = ex.choices.map((c) => ({ text: c.text, why: c.why }));
+    if (ex.pairs) kept.pairs = ex.pairs.map((pr) => ({ left: pr.left, right: pr.right }));
+    if (ex.rightDistractors) kept.rightDistractors = ex.rightDistractors.slice();
+    if (ex.items) kept.items = ex.items.slice();
+    if (ex.tests) kept.tests = ex.tests.map((t) => ({ description: t.description }));
+    BASE.exercises[ex.id] = kept;
+  });
 }
 
 function applyContent() {
@@ -165,6 +201,45 @@ function applyContent() {
     c.syllabus = tr.syllabus || base.syllabus;
     c.topics = tr.topics || base.topics;
     c.prerequisites = tr.prerequisites !== undefined ? tr.prerequisites : base.prerequisites;
+  });
+
+  const dl = dic.lessons || {}, de = dic.exercises || {};
+  eachSection((section, course, topic) => {
+    const base = BASE.lessons[course][topic][section.id];
+    const tr = ((dl[course] || {})[topic] || {})[section.id] || {};
+    LESSON_FIELDS.forEach((f) => {
+      if (base[f] === undefined) return;
+      section[f] = tr[f] !== undefined ? tr[f] : base[f];
+    });
+  });
+
+  (window.SAMPLE_EXERCISES || []).forEach((ex) => {
+    const base = BASE.exercises[ex.id] || {}, tr = de[ex.id] || {};
+    EXERCISE_FIELDS.forEach((f) => {
+      if (base[f] === undefined) return;
+      ex[f] = tr[f] !== undefined ? tr[f] : base[f];
+    });
+    /* The option order is the authored one and the grading reads `correct` by
+       position, so a translation supplies text and nothing else. */
+    if (base.choices) {
+      ex.choices.forEach((c, i) => {
+        c.text = (tr.choices && tr.choices[i] && tr.choices[i].text) || base.choices[i].text;
+        c.why = (tr.choices && tr.choices[i] && tr.choices[i].why) || base.choices[i].why;
+      });
+    }
+    if (base.pairs) {
+      ex.pairs.forEach((pr, i) => {
+        pr.left = (tr.pairs && tr.pairs[i] && tr.pairs[i].left) || base.pairs[i].left;
+        pr.right = (tr.pairs && tr.pairs[i] && tr.pairs[i].right) || base.pairs[i].right;
+      });
+    }
+    if (base.rightDistractors) ex.rightDistractors = tr.rightDistractors || base.rightDistractors;
+    if (base.items) ex.items = tr.items || base.items;
+    if (base.tests) {
+      ex.tests.forEach((t, i) => {
+        t.description = (tr.tests && tr.tests[i] && tr.tests[i].description) || base.tests[i].description;
+      });
+    }
   });
 
   TRACKS.forEach((track) => {

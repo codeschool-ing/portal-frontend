@@ -1,7 +1,7 @@
 /* ==========================================================================
    My track — the vitrine's graph turned into a progress map.
 
-   `depois` exists because the edges are drawn over the REAL positions of the
+   `after` exists because the edges are drawn over the REAL positions of the
    cards: measuring outside the document returns zero for everything. And the
    redraw on resize is the vitrine's same care, for the same reason.
    ========================================================================== */
@@ -77,7 +77,7 @@ export default async function track() {
     if (!node) return;
     const id = node.dataset.node;
     el.querySelectorAll('.edge').forEach((a) => {
-      a.classList.toggle('on', a.dataset.de === id || a.dataset.para === id);
+      a.classList.toggle('on', a.dataset.from === id || a.dataset.to === id);
     });
   });
   el.addEventListener('mouseout', (e) => {

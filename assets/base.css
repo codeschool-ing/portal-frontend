@@ -237,7 +237,7 @@ html[data-theme="light"] .lang-op.on{background:rgba(43,82,201,.09)}
 /* ---------- TRACKS ---------- */
 /* the picker grows with every new track: one line with arrows at the ends,
    instead of wrapping and leaving an orphan tab on a second line */
-/* Family switcher: "por carreira" and "por tecnologia" are different questions
+/* Family switcher: "by career" and "by technology" are different questions
    (which profession do I want / which tool do I want to master), and the 14 tabs
    would not fit in a single row. It sits above the picker, discreetly. */
 /* Two rows of tabs, one per family, each with its own label and arrows. Since
@@ -246,8 +246,8 @@ html[data-theme="light"] .lang-op.on{background:rgba(43,82,201,.09)}
 .tabs-box{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex:0 0 auto}
 /* the last row opens the same breathing room the top of the track leaves for the
    graph: the name+objective block ends up centred between the two */
-.tabs-box[data-family="tecnologia"]{margin-bottom:18px}
-/* "TRILHAS POR TECNOLOGIA" on a single line would eat 165px of the tabs. Letting
+.tabs-box[data-family="technology"]{margin-bottom:18px}
+/* "TRACKS BY TECHNOLOGY" on a single line would eat 165px of the tabs. Letting
    it wrap onto two lines costs the label the same ~100px of width, and the height
    is already the tab button's — it pushes nothing. */
 .tabs-label{
@@ -280,7 +280,7 @@ html[data-theme="light"] .lang-op.on{background:rgba(43,82,201,.09)}
   box-shadow:0 18px 36px -14px rgba(0,0,0,.6);
 }
 .drop.is-open .drop-list{display:flex}
-/* A group heading inside the menu ("por carreira", "por tecnologia"). In the
+/* A group heading inside the menu ("by career", "by technology"). In the
    options' colour it disappeared among them; here it becomes a band: accent
    colour, its own background and a hairline above separating it from the
    previous group. */
@@ -824,7 +824,7 @@ html.modal-open .screen{overflow:hidden}
 
 /* A short height is almost always the virtual keyboard being open: the person is
    typing and needs to see the field and the button, not the explanation. The
-   subtitle gives up its place, and the rest shrinks — without this "Comece agora"
+   subtitle gives up its place, and the rest shrinks — without this "Start now"
    ended up below the fold inside the modal itself. */
 @media(max-height:560px){
   .subscribe-body{padding:16px 18px}
@@ -880,7 +880,7 @@ html.modal-open .screen{overflow:hidden}
    right what details it (syllabus, topics, dependencies and tracks). The
    breakpoint is where each column still gets ~440px — below that two columns are
    narrower than a comfortable reading line, and going back to one is better. */
-/* stacked, the introduction needs room before "o que você aprende"; in two
+/* stacked, the introduction needs room before "what you learn"; in two
    columns it is the end of the column and the margin disappears */
 .modal-col-intro{margin-bottom:20px}
 
@@ -957,7 +957,7 @@ html.modal-open .screen{overflow:hidden}
 /* Narrow screens: the graph becomes a list.
    The graph only pays for itself when three or four levels fit at once. Below
    that the lane would show a card and a half at a time, so the levels stack and
-   the dependency comes to be read in the "depois de" text, not in the edge. */
+   the dependency comes to be read in the "recommended after" text, not in the edge. */
 @media(max-width:860px){
   .graph-arrow{display:none}
   .track-graph{max-height:46vh;height:auto;overflow-x:hidden}

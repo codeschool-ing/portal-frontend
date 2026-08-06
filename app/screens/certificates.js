@@ -149,7 +149,7 @@ export default async function certificates() {
   const el = document.createElement('div');
   el.className = 'view screen-certificates';
 
-  const who = now().session?.name || 'Aluno';
+  const who = now().session?.name || 'Student';
   const today = DATE(new Date());
   const t = studentTrack();
   const onPath = t ? trackPath(t, activeOption) : [];

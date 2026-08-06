@@ -116,7 +116,7 @@ const collisions = await p.evaluate(() => {
   cont.querySelectorAll('.edge').forEach((g) => {
     const path = g.querySelector('.row');
     const total = path.getTotalLength();
-    const ends = [g.dataset.de, g.dataset.para];
+    const ends = [g.dataset.from, g.dataset.to];
     for (let i = 0; i <= 120; i += 1) {
       const pt = path.getPointAtLength((total * i) / 120);
       if (boxes.some((c) => !ends.includes(c.id) &&
@@ -136,9 +136,9 @@ const lit = await p.evaluate(async () => {
   /* a course that is an endpoint of at least one edge — taking the first card
      would work only by luck, and luck is not a test */
   const edges = [...screen.querySelectorAll('.edge')];
-  const target = edges[0].dataset.para;
+  const target = edges[0].dataset.to;
   const node = screen.querySelector('[data-node="' + target + '"]');
-  const expected = edges.filter((a) => a.dataset.de === target || a.dataset.para === target).length;
+  const expected = edges.filter((a) => a.dataset.from === target || a.dataset.to === target).length;
   node.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
   const on = [...screen.querySelectorAll('.edge.on')];
   /* the width has `transition:.15s`, and `getComputedStyle` during the
@@ -154,7 +154,7 @@ const lit = await p.evaluate(async () => {
   return {
     expected, on: on.length, thick, thin,
     after: screen.querySelectorAll('.edge.on').length,
-    onlyThisCourse: on.every((a) => a.dataset.de === target || a.dataset.para === target),
+    onlyThisCourse: on.every((a) => a.dataset.from === target || a.dataset.to === target),
   };
 });
 ok('the cursor lights up the course edges', lit.on === lit.expected && lit.expected > 0,
@@ -280,7 +280,12 @@ console.log('\n== 7. progress and persistence ==');
 // "next" lands on the assessment in one step
 await p.goto(BASE + PAGE + '#/course/git/lesson/1/content');
 await p.waitForSelector('.side-right');
-ok('there is no complete button any more', (await p.locator('.marcar').count()) === 0);
+/* Completing is a consequence of moving on, not a button of its own — so the
+   section must NOT already be marked while it is being read. This used to check
+   for the absence of a separate "mark as read" button; that button no longer
+   exists anywhere, which made the check vacuous. */
+ok('the section is not marked while it is being read',
+  (await p.locator('.rail-section.done').count()) === 0);
 await p.click('.side-right');
 // moving on IS completing: one gesture, no separate button
 await p.waitForFunction(() => location.hash.endsWith('/assessment'), null, { timeout: 5000 });
@@ -296,7 +301,7 @@ await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/8');
 await p.waitForSelector('.step');
 const steps = await p.$$eval('.step-title', (e) => e.map((x) => x.textContent));
 ok('the hosting topic became 5 sections + assessment', steps.length === 6, steps.join(' · '));
-ok('the first section is the shared-hosting one', /compartilhada/i.test(steps[0]), steps[0]);
+ok('the first section is the shared-hosting one', /shared/i.test(steps[0]), steps[0]);
 ok('the last one is always the assessment', /assessment/i.test(steps[steps.length - 1]), steps[steps.length - 1]);
 ok('prose rendered', (await p.locator('.lesson-text p').count()) >= 2);
 ok('a content section reserves the video frame', await p.locator('.video-facade').isVisible());
@@ -361,7 +366,7 @@ ok('the denominator counts only the ready assessments',
   /\b43\b/.test(await p.locator('.course-count').innerText()),
   await p.locator('.course-count').innerText());
 
-await p.goto(BASE + PAGE + '#/course/html-css/lesson/7/eixos');
+await p.goto(BASE + PAGE + '#/course/html-css/lesson/7/axes');
 await p.waitForSelector('.prose-code');
 const block = await p.locator('.prose-code .code').first().innerText();
 ok('a code block inside prose', block.includes('display: flex'), JSON.stringify(block.slice(0, 40)));
@@ -373,14 +378,15 @@ ok('with a language label', (await p.locator('.prose-code .code-lang').first().i
 const blockHtml = await p.locator('.prose-code .code code').first().innerHTML();
 ok('code is escaped, with no markup applied', !/<[a-z]/i.test(blockHtml));
 
-await p.goto(BASE + PAGE + '#/course/html-css/lesson/0/esqueleto');
+await p.goto(BASE + PAGE + '#/course/html-css/lesson/0/skeleton');
 await p.waitForSelector('.prose-code');
 const htmlBlock = await p.locator('.prose-code .code').first().innerText();
 ok('HTML tags survive the escaping', htmlBlock.includes('<!DOCTYPE html>'), JSON.stringify(htmlBlock.slice(0, 24)));
 
 await p.goto(BASE + PAGE + '#/course/html-css/lesson/0/assessment');
 await p.waitForSelector('.assessment-pending');
-ok('a half-written course shows a pending assessment', (await p.locator('.marcar').count()) === 0);
+ok('a half-written course shows a pending assessment, and no exercises with it',
+  (await p.locator('.wizard').count()) === 0);
 
 console.log('\n== 10. global search ==');
 await p.goto(BASE + PAGE + '#/dashboard');
@@ -396,18 +402,33 @@ ok('it finds results in more than one group', groups >= 2, groups + ' groups');
 ok('the result carries context', (await p.locator('.bi-ctx').count()) > 0);
 
 /* Unaccented has to find accented: people typing on a phone almost never add
-   accents, and the folding happens on both sides of the comparison. */
+   accents, and the folding happens on both sides of the comparison. English,
+   the source language, has no accents to fold — so the check switches to
+   Portuguese, where the need is real. */
+await p.evaluate(() => localStorage.setItem('codeschool-language', 'pt'));
+await p.reload();
+await p.waitForFunction(() => location.hash.length > 1);
+await p.keyboard.press('Control+k');
+await p.waitForSelector('.search-field');
 await p.fill('.search-field', 'coercao');
 await p.waitForTimeout(200);
 ok('unaccented search finds the accented text', (await p.locator('.search-item').count()) > 0);
 
-/* The regression that matters: the catalogue is translated at runtime, so
-   indexing only the displayed text would make the sections (which are in
-   Portuguese) vanish in English. */
+/* The regression that matters: the content is translated at runtime, so
+   indexing only the DISPLAYED text would make a section vanish the moment the
+   student reads it in a language the section was not written in. Both sides
+   are indexed, so either term finds it. */
 await p.fill('.search-field', 'hospedagem');
 await p.waitForTimeout(200);
-ok('it finds Portuguese content with the interface in English',
-  (await p.locator('.search-item').count()) > 0);
+ok('a Portuguese term finds the section', (await p.locator('.search-item').count()) > 0);
+await p.evaluate(() => localStorage.setItem('codeschool-language', 'en'));
+await p.reload();
+await p.waitForFunction(() => location.hash.length > 1);
+await p.keyboard.press('Control+k');
+await p.waitForSelector('.search-field');
+await p.fill('.search-field', 'hosting');
+await p.waitForTimeout(200);
+ok('and the English one finds it too', (await p.locator('.search-item').count()) > 0);
 
 /* The excerpt is plain text: the body's minimal markup (backticks and **) is
    interpreted in the section, not here, and it was left on screen as `**TTL**`. */
@@ -501,7 +522,7 @@ ok('the track is translated', /Back-end Development/i.test(nameEn), nameEn);
 ok('the screen is rebuilt in the new language', await p.locator('.resume').isVisible());
 
 console.log('\n== 13. figures, annotated code and material ==');
-await p.goto(BASE + PAGE + '#/course/html-css/lesson/7/alinhamento');
+await p.goto(BASE + PAGE + '#/course/html-css/lesson/7/alignment');
 await p.waitForSelector('.example');
 const snippets = await p.locator('.example-code').count();
 ok('annotated example, one snippet per note', snippets >= 5, snippets + ' snippets');
@@ -604,7 +625,7 @@ ok('the code column fits the longest line, with room to spare',
 /* The prose code block is the other component, and it is the same button. Here
    there is one `<pre>`, so what is copied is that block and nothing around it —
    not the language label above it, which is a caption and not code. */
-await p.goto(BASE + PAGE + '#/course/html-css/lesson/4/seletores');
+await p.goto(BASE + PAGE + '#/course/html-css/lesson/4/selectors');
 await p.waitForSelector('.prose-code');
 const prosePrefix = await p.evaluate(async () => {
   const block = document.querySelector('.prose-code');
@@ -640,12 +661,12 @@ ok('the highlighter tells a keyword from a literal',
 
 /* The regression highlighting can create: markup escaping wrongly. A tag inside
    an HTML example has to keep showing up as text. */
-await p.goto(BASE + PAGE + '#/course/html-css/lesson/7/alinhamento');
+await p.goto(BASE + PAGE + '#/course/html-css/lesson/7/alignment');
 await p.waitForSelector('.example-code');
 ok('highlighted code is still escaped', await p.evaluate(() =>
   !document.querySelector('.example-code').innerHTML.includes('<script')));
 
-await p.goto(BASE + PAGE + '#/course/html-css/lesson/7/alinhamento');
+await p.goto(BASE + PAGE + '#/course/html-css/lesson/7/alignment');
 await p.waitForSelector('.example');
 
 /* Material: the link has to download (and not navigate), with a file name. */
@@ -655,14 +676,14 @@ ok('the link downloads instead of opening', (await material.getAttribute('downlo
   await material.getAttribute('download'));
 ok('the PDF really is a PDF', (await material.getAttribute('href')).startsWith('data:application/pdf;base64,'));
 
-await p.goto(BASE + PAGE + '#/course/html-css/lesson/7/eixos');
+await p.goto(BASE + PAGE + '#/course/html-css/lesson/7/axes');
 await p.waitForSelector('.fig');
 ok('an inline diagram inherits the theme colour', await p.evaluate(() => {
   const t = document.querySelector('.fig-svg svg text');
   return getComputedStyle(t).fill !== 'rgb(0, 0, 0)';
 }));
 
-await p.goto(BASE + PAGE + '#/course/html-css/lesson/3/imagens');
+await p.goto(BASE + PAGE + '#/course/html-css/lesson/3/images');
 await p.waitForSelector('.fig img');
 /* `scrollIntoViewIfNeeded` is NOT test fussiness: the figure has
    `loading="lazy"`, and a lazy image below the fold is not loaded until it
@@ -771,13 +792,13 @@ console.log('\n== 17. the two shapes of a section ==');
 /* THE REGRESSION THIS BLOCK GUARDS: the video frame used to be in EVERY content
    section, reserved. A text section with a grey rectangle on top promises a
    video that never comes — and the promise does not expire. */
-await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/0/papeis');
+await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/0/roles');
 await p.waitForSelector('.lesson-text');
 ok('a text section has no video frame', (await p.locator('.video-facade').count()) === 0);
 ok('and the text starts at the top', await p.evaluate(() =>
   document.querySelector('.crumbs').getBoundingClientRect().top < 200));
 
-await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/0/apresentacao');
+await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/0/intro');
 await p.waitForSelector('.video-facade');
 ok('a video section has the frame', true);
 ok('a video-only section does not invent a text block', (await p.locator('.lesson-text').count()) === 0);
@@ -862,7 +883,7 @@ ok('in a short window the player shrinks without deforming', Math.abs(shortWindo
   shortWindow.width + '×' + shortWindow.height);
 ok('and it starts again where the text starts', shortWindow.left < 2, shortWindow.left.toFixed(1) + 'px out of line');
 await p.setViewportSize({ width: 1440, height: 900 });
-await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/0/apresentacao');
+await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/0/intro');
 await p.waitForSelector('.video-facade');
 
 /* In the rail the icon says the NATURE of the section, not only its state. */
@@ -1184,7 +1205,7 @@ await p.goto(BASE + PAGE + '#/dashboard');
 await p.waitForSelector('.resume');
 await p.click('.account-btn');
 await p.waitForTimeout(120);
-ok('there is a "Meu plan" item', (await p.locator('.account-op[href="#/plan"]').count()) === 1);
+ok('there is a "My plan" item', (await p.locator('.account-op[href="#/plan"]').count()) === 1);
 
 console.log('\n== 22. the browser knows the page is dark ==');
 /* The portal is dark because the CSS paints everything dark — and none of that

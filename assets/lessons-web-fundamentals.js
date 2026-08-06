@@ -1,20 +1,20 @@
 /* ==========================================================================
    Lesson content — each topic's sections.
 
-   WHY THIS FILE EXISTS, INSTEAD OF A FIELD IN dados.js
+   WHY THIS FILE EXISTS, INSTEAD OF A FIELD IN THE CATALOGUE
    A catalogue topic is not one subject: it is a handful of them. Half of the
    1,503 topics enumerate three or more subjects in the title itself
-   ("Hospedagem: compartilhada, VPS, nuvem e CDN"), and the average load per
-   topic is 4 hours — which is not one page. The author already divided the
-   lesson, in prose; the portal needed to stop ignoring that.
+   ("Hosting: shared, VPS, cloud and CDN"), and the average load per topic is
+   4 hours — which is not one page. The author already divided the lesson, in
+   prose; the portal needed to stop ignoring that.
 
-   `dados.js` is a copy of the vitrine's catalogue, and the modal over there
-   renders `topicos` as a flat list. Changing the shape of that field would
+   The vitrine's catalogue file is a sibling of ours, and the modal over there
+   renders `topics` as a flat list. Changing the shape of that field would
    break the contract between the two repositories for the one reason that is
    never worth it — convenience. So the sections live here, with the SAME join
-   key the exercises use: course + the topic's text IN PORTUGUESE. (The
-   displayed title is translated at runtime and is not usable as a key — see
-   `courseLessons` in app/catalog.js.)
+   key the exercises use: course + the topic's text in the SOURCE language,
+   which is English. (The displayed title is translated at runtime and is not
+   usable as a key — see `courseLessons` in app/catalog.js.)
 
    THE SECTIONS ARE WRITTEN, NEVER DERIVED
    It would have been possible to split the title on the `:` and the commas and
@@ -23,27 +23,27 @@
    work: in `RULES.md`, the "requires a later topic" check was attempted this
    way, flagged 5 of the 48 good exercises and was discarded with the conclusion
    that "the answer is in the authoring, not in the detection". It would fail the
-   same way here — "Cliente, servidor e host: quem pede e quem responde" would
-   become a section
-   called "quem pede e quem responde". The enumeration in the title is evidence
-   that the sections are needed; it is not a source for reading them.
+   same way here — "Client, server and host: who asks and who answers" would
+   become a section called "who asks and who answers". The enumeration in the
+   title is evidence that the sections are needed; it is not a source for
+   reading them.
 
    SHAPE
-     window.LESSONS[courseId][topic in pt] = [ section, ... ]
+     window.LESSONS[courseId][topic in English] = [ section, ... ]
 
    There is one file per course, as the pipeline does with the exercises, and
    each one MERGES into the object instead of assigning it: none of them may
    depend on being the first to load.
-     section = { id, titulo, corpo?, video?, duracao?, materiais? }
-       `id`      a short, stable key — it is what enters the URL and the progress
-       `corpo`   list of paragraphs; an item that is itself a list becomes a <ul>
-       `video`   the YouTube id, or `true` for "there will be one, not yet"
-       `duracao` short text ('08 min'), shown on the player and in the rail
+     section = { id, title, body?, video?, duration?, materials? }
+       `id`       a short, stable key — it is what enters the URL and the progress
+       `body`     list of paragraphs; an item that is itself a list becomes a <ul>
+       `video`    the YouTube id, or `true` for "there will be one, not yet"
+       `duration` short text ('08 min'), shown on the player and in the rail
 
      THE SECTION DECLARES WHAT IT IS, and the layout follows:
 
        with `video`   the player opens edge to edge and the title moves below
-                      it. With no `corpo`, it is a VIDEO-ONLY section — the
+                      it. With no `body`, it is a VIDEO-ONLY section — the
                       lesson's opening, where there is no text to read along.
        no `video`     no frame at all. Not grey, not reserved: a text section
                       with a rectangle on top promises something that does not
@@ -51,6 +51,9 @@
 
      Markup in the text: `backticks` become code, **asterisks** become bold.
      Nothing beyond that — it is the subset the content uses.
+
+   The Portuguese of every title and body is in assets/lessons-pt.js, read the
+   same way the catalogue's translations are.
 
    A lesson with no entry here falls back to a single section carrying whatever
    content exists, so the portal works the same for the 85 courses that have not
@@ -70,46 +73,46 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     /* --------------------------------------------------------------- 01 */
     'Client, server and host: who asks and who answers': [
       {
-        /* VIDEO-ONLY SECTION: no `corpo`. It is the lesson-opening shape — the
+        /* VIDEO-ONLY SECTION: no `body`. It is the lesson-opening shape — the
            instructor says what is coming, and there is no text to read along.
            `video: true` reserves the frame without claiming the video exists. */
-        id: 'apresentacao',
-        title: 'Apresentação',
+        id: 'intro',
+        title: 'Introduction',
         video: true,
         duration: '02 min',
       },
       {
-        id: 'papeis',
-        title: 'Os dois papéis',
+        id: 'roles',
+        title: 'The two roles',
         body: [
-          'Quase tudo o que acontece na internet é uma conversa entre duas partes com papéis fixos. O **cliente** pede; o **servidor** responde. Seu navegador é um cliente. O computador que guarda o site é um servidor.',
-          'Os papéis são do momento, não da máquina. Um servidor web que precisa consultar um banco de dados vira cliente do banco naquele instante. O mesmo computador pode ser cliente numa conversa e servidor noutra, ao mesmo tempo.',
-          'A consequência prática é que **o cliente sempre inicia**. Um servidor não manda página para o seu navegador por conta própria: ele espera ser perguntado. Quando uma página parece receber dados sozinha — uma notificação, um chat —, há uma conexão que o cliente abriu antes e deixou aberta.',
+          'Almost everything that happens on the internet is a conversation between two parties with fixed roles. The **client** asks; the **server** answers. Your browser is a client. The computer holding the site is a server.',
+          'The roles belong to the moment, not to the machine. A web server that needs to query a database becomes the database\'s client at that instant. The same computer can be a client in one conversation and a server in another, at the same time.',
+          'The practical consequence is that **the client always starts**. A server does not push a page to your browser on its own: it waits to be asked. When a page seems to receive data by itself — a notification, a chat — there is a connection the client opened earlier and left open.',
         ],
       },
       {
         id: 'host',
-        title: 'O que é um host',
+        title: 'What a host is',
         body: [
-          '**Host** é qualquer máquina com endereço na rede. É o termo neutro, usado quando não importa se aquela máquina está pedindo ou respondendo — o notebook, o celular, o servidor e a impressora de rede são todos hosts.',
-          'A distinção importa porque cliente e servidor são papéis, e host é identidade. Uma frase como "o host não responde" fala da máquina; "o servidor não responde" fala do programa que deveria estar atendendo naquela máquina. Confundir os dois manda diagnóstico para o lado errado: cabo e energia de um lado, processo derrubado do outro.',
+          '**Host** is any machine with an address on the network. It is the neutral term, used when it does not matter whether that machine is asking or answering — the laptop, the phone, the server and the network printer are all hosts.',
+          'The distinction matters because client and server are roles, and host is identity. A sentence like "the host is not responding" is about the machine; "the server is not responding" is about the program that should be listening on that machine. Confusing the two sends the diagnosis the wrong way: cable and power on one side, a crashed process on the other.',
         ],
       },
       {
-        id: 'ida-e-volta',
+        id: 'round-trip',
         video: true,
         duration: '09 min',
-        title: 'A viagem de ida e volta',
+        title: 'The round trip',
         body: [
-          'Digitar um endereço e ver a página aparecer esconde uma sequência que vale conhecer inteira, porque é ela que o resto do curso destrincha:',
+          'Typing an address and watching the page appear hides a sequence worth knowing end to end, because it is the one the rest of the course takes apart:',
           [
-            'o navegador descobre o **endereço** do servidor a partir do nome (é o DNS, aula 08);',
-            'abre uma **conexão** até ele (aula 02);',
-            'manda um **pedido** dizendo o que quer (aula 06);',
-            'recebe uma **resposta** com o conteúdo e um código de status;',
-            'monta a página com o que veio, pedindo o resto conforme descobre que precisa (aula 10).',
+            'the browser finds the server\'s **address** from the name (that is DNS, lesson 08);',
+            'opens a **connection** to it (lesson 02);',
+            'sends a **request** saying what it wants (lesson 06);',
+            'receives a **response** with the content and a status code;',
+            'builds the page from what arrived, asking for the rest as it discovers it needs it (lesson 10).',
           ],
-          'Cada etapa pode falhar de um jeito diferente, e cada uma tem uma ferramenta própria de diagnóstico. É por isso que "o site não abre" nunca é um problema só.',
+          'Each step can fail in a different way, and each has a diagnostic tool of its own. That is why "the site will not open" is never one problem.',
         ],
       },
     ],
@@ -117,32 +120,32 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     /* --------------------------------------------------------------- 02 */
     'Packet, frame and socket': [
       {
-        id: 'pacote',
-        title: 'Pacote: por que os dados vão picados',
+        id: 'packet',
+        title: 'Packet: why data travels in pieces',
         body: [
-          'Nada atravessa a rede inteiro. Um vídeo de 2 GB é cortado em milhares de **pacotes**, cada um com um pedaço do conteúdo e um cabeçalho dizendo de onde veio e para onde vai.',
-          'A razão é de convivência: se um arquivo grande viajasse em bloco, ele ocuparia o caminho até terminar e todo o resto esperaria. Picado, os pacotes de várias conversas se intercalam, e uma transferência longa não impede uma curta de passar.',
-          'A outra razão é a falha. Um pacote perdido custa reenviar alguns kilobytes; um arquivo perdido custa reenviar o arquivo. E como cada pacote sabe seu destino, cada um pode tomar um caminho diferente — se um trecho da rede cai no meio da transmissão, os seguintes desviam sem que a conversa recomece.',
+          'Nothing crosses the network whole. A 2 GB video is cut into thousands of **packets**, each carrying a piece of the content and a header saying where it came from and where it is going.',
+          'The first reason is coexistence: if a large file travelled in one block, it would occupy the path until it finished and everything else would wait. Chopped up, the packets of several conversations interleave, and a long transfer does not stop a short one from getting through.',
+          'The other reason is failure. A lost packet costs a few kilobytes to resend; a lost file costs the file. And because each packet knows its destination, each can take a different route — if a stretch of the network goes down mid-transmission, the following ones detour without the conversation starting over.',
         ],
       },
       {
-        id: 'quadro',
-        title: 'Quadro: o pacote dentro do cabo',
+        id: 'frame',
+        title: 'Frame: the packet inside the cable',
         body: [
-          'O **quadro** (ou *frame*) é o envelope do enlace local — o que trafega de fato no cabo Ethernet ou no ar do Wi-Fi. Dentro dele vai o pacote.',
-          'A diferença entre os dois é o alcance do endereço. O pacote carrega o endereço IP do destino **final**, que pode estar do outro lado do planeta e não muda no caminho. O quadro carrega o endereço MAC do **próximo salto**, que quase sempre é o seu roteador, e é reescrito a cada trecho da viagem.',
-          'É a diferença entre o endereço no envelope e a placa do caminhão que o transporta agora. O envelope atravessa a viagem toda; o caminhão muda em cada centro de distribuição.',
+          'The **frame** is the envelope of the local link — what actually travels on the Ethernet cable or through the air over Wi-Fi. The packet goes inside it.',
+          'The difference between the two is the reach of the address. The packet carries the IP address of the **final** destination, which may be on the other side of the planet and does not change along the way. The frame carries the MAC address of the **next hop**, which is almost always your router, and it is rewritten at every leg of the journey.',
+          'It is the difference between the address on the envelope and the plate of the truck carrying it right now. The envelope crosses the whole journey; the truck changes at every sorting centre.',
         ],
       },
       {
         id: 'socket',
         video: true,
         duration: '07 min',
-        title: 'Socket: o endereço de um programa',
+        title: 'Socket: a program\'s address',
         body: [
-          'O IP encontra a máquina, mas uma máquina roda dezenas de programas em rede ao mesmo tempo. Quem separa é a **porta**, um número que identifica qual programa deve receber aquele dado.',
-          'A dupla `IP:porta` é o **socket** — `192.168.0.10:443`, por exemplo. Uma conexão é identificada por quatro coisas: IP e porta de origem, IP e porta de destino. Como a porta de origem muda a cada conexão nova, você pode abrir dez abas do mesmo site sem que as respostas se misturem.',
-          'Portas comuns valem decorar: `80` para HTTP, `443` para HTTPS, `22` para SSH, `5432` para PostgreSQL. Quando um serviço "não responde" e a máquina está no ar, quase sempre a pergunta certa é se alguém está escutando naquela porta.',
+          'The IP finds the machine, but a machine runs dozens of networked programs at once. What separates them is the **port**, a number identifying which program should receive that data.',
+          'The pair `IP:port` is the **socket** — `192.168.0.10:443`, for example. A connection is identified by four things: source IP and port, destination IP and port. Because the source port changes with every new connection, you can open ten tabs of the same site without the responses getting mixed up.',
+          'Common ports are worth memorising: `80` for HTTP, `443` for HTTPS, `22` for SSH, `5432` for PostgreSQL. When a service "is not responding" and the machine is up, the right question is almost always whether anything is listening on that port.',
         ],
       },
     ],
@@ -150,29 +153,29 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     /* --------------------------------------------------------------- 03 */
     'Bandwidth, latency and throughput': [
       {
-        id: 'banda',
-        title: 'Largura de banda é o cano, não a velocidade',
+        id: 'bandwidth',
+        title: 'Bandwidth is the pipe, not the speed',
         body: [
-          '**Largura de banda** é quanto cabe por segundo no caminho — o diâmetro do cano. Mede-se em bits por segundo: 300 Mbps são 300 milhões de bits, ou uns 37 MB, por segundo.',
-          'Repare na unidade, porque é onde quase todo mundo se confunde: o provedor anuncia em **bits** (Mbps) e o navegador mostra o download em **bytes** (MB/s). São oito para um. Uma conexão de 300 Mbps baixando a 37 MB/s está no máximo, não a um oitavo dele.',
+          '**Bandwidth** is how much fits through the path per second — the diameter of the pipe. It is measured in bits per second: 300 Mbps is 300 million bits, or about 37 MB, per second.',
+          'Watch the unit, because that is where almost everyone gets confused: the provider advertises in **bits** (Mbps) and the browser shows the download in **bytes** (MB/s). It is eight to one. A 300 Mbps connection downloading at 37 MB/s is at its maximum, not at an eighth of it.',
         ],
       },
       {
-        id: 'latencia',
-        title: 'Latência é o tempo da viagem',
+        id: 'latency',
+        title: 'Latency is the travel time',
         body: [
-          '**Latência** é quanto demora para um dado sair daqui e chegar lá — e o número que se costuma medir, o *ping*, é a ida e volta. Ela depende sobretudo da distância física e do número de equipamentos no caminho, e por isso **banda não a conserta**.',
-          'Um cano mais grosso não encurta a estrada. Contratar 1 Gbps não aproxima um servidor que está na Europa: a luz leva o tempo que leva, e 150 ms continuam sendo 150 ms.',
-          'É por isso que latência dói mais em coisas conversadas — jogo, chamada de vídeo, um site que faz vinte pedidos em sequência — e quase não aparece num download grande, que enche o cano uma vez e segue.',
+          '**Latency** is how long a piece of data takes to leave here and arrive there — and the number usually measured, the *ping*, is the round trip. It depends above all on physical distance and on the number of devices along the path, which is why **bandwidth does not fix it**.',
+          'A thicker pipe does not shorten the road. Buying 1 Gbps does not bring a server in Europe closer: light takes as long as it takes, and 150 ms stays 150 ms.',
+          'That is why latency hurts most in chatty things — a game, a video call, a site that makes twenty requests in sequence — and barely shows up in a large download, which fills the pipe once and carries on.',
         ],
       },
       {
-        id: 'vazao',
-        title: 'Vazão é o que você realmente conseguiu',
+        id: 'throughput',
+        title: 'Throughput is what you actually got',
         body: [
-          '**Vazão** (*throughput*) é a taxa observada de verdade, e ela costuma ficar abaixo da largura de banda. A diferença é onde mora o problema real: congestionamento no caminho, perda de pacotes forçando reenvio, um servidor lento do outro lado, ou o próprio protocolo esperando confirmação.',
-          'Uma analogia que se paga: a **banda** é quantas faixas tem a estrada, a **latência** é o tempo de percorrê-la, e a **vazão** é quantos carros efetivamente chegaram. Estrada larga com engarrafamento entrega pouco.',
-          'Diagnóstico prático: se a vazão está baixa **e** a latência normal, suspeite do outro lado ou de perda. Se a latência está alta, nenhuma contratação de banda vai resolver — o problema é distância ou fila.',
+          '**Throughput** is the rate you really observe, and it usually sits below the bandwidth. The gap is where the real problem lives: congestion along the path, packet loss forcing resends, a slow server on the other end, or the protocol itself waiting for an acknowledgement.',
+          'An analogy that pays for itself: **bandwidth** is how many lanes the road has, **latency** is how long it takes to drive it, and **throughput** is how many cars actually arrived. A wide road with a traffic jam delivers little.',
+          'A practical diagnosis: if throughput is low **and** latency is normal, suspect the other end or packet loss. If latency is high, no amount of bandwidth will help — the problem is distance or queueing.',
         ],
       },
     ],
@@ -181,29 +184,29 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     'IP address, MAC address and ARP': [
       {
         id: 'ip',
-        title: 'IP: o endereço que muda de lugar',
+        title: 'IP: the address that moves',
         body: [
-          'O **endereço IP** diz onde a máquina está na rede — e, como um endereço postal, ele descreve uma posição, não um objeto. Levar o notebook para outra rede troca o IP dele.',
-          'O IPv4 tem quatro números de 0 a 255 (`192.168.0.10`) e são só 4,3 bilhões de combinações, que acabaram. O IPv6 resolve com 128 bits (`2001:db8::1`) — espaço que não acaba em nenhum cenário previsível.',
-          'Enquanto isso, faixas **privadas** (`10.x.x.x`, `172.16–31.x.x`, `192.168.x.x`) são reutilizadas dentro de cada rede local e não existem na internet. O roteador faz a tradução (NAT) — é por isso que sua máquina se enxerga como `192.168.0.10` e um site vê o IP público do seu provedor.',
+          'The **IP address** says where the machine is on the network — and, like a postal address, it describes a position, not an object. Take the laptop to another network and its IP changes.',
+          'IPv4 has four numbers from 0 to 255 (`192.168.0.10`) and offers only 4.3 billion combinations, which ran out. IPv6 solves it with 128 bits (`2001:db8::1`) — space that does not run out under any foreseeable scenario.',
+          'In the meantime, **private** ranges (`10.x.x.x`, `172.16–31.x.x`, `192.168.x.x`) are reused inside every local network and do not exist on the internet. The router does the translation (NAT) — which is why your machine sees itself as `192.168.0.10` while a website sees your provider\'s public IP.',
         ],
       },
       {
         id: 'mac',
-        title: 'MAC: a identidade da placa',
+        title: 'MAC: the card\'s identity',
         body: [
-          'O **endereço MAC** (`a4:83:e7:1c:0b:22`) vem gravado na placa de rede e, ao contrário do IP, acompanha o equipamento para onde ele for. É identidade, não posição.',
-          'Ele só tem significado dentro do enlace local: nenhum roteador encaminha por MAC entre redes. Por isso o servidor de um site jamais vê o MAC do seu notebook — a rede dele vê o MAC do último roteador do caminho.',
-          'É a mesma distinção do quadro e do pacote, uma aula atrás, vista do lado do endereço: IP é para onde a coisa vai, MAC é quem a entrega no trecho atual.',
+          'The **MAC address** (`a4:83:e7:1c:0b:22`) is burned into the network card and, unlike the IP, travels with the equipment wherever it goes. It is identity, not position.',
+          'It only means anything within the local link: no router forwards by MAC between networks. That is why a website\'s server never sees your laptop\'s MAC — its network sees the MAC of the last router on the path.',
+          'It is the same distinction as frame and packet one lesson back, seen from the address side: IP is where the thing is going, MAC is who delivers it on the current leg.',
         ],
       },
       {
         id: 'arp',
-        title: 'ARP: a ponte entre os dois',
+        title: 'ARP: the bridge between the two',
         body: [
-          'Para entregar um quadro na rede local a máquina precisa do MAC de quem tem aquele IP — e é isso que o **ARP** descobre. Ele grita na rede "quem tem `192.168.0.1`?", e a dona responde com o próprio MAC.',
-          'A resposta fica num cache por alguns minutos, senão cada pacote custaria uma pergunta. Dá para ver o seu com `arp -a`.',
-          'Vale saber que o ARP não confere nada: quem responder primeiro é acreditado. É a base do ataque de *ARP spoofing*, em que uma máquina responde no lugar do roteador e passa a receber o tráfego da rede — o motivo pelo qual usar HTTPS em rede pública deixa de ser recomendação e vira necessidade.',
+          'To deliver a frame on the local network the machine needs the MAC of whoever holds that IP — and that is what **ARP** finds out. It shouts on the network "who has `192.168.0.1`?", and the owner answers with its own MAC.',
+          'The answer sits in a cache for a few minutes, otherwise every packet would cost a question. You can see yours with `arp -a`.',
+          'It is worth knowing that ARP checks nothing: whoever answers first is believed. That is the basis of the *ARP spoofing* attack, in which a machine answers in the router\'s place and starts receiving the network\'s traffic — the reason using HTTPS on a public network stops being a recommendation and becomes a necessity.',
         ],
       },
     ],
@@ -211,37 +214,37 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     /* --------------------------------------------------------------- 05 */
     'Layered networks: from the cable to the browser': [
       {
-        id: 'porque-camadas',
-        title: 'Por que dividir em camadas',
+        id: 'why-layers',
+        title: 'Why split into layers',
         body: [
-          'A rede é organizada em camadas onde cada uma resolve um problema e usa a de baixo sem saber como ela funciona. É a razão de você poder trocar Wi-Fi por cabo sem reescrever o navegador: o que mudou foi a camada de baixo, e as de cima nem ficaram sabendo.',
-          'Também é o que permite a internet ter sido inventada antes da fibra óptica e do 5G. As camadas de cima continuaram valendo quando as de baixo foram trocadas por completo.',
+          'The network is organised in layers where each one solves a problem and uses the one below without knowing how it works. It is the reason you can swap Wi-Fi for a cable without rewriting the browser: what changed was the layer underneath, and the ones above never found out.',
+          'It is also what let the internet be invented before fibre optics and 5G. The upper layers went on working when the lower ones were replaced entirely.',
         ],
       },
       {
-        id: 'as-camadas',
+        id: 'the-layers',
         video: true,
         duration: '13 min',
-        title: 'As quatro que importam na prática',
+        title: 'The four that matter in practice',
         body: [
-          'O modelo OSI tem sete camadas e é bom para estudar. No dia a dia, quatro explicam quase tudo:',
+          'The OSI model has seven layers and is good for studying. Day to day, four explain almost everything:',
           [
-            '**Enlace** — o quadro no cabo ou no ar. Endereço MAC, Ethernet, Wi-Fi.',
-            '**Rede** — o pacote atravessando redes diferentes. Endereço IP, roteamento.',
-            '**Transporte** — a conversa entre dois programas. Portas, TCP e UDP.',
-            '**Aplicação** — o que os programas falam entre si. HTTP, DNS, SMTP.',
+            '**Link** — the frame on the cable or in the air. MAC address, Ethernet, Wi-Fi.',
+            '**Network** — the packet crossing different networks. IP address, routing.',
+            '**Transport** — the conversation between two programs. Ports, TCP and UDP.',
+            '**Application** — what the programs say to each other. HTTP, DNS, SMTP.',
           ],
-          'Cada camada envelopa a de cima: o quadro contém o pacote, que contém o segmento, que contém o pedido HTTP. É literalmente uma boneca russa, e é assim que o Wireshark mostra qualquer captura.',
+          'Each layer wraps the one above: the frame contains the packet, which contains the segment, which contains the HTTP request. It is literally a set of nesting dolls, and that is how Wireshark shows any capture.',
         ],
       },
       {
         id: 'tcp-udp',
-        title: 'TCP e UDP: garantir ou não esperar',
+        title: 'TCP and UDP: guarantee, or do not wait',
         body: [
-          'A camada de transporte tem duas escolhas, e a diferença é o que cada uma promete.',
-          '**TCP** garante entrega, ordem e integridade: confirma cada pedaço, reenvia o que se perdeu e remonta na sequência certa. Custa uma conexão para estabelecer e espera pelo que faltou. É o que HTTP usa — uma página com metade do HTML não serve para nada.',
-          '**UDP** não promete nada: manda e segue. Custa quase nada e não espera ninguém. É o que chamada de vídeo e jogo usam, porque num vídeo ao vivo o quadro atrasado já não tem serventia — melhor perder do que travar a imagem esperando por ele.',
-          'A regra de bolso: se o dado incompleto é inútil, TCP. Se o dado atrasado é inútil, UDP.',
+          'The transport layer has two choices, and the difference is what each one promises.',
+          '**TCP** guarantees delivery, order and integrity: it acknowledges every piece, resends what was lost and reassembles in the right sequence. It costs a connection to establish and it waits for whatever is missing. It is what HTTP uses — half an HTML document is no use to anyone.',
+          '**UDP** promises nothing: it sends and moves on. It costs almost nothing and waits for no one. It is what video calls and games use, because in a live video a late frame is already useless — better to lose it than to freeze the picture waiting for it.',
+          'The rule of thumb: if incomplete data is useless, TCP. If late data is useless, UDP.',
         ],
       },
     ],
@@ -249,56 +252,56 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     /* --------------------------------------------------------------- 06 */
     'HTTP and HTTPS: methods, headers and status codes': [
       {
-        id: 'metodos',
+        id: 'methods',
         video: true,
         duration: '10 min',
-        title: 'Métodos: o verbo do pedido',
+        title: 'Methods: the request\'s verb',
         body: [
-          'Todo pedido HTTP começa por um verbo que diz a intenção. Os que aparecem sempre:',
+          'Every HTTP request starts with a verb stating the intent. The ones you always meet:',
           [
-            '`GET` — me dê. Não deve alterar nada no servidor.',
-            '`POST` — tome isto, e crie ou processe algo.',
-            '`PUT` — substitua o recurso por isto.',
-            '`PATCH` — altere só estes campos.',
-            '`DELETE` — remova.',
+            '`GET` — give me. It must not change anything on the server.',
+            '`POST` — take this, and create or process something.',
+            '`PUT` — replace the resource with this.',
+            '`PATCH` — change only these fields.',
+            '`DELETE` — remove it.',
           ],
-          'A promessa de que `GET` não altera nada não é formalidade. Navegadores, proxies e buscadores repetem `GET` à vontade — pré-carregam links, revalidam cache, rastreiam páginas. Uma aplicação que apagasse um registro via `GET` seria esvaziada pelo próprio rastreador do Google, e já aconteceu com gente grande.',
+          'The promise that `GET` changes nothing is not a formality. Browsers, proxies and search engines repeat `GET` freely — they prefetch links, revalidate caches, crawl pages. An application that deleted a record via `GET` would be emptied by Google\'s own crawler, and it has happened to serious companies.',
         ],
       },
       {
-        id: 'cabecalhos',
-        title: 'Cabeçalhos: os metadados da conversa',
+        id: 'headers',
+        title: 'Headers: the conversation\'s metadata',
         body: [
-          'Pedido e resposta carregam **cabeçalhos** — pares de nome e valor que descrevem o conteúdo e as condições, sem fazer parte dele.',
-          'No pedido, os que mais aparecem são `Host` (qual site, já que um servidor hospeda vários), `Accept` (que formatos servem), `Authorization` (a credencial) e `Cookie`. Na resposta, `Content-Type` (o que é isto), `Cache-Control` (por quanto tempo guardar) e `Set-Cookie`.',
-          '`Content-Type` errado é uma das causas mais comuns de "funciona no meu servidor e não no outro": o mesmo arquivo servido como `text/plain` em vez de `text/css` faz o navegador recusar a folha de estilo, e a página aparece sem estilo nenhum, sem erro visível.',
+          'Request and response both carry **headers** — name and value pairs describing the content and the conditions, without being part of it.',
+          'On the request, the ones that show up most are `Host` (which site, since one server hosts several), `Accept` (which formats will do), `Authorization` (the credential) and `Cookie`. On the response, `Content-Type` (what this is), `Cache-Control` (how long to keep it) and `Set-Cookie`.',
+          'A wrong `Content-Type` is one of the most common causes of "it works on my server and not on the other one": the same file served as `text/plain` instead of `text/css` makes the browser refuse the stylesheet, and the page shows up with no styling at all and no visible error.',
         ],
       },
       {
         id: 'status',
         video: true,
         duration: '08 min',
-        title: 'Códigos de status: as cinco famílias',
+        title: 'Status codes: the five families',
         body: [
-          'A resposta começa com um número de três dígitos, e o primeiro dígito já classifica:',
+          'The response starts with a three-digit number, and the first digit already classifies it:',
           [
-            '**1xx** — informativo, raro no dia a dia.',
-            '**2xx** — deu certo. `200 OK`, `201 Created`, `204 No Content`.',
-            '**3xx** — está em outro lugar. `301` permanente, `302` temporário, `304` não mudou desde a última vez.',
-            '**4xx** — o pedido está errado. `400` malformado, `401` não autenticado, `403` autenticado mas sem permissão, `404` não existe, `429` pedindo demais.',
-            '**5xx** — o servidor falhou. `500` erro interno, `502` o servidor de trás respondeu mal, `503` fora do ar, `504` o servidor de trás não respondeu a tempo.',
+            '**1xx** — informational, rare day to day.',
+            '**2xx** — it worked. `200 OK`, `201 Created`, `204 No Content`.',
+            '**3xx** — it is somewhere else. `301` permanent, `302` temporary, `304` not modified since last time.',
+            '**4xx** — the request is wrong. `400` malformed, `401` not authenticated, `403` authenticated but without permission, `404` does not exist, `429` asking too often.',
+            '**5xx** — the server failed. `500` internal error, `502` the server behind answered badly, `503` down, `504` the server behind did not answer in time.',
           ],
-          'A fronteira que mais se erra é 4xx contra 5xx: **4xx é culpa de quem pediu, 5xx é culpa de quem responde**. E `401` contra `403`: o primeiro diz "não sei quem você é", o segundo diz "sei quem você é, e você não pode".',
+          'The boundary people get wrong most is 4xx against 5xx: **4xx is the caller\'s fault, 5xx is the responder\'s**. And `401` against `403`: the first says "I do not know who you are", the second says "I know who you are, and you cannot".',
         ],
-        materials: ['wf-http-codigos'],
+        materials: ['wf-http-codes'],
       },
       {
         id: 'https',
-        title: 'HTTPS: o mesmo HTTP, dentro de um túnel',
+        title: 'HTTPS: the same HTTP, inside a tunnel',
         body: [
-          '**HTTPS é HTTP passando por TLS.** Os métodos, cabeçalhos e códigos são idênticos; o que muda é que tudo isso viaja cifrado.',
-          'O TLS entrega três coisas ao mesmo tempo, e vale saber quais: **confidencialidade** (ninguém no caminho lê), **integridade** (ninguém altera sem se denunciar) e **autenticidade** (o certificado prova que aquele servidor é mesmo o dono do domínio). É a terceira que o cadeado representa — e é por isso que cadeado não significa "site confiável", significa "é mesmo o site cujo nome está na barra".',
-          'O que o TLS **não** esconde: o nome do domínio que você acessou e o volume de dados trafegado ficam visíveis para a rede. O caminho, os parâmetros e o conteúdo, não.',
+          '**HTTPS is HTTP going through TLS.** The methods, headers and codes are identical; what changes is that all of it travels encrypted.',
+          'TLS delivers three things at once, and it is worth knowing which: **confidentiality** (nobody along the path reads it), **integrity** (nobody alters it without giving themselves away) and **authenticity** (the certificate proves that server really does own the domain). The third is what the padlock stands for — and that is why a padlock does not mean "trustworthy site", it means "this really is the site whose name is in the bar".',
+          'What TLS does **not** hide: the domain name you visited and the volume of data transferred stay visible to the network. The path, the parameters and the content do not.',
         ],
       },
     ],
@@ -307,30 +310,30 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     'Cookies, sessions and browser cache': [
       {
         id: 'cookies',
-        title: 'Cookies: a memória que o HTTP não tem',
+        title: 'Cookies: the memory HTTP does not have',
         body: [
-          'HTTP não lembra de nada: cada pedido chega como se fosse o primeiro. O **cookie** é a gambiarra que virou fundação — o servidor manda um `Set-Cookie` e o navegador devolve aquele valor em todo pedido seguinte para aquele domínio.',
-          'Os atributos são o que separa cookie seguro de problema de segurança. `HttpOnly` impede o JavaScript da página de ler o valor, o que limita o estrago de um XSS. `Secure` impede o envio fora do HTTPS. `SameSite` controla se o cookie viaja em pedidos que partem de outro site, que é a defesa contra CSRF.',
+          'HTTP remembers nothing: every request arrives as if it were the first. The **cookie** is the workaround that became foundation — the server sends a `Set-Cookie` and the browser hands that value back on every following request to that domain.',
+          'The attributes are what separates a safe cookie from a security problem. `HttpOnly` stops the page\'s JavaScript from reading the value, which limits the damage of an XSS. `Secure` stops it being sent outside HTTPS. `SameSite` controls whether the cookie travels on requests originating from another site, which is the defence against CSRF.',
         ],
       },
       {
-        id: 'sessoes',
-        title: 'Sessão: o cookie que não carrega o segredo',
+        id: 'sessions',
+        title: 'Session: the cookie that does not carry the secret',
         body: [
-          'Guardar dados de verdade no cookie é má ideia — o usuário edita o que quiser. O padrão é o cookie carregar só um **identificador de sessão** aleatório, e o servidor guardar os dados associados a ele.',
-          'Daí a consequência que aparece no primeiro deploy sério: se a aplicação roda em dois servidores e a sessão está na memória de um deles, metade dos pedidos não encontra a sessão e o usuário "cai" aleatoriamente. Por isso sessão em produção mora em lugar compartilhado — Redis, banco — ou não existe, e o estado vai num token assinado.',
-          'Sair de verdade é invalidar a sessão **no servidor**. Apagar o cookie só some com a chave; se alguém tiver copiado o identificador antes, ele continua valendo.',
+          'Keeping real data in the cookie is a bad idea — the user edits whatever they like. The standard is for the cookie to carry only a random **session identifier**, with the server holding the data associated with it.',
+          'Hence the consequence that shows up at the first serious deploy: if the application runs on two servers and the session lives in the memory of one of them, half the requests cannot find the session and the user gets "logged out" at random. That is why a session in production lives somewhere shared — Redis, a database — or does not exist at all, and the state travels in a signed token.',
+          'Logging out for real means invalidating the session **on the server**. Deleting the cookie only removes the key; if somebody copied the identifier beforehand, it still works.',
         ],
       },
       {
         id: 'cache',
         video: true,
         duration: '06 min',
-        title: 'Cache: não pedir de novo o que não mudou',
+        title: 'Cache: not asking again for what has not changed',
         body: [
-          'O jeito mais rápido de carregar um arquivo é não carregá-lo. O **cache** guarda a resposta e a reutiliza enquanto ela valer, e quem manda nisso é o servidor, pelo `Cache-Control`.',
-          '`max-age=3600` diz "vale por uma hora, nem pergunte". `no-cache` diz "pode guardar, mas confirme antes de usar" — o navegador manda um pedido condicional e recebe `304 Not Modified` se nada mudou, o que economiza o corpo inteiro. `no-store` diz "não guarde", e é o certo para página de extrato bancário.',
-          'A tensão prática é entre cachear muito (rápido, mas o usuário vê a versão velha) e pouco (sempre atual, mas lento). A saída padrão é o **nome com impressão digital**: `app.9f2c1a.css` pode ser cacheado por um ano, porque qualquer alteração muda o nome do arquivo e o HTML passa a apontar para outro.',
+          'The fastest way to load a file is not to load it. The **cache** keeps the response and reuses it while it is still valid, and the server is what decides that, through `Cache-Control`.',
+          '`max-age=3600` says "good for an hour, do not even ask". `no-cache` says "you may keep it, but confirm before using it" — the browser sends a conditional request and gets `304 Not Modified` if nothing changed, which saves the whole body. `no-store` says "do not keep it", and it is the right call for a bank statement page.',
+          'The practical tension is between caching a lot (fast, but the user sees the stale version) and caching little (always current, but slow). The standard way out is the **fingerprinted name**: `app.9f2c1a.css` can be cached for a year, because any change changes the file name and the HTML starts pointing at a different one.',
         ],
       },
     ],
@@ -338,35 +341,35 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     /* --------------------------------------------------------------- 08 */
     'Domains: registration, DNS, propagation and subdomains': [
       {
-        id: 'registro',
-        title: 'Registro: você aluga, não compra',
+        id: 'registration',
+        title: 'Registration: you rent, you do not buy',
         body: [
-          'Um domínio é **alugado**, por um a dez anos, junto a um registrador credenciado. No `.br` quem controla é o Registro.br; nos genéricos (`.com`, `.org`) são registradores comerciais.',
-          'Não renovar é a forma mais comum e mais cara de perder um domínio: o nome volta ao mercado, e com ele os e-mails e os links de anos. Renovação automática e o e-mail de contato do registro atualizado valem mais do que parecem.',
-          'O nome se lê da direita para a esquerda: em `portal.codeschool.ing`, `.ing` é o topo, `codeschool` é o que se registra, e `portal` é um subdomínio que você cria à vontade, sem pagar nada a mais.',
+          'A domain is **rented**, for one to ten years, from an accredited registrar. Under `.br` the controller is Registro.br; under the generic ones (`.com`, `.org`) they are commercial registrars.',
+          'Failing to renew is the most common and most expensive way to lose a domain: the name goes back on the market, and with it years of e-mail and links. Automatic renewal and a current contact address on the registration are worth more than they look.',
+          'The name reads from right to left: in `portal.codeschool.ing`, `.ing` is the top, `codeschool` is what gets registered, and `portal` is a subdomain you create freely, at no extra cost.',
         ],
       },
       {
         id: 'dns',
-        title: 'DNS: a tradução de nome para endereço',
+        title: 'DNS: translating a name into an address',
         video: true,
         duration: '11 min',
         body: [
-          'O **DNS** é o serviço que responde "qual o IP de `codeschool.ing`?". Ele é hierárquico: a pergunta sobe até quem sabe, e a resposta desce sendo guardada em cache no caminho.',
-          'Os tipos de registro que se usa toda semana:',
+          '**DNS** is the service that answers "what is the IP of `codeschool.ing`?". It is hierarchical: the question climbs to whoever knows, and the answer comes back down being cached along the way.',
+          'The record types you use every week:',
           [
-            '`A` — aponta o nome para um IPv4. `AAAA` faz o mesmo para IPv6.',
-            '`CNAME` — diz "este nome é apelido daquele". Não pode existir na raiz do domínio.',
-            '`MX` — para onde vai o e-mail deste domínio.',
-            '`TXT` — texto livre; é onde vivem as provas de posse e as regras antifraude de e-mail (SPF, DKIM).',
+            '`A` — points the name at an IPv4. `AAAA` does the same for IPv6.',
+            '`CNAME` — says "this name is an alias of that one". It cannot exist at the domain root.',
+            '`MX` — where this domain\'s e-mail goes.',
+            '`TXT` — free text; it is where proofs of ownership and the anti-fraud e-mail rules live (SPF, DKIM).',
           ],
-          'A restrição do `CNAME` na raiz é a que mais aparece na prática: para apontar `codeschool.ing` (sem `www`) a um serviço hospedado, ou se usa `A` com IPs fixos, ou o provedor oferece um `ALIAS`/`ANAME`, que é uma extensão fora do padrão.',
+          'The `CNAME`-at-the-root restriction is the one that shows up most in practice: to point `codeschool.ing` (without `www`) at a hosted service, either you use `A` with fixed IPs, or the provider offers an `ALIAS`/`ANAME`, which is a non-standard extension.',
           {
             /* Drawn inline here, and not exported as an image, so it inherits
                the theme's colours: a diagram PNG is born with a background, and
                that background is wrong on half the visits. */
             svg: [
-              '<svg viewBox="0 0 720 190" role="img" aria-label="A pergunta sobe do navegador ao resolvedor, e do resolvedor aos servidores raiz, de TLD e autoritativo; a resposta desce sendo guardada em cache">',
+              '<svg viewBox="0 0 720 190" role="img" aria-label="The question climbs from the browser to the resolver, and from the resolver to the root, TLD and authoritative servers; the answer comes back down being cached">',
               '<g fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55">',
               '<rect x="8" y="60" width="118" height="46" rx="4"/>',
               '<rect x="176" y="60" width="128" height="46" rx="4"/>',
@@ -375,13 +378,13 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
               '<rect x="354" y="128" width="120" height="38" rx="4"/>',
               '</g>',
               '<g fill="currentColor" font-family="IBM Plex Mono, monospace" font-size="11">',
-              '<text x="67" y="80" text-anchor="middle">navegador</text>',
-              '<text x="67" y="95" text-anchor="middle" opacity=".6">tem cache</text>',
-              '<text x="240" y="80" text-anchor="middle">resolvedor</text>',
-              '<text x="240" y="95" text-anchor="middle" opacity=".6">do provedor</text>',
-              '<text x="414" y="40" text-anchor="middle">raiz  .</text>',
+              '<text x="67" y="80" text-anchor="middle">browser</text>',
+              '<text x="67" y="95" text-anchor="middle" opacity=".6">has a cache</text>',
+              '<text x="240" y="80" text-anchor="middle">resolver</text>',
+              '<text x="240" y="95" text-anchor="middle" opacity=".6">your provider\'s</text>',
+              '<text x="414" y="40" text-anchor="middle">root  .</text>',
               '<text x="414" y="96" text-anchor="middle">TLD  .ing</text>',
-              '<text x="414" y="152" text-anchor="middle">autoritativo</text>',
+              '<text x="414" y="152" text-anchor="middle">authoritative</text>',
               '</g>',
               '<g fill="none" stroke="currentColor" stroke-width="1.4" opacity=".8">',
               '<path d="M126 78h42" marker-end="url(#pt)"/>',
@@ -392,32 +395,32 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
               '<defs><marker id="pt" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">',
               '<path d="M0 0l8 4-8 4z" fill="currentColor"/></marker></defs>',
               '<g font-family="IBM Plex Mono, monospace" font-size="10" opacity=".55" fill="currentColor">',
-              '<text x="500" y="96">cada resposta desce</text>',
-              '<text x="500" y="112">guardada por TTL segundos</text>',
+              '<text x="500" y="96">every answer comes back down</text>',
+              '<text x="500" y="112">kept for TTL seconds</text>',
               '</g>',
               '</svg>',
             ].join(''),
-            caption: 'A pergunta sobe até quem sabe; a resposta desce sendo guardada em cache no caminho. É o cache do caminho que faz a propagação demorar.',
+            caption: 'The question climbs to whoever knows; the answer comes back down being cached along the way. It is that cache along the path that makes propagation take time.',
           },
         ],
       },
       {
-        id: 'propagacao',
-        title: 'Propagação: por que a mudança demora',
+        id: 'propagation',
+        title: 'Propagation: why the change takes time',
         body: [
-          'Alterou o DNS e o site velho continua aparecendo? Isso é o cache fazendo o trabalho dele. Cada registro tem um **TTL** — o tempo que os servidores do mundo podem guardar a resposta antes de perguntar de novo.',
-          'Nada "se espalha": o registro novo já está no ar desde o primeiro segundo. O que demora é os caches antigos expirarem, e o teto disso é o TTL que estava valendo **antes** da mudança.',
-          'Daí a manobra padrão de quem vai migrar: baixar o TTL para uns cinco minutos **um dia antes**, fazer a troca, conferir e só então voltar o TTL para horas. Baixar o TTL depois de mudar não adianta nada — os caches já pegaram o valor antigo.',
+          'Changed the DNS and the old site is still showing? That is the cache doing its job. Every record has a **TTL** — how long the world\'s servers may keep the answer before asking again.',
+          'Nothing "spreads": the new record has been live since the first second. What takes time is the old caches expiring, and the ceiling on that is the TTL that was in force **before** the change.',
+          'Hence the standard manoeuvre for anyone about to migrate: lower the TTL to about five minutes **a day beforehand**, make the change, check, and only then put the TTL back up to hours. Lowering the TTL after changing does nothing at all — the caches already took the old value.',
         ],
-        materials: ['wf-dns-resumo'],
+        materials: ['wf-dns-cheatsheet'],
       },
       {
-        id: 'subdominios',
-        title: 'Subdomínios: quando separar',
+        id: 'subdomains',
+        title: 'Subdomains: when to separate',
         body: [
-          'Subdomínio é de graça e ilimitado, então a pergunta nunca é "posso?", é "devo?". `app.exemplo.com` e `exemplo.com/app` resolvem a mesma necessidade de formas diferentes.',
-          'Subdomínio separa de verdade: cada um pode apontar para um servidor diferente, ter certificado próprio e, para muitos efeitos de segurança, é tratado como outro site — cookie de um não é enviado ao outro por padrão. É o que se quer para o painel administrativo, para a API e para o ambiente de teste.',
-          'Caminho na mesma origem compartilha tudo — sessão, cookie, certificado — e evita a configuração extra. É o que se quer quando as partes são o mesmo produto e conversam o tempo todo.',
+          'A subdomain is free and unlimited, so the question is never "can I?", it is "should I?". `app.example.com` and `example.com/app` solve the same need in different ways.',
+          'A subdomain really does separate: each can point at a different server, have a certificate of its own and, for many security purposes, is treated as another site — one\'s cookie is not sent to the other by default. That is what you want for the admin panel, for the API and for the test environment.',
+          'A path on the same origin shares everything — session, cookie, certificate — and avoids the extra configuration. That is what you want when the parts are the same product and talk to each other constantly.',
         ],
       },
     ],
@@ -425,56 +428,56 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     /* --------------------------------------------------------------- 09 */
     'Hosting: shared, VPS, cloud and CDN': [
       {
-        id: 'compartilhada',
-        title: 'Hospedagem compartilhada',
+        id: 'shared',
+        title: 'Shared hosting',
         video: true,
         duration: '08 min',
         body: [
-          'Um servidor, dezenas ou centenas de sites, todos dividindo o mesmo sistema operacional e os mesmos recursos. Você recebe um painel, uma pasta e um banco de dados; o provedor cuida do resto.',
-          'É a opção mais barata e a que exige menos conhecimento — e o preço disso é o controle. Não se instala o que se quer, a versão de linguagem é a que estiver lá, e o **vizinho barulhento** é real: um site vizinho recebendo um pico de acesso derruba o desempenho do seu, sem que você tenha feito nada.',
-          'Continua sendo a escolha certa para site institucional, blog e loja pequena. Deixa de ser quando você precisa de um processo rodando o tempo todo, de uma dependência específica ou de garantir desempenho.',
+          'One server, dozens or hundreds of sites, all sharing the same operating system and the same resources. You get a control panel, a folder and a database; the provider handles the rest.',
+          'It is the cheapest option and the one demanding the least knowledge — and the price of that is control. You do not install what you want, the language version is whatever is there, and the **noisy neighbour** is real: a neighbouring site taking a traffic spike drags your performance down without you having done anything.',
+          'It is still the right choice for a company site, a blog and a small shop. It stops being right when you need a process running all the time, a specific dependency, or guaranteed performance.',
         ],
       },
       {
         id: 'vps',
-        title: 'VPS: a máquina que é sua',
+        title: 'VPS: the machine that is yours',
         body: [
-          'Um **VPS** é uma fatia virtualizada de um servidor físico, com sistema operacional próprio e recursos reservados. Você entra por SSH e é administrador — instala o que quiser, escolhe as versões, abre as portas que precisar.',
-          'O que muda de verdade não é a potência: é **de quem é a responsabilidade**. Atualização de segurança, firewall, backup, certificado, monitoramento — tudo isso passa a ser seu. Um VPS esquecido por seis meses é uma máquina invadida esperando acontecer.',
-          'A conta que vale fazer antes de migrar: o VPS costuma custar pouco mais que a hospedagem compartilhada em dinheiro, e muito mais em horas. Se ninguém no time vai cuidar dele, o compartilhado ou uma plataforma gerenciada entregam mais.',
+          'A **VPS** is a virtualised slice of a physical server, with an operating system of its own and reserved resources. You log in over SSH and you are the administrator — install what you like, pick the versions, open the ports you need.',
+          'What really changes is not the power: it is **whose responsibility it is**. Security updates, firewall, backup, certificate, monitoring — all of that becomes yours. A VPS forgotten for six months is a compromised machine waiting to happen.',
+          'The sum worth doing before migrating: a VPS usually costs a little more than shared hosting in money, and a great deal more in hours. If nobody on the team is going to look after it, shared hosting or a managed platform delivers more.',
         ],
       },
       {
-        id: 'nuvem',
-        title: 'Nuvem: pagar pelo que se usa',
+        id: 'cloud',
+        title: 'Cloud: paying for what you use',
         body: [
-          'A nuvem — AWS, Azure, Google Cloud e afins — vende **recursos sob demanda**: você cria dez servidores em um minuto e os destrói em outro, pagando pelo tempo em que existiram. É a mesma ideia do VPS levada ao extremo da elasticidade, com um catálogo de serviços prontos em volta (banco gerenciado, fila, armazenamento, autenticação).',
-          'A vantagem real é acompanhar demanda que varia: uma loja que triplica o tráfego na Black Friday sobe capacidade naquele dia e devolve na semana seguinte. Uma loja de tráfego constante não ganha nada com isso — e provavelmente paga mais caro que num VPS.',
-          'Os dois custos que surpreendem quem chega: **transferência de dados para fora** costuma ser cobrada e some da estimativa inicial, e a complexidade sobe rápido. Uma arquitetura de nuvem mal dimensionada é mais cara e mais frágil que uma máquina só bem cuidada.',
+          'The cloud — AWS, Azure, Google Cloud and the like — sells **resources on demand**: you create ten servers in a minute and destroy them in another, paying for the time they existed. It is the same idea as a VPS taken to the extreme of elasticity, with a catalogue of ready-made services around it (managed database, queue, storage, authentication).',
+          'The real advantage is following demand that varies: a shop that triples its traffic on Black Friday adds capacity that day and gives it back the following week. A shop with steady traffic gains nothing from it — and probably pays more than it would on a VPS.',
+          'The two costs that surprise newcomers: **outbound data transfer** is usually billed and vanishes from the initial estimate, and complexity climbs fast. A badly sized cloud architecture is more expensive and more fragile than one well-tended machine.',
         ],
       },
       {
         id: 'cdn',
-        title: 'CDN: aproximar o conteúdo de quem pede',
+        title: 'CDN: bringing the content closer to whoever asks',
         body: [
-          'Uma **CDN** é uma rede de servidores espalhados pelo mundo que guardam cópias do seu conteúdo. Quem acessa de Lisboa recebe do nó de Lisboa, não do seu servidor em São Paulo.',
-          'Ela ataca exatamente o problema que largura de banda não resolve, três aulas atrás: **latência é distância**, e a única forma de reduzi-la é encurtar o caminho. Para arquivos estáticos — imagem, CSS, JavaScript, vídeo — o ganho é grande e a configuração é pequena.',
-          'A CDN não substitui a hospedagem: ela fica na frente dela. O seu servidor continua existindo e respondendo pelo que é dinâmico e pelo que a CDN ainda não tem em cache — é o que se chama de **origem**.',
-          'O efeito colateral que morde: como a CDN guarda cópias, publicar uma versão nova nem sempre aparece na hora. Ou se invalida o cache no deploy, ou se usa nome com impressão digital no arquivo — a mesma solução da aula de cache, agora em escala mundial.',
+          'A **CDN** is a network of servers spread around the world holding copies of your content. Somebody visiting from Lisbon is served by the Lisbon node, not by your server in São Paulo.',
+          'It attacks exactly the problem bandwidth cannot solve, three lessons back: **latency is distance**, and the only way to reduce it is to shorten the path. For static files — images, CSS, JavaScript, video — the gain is large and the configuration is small.',
+          'A CDN does not replace hosting: it sits in front of it. Your server still exists and still answers for what is dynamic and for what the CDN does not have cached yet — that is what is called the **origin**.',
+          'The side effect that bites: because the CDN holds copies, publishing a new version does not always show up straight away. Either you invalidate the cache on deploy, or you use a fingerprinted file name — the same solution as the cache lesson, now at world scale.',
         ],
       },
       {
-        id: 'escolher',
-        title: 'Como escolher',
+        id: 'choosing',
+        title: 'How to choose',
         body: [
-          'As quatro opções não formam uma escada em que a última é a melhor: elas respondem a perguntas diferentes.',
+          'The four options are not a ladder where the last one is best: they answer different questions.',
           [
-            '**Quanto controle você precisa?** Instalar coisas e rodar processos próprios já exclui o compartilhado.',
-            '**Quem vai administrar?** Sem alguém responsável por atualização e backup, gerenciado ganha de VPS.',
-            '**A demanda varia muito?** Se sim, a elasticidade da nuvem se paga. Se não, ela é custo sem contrapartida.',
-            '**Seu público está longe?** Então CDN, independentemente de qual das três estiver atrás.',
+            '**How much control do you need?** Installing things and running your own processes already rules out shared hosting.',
+            '**Who is going to administer it?** With nobody responsible for updates and backups, managed beats a VPS.',
+            '**Does demand vary a lot?** If so, the cloud\'s elasticity pays for itself. If not, it is cost with nothing in return.',
+            '**Is your audience far away?** Then a CDN, regardless of which of the three is behind it.',
           ],
-          'E vale dizer o que este curso mesmo faz: a vitrine da escola é um site estático publicado no GitHub Pages, que é hospedagem gerenciada com CDN embutida, de graça. Para HTML, CSS e JavaScript sem servidor, é difícil justificar mais que isso.',
+          'And it is worth saying what this course itself does: the school\'s vitrine is a static site published on GitHub Pages, which is managed hosting with a CDN built in, for free. For HTML, CSS and JavaScript with no server, it is hard to justify more than that.',
         ],
       },
     ],
@@ -483,39 +486,39 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     'How the browser builds the page: DOM, CSSOM and rendering': [
       {
         id: 'dom',
-        title: 'DOM: o HTML virando árvore',
+        title: 'DOM: the HTML becoming a tree',
         body: [
-          'O navegador lê o HTML e constrói o **DOM** — uma árvore de objetos em que cada elemento é um nó com pai, filhos e propriedades. O HTML é o texto; o DOM é o que existe na memória depois de interpretá-lo.',
-          'A distinção importa porque o DOM não é obrigado a se parecer com o arquivo. Ele é corrigido na montagem (uma tag mal fechada é remendada) e alterado depois, pelo JavaScript. Por isso "ver o código-fonte" e "inspecionar o elemento" podem mostrar coisas diferentes — o primeiro é o texto que veio, o segundo é a árvore como está agora.',
+          'The browser reads the HTML and builds the **DOM** — a tree of objects in which every element is a node with a parent, children and properties. The HTML is the text; the DOM is what exists in memory after interpreting it.',
+          'The distinction matters because the DOM is not obliged to look like the file. It is corrected while being built (a badly closed tag gets patched) and altered afterwards by JavaScript. That is why "view source" and "inspect element" can show different things — the first is the text that arrived, the second is the tree as it is now.',
         ],
       },
       {
         id: 'cssom',
-        title: 'CSSOM e o cálculo de estilo',
+        title: 'CSSOM and style computation',
         body: [
-          'O CSS passa pelo mesmo processo e vira o **CSSOM**. Aí o navegador combina as duas árvores para decidir o estilo final de cada nó, resolvendo herança, especificidade e ordem.',
-          'É neste ponto que se decide uma disputa como a que este portal enfrentou: uma regra do navegador para `[hidden]` tem especificidade zero e perde para qualquer classe que declare `display`. Nada disso é visível no arquivo CSS — só no estilo computado.',
-          'CSS **bloqueia a renderização** de propósito: mostrar a página sem estilo e reestilizá-la depois piscaria a tela inteira. Por isso folha de estilo grande atrasa a primeira pintura, e por isso `<link>` de CSS fica no `<head>`.',
+          'The CSS goes through the same process and becomes the **CSSOM**. Then the browser combines the two trees to decide the final style of every node, resolving inheritance, specificity and order.',
+          'This is where a dispute like the one this portal ran into gets decided: a browser rule for `[hidden]` has zero specificity and loses to any class declaring `display`. None of that is visible in the CSS file — only in the computed style.',
+          'CSS **blocks rendering** on purpose: showing the page unstyled and restyling it afterwards would flash the whole screen. That is why a large stylesheet delays the first paint, and why the CSS `<link>` goes in the `<head>`.',
         ],
       },
       {
-        id: 'renderizacao',
+        id: 'rendering',
         video: true,
         duration: '11 min',
-        title: 'Layout, pintura e composição',
+        title: 'Layout, paint and composition',
         body: [
-          'Com estilo resolvido, faltam três passos: **layout** calcula a posição e o tamanho de cada caixa, **pintura** desenha os pixels, e **composição** junta as camadas na tela.',
-          'O custo de cada um é bem diferente, e é isso que separa animação suave de animação travada. Mudar `width` ou `top` refaz o layout de tudo o que estiver em volta. Mudar `background-color` só repinta. Mudar `transform` ou `opacity` mexe só na composição, que a placa de vídeo faz sozinha.',
-          'Daí a regra prática mais rentável do front-end: **anime `transform` e `opacity`**, não `left`, `top` ou `width`.',
+          'With the style resolved, three steps remain: **layout** computes the position and size of every box, **paint** draws the pixels, and **composition** puts the layers together on screen.',
+          'The cost of each is very different, and that is what separates a smooth animation from a stuttering one. Changing `width` or `top` redoes the layout of everything around it. Changing `background-color` only repaints. Changing `transform` or `opacity` touches only composition, which the graphics card does on its own.',
+          'Hence the most profitable practical rule in front-end work: **animate `transform` and `opacity`**, not `left`, `top` or `width`.',
         ],
       },
       {
         id: 'scripts',
-        title: 'Onde o JavaScript entra',
+        title: 'Where JavaScript comes in',
         body: [
-          'Um `<script>` comum **para a montagem do DOM** enquanto baixa e executa, porque ele pode alterar a árvore que está sendo construída. Script no topo do `<head>` é a receita clássica de página em branco.',
-          'Dois atributos resolvem: `defer` baixa em paralelo e executa depois do HTML montado, preservando a ordem entre scripts; `async` baixa em paralelo e executa assim que chegar, sem garantir ordem nenhuma.',
-          '`defer` é o padrão certo para o código da própria página, e é também o comportamento de um `<script type="module">` — o que explica por que este portal pode chamar `document.querySelector` no topo do módulo sem esperar por evento nenhum.',
+          'An ordinary `<script>` **stops the DOM being built** while it downloads and executes, because it may alter the very tree under construction. A script at the top of the `<head>` is the classic recipe for a blank page.',
+          'Two attributes solve it: `defer` downloads in parallel and executes after the HTML is built, preserving the order between scripts; `async` downloads in parallel and executes as soon as it arrives, guaranteeing no order at all.',
+          '`defer` is the right default for the page\'s own code, and it is also the behaviour of a `<script type="module">` — which explains why this portal can call `document.querySelector` at the top of a module without waiting for any event.',
         ],
       },
     ],
@@ -523,32 +526,32 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     /* --------------------------------------------------------------- 11 */
     'Developer tools: network, console and elements': [
       {
-        id: 'elementos',
-        title: 'Elementos: o DOM ao vivo',
+        id: 'elements',
+        title: 'Elements: the DOM live',
         body: [
-          'A aba **Elementos** mostra o DOM como ele está agora, não como o arquivo veio — e deixa editar tudo ali mesmo, o que é a forma mais rápida de testar uma ideia de layout sem tocar no código.',
-          'O painel de estilos ao lado é onde se resolve "por que esta regra não pega": ele lista todas as declarações que atingem o elemento, rasura as que perderam e mostra de qual arquivo e linha cada uma veio. A aba de estilo **computado** dá a palavra final, com o valor que realmente valeu.',
-          'O modelo de caixa desenhado embaixo — conteúdo, padding, borda, margem — responde quase toda pergunta de espaçamento em dois segundos.',
+          'The **Elements** tab shows the DOM as it is now, not as the file arrived — and lets you edit all of it right there, which is the fastest way to test a layout idea without touching the code.',
+          'The styles panel beside it is where "why is this rule not applying" gets settled: it lists every declaration reaching the element, strikes through the ones that lost and shows which file and line each came from. The **computed** style tab has the final word, with the value that actually won.',
+          'The box model drawn underneath — content, padding, border, margin — answers almost any spacing question in two seconds.',
         ],
       },
       {
         id: 'console',
         video: true,
         duration: '12 min',
-        title: 'Console: erros e experimentos',
+        title: 'Console: errors and experiments',
         body: [
-          'O **Console** é o primeiro lugar a olhar quando algo não funciona, e o mais ignorado por quem está começando. Erro de JavaScript, arquivo que não carregou, recurso bloqueado — tudo aparece ali, e quase sempre com a linha exata.',
-          'Ele também é um ambiente de execução: dá para inspecionar variáveis, chamar funções da página e testar um seletor antes de escrevê-lo no código. `$0` refere-se ao elemento selecionado na aba Elementos.',
-          'Um aviso que vale: nunca cole código que um desconhecido mandou colar no console. Ele roda com todos os privilégios da página aberta, inclusive os seus cookies de sessão — é um golpe comum o bastante para alguns sites imprimirem um aviso ali.',
+          'The **Console** is the first place to look when something does not work, and the most ignored by beginners. A JavaScript error, a file that did not load, a blocked resource — it all shows up there, and almost always with the exact line.',
+          'It is also an execution environment: you can inspect variables, call the page\'s functions and test a selector before writing it into the code. `$0` refers to the element selected in the Elements tab.',
+          'One warning worth heeding: never paste code a stranger told you to paste into the console. It runs with all the privileges of the open page, including your session cookies — it is a common enough scam that some sites print a warning right there.',
         ],
       },
       {
-        id: 'rede',
-        title: 'Rede: o que foi pedido e o que voltou',
+        id: 'network',
+        title: 'Network: what was asked for and what came back',
         body: [
-          'A aba **Rede** lista cada pedido que a página fez, com método, status, tamanho e tempo. É onde se confirma, em vez de supor, quase tudo o que este curso apresentou.',
-          'O que olhar primeiro: o **status** (4xx é seu, 5xx é do servidor), o **tempo** dividido entre espera e transferência — que separa servidor lento de conexão lenta —, e a coluna de **tamanho**, onde uma resposta servida do cache aparece como tal em vez de trafegar de novo.',
-          'Duas opções mudam o diagnóstico: *Disable cache* força tudo a ser buscado, mostrando como é a primeira visita de um usuário novo; e a limitação de velocidade simula uma conexão ruim, que é a única forma honesta de saber como o site se comporta fora do seu Wi-Fi.',
+          'The **Network** tab lists every request the page made, with method, status, size and timing. It is where you confirm, instead of assuming, almost everything this course has presented.',
+          'What to look at first: the **status** (4xx is yours, 5xx is the server\'s), the **timing** split between waiting and transferring — which separates a slow server from a slow connection — and the **size** column, where a response served from cache shows up as such instead of travelling again.',
+          'Two options change the diagnosis: *Disable cache* forces everything to be fetched, showing what a new user\'s first visit looks like; and throttling simulates a bad connection, which is the only honest way to know how the site behaves outside your Wi-Fi.',
         ],
       },
     ],

@@ -319,7 +319,7 @@ export function drawEdges(root, t) {
       // unlocks has been finished, dimmed when it has not
       const met = courseById(d) && courseState(d) === 'done';
       lines.push(
-        '<g class="edge' + (met ? ' edge-done' : '') + '" data-de="' + esc(d) + '" data-para="' + esc(node.id) + '">' +
+        '<g class="edge' + (met ? ' edge-done' : '') + '" data-from="' + esc(d) + '" data-to="' + esc(node.id) + '">' +
           '<title>' + esc(nodeLabel(d, g)) + ' → ' + esc(nodeLabel(node.id, g)) + '</title>' +
           '<path class="hit" d="' + dd + '"/>' +
           '<path class="row" d="' + dd + '"/>' +

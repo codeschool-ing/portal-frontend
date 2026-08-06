@@ -469,7 +469,7 @@ body.no-rail .rail{display:none}
 
 /* `list-style:none` because the numbering belongs to `.lesson-num`, monospaced
    and zero-padded: letting the <ol> marker show up as well numbered the same
-   line twice ("1. 01 Cliente, servidor e host"). */
+   line twice ("1. 01 Client, server and host"). */
 .lessons{display:flex;flex-direction:column;gap:1px;list-style:none;padding:0}
 .lesson-row{
   display:grid;grid-template-columns:18px 26px 1fr auto;align-items:center;gap:4px 10px;
@@ -498,7 +498,7 @@ body.no-rail .rail{display:none}
    unlike the vitrine's rows, which scroll because there height is the scarce
    resource and there are arrows to navigate with. Here there are no arrows, and
    a scrollable row with no affordance hides the last section without warning:
-   which is what happened to "Como escolher", the fifth in the hosting topic,
+   which is what happened to "How to choose", the fifth in the hosting topic,
    that simply did not show up. */
 .steps{display:flex;flex-wrap:wrap;gap:6px}
 .step{
@@ -1490,7 +1490,7 @@ html[data-theme="light"] .cert-in{--linkedin:#0a66c2}
   /* Search goes before everything else — it is the most dispensable item on the
      bar, because the Catalogue is one tap away in the rail and it already has
      the field. Without this the account avatar was clipped by the right border
-     at 390px. It is the vitrine's own order of sacrifice, where "Área do aluno"
+     at 390px. It is the vitrine's own order of sacrifice, where "Student area"
      gives way first. */
   #search-btn{display:none}
   .account-avatar{width:28px;height:28px}

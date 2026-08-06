@@ -89,9 +89,9 @@ function buildIndex() {
     lessons.forEach((a) => {
       const sections = lessonSections(c.id, a.key);
       const first = '#/course/' + c.id + '/lesson/' + a.ix + '/' + sections[0].id;
-      /* The translated title AND the Portuguese key: see the header of this
-         file. In Portuguese the two are the same string, and then the key stays
-         out — repeated, it would become the excerpt of the result. */
+      /* The translated title AND the join key: see the header of this file. In
+         English — the source language — the two are the same string, and then
+         the key stays out; repeated, it would become the result's excerpt. */
       add('lessons', a.title, c.name, first, a.key === a.title ? '' : a.key);
 
       /* A section only becomes a result where the content was written. In the 84

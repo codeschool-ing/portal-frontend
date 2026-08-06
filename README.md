@@ -86,9 +86,9 @@ French and Italian.
 
 Nothing was translated by hand for this: all 86 course names, all 1,503 topic
 titles and all 16 tracks already had an English translation in
-`i18n-cursos-en.js`. The move was an inversion — that file's values became the
-base, and the base became a translation. `i18n-cursos-en.js` would have been an
-identity map afterwards, so it is gone.
+the vitrine's English catalogue dictionary. The move was an inversion — that
+file's values became the base, and the base became a translation. The English
+dictionary would have been an identity map afterwards, so it is gone.
 
 **The join key moved with it.** Content is matched by course plus topic title,
 and the title is English now on both the catalogue side and the exercise side.
@@ -108,8 +108,8 @@ normally.
 
 **The top bar is the same, with a different job.** The brand with its LED, the
 theme, the language and the panels' `.term-bar` frame all stayed. The sales links
-(Trilhas · Cursos · Planos · FAQ) went, and the student's context came in. There
-is a symmetry here: the vitrine's "Área do aluno" link is described in that
+(Tracks · Courses · Plans · FAQ) went, and the student's context came in. There
+is a symmetry here: the vitrine's "Student area" link is described in that
 repository's README as a *placeholder for future functionality*. This repository
 is its destination.
 
@@ -127,9 +127,9 @@ routing with 16px of clearance. What changed is what the card says.
 Four states: **completed · in progress · available · further ahead**.
 
 **It shows, but it does not lock.** The vitrine's FAQ promises, in writing:
-*"Não. A trilha é uma recomendação de ordem — se você só precisa de um curso
-dela, assista só ele."* A padlock here would contradict an already published
-promise. That is why the most restrictive state is called `adiante`, remains
+*"No. The track is a recommended order — if you only need one course from it,
+watch just that one."* A padlock here would contradict an already published
+promise. That is why the most restrictive state is called `ahead`, remains
 clickable, and the card's footer says "recommended after X" instead of "locked".
 
 **The cursor lights up a course's edges** — the ones arriving at it and the ones
@@ -173,11 +173,11 @@ the title on the `:` and the commas and get 734 divisions for free, and it would
 have been a mistake: that is lexical heuristics over authored prose, exactly what
 `RULES.md` records having tried and discarded when checking "requires a later
 topic" — *"the answer is in the authoring, not in the detection"*. It would fail
-the same way here: `Cliente, servidor e host: quem pede e quem responde` would become a
-section called "quem pede e quem responde". The enumeration in the title is
+the same way here: `Client, server and host: who asks and who answers` would
+become a section called "who asks and who answers". The enumeration in the title is
 **evidence** that the sections are needed; it is not a source for reading them.
 
-The sections live in `assets/lessons-*.js`, and not in `dados.js`, because that
+The sections live in `assets/lessons-*.js`, and not in the catalogue, because that
 one is a copy of the vitrine's catalogue and the modal over there renders
 `topicos` as a flat list. That leaves three files with three owners and the same
 join key:
@@ -227,21 +227,21 @@ price was landing in a section without knowing which lesson it belonged to.)
 
 | | |
 | --- | --- |
-| `--trilho` | the menu column |
-| `--leitura` | 820px, the narrow column |
-| `--amplo` | 934–1074px, the wide column |
-| `--tela` | which of the two is in force — **everything** in the lesson uses it |
+| `--rail` | the menu column |
+| `--reading` | 820px, the narrow column |
+| `--wide` | 934–1074px, the wide column |
+| `--screen` | which of the two is in force — **everything** in the lesson uses it |
 
 This was the third attempt, and the first two got it wrong the same way.
 
 The first let the **player** bleed edge to edge while the text stayed at 820. The
-second released the **example** to `--amplo` — and then the player along with it
+second released the **example** to `--wide` — and then the player along with it
 — and left the rest at 820. Both produced the same thing: different margins
 inside one lesson, the eye hunting for where the line starts on every scroll.
 Fixing it element by element did not converge, because the defect belonged to no
 element: it was that there was more than one width.
 
-Now there is `--tela`, and it holds for the title, the breadcrumbs, the steps,
+Now there is `--screen`, and it holds for the title, the breadcrumbs, the steps,
 the prose, the player, the example, the material and the footer. A single
 variable settles it **by construction** — there is no way for one element to
 disagree with another, not even mid-resize.
@@ -256,9 +256,9 @@ alignment on the right, not the one on the left.
 
 The wide column was **measured, not guessed**. The longest line that exists in
 the examples has 74 characters; IBM Plex Mono at 12.64px advances 7.601px per
-character — 562px, plus 36px of padding, 598px. Hence `--cod:604px`: a little
-more than the line, not the whole screen. The note has `--nota:440px` as its
-ceiling and `--nota-min:300px` as its floor, and it is the note that shrinks when
+character — 562px, plus 36px of padding, 598px. Hence `--code:604px`: a little
+more than the line, not the whole screen. The note has `--note:440px` as its
+ceiling and `--note-min:300px` as its floor, and it is the note that shrinks when
 space runs short, because the code cannot.
 
 The wide column's ceiling comes from the **navigation arrow**, which lives in the
@@ -388,7 +388,7 @@ body: [
 ```
 
 The shape grew because the content asked for it, and only as much as it asked.
-The block reuses `.cod-bloco`, the exercises' component, and is escaped with
+The block reuses `.code-block`, the exercises' component, and is escaped with
 `esc` and not with `formatted`: inside code, a backtick is a backtick and an
 asterisk is an asterisk.
 
@@ -408,8 +408,8 @@ Brazil. That is how it turned up, in an English Chromium.
 
 The key is the **Portuguese text**, stored by `saveBase()` on load. It is the
 vitrine's own i18n decision — *the translation key is the Portuguese text itself*
-— applied to the join with the content. Each lesson carries both things: `titulo`
-to display, `chave` to match on.
+— applied to the join with the content. Each lesson carries both things: `title`
+to display, `key` to match on.
 
 ## The translation has two halves, and only one crosses intact
 
@@ -460,7 +460,7 @@ instead of handing out a "correct" nobody verified.
 Three of the school's rules that the interface has respected since day one,
 because they are easy to get wrong and expensive to fix later:
 
-- **`porque` is post-answer feedback, not a visible hint.** It only appears after
+- **`why` is post-answer feedback, not a visible hint.** It only appears after
   answering.
 - **The JSON's order is the answer key** in `ordering` (the `items` are in the
   right order) and in `matching` (`pairs[i].left ↔ pairs[i].right`). Both
@@ -483,7 +483,7 @@ before closing an exercise.
 emits (`prompt`, `socraticHint`, `options[].{text,correct,why}`, `items`,
 `trap`, `pairs`, `rightDistractors`,
 `tests[].{description,input,expected_output}`, `check_*`). The portal adds
-two fields that are its own, not the exercise's: `id` and `curso`.
+two fields that are its own, not the exercise's: `id` and `course`.
 
 Ignoring the tool for now costs nothing; inventing a parallel format would cost a
 migration.
@@ -517,7 +517,7 @@ app/materials.js               the list of material to download
 assets/plans.js                the plans and what each one includes
 assets/materials.js            GENERATED — the PDFs, as data: URIs
 tools/materials/               generates assets/materials.js
-tools/examples/                runs the `exemplo` blocks and checks the output
+tools/examples/                runs the `example` blocks and checks the output
 app/screens/*.js               one per screen
 app/exercises/*.js             one per type, plus the wrapper and the grading
 tools/smoke/                   the smoke suite
@@ -714,7 +714,7 @@ written in the content file. It is the field that will need sanitising the day
 the content comes from outside, and the comment in the code exists so that
 question does not slip by.)
 
-**The `exemplo` is [Go By Example](https://gobyexample.com)'s shape:** the
+**The `example` is [Go By Example](https://gobyexample.com)'s shape:** the
 explanation on one side, the program on the other, each note at the height of the
 snippet it comments on. It earns a block of its own because **a paragraph between
 two snippets breaks the program** — the reader loses the thread that this is one
@@ -770,11 +770,11 @@ Every code component has a button in the top-right corner, as on
 gobyexample.com: the annotated `example`, the prose code block and the given
 code of a `expected-output` exercise.
 
-**In an `exemplo` it copies the WHOLE program.** The block cuts the file into
+**In an `example` it copies the WHOLE program.** The block cuts the file into
 snippets precisely so each one can carry a note beside it — that is the entire
 argument for the shape. A button that handed over the snippet under the cursor
 would answer a question nobody asked; the reader wants the program. So it
-gathers every `.exemplo-cod` in order and joins them back. The output block is
+gathers every `.example-code` in order and joins them back. The output block is
 deliberately *not* copyable: it is what the program prints, not something
 anyone pastes into an editor.
 
@@ -794,7 +794,7 @@ old `execCommand` selection is the fallback.
 **And when both fail, the button says so.** Always showing the check would be
 easy and nobody would notice until they pasted. It is the same rule the grading
 follows at the other end of the portal: not checked never becomes passed, so
-not copied never becomes copied. That also makes the test cheap — the `copiado`
+not copied never becomes copied. That also makes the test cheap — the `copied`
 class only appears when the write resolved, so asserting the class proves the
 copy happened, with no clipboard-read permission needed.
 
@@ -826,7 +826,7 @@ create an import cycle that `bundle.py` refuses.
 In `web-fundamentals` the subject is concepts and prose is enough. In `html-css`
 the code appears in short fragments. In `javascript` the subject is a
 **language**, and a language is learned by reading programs — the first four
-lessons were written almost entirely in `exemplo`.
+lessons were written almost entirely in `example`.
 
 **Every example has to run**, and there is a tool to guarantee that:
 
@@ -848,7 +848,7 @@ only finds out in their own console.
 
 ## Supporting material
 
-The section references material by key (`materials: ['wf-dns-resumo']`); the
+The section references material by key (`materials: ['wf-dns-cheatsheet']`); the
 record with title, type and size lives in `window.MATERIALS`. The indirection
 exists for one day only: when the file leaves the `data:` URI and becomes a
 signed bucket URL, the record changes — not one line of content has to be
@@ -948,10 +948,10 @@ left arrow  → centred in the gap between the rail and the column
 right arrow → centred in the gap between the column and the screen edge
 ```
 
-The rail and the column became **CSS variables** (`--trilho`, `--tela`) because
+The rail and the column became **CSS variables** (`--rail`, `--screen`) because
 the arrow's position derives from both — and a number repeated in two places
 diverges. It already diverged once, in the content's padding, and it cost 2px of
-horizontal scrolling on the phone. It is `--tela` and not `--leitura`: when the
+horizontal scrolling on the phone. It is `--screen` and not `--reading`: when the
 lesson widens the gap shrinks, and an arrow positioned by the narrow column would
 sit on top of the wide one's content.
 
@@ -1038,7 +1038,7 @@ inside a 390×844 and fails if it goes past the width or hangs off the bottom.
 **The catalogue's categories gained arrows.** There are nine, and not even with
 the rail closed do they fit on one line: the last ones were clipped at the border
 with nothing saying there was more. The structure is the vitrine's —
-`.chips-caixa` with an arrow on each side and a fade at the ends — and `base.css`
+`.chips-box` with an arrow on each side and a fade at the ends — and `base.css`
 already carried the style for all three pieces. Reimplementing it would mean
 maintaining two of everything. When everything fits, the arrows disappear: a
 disabled arrow that never does anything is noise.
@@ -1071,7 +1071,7 @@ They are on the record because none of them appears by reading the code:
    a dark screen. One defect, visible in half the browsers.
 
    The vitrine already knew half of this: where it leaves a bar on show
-   (`.cursos-rol`), it declares `scrollbar-width` **and** `scrollbar-color`
+   (`.courses-scroll`), it declares `scrollbar-width` **and** `scrollbar-color`
    together. The portal's rail had copied only the first. Now there is
    `color-scheme` at the root following the theme, the colour declared on every
    scrollable container, and a test that **sweeps the whole page** looking for any

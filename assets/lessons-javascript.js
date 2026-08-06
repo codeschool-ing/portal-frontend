@@ -1,25 +1,25 @@
 /* ==========================================================================
    Lesson content — JavaScript.
 
-   WHY THIS COURSE USES `exemplo` THE MOST
+   WHY THIS COURSE USES `example` THE MOST
    In `web-fundamentals` the subject is concepts: what a packet is, why
    propagation takes time. Prose covers it. In `html-css` the code shows up, but
    in short fragments — one selector, three properties.
 
    Here the subject is a LANGUAGE, and a language is learned by reading programs.
    A three-line snippet teaches the syntax and hides what matters: how the parts
-   fit together. The `exemplo` block exists for that — the program runs down the
+   fit together. The `example` block exists for that — the program runs down the
    left in one piece, the explanation of each fragment sits beside it, and nobody
    has to break the file into paragraphs in order to comment on it.
 
-   THE RULE THAT HOLDS FOR EVERY EXAMPLE HERE: it has to RUN. Every `saida` was
+   THE RULE THAT HOLDS FOR EVERY EXAMPLE HERE: it has to RUN. Every `output` was
    written from what the program actually prints, including the parts that
    surprise — `0.30000000000000004`, `'11'`, `[object Object]`. An example with
    invented output teaches the wrong thing, and the student finds out in their
    own console.
 
-   Join key: course + the topic's text IN PORTUGUESE (see the header of
-   lessons-web-fundamentals.js).
+   Join key: course + the topic's text in the source language (see the header of
+   lessons-web-fundamentals.js). The Portuguese is in assets/lessons-pt.js.
    ========================================================================== */
 
 window.LESSONS = Object.assign(window.LESSONS || {}, {
@@ -29,8 +29,8 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     'ES6+ syntax: let/const, arrow functions and template strings': [
       {
         // video only: the course's opening, with no text to read along
-        id: 'apresentacao',
-        title: 'Apresentação do curso',
+        id: 'intro',
+        title: 'Introduction to the course',
         video: true,
         duration: '03 min',
       },
@@ -38,65 +38,65 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
         id: 'let-const',
         video: true,
         duration: '09 min',
-        title: 'let e const: o fim do var',
+        title: 'let and const: the end of var',
         body: [
-          '`var` tem duas propriedades que ninguém pediu: ela vaza para fora do bloco onde foi declarada e pode ser redeclarada sem reclamação. `let` e `const` não fazem nem uma coisa nem outra, e por isso `var` não aparece mais em código novo.',
+          '`var` has two properties nobody asked for: it leaks out of the block it was declared in, and it can be redeclared without complaint. `let` and `const` do neither, and that is why `var` no longer shows up in new code.',
           {
             example: {
               language: 'javascript',
-              file: 'escopo.js',
+              file: 'scope.js',
               parts: [
                 {
-                  code: 'if (true) {\n  var antiga = "eu vazo";\n  let nova = "eu fico";\n}',
-                  note: 'As duas são declaradas dentro do `if`. Só uma delas continua existindo depois da chave que fecha.',
+                  code: 'if (true) {\n  var old = "I leak";\n  let fresh = "I stay put";\n}',
+                  note: 'Both are declared inside the `if`. Only one of them still exists after the closing brace.',
                 },
                 {
-                  code: 'console.log(antiga);',
-                  note: '`var` é de FUNÇÃO, não de bloco: ela foi içada para o topo da função e sobreviveu ao bloco. É daí que vem quase todo bug de variável trocada em laço.',
+                  code: 'console.log(old);',
+                  note: '`var` is FUNCTION-scoped, not block-scoped: it was hoisted to the top of the function and survived the block. That is where nearly every swapped-variable-in-a-loop bug comes from.',
                 },
                 {
-                  code: 'try {\n  console.log(nova);\n} catch (e) {\n  console.log(e.constructor.name);\n}',
-                  note: '`let` morre com o bloco. Fora dele o nome nem existe — e o erro é `ReferenceError`, não `undefined`, o que é uma diferença importante: falhar alto é melhor que seguir com lixo.',
+                  code: 'try {\n  console.log(fresh);\n} catch (e) {\n  console.log(e.constructor.name);\n}',
+                  note: '`let` dies with the block. Outside it the name does not even exist — and the error is a `ReferenceError`, not `undefined`, which is an important difference: failing loudly beats carrying on with rubbish.',
                 },
                 {
-                  code: 'const lista = [1, 2];\nlista.push(3);\nconsole.log(lista);',
-                  note: 'A confusão mais comum de `const`: ela congela a LIGAÇÃO, não o valor. `lista = []` daria erro; mexer dentro do array, não. Para congelar o conteúdo existe `Object.freeze`.',
+                  code: 'const list = [1, 2];\nlist.push(3);\nconsole.log(list);',
+                  note: 'The most common confusion about `const`: it freezes the BINDING, not the value. `list = []` would be an error; changing things inside the array is not. To freeze the contents there is `Object.freeze`.',
                 },
               ],
-              output: 'eu vazo\nReferenceError\n[ 1, 2, 3 ]',
+              output: 'I leak\nReferenceError\n[ 1, 2, 3 ]',
             },
           },
-          'A regra prática: **`const` por padrão, `let` quando o valor for mesmo trocar, `var` nunca.** Começar por `const` faz o compilador avisar quando você reatribui sem querer — e a maioria das reatribuições que a gente escreve sem pensar é acidente.',
+          'The practical rule: **`const` by default, `let` when the value really is going to change, `var` never.** Starting from `const` makes the compiler warn you when you reassign by accident — and most of the reassignments we write without thinking are accidents.',
         ],
       },
       {
         id: 'arrow',
-        title: 'Arrow functions, e o que elas não têm',
+        title: 'Arrow functions, and what they do not have',
         body: [
-          'A seta encurta a escrita, mas essa é a parte menos importante. O que muda de verdade é que ela **não tem `this` próprio** — ela usa o `this` de onde foi escrita.',
+          'The arrow shortens the writing, but that is the least important part. What really changes is that it **has no `this` of its own** — it uses the `this` of wherever it was written.',
           {
             example: {
               language: 'javascript',
-              file: 'seta.js',
+              file: 'arrow.js',
               parts: [
                 {
-                  code: 'const dobro = n => n * 2;\nconsole.log(dobro(4));',
-                  note: 'Um parâmetro, um retorno: sem parênteses, sem `return`, sem chaves. É a forma que aparece dentro de `map` e `filter` o tempo todo.',
+                  code: 'const double = n => n * 2;\nconsole.log(double(4));',
+                  note: 'One parameter, one return: no parentheses, no `return`, no braces. It is the form that shows up inside `map` and `filter` all the time.',
                 },
                 {
-                  code: 'const par = (a, b) => ({ a, b });\nconsole.log(par(1, 2));',
-                  note: 'Devolver um objeto exige os parênteses em volta. Sem eles, `{` é lido como início de bloco, e a função devolve `undefined` — em silêncio.',
+                  code: 'const pair = (a, b) => ({ a, b });\nconsole.log(pair(1, 2));',
+                  note: 'Returning an object requires the parentheses around it. Without them, `{` is read as the start of a block, and the function returns `undefined` — silently.',
                 },
                 {
-                  code: 'const contador = {\n  n: 7,\n  comum() { return this.n; },\n  seta: () => (typeof this === "undefined" ? "sem this" : "this de fora"),\n};',
-                  note: 'A diferença que importa. A função comum recebe `this` de quem a CHAMOU; a seta herdou o `this` do lugar onde foi ESCRITA — e num módulo ES esse lugar não tem `this` nenhum.',
+                  code: 'const counter = {\n  n: 7,\n  plain() { return this.n; },\n  arrow: () => (typeof this === "undefined" ? "no this" : "outer this"),\n};',
+                  note: 'The difference that matters. The plain function gets `this` from whoever CALLED it; the arrow inherited the `this` of the place where it was WRITTEN — and in an ES module that place has no `this` at all.',
                 },
                 {
-                  code: 'console.log(contador.comum());\nconsole.log(contador.seta());',
-                  note: 'A seta nem enxerga o objeto de que é propriedade. Por isso ela é ótima para callback — carrega o `this` de fora junto — e péssima para método.',
+                  code: 'console.log(counter.plain());\nconsole.log(counter.arrow());',
+                  note: 'The arrow cannot even see the object it is a property of. That is why it is excellent for a callback — it carries the outer `this` along — and terrible for a method.',
                 },
               ],
-              output: '8\n{ a: 1, b: 2 }\n7\nsem this',
+              output: '8\n{ a: 1, b: 2 }\n7\nno this',
             },
           },
         ],
@@ -105,9 +105,9 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
         id: 'template',
         title: 'Template strings',
         body: [
-          'Crase em vez de aspas, `${}` para interpolar, e a quebra de linha vale literalmente. Some a concatenação com `+`, que é onde nascem os espaços faltando.',
-          { code: 'javascript', text: 'const nome = "Ana";\nconst n = 3;\n\nconsole.log(`${nome} concluiu ${n} ${n === 1 ? "curso" : "cursos"}.`);\n// Ana concluiu 3 cursos.' },
-          'A interpolação aceita **qualquer expressão**, não só variável — chamada de função, ternário, operação. O que ela não deve receber é texto vindo do usuário destinado a virar HTML: aí a interpolação vira o furo, e é por isso que este portal tem um `esc()` em `app/text.js`.',
+          'Backticks instead of quotes, `${}` to interpolate, and a line break counts literally. Concatenation with `+` disappears, which is where the missing spaces are born.',
+          { code: 'javascript', text: 'const name = "Ana";\nconst n = 3;\n\nconsole.log(`${name} finished ${n} ${n === 1 ? "course" : "courses"}.`);\n// Ana finished 3 courses.' },
+          'Interpolation accepts **any expression**, not just a variable — a function call, a ternary, an operation. What it must not receive is user text destined to become HTML: that is where interpolation turns into the hole, and it is why this portal has an `esc()` in `app/text.js`.',
         ],
       },
     ],
@@ -115,30 +115,30 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     /* --------------------------------------------------------------- 02 */
     'Types, coercion, strict equality and falsy values': [
       {
-        id: 'coercao',
-        title: 'Coerção: quando a linguagem adivinha',
+        id: 'coercion',
+        title: 'Coercion: when the language guesses',
         body: [
-          'JavaScript converte tipos sozinho quando um operador recebe o que não esperava. Isso resolve pequenas conveniências e cria as maiores surpresas da linguagem.',
+          'JavaScript converts types on its own when an operator receives something it did not expect. That solves small conveniences and creates the language\'s biggest surprises.',
           {
             example: {
               language: 'javascript',
-              file: 'coercao.js',
+              file: 'coercion.js',
               parts: [
                 {
                   code: 'console.log(1 + "1");\nconsole.log(1 - "1");',
-                  note: '`+` é sobrecarregado: com uma string de um lado ele CONCATENA. `-` não tem essa ambiguidade, então converte para número. Mesmo par de valores, dois resultados de naturezas diferentes.',
+                  note: '`+` is overloaded: with a string on one side it CONCATENATES. `-` has no such ambiguity, so it converts to a number. The same pair of values, two results of different natures.',
                 },
                 {
                   code: 'console.log([] + {});\nconsole.log([1, 2] + [3]);',
-                  note: 'Objeto virando string passa por `toString()`. O de array junta com vírgula; o de objeto comum devolve `[object Object]`. É por isso que aquela mensagem aparece na tela às vezes.',
+                  note: 'An object becoming a string goes through `toString()`. An array\'s joins with commas; a plain object\'s returns `[object Object]`. That is why that message shows up on screen sometimes.',
                 },
                 {
                   code: 'console.log(0.1 + 0.2);\nconsole.log(0.1 + 0.2 === 0.3);',
-                  note: 'Este não é bug de JavaScript: é ponto flutuante IEEE-754, e vale igual em Python, Java e C. Dinheiro se guarda em centavos inteiros, nunca em `float`.',
+                  note: 'This is not a JavaScript bug: it is IEEE-754 floating point, and it holds the same in Python, Java and C. Money is stored in whole cents, never in a `float`.',
                 },
                 {
                   code: 'console.log(Number("12px"));\nconsole.log(parseInt("12px", 10));',
-                  note: '`Number` é tudo ou nada; `parseInt` lê enquanto der e para. Ler a largura de um CSS pede o segundo — e o `10` não é opcional por hábito, é o que evita a base errada.',
+                  note: '`Number` is all or nothing; `parseInt` reads as far as it can and stops. Reading a width out of CSS calls for the second — and the `10` is not optional out of habit, it is what avoids the wrong base.',
                 },
               ],
               output: '11\n0\n[object Object]\n1,23\n0.30000000000000004\nfalse\nNaN\n12',
@@ -147,28 +147,28 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
         ],
       },
       {
-        id: 'igualdade',
+        id: 'equality',
         video: true,
         duration: '08 min',
-        title: '== contra ===',
+        title: '== against ===',
         body: [
-          '`==` compara depois de converter; `===` compara sem converter. A tabela do `==` tem casos que ninguém memoriza, e a saída disso é simples: **use `===` sempre.**',
+          '`==` compares after converting; `===` compares without converting. The `==` table has cases nobody memorises, and the conclusion is simple: **use `===` always.**',
           {
             example: {
               language: 'javascript',
-              file: 'igual.js',
+              file: 'equality.js',
               parts: [
                 {
                   code: 'console.log(0 == "");\nconsole.log(0 == "0");\nconsole.log("" == "0");',
-                  note: 'Os três com `==`. Repare que os dois primeiros são verdadeiros e o terceiro é falso: `==` **não é transitivo**, o que basta para descartá-lo.',
+                  note: 'All three with `==`. Note that the first two are true and the third is false: `==` **is not transitive**, which is enough to rule it out.',
                 },
                 {
                   code: 'console.log(null == undefined);\nconsole.log(null === undefined);',
-                  note: 'A única exceção que vale conhecer: `x == null` é o jeito curto de perguntar "é `null` ou `undefined`?". É o único uso defensável de `==`.',
+                  note: 'The one exception worth knowing: `x == null` is the short way of asking "is it `null` or `undefined`?". It is the only defensible use of `==`.',
                 },
                 {
                   code: 'console.log(NaN === NaN);\nconsole.log(Number.isNaN(NaN));',
-                  note: '`NaN` é o único valor diferente de si mesmo. Testar com `===` nunca funciona; a pergunta certa é `Number.isNaN`.',
+                  note: '`NaN` is the only value different from itself. Testing with `===` never works; the right question is `Number.isNaN`.',
                 },
               ],
               output: 'true\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue',
@@ -177,108 +177,108 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
         ],
       },
       {
-        id: 'falsos',
+        id: 'falsy',
         video: true,
         duration: '11 min',
-        title: 'Os oito valores falsos',
+        title: 'The eight falsy values',
         body: [
-          'Num `if`, qualquer valor vira booleano. São **oito** os que viram `false` — e todo o resto vira `true`, inclusive `[]`, `{}` e `"0"`:',
+          'In an `if`, any value becomes a boolean. **Eight** of them become `false` — and everything else becomes `true`, including `[]`, `{}` and `"0"`:',
           [
             '`false`, `0`, `-0`, `0n` (BigInt zero)',
-            '`""` (string vazia)',
+            '`""` (the empty string)',
             '`null`, `undefined`, `NaN`',
           ],
-          'A armadilha prática está em `0` e `""` serem falsos: `if (quantidade)` ignora a quantidade zero, e `if (nome)` ignora o nome vazio — nos dois casos tratando "existe e vale zero/vazio" como "não existe".',
+          'The practical trap is that `0` and `""` are falsy: `if (quantity)` ignores a quantity of zero, and `if (name)` ignores an empty name — in both cases treating "exists and is zero/empty" as "does not exist".',
           {
             example: {
               language: 'javascript',
-              file: 'falsos.js',
+              file: 'falsy.js',
               parts: [
                 {
-                  code: 'const config = { retries: 0, titulo: "" };',
-                  note: 'Dois valores legítimos que por acaso são falsos. Zero tentativas é uma decisão; título vazio também.',
+                  code: 'const config = { retries: 0, title: "" };',
+                  note: 'Two legitimate values that happen to be falsy. Zero retries is a decision; an empty title is one too.',
                 },
                 {
-                  code: 'console.log(config.retries || 3);\nconsole.log(config.titulo || "sem título");',
-                  note: 'O `||` clássico atropela os dois: ele testa "é falso?", não "está ausente?". O zero que o usuário escolheu virou três.',
+                  code: 'console.log(config.retries || 3);\nconsole.log(config.title || "no title");',
+                  note: 'The classic `||` runs over both: it tests "is it falsy?", not "is it absent?". The zero the user chose became three.',
                 },
                 {
-                  code: 'console.log(config.retries ?? 3);\nconsole.log(JSON.stringify(config.titulo ?? "sem título"));',
-                  note: '`??` só entra em ação para `null` e `undefined` — o zero e a string vazia passam intactos. É o operador que a maioria dos `||` de valor padrão realmente queria ser. (O `JSON.stringify` está aí só para a string vazia aparecer como `""` em vez de uma linha em branco.)',
+                  code: 'console.log(config.retries ?? 3);\nconsole.log(JSON.stringify(config.title ?? "no title"));',
+                  note: '`??` only kicks in for `null` and `undefined` — the zero and the empty string pass through untouched. It is the operator most default-value `||`s really wanted to be. (The `JSON.stringify` is there only so the empty string shows as `""` instead of a blank line.)',
                 },
               ],
-              output: '3\nsem título\n0\n""',
+              output: '3\nno title\n0\n""',
             },
           },
         ],
-        materials: ['js-coercao-tabela'],
+        materials: ['js-coercion-table'],
       },
     ],
 
     /* --------------------------------------------------------------- 03 */
     'Objects, arrays, spread and destructuring': [
       {
-        id: 'desestruturar',
-        title: 'Desestruturação',
+        id: 'destructuring',
+        title: 'Destructuring',
         body: [
-          'Tirar campos de um objeto ou itens de um array sem repetir o nome da fonte em cada linha. É a sintaxe que mais aparece em código moderno depois da seta.',
+          'Pulling fields out of an object or items out of an array without repeating the source name on every line. It is the syntax that shows up most in modern code after the arrow.',
           {
             example: {
               language: 'javascript',
-              file: 'destruct.js',
+              file: 'destructure.js',
               parts: [
                 {
-                  code: 'const curso = { id: "js", nome: "JavaScript", horas: 80 };',
-                  note: 'O objeto de partida.',
+                  code: 'const course = { id: "js", name: "JavaScript", hours: 80 };',
+                  note: 'The starting object.',
                 },
                 {
-                  code: 'const { nome, horas } = curso;\nconsole.log(nome, horas);',
-                  note: 'Os nomes à esquerda são as CHAVES, não posições. Ordem não importa; grafia importa.',
+                  code: 'const { name, hours } = course;\nconsole.log(name, hours);',
+                  note: 'The names on the left are the KEYS, not positions. Order does not matter; spelling does.',
                 },
                 {
-                  code: 'const { nome: titulo, nivel = "livre" } = curso;\nconsole.log(titulo, nivel);',
-                  note: 'Duas coisas de uma vez: renomear na saída, e um padrão para a chave que não existe. O padrão só entra quando o valor é `undefined` — `null` passa direto.',
+                  code: 'const { name: title, level = "open" } = course;\nconsole.log(title, level);',
+                  note: 'Two things at once: renaming on the way out, and a default for the key that does not exist. The default only kicks in when the value is `undefined` — `null` goes straight through.',
                 },
                 {
-                  code: 'function resumo({ nome, horas }) {\n  return `${nome}: ${horas}h`;\n}\nconsole.log(resumo(curso));',
-                  note: 'Desestruturar no PARÂMETRO é onde ela mais rende: a assinatura passa a documentar o que a função usa, em vez de receber um `opcoes` opaco.',
+                  code: 'function summary({ name, hours }) {\n  return `${name}: ${hours}h`;\n}\nconsole.log(summary(course));',
+                  note: 'Destructuring in the PARAMETER is where it pays off most: the signature starts documenting what the function uses, instead of taking an opaque `options`.',
                 },
               ],
-              output: 'JavaScript 80\nJavaScript livre\nJavaScript: 80h',
+              output: 'JavaScript 80\nJavaScript open\nJavaScript: 80h',
             },
           },
         ],
       },
       {
-        id: 'espalhar',
+        id: 'spread',
         video: true,
         duration: '09 min',
-        title: 'Espalhar e juntar',
+        title: 'Spreading and gathering',
         body: [
-          'As mesmas três reticências fazem coisas opostas conforme o lado em que estão: à direita elas **espalham**, à esquerda elas **juntam**.',
+          'The same three dots do opposite things depending on which side they are on: on the right they **spread**, on the left they **gather**.',
           {
             example: {
               language: 'javascript',
               file: 'spread.js',
               parts: [
                 {
-                  code: 'const base = { tema: "escuro", idioma: "pt" };\nconst novo = { ...base, idioma: "en" };\nconsole.log(novo);',
-                  note: 'Cópia com alteração, sem mexer no original. A ordem decide quem vence: a última chave repetida sobrescreve — por isso `idioma` sai `en`.',
+                  code: 'const base = { theme: "dark", language: "pt" };\nconst fresh = { ...base, language: "en" };\nconsole.log(fresh);',
+                  note: 'A copy with a change, without touching the original. The order decides who wins: the last repeated key overwrites — which is why `language` comes out as `en`.',
                 },
                 {
                   code: 'const a = [1, 2];\nconst b = [0, ...a, 3];\nconsole.log(b);',
-                  note: 'O mesmo em array, mantendo a ordem. Substitui `concat` e o velho `push.apply`.',
+                  note: 'The same for an array, keeping the order. It replaces `concat` and the old `push.apply`.',
                 },
                 {
-                  code: 'function soma(...numeros) {\n  return numeros.reduce((t, n) => t + n, 0);\n}\nconsole.log(soma(1, 2, 3, 4));',
-                  note: 'Do outro lado: aqui as reticências JUNTAM os argumentos num array de verdade. É o substituto de `arguments`, que não era array e não existe em arrow function.',
+                  code: 'function sum(...numbers) {\n  return numbers.reduce((t, n) => t + n, 0);\n}\nconsole.log(sum(1, 2, 3, 4));',
+                  note: 'On the other side: here the dots GATHER the arguments into a real array. It is the replacement for `arguments`, which was not an array and does not exist in an arrow function.',
                 },
                 {
-                  code: 'const orig = { dono: { nome: "Ana" } };\nconst copia = { ...orig };\ncopia.dono.nome = "Bia";\nconsole.log(orig.dono.nome);',
-                  note: 'A pegadinha: a cópia é RASA. O objeto de dentro continua sendo o mesmo, e alterá-lo altera os dois. Para cópia profunda existe `structuredClone`.',
+                  code: 'const orig = { owner: { name: "Ana" } };\nconst copy = { ...orig };\ncopy.owner.name = "Bia";\nconsole.log(orig.owner.name);',
+                  note: 'The gotcha: the copy is SHALLOW. The inner object is still the same one, and changing it changes both. For a deep copy there is `structuredClone`.',
                 },
               ],
-              output: "{ tema: 'escuro', idioma: 'en' }\n[ 0, 1, 2, 3 ]\n10\nBia",
+              output: "{ theme: 'dark', language: 'en' }\n[ 0, 1, 2, 3 ]\n10\nBia",
             },
           },
         ],
@@ -289,29 +289,29 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     'Functions, scope, closures and the value of this': [
       {
         id: 'closure',
-        title: 'Closure: a função que lembra',
+        title: 'Closure: the function that remembers',
         body: [
-          'Uma função criada dentro de outra continua enxergando as variáveis da de fora, mesmo depois de a de fora ter terminado. Isso não é um recurso avançado: é o que faz callback, `setTimeout` e quase todo padrão de módulo funcionarem.',
+          'A function created inside another one goes on seeing the outer one\'s variables, even after the outer one has finished. That is not an advanced feature: it is what makes callbacks, `setTimeout` and almost every module pattern work.',
           {
             example: {
               language: 'javascript',
               file: 'closure.js',
               parts: [
                 {
-                  code: 'function contador() {\n  let n = 0;',
-                  note: '`n` vive dentro de `contador`. Ninguém de fora consegue tocá-lo — não há `private`, e não precisa.',
+                  code: 'function counter() {\n  let n = 0;',
+                  note: '`n` lives inside `counter`. Nobody outside can touch it — there is no `private`, and none is needed.',
                 },
                 {
-                  code: '  return {\n    incrementar: () => ++n,\n    ler: () => n,\n  };\n}',
-                  note: 'As duas setas fecham sobre o mesmo `n`. Devolver funções em vez do valor é o que transforma escopo em encapsulamento.',
+                  code: '  return {\n    increment: () => ++n,\n    read: () => n,\n  };\n}',
+                  note: 'Both arrows close over the same `n`. Returning functions instead of the value is what turns scope into encapsulation.',
                 },
                 {
-                  code: 'const c = contador();\nc.incrementar();\nc.incrementar();\nconsole.log(c.ler());',
-                  note: '`contador()` já retornou faz tempo, e `n` continua vivo — porque alguém ainda o referencia. É o coletor de lixo que decide, não a pilha de chamadas.',
+                  code: 'const c = counter();\nc.increment();\nc.increment();\nconsole.log(c.read());',
+                  note: '`counter()` returned long ago, and `n` is still alive — because somebody still references it. The garbage collector decides, not the call stack.',
                 },
                 {
-                  code: 'const outro = contador();\nconsole.log(outro.ler());',
-                  note: 'Cada chamada cria um escopo NOVO. Dois contadores não compartilham nada, que é o que separa closure de variável global.',
+                  code: 'const other = counter();\nconsole.log(other.read());',
+                  note: 'Every call creates a NEW scope. Two counters share nothing, which is what separates a closure from a global variable.',
                 },
               ],
               output: '2\n0',
@@ -323,32 +323,32 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
         id: 'this',
         video: true,
         duration: '13 min',
-        title: 'O valor de this',
+        title: 'The value of this',
         body: [
-          '`this` não é decidido onde a função é escrita, e sim **onde ela é chamada** — com uma exceção, a arrow function. Quase todo bug de `this` é a mesma função tendo sido separada do objeto dela.',
+          '`this` is not decided where the function is written, but **where it is called** — with one exception, the arrow function. Almost every `this` bug is the same function having been separated from its object.',
           {
             example: {
               language: 'javascript',
               file: 'this.js',
               parts: [
                 {
-                  code: 'const aluno = {\n  nome: "Ana",\n  ola() { return `oi, ${this.nome}`; },\n};\nconsole.log(aluno.ola());',
-                  note: 'Chamada como método: `this` é o que está à esquerda do ponto.',
+                  code: 'const student = {\n  name: "Ana",\n  hello() { return `hi, ${this.name}`; },\n};\nconsole.log(student.hello());',
+                  note: 'Called as a method: `this` is whatever is to the left of the dot.',
                 },
                 {
-                  code: 'const solta = aluno.ola;\ntry {\n  console.log(solta());\n} catch (e) {\n  console.log(e.constructor.name);\n}',
-                  note: 'A MESMA função, chamada sem dono. Em módulo ES o `this` é `undefined`, e ler `.nome` dele explode. É exatamente o que acontece ao passar `obj.metodo` como callback — e o `try` está aqui só para o exemplo continuar rodando.',
+                  code: 'const loose = student.hello;\ntry {\n  console.log(loose());\n} catch (e) {\n  console.log(e.constructor.name);\n}',
+                  note: 'The SAME function, called with no owner. In an ES module `this` is `undefined`, and reading `.name` off it blows up. It is exactly what happens when you pass `obj.method` as a callback — and the `try` is here only so the example keeps running.',
                 },
                 {
-                  code: 'const presa = aluno.ola.bind(aluno);\nconsole.log(presa());',
-                  note: '`bind` amarra o `this` de uma vez. A alternativa moderna é passar uma seta: `() => aluno.ola()`, que carrega o contexto de fora.',
+                  code: 'const bound = student.hello.bind(student);\nconsole.log(bound());',
+                  note: '`bind` ties `this` down once and for all. The modern alternative is to pass an arrow: `() => student.hello()`, which carries the outer context along.',
                 },
               ],
-              output: 'oi, Ana\nTypeError\noi, Ana',
+              output: 'hi, Ana\nTypeError\nhi, Ana',
             },
           },
         ],
-        materials: ['js-this-mapa'],
+        materials: ['js-this-map'],
       },
     ],
   },

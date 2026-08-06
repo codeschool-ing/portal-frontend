@@ -123,20 +123,90 @@ const MOVED_IDS = {
   'go-tec': 'go-tech', 'sql-tec': 'sql-tech',
 };
 
+/* Section ids and exercise ids moved with the content, and they are stored keys
+   too — one level below the course. A section id is unique only inside its
+   course, so the map is scoped by course; an exercise id is globally unique, so
+   it is not. Miss these and a student keeps the course but loses every section
+   they ticked and every answer they gave in it. */
+const MOVED_SECTIONS = {
+  'web-fundamentals': {
+    'apresentacao': 'intro', 'papeis': 'roles', 'ida-e-volta': 'round-trip',
+    'pacote': 'packet', 'quadro': 'frame', 'banda': 'bandwidth', 'latencia': 'latency',
+    'vazao': 'throughput', 'porque-camadas': 'why-layers', 'as-camadas': 'the-layers',
+    'metodos': 'methods', 'cabecalhos': 'headers', 'sessoes': 'sessions',
+    'registro': 'registration', 'propagacao': 'propagation', 'subdominios': 'subdomains',
+    'compartilhada': 'shared', 'nuvem': 'cloud', 'escolher': 'choosing',
+    'renderizacao': 'rendering', 'elementos': 'elements', 'rede': 'network',
+  },
+  'html-css': {
+    'esqueleto': 'skeleton', 'metadados': 'metadata', 'onde-entra': 'where-they-go',
+    'por-que': 'why-not-div', 'regioes': 'regions', 'rotulos': 'labels',
+    'tipos': 'field-types', 'validacao': 'validation', 'tabelas': 'tables',
+    'imagens': 'images', 'midia': 'media', 'seletores': 'selectors',
+    'especificidade': 'specificity', 'cascata': 'cascade', 'caixa': 'box', 'unidades': 'units',
+    'fluxo': 'flow', 'eixos': 'axes', 'alinhamento': 'alignment', 'crescer': 'grow-shrink',
+    'linhas-colunas': 'rows-columns', 'implicito': 'implicit', 'variaveis': 'variables',
+    'tema': 'theme', 'organizar': 'organising', 'transicao': 'transition',
+    'utilitarios': 'utilities', 'configurar': 'configuration', 'quando': 'when-not',
+  },
+  javascript: {
+    'apresentacao': 'intro', 'coercao': 'coercion', 'igualdade': 'equality', 'falsos': 'falsy',
+    'desestruturar': 'destructuring', 'espalhar': 'spread',
+  },
+};
+
+const MOVED_EXERCISES = {
+  'js-coercao-quiz-1': 'js-coercion-quiz-1', 'js-coercao-multipla-1': 'js-coercion-multiple-1',
+  'js-coercao-ordenacao-1': 'js-coercion-ordering-1',
+  'js-coercao-associacao-1': 'js-coercion-matching-1',
+  'js-coercao-saida-1': 'js-coercion-output-1', 'js-coercao-codigo-1': 'js-coercion-code-1',
+  'js-demo-expressao-1': 'js-demo-expression-1', 'js-sintaxe-quiz-1': 'js-syntax-quiz-1',
+  'js-objetos-associacao-1': 'js-objects-matching-1', 'est-derivada-1': 'stats-derivative-1',
+  'wf-11-saida': 'wf-11-output',
+};
+
 const movedId = (id) => MOVED_IDS[id] || id;
+
+/* `course` is the id AFTER the move — this runs once the course keys are already
+   renamed, and the section maps are written against the new names. */
+function moveSections(course, lessons) {
+  const map = MOVED_SECTIONS[course];
+  if (!map || !lessons) return lessons;
+  const rename = (o, m) => (o ? Object.fromEntries(Object.entries(o).map(([k, v]) => [m[k] || k, v])) : o);
+  return Object.fromEntries(Object.entries(lessons).map(([ix, lesson]) => [ix, {
+    ...lesson,
+    sections: rename(lesson.sections, map),
+    exercises: rename(lesson.exercises, MOVED_EXERCISES),
+  }]));
+}
 
 function moveIds(doc) {
   const keyed = (o) => (o ? Object.fromEntries(Object.entries(o).map(([k, v]) => [movedId(k), v])) : o);
   const out = { ...doc };
-  if (out.progress) out.progress = keyed(out.progress);
-  if (out.notes) out.notes = keyed(out.notes);
+  if (out.progress) {
+    out.progress = Object.fromEntries(Object.entries(keyed(out.progress)).map(([course, rec]) =>
+      [course, { ...rec, lessons: moveSections(course, rec.lessons) }]));
+  }
+  /* A note is filed under course → lesson index → SECTION id. */
+  if (out.notes) {
+    out.notes = Object.fromEntries(Object.entries(keyed(out.notes)).map(([course, byLesson]) => {
+      const map = MOVED_SECTIONS[course];
+      if (!map) return [course, byLesson];
+      return [course, Object.fromEntries(Object.entries(byLesson || {}).map(([ix, bySection]) =>
+        [ix, Object.fromEntries(Object.entries(bySection || {}).map(([sec, text]) => [map[sec] || sec, text]))]))];
+    }));
+  }
   if (out.exams) {
     out.exams = Object.fromEntries(Object.entries(out.exams).map(([k, v]) => {
       const [scope, id] = [k.slice(0, k.indexOf(':') + 1), k.slice(k.indexOf(':') + 1)];
       return [scope + movedId(id), v];
     }));
   }
-  if (out.last?.courseId) out.last = { ...out.last, courseId: movedId(out.last.courseId) };
+  if (out.last?.courseId) {
+    const courseId = movedId(out.last.courseId);
+    const map = MOVED_SECTIONS[courseId] || {};
+    out.last = { ...out.last, courseId, sectionId: map[out.last.sectionId] || out.last.sectionId };
+  }
   if (out.enrollment) {
     const e = { ...out.enrollment };
     if (e.trackId) e.trackId = movedId(e.trackId);
@@ -325,7 +395,7 @@ export function saveAnswer(courseId, ix, exId, verdict) {
       attempts: before.attempts + 1,
       // once right, still right: redoing it to practise does not take the credit
       correct: before.correct || verdict.correct === true,
-      /* `conferido` separates "got it wrong" from "nobody checked". Without it,
+      /* `checked` separates "got it wrong" from "nobody checked". Without it,
          a code exercise that was answered and never executed was
          indistinguishable from a mistake, and the performance screen would
          count as a failure something that was never judged — the same confusion
