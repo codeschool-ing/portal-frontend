@@ -7,7 +7,7 @@
    was written — when it is time to revise, nobody remembers which section they
    noted what in.
 
-   They also show up in the global search, under the "suas notas" group.
+   They also show up in the global search, under the "your notes" group.
    ========================================================================== */
 
 import { courseLessons, courseById } from '../catalog.js';
@@ -31,28 +31,28 @@ export default async function notes() {
   list.forEach((n) => { (byCourse[n.courseId] = byCourse[n.courseId] || []).push(n); });
 
   const el = document.createElement('div');
-  el.className = 'tela tela-notas';
+  el.className = 'view tela-notas';
   el.innerHTML =
-    '<header class="tela-head">' +
+    '<header class="view-head">' +
       '<h1>' + txt('Your notes') + '</h1>' +
       '<p>' + list.length + ' ' + (list.length === 1 ? txt('score') : txt('notes')) + '</p>' +
     '</header>' +
     Object.entries(byCourse).map(([courseId, ofCourse]) => {
       const c = courseById(courseId);
       const lessons = courseLessons(courseId);
-      return '<section class="bloco">' +
-        '<div class="bloco-topo">' +
+      return '<section class="block">' +
+        '<div class="block-top">' +
           '<h2>' + esc(c ? c.name : courseId) + '</h2>' +
-          '<a class="bloco-link" href="#/curso/' + esc(courseId) + '">' + txt('open the course') + ' →</a>' +
+          '<a class="block-link" href="#/course/' + esc(courseId) + '">' + txt('open the course') + ' →</a>' +
         '</div>' +
         ofCourse.map((n) => {
           const a = lessons[n.lessonIx];
           const s = a && lessonSections(courseId, a.key).find((x) => x.id === n.sectionId);
-          return '<article class="nota-item">' +
-            '<a class="nota-onde" href="#/curso/' + esc(courseId) + '/aula/' + n.lessonIx + '/' + esc(n.sectionId) + '">' +
+          return '<article class="note-item">' +
+            '<a class="note-where" href="#/course/' + esc(courseId) + '/lesson/' + n.lessonIx + '/' + esc(n.sectionId) + '">' +
               (a ? esc(a.title) : '') + (s ? ' · ' + esc(s.title) : '') + ' →' +
             '</a>' +
-            '<p class="nota-texto">' + esc(n.text) + '</p>' +
+            '<p class="note-text">' + esc(n.text) + '</p>' +
           '</article>';
         }).join('') +
       '</section>';

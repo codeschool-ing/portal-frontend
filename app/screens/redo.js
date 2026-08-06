@@ -7,7 +7,7 @@
    curriculum — it is the mistake.
 
    EACH EXERCISE'S CONTEXT IS PRESERVED. The wizard stores the answer under
-   `progresso[curso].aulas[ix]`, so each one has to come back with the course and
+   `progresso[curso].lessons[ix]`, so each one has to come back with the course and
    the lesson it came from; passing a single context would record the correct
    answer against the wrong lesson, and the performance screen would start lying
    about where the person improved.
@@ -24,20 +24,20 @@ export default async function redo() {
   }
 
   const el = document.createElement('div');
-  el.className = 'tela tela-refazer';
+  el.className = 'view tela-refazer';
   el.innerHTML =
-    '<header class="tela-head">' +
+    '<header class="view-head">' +
       '<h1>' + txt('The ones you got wrong') + '</h1>' +
       '<p>' + list.length + ' ' + (list.length === 1
         ? txt('exercise, from the course you answered it in.')
         : txt('exercises, from every course you answered in.')) + '</p>' +
     '</header>' +
-    '<section class="bloco"></section>';
+    '<section class="block"></section>';
 
   /* One context per exercise, and not a single one for the whole wizard: each
      answer has to be stored against the lesson it came from. */
   const contextByIndex = list.map((r) => ({ courseId: r.courseId, lessonIx: r.lessonIx }));
-  el.querySelector('.bloco').appendChild(
+  el.querySelector('.block').appendChild(
     buildAssessment(list.map((r) => r.ex), contextByIndex),
   );
 

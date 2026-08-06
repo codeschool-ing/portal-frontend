@@ -45,14 +45,14 @@ export const COURSE_QUESTIONS = 10;
 export const TRACK_QUESTIONS = 15;
 
 /* Every exercise in a course, each one knowing which lesson it came from — the
-   wizard stores the answer under `progresso[curso].aulas[ix]`, and an exam that
+   wizard stores the answer under `progress[course].lessons[ix]`, and an exam that
    pooled lessons without keeping the origin would file everything against the
    wrong lesson. */
 export function courseBank(courseId) {
   const out = [];
   courseLessons(courseId).forEach((a, ix) => {
     lessonExercises(courseId, a.key).forEach((ex) => {
-      out.push({ ex, ctx: { courseId: courseId, lessonIx: ix }, aula: a.title });
+      out.push({ ex, ctx: { courseId, lessonIx: ix }, lesson: a.title });
     });
   });
   return out;
@@ -77,7 +77,7 @@ export function courseExam(courseId, attempt = 0) {
     scope: 'course',
     about: courseId,
     title: c ? c.name : courseId,
-    backTo: '#/curso/' + courseId,
+    backTo: '#/course/' + courseId,
     items: draw(bank, COURSE_QUESTIONS, courseId + ':' + attempt),
     bankSize: bank.length,
   };
@@ -91,7 +91,7 @@ export function trackExam(track, activeOption, attempt = 0) {
     scope: 'track',
     about: track.id,
     title: track.name,
-    backTo: '#/trilha',
+    backTo: '#/track',
     items: draw(bank, TRACK_QUESTIONS, track.id + ':' + attempt),
     bankSize: bank.length,
     courses: path.length,

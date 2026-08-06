@@ -136,7 +136,7 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
   // the graph does not end in loose courses with no outgoing arrow
   const hasSuccessor = {};
   nodes.forEach((n) => n.deps.forEach((d) => { hasSuccessor[d] = true; }));
-  nodes.push({ id: '@saida', kind: 'saida', courses: [], deps: nodes.filter((n) => !hasSuccessor[n.id]).map((n) => n.id) });
+  nodes.push({ id: '@outcome', kind: 'outcome', courses: [], deps: nodes.filter((n) => !hasSuccessor[n.id]).map((n) => n.id) });
 
   const successors = {};
   nodes.forEach((n) => n.deps.forEach((d) => { (successors[d] = successors[d] || []).push(n.id); }));

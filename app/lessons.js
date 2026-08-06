@@ -53,14 +53,14 @@ export function lessonSections(courseId, key) {
   const written = window.LESSONS?.[courseId]?.[key];
 
   const sections = written?.length
-    ? written.map((s) => ({ ...s, tipo: 'conteudo' }))
-    : [{ id: 'conteudo', title: 'Conteúdo', tipo: 'conteudo', body: null }];
+    ? written.map((s) => ({ ...s, type: 'content' }))
+    : [{ id: 'content', title: 'Conteúdo', type: 'content', body: null }];
 
   const exercises = lessonExercises(courseId, key);
   sections.push({
-    id: 'avaliacao',
+    id: 'assessment',
     title: 'Avaliação',
-    tipo: 'avaliacao',
+    type: 'assessment',
     count: exercises.length,
     pending: exercises.length === 0,
     countsTowardsProgress: exercises.length > 0,
@@ -99,7 +99,7 @@ export const sectionIndex = (sections, sectionId) => {
 
 /* ---------- supplementary material ----------
 
-   A section refers to material by KEY (`materiais: ['wf-dns-resumo']`), and the
+   A section refers to material by KEY (`materials: ['wf-dns-resumo']`), and the
    record with title, size and bytes lives in `window.MATERIALS`. Two reasons,
    and the second is the one that matters:
 

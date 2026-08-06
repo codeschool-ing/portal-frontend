@@ -59,21 +59,21 @@ import { COPY_ICONS } from './text.js';
 
 const HELD = 1600;   // how long the button stays in its "copied" state
 
-/* Inside an `exemplo` the program is cut into snippets with a note beside each
+/* Inside an `example` the program is cut into snippets with a note beside each
    one; joining them back is the point — nobody wants a third of a program.
-   Inside a `.cod-bloco` there is a single `<pre>`.
+   Inside a `.code-block` there is a single `<pre>`.
 
    `textContent` and never `innerHTML`: the snippets went through `highlight()`
    and are wrapped in `<span>`s, so reading the markup would paste the colours
    along with the code. It also decodes what `esc()` wrote, which is the round
    trip we want — what is copied is what the author typed. */
 export function codeToCopy(button) {
-  const example = button.closest('.exemplo');
+  const example = button.closest('.example');
   if (example) {
-    return [...example.querySelectorAll('.exemplo-cod')].map((el) => el.textContent).join('\n');
+    return [...example.querySelectorAll('.example-code')].map((el) => el.textContent).join('\n');
   }
-  const block = button.closest('.cod-bloco');
-  const pre = block && block.querySelector('pre.cod');
+  const block = button.closest('.code-block');
+  const pre = block && block.querySelector('pre.code');
   return pre ? pre.textContent : '';
 }
 
@@ -109,14 +109,14 @@ function flash(button, ok) {
   clearTimeout(button.dataset.timer);
   const label = ok ? txt('code copied') : txt('could not copy');
   button.innerHTML = ok ? COPY_ICONS.copied : COPY_ICONS.copy;
-  button.classList.toggle('copiado', ok);
-  button.classList.toggle('falhou', !ok);
+  button.classList.toggle('copied', ok);
+  button.classList.toggle('failed', !ok);
   button.setAttribute('aria-label', label);
   button.setAttribute('title', label);
 
   button.dataset.timer = setTimeout(() => {
     button.innerHTML = COPY_ICONS.copy;
-    button.classList.remove('copiado', 'falhou');
+    button.classList.remove('copied', 'failed');
     button.setAttribute('aria-label', txt('Copy the code'));
     button.setAttribute('title', txt('Copy the code'));
   }, HELD);

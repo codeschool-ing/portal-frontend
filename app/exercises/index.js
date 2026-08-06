@@ -57,40 +57,40 @@ export function buildExercise(ex, ctx, ix, options = {}) {
   el.dataset.ex = uid;
 
   if (!mod) {
-    el.innerHTML = '<p class="ex-erro">' + txt('unknown exercise type') + ': ' + esc(ex.type) + '</p>';
+    el.innerHTML = '<p class="ex-error">' + txt('unknown exercise type') + ': ' + esc(ex.type) + '</p>';
     return el;
   }
 
   el.innerHTML =
-    '<header class="ex-topo">' +
-      '<span class="ex-tipo">' + txt(ex.type) + '</span>' +
-      (ex.difficulty ? '<span class="ex-dif">' + txt(ex.difficulty) + '</span>' : '') +
+    '<header class="ex-top">' +
+      '<span class="ex-type">' + txt(ex.type) + '</span>' +
+      (ex.difficulty ? '<span class="ex-difficulty">' + txt(ex.difficulty) + '</span>' : '') +
     '</header>' +
-    '<p class="ex-enunciado">' + formatted(ex.prompt) + '</p>' +
-    '<div class="ex-corpo">' + mod.body(ex, uid) + '</div>' +
+    '<p class="ex-prompt">' + formatted(ex.prompt) + '</p>' +
+    '<div class="ex-body">' + mod.body(ex, uid) + '</div>' +
     // the hint is scaffolding for someone learning; in an exam it is a cheat sheet
     (ex.socraticHint && !exam
-      ? '<details class="ex-dica"><summary>' + txt('hint') + '</summary><p>' + formatted(ex.socraticHint) + '</p></details>'
+      ? '<details class="ex-hint"><summary>' + txt('hint') + '</summary><p>' + formatted(ex.socraticHint) + '</p></details>'
       : '') +
-    '<div class="ex-acoes">' +
+    '<div class="ex-actions">' +
       (mod.selfCompleting ? '' : '<button type="button" class="btn btn-primary ex-responder">' +
         txt(exam ? 'Registrar resposta' : 'Responder') + '</button>') +
       (exam ? '' : '<button type="button" class="btn btn-ghost ex-refazer" hidden>' + txt('Try again') + '</button>') +
     '</div>' +
-    '<div class="ex-veredito" aria-live="polite"></div>';
+    '<div class="ex-verdict" aria-live="polite"></div>';
 
-  const body = el.querySelector('.ex-corpo');
+  const body = el.querySelector('.ex-body');
 
   async function check(answer) {
-    const out = el.querySelector('.ex-veredito');
+    const out = el.querySelector('.ex-verdict');
     if (answer === null) {
-      out.className = 'ex-veredito v-vazio';
+      out.className = 'ex-verdict v-empty';
       out.textContent = txt('Answer before checking.');
       return;
     }
     const button = el.querySelector('.ex-responder');
     if (button) button.disabled = true;
-    out.className = 'ex-veredito v-esperando';
+    out.className = 'ex-verdict v-waiting';
     out.textContent = txt('checking…');
 
     const v = await api.grade(ex, answer);
@@ -100,7 +100,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
       /* Held back. The element remembers how to reveal itself later — the whole
          exam opens at once when it closes, and the student reviews what they
          answered. */
-      out.className = 'ex-veredito v-registrado';
+      out.className = 'ex-verdict v-recorded';
       out.innerHTML = '<strong>' + txt('answer recorded') + '</strong> ' +
         txt('the result comes at the end of the exam.');
       el.revealExam = () => { mod.reveal(body, ex, v); showVerdict(el, ex, v); };
@@ -136,24 +136,24 @@ export function buildExercise(ex, ctx, ix, options = {}) {
 }
 
 function showVerdict(el, ex, v) {
-  const out = el.querySelector('.ex-veredito');
+  const out = el.querySelector('.ex-verdict');
 
   if (v.correct === null) {
     /* Unchecked NEVER becomes passed — it is the pipeline's rule and it holds
        whole here: while there is no execution, the portal says it did not
        check. */
-    out.className = 'ex-veredito v-pendente';
+    out.className = 'ex-verdict v-pending';
     out.innerHTML = '<strong>' + txt('not checked') + '</strong> ' + esc(v.detail || '');
     return;
   }
 
   if (v.correct) {
-    out.className = 'ex-veredito v-certo';
+    out.className = 'ex-verdict v-right';
     out.innerHTML = '<strong>' + txt('correct') + '</strong>';
     return;
   }
 
-  out.className = 'ex-veredito v-errado';
+  out.className = 'ex-verdict v-wrong';
   let extra = '';
   if (v.partial) extra = ' ' + txt('not every pair was closed.');
   else if (typeof v.errors === 'number' && v.errors > 0) extra = '';
@@ -161,14 +161,14 @@ function showVerdict(el, ex, v) {
      which neighbouring pair gets swapped, and why. As feedback it is worth a
      lot; any earlier, it would be the answer. */
   if (ex.type === 'ordering' && ex.trap) {
-    extra += '<span class="v-armadilha">' + formatted(ex.trap) + '</span>';
+    extra += '<span class="v-trap">' + formatted(ex.trap) + '</span>';
   }
   out.innerHTML = '<strong>' + txt('not yet') + '</strong>' + extra;
 }
 
 function markAlreadyDone(el, previous) {
-  const out = el.querySelector('.ex-veredito');
-  out.className = 'ex-veredito v-antigo';
+  const out = el.querySelector('.ex-verdict');
+  out.className = 'ex-verdict v-old';
   out.innerHTML = '<strong>' + txt('already solved') + '</strong> ' +
     txt('in') + ' ' + previous.attempts + ' ' +
     (previous.attempts === 1 ? txt('attempt') : txt('attempts'));
@@ -198,32 +198,32 @@ export function buildAssessment(exercises, ctx, options = {}) {
   let confirming = false;
 
   el.innerHTML =
-    '<header class="wz-topo">' +
-      '<span class="wz-conta"></span>' +
-      '<div class="wz-pontos" role="tablist"></div>' +
+    '<header class="wz-top">' +
+      '<span class="wz-count"></span>' +
+      '<div class="wz-dots" role="tablist"></div>' +
     '</header>' +
     '<div class="wz-palco"></div>' +
-    '<footer class="wz-pe">' +
+    '<footer class="wz-foot">' +
       '<button type="button" class="btn btn-ghost wz-antes">← ' + txt('previous') + '</button>' +
       '<button type="button" class="btn btn-primary wz-depois">' + txt('next') + ' →</button>' +
     '</footer>';
 
   const stage = el.querySelector('.wz-palco');
-  const dots = el.querySelector('.wz-pontos');
+  const dots = el.querySelector('.wz-dots');
 
   function paintHeader() {
-    el.querySelector('.wz-conta').textContent =
+    el.querySelector('.wz-count').textContent =
       txt('question') + ' ' + (current + 1) + ' ' + txt('of') + ' ' + exercises.length;
     dots.innerHTML = states.map((s, i) => {
-      const cls = ['wz-ponto'];
+      const cls = ['wz-dot'];
       if (i === current) cls.push('on');
       /* In an exam that is still open the marker says WHETHER it was answered,
          not whether it was right: the colour of a correct answer would be the
          verdict the exam is holding back. */
       if (s.answered) {
         cls.push(exam && !submitted
-          ? 'feito'
-          : (s.correct === true ? 'certo' : (s.correct === null ? 'pendente' : 'errado')));
+          ? 'done'
+          : (s.correct === true ? 'right' : (s.correct === null ? 'pending' : 'wrong')));
       }
       return '<button type="button" class="' + cls.join(' ') + '" data-ir="' + i + '" ' +
         'aria-label="' + txt('question') + ' ' + (i + 1) + '">' + (i + 1) + '</button>';
@@ -237,7 +237,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
     else if (!exam) next.textContent = txt('see the result');
     else if (confirming) next.textContent = txt('Submit with') + ' ' + blank + ' ' + txt('blank');
     else next.textContent = txt('Submit the exam');
-    next.classList.toggle('wz-cuidado', confirming && !submitted);
+    next.classList.toggle('wz-warn', confirming && !submitted);
   }
 
   /* The elements are KEPT, not recreated. Going to question 3 and back to 1 has
@@ -278,23 +278,23 @@ export function buildAssessment(exercises, ctx, options = {}) {
 
     stage.textContent = '';
     const r = document.createElement('div');
-    r.className = 'wz-resultado';
+    r.className = 'wz-result';
     const grade = options.onSubmit
       ? options.onSubmit({ right, unchecked, unanswered, states })
       : null;
     r.innerHTML =
       (grade ? grade.html : '') +
-      (grade ? '' : '<span class="wz-res-rot">' + txt('result') + '</span>' +
-        '<p class="wz-res-nota"><strong>' + right + '</strong>/' + exercises.length + ' ' + txt('correct') + '</p>') +
-      (unchecked ? '<p class="wz-res-obs">' + unchecked + ' ' + txt('are waiting to be checked on the server.') + '</p>' : '') +
-      (unanswered ? '<p class="wz-res-obs">' + unanswered + ' ' + txt('unanswered.') + '</p>' : '') +
+      (grade ? '' : '<span class="wz-res-label">' + txt('result') + '</span>' +
+        '<p class="wz-res-score"><strong>' + right + '</strong>/' + exercises.length + ' ' + txt('correct') + '</p>') +
+      (unchecked ? '<p class="wz-res-note">' + unchecked + ' ' + txt('are waiting to be checked on the server.') + '</p>' : '') +
+      (unanswered ? '<p class="wz-res-note">' + unanswered + ' ' + txt('unanswered.') + '</p>' : '') +
       '<button type="button" class="btn btn-ghost wz-voltar">' +
         txt(exam ? 'Review the exam question by question' : 'Review the questions') + '</button>';
     stage.appendChild(r);
     r.querySelector('.wz-voltar').addEventListener('click', () => show(0));
     el.querySelector('.wz-depois').disabled = true;
     paintHeader();
-    el.dispatchEvent(new CustomEvent('avaliacao:concluida', {
+    el.dispatchEvent(new CustomEvent('assessment:concluida', {
       bubbles: true,
       detail: { lastCorrect: right, total: exercises.length },
     }));
@@ -311,7 +311,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
   });
 
   dots.addEventListener('click', (e) => {
-    const b = e.target.closest('.wz-ponto');
+    const b = e.target.closest('.wz-dot');
     if (b) show(Number(b.dataset.ir));
   });
   el.querySelector('.wz-antes').addEventListener('click', () => show(Math.max(0, current - 1)));

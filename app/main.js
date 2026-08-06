@@ -48,40 +48,40 @@ let booted = false;
 globalThis.redrawAll = () => (booted ? dispatch() : null);
 
 /* ---------- routes ---------- */
-route('/entrar', signIn);
-route('/painel', dashboard);
-route('/trilha', trackScreen);
-route('/curso/:id', course);
+route('/sign-in', signIn);
+route('/dashboard', dashboard);
+route('/track', trackScreen);
+route('/course/:id', course);
 /* Two routes for the same screen: without the section, it lands on the first
    one. That is what keeps an old link (or the course button) working after the
    lesson turned into several sections. */
-route('/curso/:id/prova', courseExamScreen);
-route('/trilha/prova', trackExamScreen);
-route('/curso/:id/aula/:ix', lesson);
-route('/curso/:id/aula/:ix/:sec', lesson);
-route('/catalogo', catalogue);
-route('/certificados', certificates);
-route('/conta', account);
-route('/plano', planScreen);
-route('/desempenho', performance);
-route('/refazer', redo);
-route('/notas', notes);
+route('/course/:id/exam', courseExamScreen);
+route('/track/exam', trackExamScreen);
+route('/course/:id/lesson/:ix', lesson);
+route('/course/:id/lesson/:ix/:sec', lesson);
+route('/catalog', catalogue);
+route('/certificates', certificates);
+route('/account', account);
+route('/plan', planScreen);
+route('/performance', performance);
+route('/redo', redo);
+route('/notes', notes);
 
 const $ = (s) => document.querySelector(s);
-const content = $('#conteudo');
-const rail = $('#trilho');
+const content = $('#content');
+const rail = $('#rail');
 
 let leaving = null;
 
 whenChanged(async (path, found) => {
   // with no session only the sign-in screen exists — the rest assumes a student
-  if (!now().session && path !== '/entrar') return goTo('/entrar');
-  if (now().session && path === '/entrar') return goTo('/painel');
+  if (!now().session && path !== '/sign-in') return goTo('/sign-in');
+  if (now().session && path === '/sign-in') return goTo('/dashboard');
 
   if (leaving) { leaving(); leaving = null; }
 
   if (!found) {
-    content.innerHTML = '<div class="tela"><p class="vazio">' + txt('page not found') + '</p></div>';
+    content.innerHTML = '<div class="view"><p class="empty">' + txt('page not found') + '</p></div>';
     content.setAttribute('aria-label', txt('page not found'));
     return;
   }
@@ -108,7 +108,7 @@ whenChanged(async (path, found) => {
   leaving = onLeave || null;
 
   const signedIn = Boolean(now().session);
-  document.body.classList.toggle('sem-trilho', !signedIn);
+  document.body.classList.toggle('no-rail', !signedIn);
   if (signedIn) buildRail(rail, path, found.params);
   else rail.innerHTML = '';
   closeRail();
@@ -120,7 +120,7 @@ whenChanged(async (path, found) => {
    the dashboard uses, because two computations of the same number diverge on the
    day one of them changes. */
 function paintContext() {
-  const cx = $('#nav-contexto');
+  const cx = $('#nav-context');
   const t = now().session ? studentTrack() : null;
   if (!t) { cx.innerHTML = ''; return; }
   const p = trackProgress(t);
@@ -130,99 +130,99 @@ function paintContext() {
      want to revisit at any time, and which costs nothing, because progress is
      per course and a shared course keeps counting. */
   cx.innerHTML =
-    '<div class="ctx-caixa">' +
+    '<div class="ctx-box">' +
       '<button type="button" class="ctx" aria-haspopup="true" aria-expanded="false">' +
-        '<span class="ctx-nome">' + esc(t.name) + '</span>' +
-        '<span class="ctx-barra"><span style="width:' + p.pct + '%"></span></span>' +
+        '<span class="ctx-name">' + esc(t.name) + '</span>' +
+        '<span class="ctx-bar"><span style="width:' + p.pct + '%"></span></span>' +
         '<span class="ctx-pct">' + p.pct + '%</span>' +
-        '<span class="ctx-seta" aria-hidden="true">▾</span>' +
+        '<span class="ctx-arrow" aria-hidden="true">▾</span>' +
       '</button>' +
       '<div class="ctx-menu" role="menu">' +
-        '<a class="ctx-op ctx-mapa" href="#/trilha">' + txt('see the track map') + ' →</a>' +
+        '<a class="ctx-op ctx-map" href="#/track">' + txt('see the track map') + ' →</a>' +
         TRACKS_BY_FAMILY().map(([family, list]) =>
-          '<span class="ctx-grupo">' + txt('trilhas por ' + family) + '</span>' +
+          '<span class="ctx-group">' + txt('tracks por ' + family) + '</span>' +
           list.map((x) => '<button type="button" class="ctx-op' + (x.id === t.id ? ' on' : '') + '" ' +
-            'data-trilha="' + esc(x.id) + '">' + esc(x.name) + '</button>').join('')).join('') +
+            'data-track="' + esc(x.id) + '">' + esc(x.name) + '</button>').join('')).join('') +
       '</div>' +
     '</div>';
 }
 
-$('#nav-contexto').addEventListener('click', async (e) => {
-  const box = $('#nav-contexto .ctx-caixa');
+$('#nav-context').addEventListener('click', async (e) => {
+  const box = $('#nav-context .ctx-box');
   if (e.target.closest('.ctx')) {
-    const opened = box.classList.toggle('aberto');
+    const opened = box.classList.toggle('is-open');
     box.querySelector('.ctx').setAttribute('aria-expanded', String(opened));
     return;
   }
-  const op = e.target.closest('.ctx-op[data-trilha]');
+  const op = e.target.closest('.ctx-op[data-track]');
   if (!op) return;
-  box.classList.remove('aberto');
-  await api.enrol(op.dataset.trilha);
-  goTo('/trilha');
+  box.classList.remove('is-open');
+  await api.enrol(op.dataset.track);
+  goTo('/track');
 });
 
 /* ---------- the account menu ---------- */
 function paintAccount() {
   const s = now().session;
-  $('#conta-avatar').textContent = (s?.name || '·').trim().charAt(0).toUpperCase() || '·';
-  $('#conta-menu').innerHTML = s
-    ? '<a class="conta-op" href="#/conta">' + txt('My account') + '</a>' +
-      '<a class="conta-op" href="#/plano">' + txt('My plan') + '</a>' +
-      '<a class="conta-op" href="#/certificados">' + txt('Certificates') + '</a>' +
-      '<a class="conta-op" href="https://codeschool.ing">' + txt('Go to the site') + ' ↗</a>'
-    : '<a class="conta-op" href="#/entrar">' + txt('Sign in') + '</a>';
+  $('#account-avatar').textContent = (s?.name || '·').trim().charAt(0).toUpperCase() || '·';
+  $('#account-menu').innerHTML = s
+    ? '<a class="account-op" href="#/account">' + txt('My account') + '</a>' +
+      '<a class="account-op" href="#/plan">' + txt('My plan') + '</a>' +
+      '<a class="account-op" href="#/certificates">' + txt('Certificates') + '</a>' +
+      '<a class="account-op" href="https://codeschool.ing">' + txt('Go to the site') + ' ↗</a>'
+    : '<a class="account-op" href="#/sign-in">' + txt('Sign in') + '</a>';
 }
 
-$('#conta').addEventListener('click', (e) => {
-  if (e.target.closest('.conta-btn')) {
-    const c = $('#conta');
-    const opened = c.classList.toggle('aberto');
-    c.querySelector('.conta-btn').setAttribute('aria-expanded', String(opened));
-  } else if (e.target.closest('.conta-op')) {
-    $('#conta').classList.remove('aberto');
+$('#account').addEventListener('click', (e) => {
+  if (e.target.closest('.account-btn')) {
+    const c = $('#account');
+    const opened = c.classList.toggle('is-open');
+    c.querySelector('.account-btn').setAttribute('aria-expanded', String(opened));
+  } else if (e.target.closest('.account-op')) {
+    $('#account').classList.remove('is-open');
   }
 });
 
 /* ---------- language: the vitrine's selector, unchanged ---------- */
-$('#idioma').addEventListener('click', (e) => {
-  if (!e.target.closest('.idioma-btn')) return;
-  const c = $('#idioma');
-  const opened = c.classList.toggle('aberto');
-  c.querySelector('.idioma-btn').setAttribute('aria-expanded', String(opened));
+$('#lang').addEventListener('click', (e) => {
+  if (!e.target.closest('.lang-btn')) return;
+  const c = $('#lang');
+  const opened = c.classList.toggle('is-open');
+  c.querySelector('.lang-btn').setAttribute('aria-expanded', String(opened));
 });
 
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('#idioma')) $('#idioma').classList.remove('aberto');
-  if (!e.target.closest('#conta')) $('#conta').classList.remove('aberto');
-  if (!e.target.closest('#nav-contexto')) $('#nav-contexto .ctx-caixa')?.classList.remove('aberto');
+  if (!e.target.closest('#lang')) $('#lang').classList.remove('is-open');
+  if (!e.target.closest('#account')) $('#account').classList.remove('is-open');
+  if (!e.target.closest('#nav-context')) $('#nav-context .ctx-box')?.classList.remove('is-open');
 });
 
 /* ---------- theme: the vitrine's localStorage key, on purpose ----
    whoever sets the theme on the site finds the portal already in it */
-const THEME_KEY = 'codeschool-tema';
+const THEME_KEY = 'codeschool-theme';
 function applyTheme(theme) {
-  document.documentElement.dataset.tema = theme === 'claro' ? 'claro' : '';
+  document.documentElement.dataset.theme = theme === 'light' ? 'light' : '';
   try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* private mode */ }
-  $('#tema-btn').setAttribute('aria-label', theme === 'claro' ? txt('Switch to the dark theme') : txt('Switch to the light theme'));
+  $('#theme-btn').setAttribute('aria-label', theme === 'light' ? txt('Switch to the dark theme') : txt('Switch to the light theme'));
 }
-$('#tema-btn').addEventListener('click', () => {
-  applyTheme(document.documentElement.dataset.tema === 'claro' ? 'escuro' : 'claro');
+$('#theme-btn').addEventListener('click', () => {
+  applyTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
 });
 
 /* ---------- the rail as a drawer, on a narrow screen ---------- */
 const closeRail = () => {
-  document.body.classList.remove('trilho-aberto');
-  $('#trilho-btn').setAttribute('aria-expanded', 'false');
-  $('#trilho-veu').hidden = true;
+  document.body.classList.remove('rail-open');
+  $('#rail-btn').setAttribute('aria-expanded', 'false');
+  $('#rail-veil').hidden = true;
 };
-$('#trilho-btn').addEventListener('click', () => {
-  const opened = document.body.classList.toggle('trilho-aberto');
-  $('#trilho-btn').setAttribute('aria-expanded', String(opened));
-  $('#trilho-veu').hidden = !opened;
+$('#rail-btn').addEventListener('click', () => {
+  const opened = document.body.classList.toggle('rail-open');
+  $('#rail-btn').setAttribute('aria-expanded', String(opened));
+  $('#rail-veil').hidden = !opened;
 });
-$('#trilho-veu').addEventListener('click', closeRail);
-$('#trilho').addEventListener('click', (e) => {
-  const opener = e.target.closest('.ta-abrir');
+$('#rail-veil').addEventListener('click', closeRail);
+$('#rail').addEventListener('click', (e) => {
+  const opener = e.target.closest('.ta-open');
   if (opener) {
     // it is a <button> and does not navigate: it only shows or hides that
     // lesson's sections
@@ -244,7 +244,7 @@ addEventListener('keydown', (e) => {
 
 /* The search. The button and ⌘K existed from day one and both only led to the
    catalogue — a shortcut that promised search and delivered navigation. */
-$('#busca-btn').addEventListener('click', openSearch);
+$('#search-btn').addEventListener('click', openSearch);
 addEventListener('keydown', (e) => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openSearch(); }
   // the slash opens it too, as in almost everywhere that has search — except
@@ -265,7 +265,7 @@ subscribe(() => {
 });
 
 function routeParams() {
-  const m = currentPath().match(/^\/curso\/([^/]+)/);
+  const m = currentPath().match(/^\/course\/([^/]+)/);
   return m ? { id: decodeURIComponent(m[1]) } : null;
 }
 

@@ -175,25 +175,25 @@ function applyContent() {
 
 /* ---------- the picker ---------- */
 function buildLanguagePicker() {
-  const box = document.querySelector('#idioma-menu');
+  const box = document.querySelector('#lang-menu');
   if (!box) return;
   box.textContent = '';
   LANGUAGES.forEach((i) => {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'idioma-op' + (i.code === LANG ? ' on' : '');
+    b.className = 'lang-op' + (i.code === LANG ? ' on' : '');
     b.lang = i.html;
     b.textContent = i.label;
     b.addEventListener('click', () => { switchLanguage(i.code); closeLanguageMenu(); });
     box.appendChild(b);
   });
   const active = LANGUAGES.find((i) => i.code === LANG);
-  document.querySelector('#idioma-curto').textContent = active.short;
+  document.querySelector('#lang-short').textContent = active.short;
   document.documentElement.lang = active.html;
 }
 function closeLanguageMenu() {
-  const c = document.querySelector('#idioma');
-  if (c) { c.classList.remove('aberto'); c.querySelector('.idioma-btn').setAttribute('aria-expanded', 'false'); }
+  const c = document.querySelector('#lang');
+  if (c) { c.classList.remove('is-open'); c.querySelector('.lang-btn').setAttribute('aria-expanded', 'false'); }
 }
 
 function switchLanguage(cod) {

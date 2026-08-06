@@ -58,36 +58,36 @@ function code(seed) {
    same phosphor, the brand's LED — but applied to a document instead of to a
    window.
 
-   `exemplo` changes three things at once — the frame, the seal and the code text
+   `example` changes three things at once — the frame, the seal and the code text
    — and that is deliberate: whoever glances, whoever reads the label and whoever
    goes to check the number all get the same information. */
 function card({ label, name, meta, who, when, key, sample, grade }) {
   /* The whole certificate is a button. There is no "view larger" beside it: the
      target the person wants to click is the document, and a smaller control next
      to it would be a worse target for the same intention. */
-  return '<article class="cert' + (sample ? ' cert-exemplo' : '') + '" ' +
+  return '<article class="cert' + (sample ? ' cert-sample' : '') + '" ' +
       'tabindex="0" role="button" data-cert="' + esc(key) + '" ' +
       'aria-label="' + txt('View the certificate at full size') + '">' +
-    '<div class="cert-folha">' +
-      '<header class="cert-topo">' +
-        '<span class="cert-marca"><span class="cert-led" aria-hidden="true"></span>codeschool<b>.ing</b></span>' +
+    '<div class="cert-sheet">' +
+      '<header class="cert-top">' +
+        '<span class="cert-brand"><span class="cert-led" aria-hidden="true"></span>codeschool<b>.ing</b></span>' +
         (sample
-          ? '<span class="cert-selo">' + txt('sample') + '</span>'
-          : '<span class="cert-tipo">' + txt(label) + '</span>') +
+          ? '<span class="cert-seal">' + txt('sample') + '</span>'
+          : '<span class="cert-type">' + txt(label) + '</span>') +
       '</header>' +
 
-      '<div class="cert-miolo">' +
-        '<span class="cert-frase">' + txt('certifies that') + '</span>' +
-        '<p class="cert-aluno">' + esc(who) + '</p>' +
-        '<span class="cert-frase">' +
+      '<div class="cert-body">' +
+        '<span class="cert-line">' + txt('certifies that') + '</span>' +
+        '<p class="cert-student">' + esc(who) + '</p>' +
+        '<span class="cert-line">' +
           txt(label === 'track completed' ? 'completed the track' : 'completed the course') + '</span>' +
-        '<h2 class="cert-curso">' + esc(name) + '</h2>' +
+        '<h2 class="cert-course">' + esc(name) + '</h2>' +
         '<p class="cert-meta">' + esc(meta) + (grade ? ' · ' + esc(grade) : '') + '</p>' +
       '</div>' +
 
-      '<footer class="cert-pe">' +
+      '<footer class="cert-foot">' +
         '<span>' + esc(when) + '</span>' +
-        '<span class="cert-codigo">' +
+        '<span class="cert-code">' +
           (sample ? txt('sample — no code has been issued') : code(key + who)) +
         '</span>' +
       '</footer>' +
@@ -147,7 +147,7 @@ const ICON_LINKEDIN = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden=
 
 export default async function certificates() {
   const el = document.createElement('div');
-  el.className = 'tela tela-certificados';
+  el.className = 'view tela-certificados';
 
   const who = now().session?.name || 'Aluno';
   const today = DATE(new Date());
@@ -203,7 +203,7 @@ export default async function certificates() {
       meta: model.hours + 'h · ' + txt(model.level) + (t ? ' · ' + t.name : ''),
       who: who,
       when: today,
-      key: 'exemplo.curso',
+      key: 'example.curso',
       sample: true,
       grade: txt('final exam:') + ' 90%',
     })) +
@@ -214,13 +214,13 @@ export default async function certificates() {
         (onPath.reduce((s, id) => s + (courseById(id)?.hours || 0), 0) || 380) + 'h',
       who: who,
       when: today,
-      key: 'exemplo.trilha',
+      key: 'example.trilha',
       sample: true,
       grade: txt('track exam:') + ' 84%',
     }));
 
   el.innerHTML =
-    '<header class="tela-head">' +
+    '<header class="view-head">' +
       '<h1>' + txt('Your certificates') + '</h1>' +
       '<p>' + txt('One per course completed with a passed exam, and one per whole track.') + '</p>' +
     '</header>' +
@@ -228,12 +228,12 @@ export default async function certificates() {
     (issued ? '<div class="certs">' + issued + '</div>' : '') +
 
     (almostDone.length
-      ? '<section class="bloco">' +
-          '<div class="bloco-topo"><h2>' + txt('Only the exam is left') + '</h2></div>' +
-          '<ul class="cert-falta">' +
+      ? '<section class="block">' +
+          '<div class="block-top"><h2>' + txt('Only the exam is left') + '</h2></div>' +
+          '<ul class="cert-missing">' +
             almostDone.map((c) => '<li>' +
               '<span>' + esc(c.name) + ' — ' + txt('content completed') + '</span>' +
-              '<a class="btn btn-primary" href="#/curso/' + esc(c.id) + '/prova">' +
+              '<a class="btn btn-primary" href="#/course/' + esc(c.id) + '/exam">' +
                 txt('Take the exam') + ' →</a>' +
             '</li>').join('') +
           '</ul>' +
@@ -241,8 +241,8 @@ export default async function certificates() {
       : '') +
 
     (examples
-      ? '<section class="cert-previa">' +
-          '<div class="bloco-topo">' +
+      ? '<section class="cert-preview">' +
+          '<div class="block-top">' +
             '<h2>' + txt('What yours will look like') + '</h2>' +
             '<span class="mono dim">' + txt('samples — they do not count as a certificate') + '</span>' +
           '</div>' +
@@ -253,9 +253,9 @@ export default async function certificates() {
   /* One listener on the whole screen, and not one per card: the cards are rebuilt
      on every render, and a listener per card leaks on every rebuild. */
   const open = (art) => {
-    const isExample = art.classList.contains('cert-exemplo');
+    const isExample = art.classList.contains('cert-sample');
     const key = art.dataset.cert;
-    const certName = art.querySelector('.cert-curso')?.textContent || '';
+    const certName = art.querySelector('.cert-course')?.textContent || '';
     /* The LinkedIn button exists in BOTH cases, next to the close button. On an
        example it comes disabled, and the reason is in the `title`: hiding the
        button would make people think the feature does not exist, and showing it

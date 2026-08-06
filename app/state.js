@@ -70,7 +70,7 @@ const LEGACY_FIELDS = {
 };
 
 /* Renames keys everywhere in the tree. It cannot rename VALUES, and it must not
-   try: a note's text is a value, and a note that happens to read "aulas" is the
+   try: a note's text is a value, and a note that happens to read "lessons" is the
    student's sentence, not a key of ours. */
 function renameKeys(node) {
   if (Array.isArray(node)) return node.map(renameKeys);

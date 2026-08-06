@@ -32,33 +32,33 @@ export default {
 
     return (
       (ex.checkOrigin
-        ? '<div class="expr-origem">' +
-            '<span class="expr-rot">' + txt(OP_NAME[ex.checkOperation] || 'expression') + ' ' + txt('of') + '</span>' +
-            '<code class="expr-cod">' + esc(ex.checkOrigin) + '</code>' +
+        ? '<div class="expr-origin">' +
+            '<span class="expr-label">' + txt(OP_NAME[ex.checkOperation] || 'expression') + ' ' + txt('of') + '</span>' +
+            '<code class="expr-code">' + esc(ex.checkOrigin) + '</code>' +
           '</div>'
         : '') +
-      '<label class="ex-rotulo" for="expr-' + uid + '">' + txt('your answer') + '</label>' +
-      '<input id="expr-' + uid + '" class="ex-campo mono" type="text" spellcheck="false" ' +
+      '<label class="ex-label" for="expr-' + uid + '">' + txt('your answer') + '</label>' +
+      '<input id="expr-' + uid + '" class="ex-field mono" type="text" spellcheck="false" ' +
         'autocapitalize="off" autocorrect="off" placeholder="x**3/3" />' +
-      '<p class="ex-nota">' + txt('Any equivalent form counts.') +
+      '<p class="ex-note">' + txt('Any equivalent form counts.') +
         (vars.length ? ' ' + txt('variables') + ': <code>' + esc(vars.join(', ')) + '</code>' : '') +
       '</p>' +
       (assumptions.length
-        ? '<p class="ex-nota ex-nota-dom">' + txt('Domain assumptions') + ': <code>' +
+        ? '<p class="ex-note ex-note-domain">' + txt('Domain assumptions') + ': <code>' +
             esc(assumptions.join(', ')) + '</code></p>'
         : '') +
       (ex.checkOperation === 'none'
-        ? '<p class="ex-nota ex-nota-aviso">' + formatted(txt('This exercise declares no recomputation — nobody checked the answer key.')) + '</p>'
+        ? '<p class="ex-note ex-note-warn">' + formatted(txt('This exercise declares no recomputation — nobody checked the answer key.')) + '</p>'
         : '')
     );
   },
 
   collect(root) {
-    const v = root.querySelector('.ex-campo').value;
+    const v = root.querySelector('.ex-field').value;
     return v.trim() ? v.trim() : null;
   },
 
   reveal(root) {
-    root.querySelector('.ex-campo').disabled = true;
+    root.querySelector('.ex-field').disabled = true;
   },
 };

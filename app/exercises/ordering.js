@@ -36,11 +36,11 @@ export default {
     const shuffled = shuffleWith(uid, ex.items);
     const rows = shuffled.map((item) => (
       '<li class="ord-item" draggable="true" data-item="' + encodeURIComponent(item) + '">' +
-        '<span class="ord-pega" aria-hidden="true">' + GRIP + '</span>' +
-        '<span class="ord-txt">' + formatted(item) + '</span>' +
-        '<span class="ord-setas">' +
-          '<button type="button" class="ord-seta" data-dir="-1" aria-label="Mover para cima">' + ARROW_UP + '</button>' +
-          '<button type="button" class="ord-seta" data-dir="1" aria-label="Mover para baixo">' + ARROW_DOWN + '</button>' +
+        '<span class="ord-grip" aria-hidden="true">' + GRIP + '</span>' +
+        '<span class="ord-text">' + formatted(item) + '</span>' +
+        '<span class="ord-arrows">' +
+          '<button type="button" class="ord-arrow" data-direction="-1" aria-label="' + txt('Move up') + '">' + ARROW_UP + '</button>' +
+          '<button type="button" class="ord-arrow" data-direction="1" aria-label="' + txt('Move down') + '">' + ARROW_DOWN + '</button>' +
         '</span>' +
       '</li>'
     )).join('');
@@ -52,10 +52,10 @@ export default {
     if (!list) return;
 
     list.addEventListener('click', (e) => {
-      const b = e.target.closest('.ord-seta');
+      const b = e.target.closest('.ord-arrow');
       if (!b) return;
       const li = b.closest('.ord-item');
-      const dir = Number(b.dataset.dir);
+      const dir = Number(b.dataset.direction);
       const neighbour = dir < 0 ? li.previousElementSibling : li.nextElementSibling;
       if (!neighbour) return;
       if (dir < 0) list.insertBefore(li, neighbour);
@@ -66,10 +66,10 @@ export default {
     let dragged = null;
     list.addEventListener('dragstart', (e) => {
       dragged = e.target.closest('.ord-item');
-      if (dragged) dragged.classList.add('arrastando');
+      if (dragged) dragged.classList.add('dragging');
     });
     list.addEventListener('dragend', () => {
-      if (dragged) dragged.classList.remove('arrastando');
+      if (dragged) dragged.classList.remove('dragging');
       dragged = null;
     });
     list.addEventListener('dragover', (e) => {
@@ -91,10 +91,10 @@ export default {
   reveal(root, ex) {
     root.querySelectorAll('.ord-item').forEach((li, i) => {
       const right = decodeURIComponent(li.dataset.item) === ex.items[i];
-      li.classList.toggle('ord-certo', right);
-      li.classList.toggle('ord-errado', !right);
+      li.classList.toggle('ord-right', right);
+      li.classList.toggle('ord-wrong', !right);
       li.draggable = false;
-      li.querySelectorAll('.ord-seta').forEach((b) => { b.disabled = true; });
+      li.querySelectorAll('.ord-arrow').forEach((b) => { b.disabled = true; });
     });
   },
 };

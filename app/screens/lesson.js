@@ -77,27 +77,27 @@ export default async function lesson({ id, ix, sec }) {
 
   const { previous, next } = neighbours(id, n, pos);
   const note = noteFor(id, n, section.id);
-  const routeTo = (v) => '#/curso/' + esc(id) + '/aula/' + v.ix + '/' + esc(v.sectionId);
+  const routeTo = (v) => '#/course/' + esc(id) + '/lesson/' + v.ix + '/' + esc(v.sectionId);
 
   const el = document.createElement('div');
-  const hasVideoHere = section.tipo === 'conteudo' && section.video !== undefined;
-  el.className = 'tela tela-aula' + (hasVideoHere ? ' aula-com-video' : ' aula-so-texto');
+  const hasVideoHere = section.type === 'content' && section.video !== undefined;
+  el.className = 'view view-lesson' + (hasVideoHere ? ' lesson-with-video' : ' aula-so-texto');
 
   const steps = sections.map((s, i) => (
-    '<a class="passo' + (i === pos ? ' on' : '') + (sectionDone(id, n, s.id) ? ' feito' : '') +
-      (s.tipo === 'avaliacao' ? ' passo-aval' : '') + (s.pending ? ' passo-pendente' : '') + '" ' +
-      'href="#/curso/' + esc(id) + '/aula/' + n + '/' + esc(s.id) + '">' +
-      '<span class="passo-n">' + (s.tipo === 'avaliacao' ? '★' : String(i + 1).padStart(2, '0')) + '</span>' +
-      '<span class="passo-tit">' + esc(s.title) + '</span>' +
+    '<a class="step' + (i === pos ? ' on' : '') + (sectionDone(id, n, s.id) ? ' done' : '') +
+      (s.type === 'assessment' ? ' step-assessment' : '') + (s.pending ? ' step-pending' : '') + '" ' +
+      'href="#/course/' + esc(id) + '/lesson/' + n + '/' + esc(s.id) + '">' +
+      '<span class="step-n">' + (s.type === 'assessment' ? '★' : String(i + 1).padStart(2, '0')) + '</span>' +
+      '<span class="step-title">' + esc(s.title) + '</span>' +
     '</a>'
   )).join('');
 
   /* The forward arrow ALWAYS exists. On the course's last section it leads to
      the course page — if it disappeared there, that section would be the only
      one that could never be completed, because completing became moving on. */
-  const nextTarget = next ? routeTo(next) : '#/curso/' + esc(id);
+  const nextTarget = next ? routeTo(next) : '#/course/' + esc(id);
   const sideArrow = (target, side, arrow, label, advances) => (target
-    ? '<a class="lado-seta lado-' + side + (advances ? ' avancar' : '') + '" href="' + target +
+    ? '<a class="side-arrow side-' + side + (advances ? ' advances' : '') + '" href="' + target +
       '" aria-label="' + txt(label) + '">' + arrow + '</a>'
     : '');
 
@@ -121,37 +121,37 @@ export default async function lesson({ id, ix, sec }) {
   const videoReady = hasVideo && typeof section.video === 'string' && section.video;
 
   el.innerHTML =
-    sideArrow(previous && routeTo(previous), 'esq', ARROW_LEFT, 'seção anterior') +
-    sideArrow(nextTarget, 'dir', ARROW_RIGHT, 'concluir e ir para a próxima seção', true) +
+    sideArrow(previous && routeTo(previous), 'left', ARROW_LEFT, 'previous section') +
+    sideArrow(nextTarget, 'right', ARROW_RIGHT, 'complete and go to the next section', true) +
 
-    '<nav class="migalhas">' +
-      '<a href="#/curso/' + esc(id) + '">' + esc(c.name) + '</a>' +
+    '<nav class="crumbs">' +
+      '<a href="#/course/' + esc(id) + '">' + esc(c.name) + '</a>' +
       '<span aria-hidden="true">›</span>' +
       '<span>' + txt('lesson') + ' ' + (n + 1) + ' ' + txt('of') + ' ' + lessons.length + '</span>' +
     '</nav>' +
 
-    '<header class="aula-cabeca">' +
-      '<h1 class="aula-titulo">' + esc(a.title) + '</h1>' +
-      '<nav class="passos" aria-label="' + txt('Sections of this lesson') + '">' + steps + '</nav>' +
+    '<header class="lesson-head">' +
+      '<h1 class="lesson-title">' + esc(a.title) + '</h1>' +
+      '<nav class="steps" aria-label="' + txt('Sections of this lesson') + '">' + steps + '</nav>' +
     '</header>' +
 
-    '<h2 class="secao-titulo">' + esc(section.title) + '</h2>' +
+    '<h2 class="section-title">' + esc(section.title) + '</h2>' +
 
     /* THE PLAYER COMES AFTER THE HEADER. It used to come before, so as not to
        push the play button below the fold — and the price was landing in a
        section without knowing which lesson it belongs to. Where am I comes before
        what am I watching, and the answer is the same in the text sections. */
     (hasVideo
-      ? '<div class="video-fachada" data-video="' + esc(videoReady || '') + '">' +
+      ? '<div class="video-facade" data-video="' + esc(videoReady || '') + '">' +
           (videoReady
             ? '<button type="button" class="video-play" aria-label="' + txt('Watch') + '">▶</button>'
-            : '<span class="video-breve mono dim">' + txt('video coming soon') + '</span>') +
-          (section.duration ? '<span class="video-duracao mono">' + esc(section.duration) + '</span>' : '') +
+            : '<span class="video-soon mono dim">' + txt('video coming soon') + '</span>') +
+          (section.duration ? '<span class="video-duration mono">' + esc(section.duration) + '</span>' : '') +
         '</div>'
       : '') +
 
-    (section.tipo === 'avaliacao'
-      ? '<section class="bloco aula-exercicios' + (section.pending ? ' aval-pendente' : '') + '">' +
+    (section.type === 'assessment'
+      ? '<section class="block aula-exercicios' + (section.pending ? ' assessment-pending' : '') + '">' +
           (section.pending
             ? '<p class="mono dim">' + txt('[assessment in preparation — this topic\'s exercises have not been produced yet]') + '</p>'
             : '') +
@@ -160,10 +160,10 @@ export default async function lesson({ id, ix, sec }) {
          to come" notice, which would be false there: the content is the video.
          The notice still holds for a lesson with nothing written yet. */
       : (section.body
-        ? '<section class="bloco aula-texto">' + prose(section.body) + '</section>'
+        ? '<section class="block lesson-text">' + prose(section.body) + '</section>'
         : (hasVideo
           ? ''
-          : '<section class="bloco aula-texto"><p class="mono dim">' +
+          : '<section class="block lesson-text"><p class="mono dim">' +
             txt('[lesson content — the real material lands in Stage 2]') + '</p></section>'))) +
 
     /* Material comes AFTER the text and BEFORE the note: downloading the PDF is
@@ -173,26 +173,26 @@ export default async function lesson({ id, ix, sec }) {
     /* The note sits at the END of the section, and not floating beside it:
        noting is what you do after reading, not during. Collapsed when empty, so
        it does not ask for attention from someone who will not use it. */
-    '<details class="nota" ' + (note ? 'open' : '') + '>' +
+    '<details class="note" ' + (note ? 'open' : '') + '>' +
       '<summary>' + (note ? '✎ ' + txt('your note') : '＋ ' + txt('make a note on this section')) + '</summary>' +
-      '<textarea class="nota-campo" rows="4" placeholder="' +
+      '<textarea class="note-field" rows="4" placeholder="' +
         txt('what you want to remember from this section…') + '">' + esc(note) + '</textarea>' +
-      '<span class="nota-estado mono dim" aria-live="polite"></span>' +
+      '<span class="note-status mono dim" aria-live="polite"></span>' +
     '</details>' +
 
     /* The footer only exists where there are no side arrows — below 1400px.
        There is no complete button: moving on is completing. */
-    '<footer class="aula-pe">' +
+    '<footer class="lesson-foot">' +
       (previous ? '<a class="btn btn-ghost" href="' + routeTo(previous) + '">← ' + txt('previous') + '</a>' : '<span></span>') +
-      '<a class="btn btn-primary avancar" href="' + nextTarget + '">' + txt('next') + ' →</a>' +
+      '<a class="btn btn-primary advances" href="' + nextTarget + '">' + txt('next') + ' →</a>' +
     '</footer>';
 
-  if (section.tipo === 'avaliacao' && !section.pending) {
+  if (section.type === 'assessment' && !section.pending) {
     const exercises = await api.lessonExercises(id, a.key);
     el.querySelector('.aula-exercicios').appendChild(buildAssessment(exercises, { courseId: id, lessonIx: n }));
   }
 
-  const frame = el.querySelector('.video-fachada');
+  const frame = el.querySelector('.video-facade');
   if (frame) {
     frame.addEventListener('click', (e) => {
       const cx = e.currentTarget;
@@ -204,8 +204,8 @@ export default async function lesson({ id, ix, sec }) {
 
   /* The note saves itself, after a pause following the last keystroke. A save
      button would be one more chance to lose what you wrote. */
-  const noteField = el.querySelector('.nota-campo');
-  const notice = el.querySelector('.nota-estado');
+  const noteField = el.querySelector('.note-field');
+  const notice = el.querySelector('.note-status');
   let saveT = null;
   noteField.addEventListener('input', () => {
     clearTimeout(saveT);
@@ -226,7 +226,7 @@ export default async function lesson({ id, ix, sec }) {
      the browser processes the hash change — there is no race. An assessment with
      no exercises yet stays out: there is nothing to complete in it. */
   el.addEventListener('click', (e) => {
-    if (!e.target.closest('.avancar')) return;
+    if (!e.target.closest('.advances')) return;
     if (section.pending) return;
     if (!sectionDone(id, n, section.id)) api.completeSection(id, n, section.id, true);
   });

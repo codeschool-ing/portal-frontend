@@ -31,19 +31,19 @@ export default async function catalogue() {
          and not even with the rail closed do they fit on one line: the last ones
          were cut off at the edge with nothing saying there was more.
 
-         The structure is the vitrine's — `.chips-caixa` with an arrow on each
+         The structure is the vitrine's — `.chips-box` with an arrow on each
          side and the fade at the ends — and `base.css` already brings the style
          for all three. Reimplementing here would mean maintaining two of
          everything. */
-      '<div class="chips-caixa">' +
-        '<button type="button" class="abas-seta" data-rolar="-1" aria-label="' +
+      '<div class="chips-box">' +
+        '<button type="button" class="tabs-arrow" data-scroll="-1" aria-label="' +
           txt('Previous categories') + '">←</button>' +
         '<div class="chips" id="cat-chips" role="group">' +
           categories.map((k, i) =>
             '<button class="chip' + (i === 0 ? ' on' : '') + '" type="button" data-cat="' + esc(k) + '">' +
               txt(k) + '</button>').join('') +
         '</div>' +
-        '<button type="button" class="abas-seta" data-rolar="1" aria-label="' +
+        '<button type="button" class="tabs-arrow" data-scroll="1" aria-label="' +
           txt('Next categories') + '">→</button>' +
       '</div>' +
     '</div>' +
@@ -93,21 +93,21 @@ export default async function catalogue() {
      the fade at the ends says which side still has something. When everything
      fits, both disappear — a disabled arrow that never does anything is noise. */
   const chips = el.querySelector('#cat-chips');
-  const box = el.querySelector('.chips-caixa');
+  const box = el.querySelector('.chips-box');
 
   function adjustArrows() {
     const spare = chips.scrollWidth - chips.clientWidth;
-    box.classList.toggle('sem-setas', spare <= 1);
-    chips.classList.toggle('fade-esq', chips.scrollLeft > 4);
-    chips.classList.toggle('fade-dir', chips.scrollLeft < spare - 4);
-    box.querySelector('[data-rolar="-1"]').disabled = chips.scrollLeft <= 4;
-    box.querySelector('[data-rolar="1"]').disabled = chips.scrollLeft >= spare - 4;
+    box.classList.toggle('no-arrows', spare <= 1);
+    chips.classList.toggle('fade-left', chips.scrollLeft > 4);
+    chips.classList.toggle('fade-right', chips.scrollLeft < spare - 4);
+    box.querySelector('[data-scroll="-1"]').disabled = chips.scrollLeft <= 4;
+    box.querySelector('[data-scroll="1"]').disabled = chips.scrollLeft >= spare - 4;
   }
 
   box.addEventListener('click', (e) => {
-    const arrow = e.target.closest('.abas-seta');
+    const arrow = e.target.closest('.tabs-arrow');
     if (!arrow) return;
-    chips.scrollBy({ left: Number(arrow.dataset.rolar) * Math.max(200, chips.clientWidth - 80), behavior: 'smooth' });
+    chips.scrollBy({ left: Number(arrow.dataset.scroll) * Math.max(200, chips.clientWidth - 80), behavior: 'smooth' });
   });
   chips.addEventListener('scroll', adjustArrows);
 

@@ -16,7 +16,7 @@ import { esc } from '../text.js';
 
 export default async function dashboard() {
   const el = document.createElement('div');
-  el.className = 'tela tela-painel';
+  el.className = 'view tela-painel';
 
   const session = await api.session();
   const t = studentTrack();
@@ -35,16 +35,16 @@ export default async function dashboard() {
     const s = sections.find((x) => x.id === next.sectionId) || sections[0];
     const p = courseProgress(c.id);
     return (
-      '<a class="retomar" href="#/curso/' + esc(c.id) + '/aula/' + a.ix + '/' + esc(s.id) + '">' +
-        '<span class="retomar-rot">' + txt('pick up where you left off') + '</span>' +
-        '<span class="retomar-aula">' + esc(s.title) + '</span>' +
-        '<span class="retomar-curso">' + esc(c.name) + ' · ' + esc(a.title) + '</span>' +
-        '<span class="retomar-onde mono dim">' +
+      '<a class="resume" href="#/course/' + esc(c.id) + '/lesson/' + a.ix + '/' + esc(s.id) + '">' +
+        '<span class="resume-label">' + txt('pick up where you left off') + '</span>' +
+        '<span class="resume-lesson">' + esc(s.title) + '</span>' +
+        '<span class="resume-course">' + esc(c.name) + ' · ' + esc(a.title) + '</span>' +
+        '<span class="resume-where mono dim">' +
           txt('lesson') + ' ' + (a.ix + 1) + '/' + lessons.length + ' · ' +
           txt('section') + ' ' + (sections.indexOf(s) + 1) + '/' + sections.length +
         '</span>' +
         bar(p.pct, p.feitas + ' de ' + p.total) +
-        '<span class="retomar-btn btn btn-primary">' + txt('Continue') + ' →</span>' +
+        '<span class="resume-btn btn btn-primary">' + txt('Continue') + ' →</span>' +
       '</a>'
     );
   })();
@@ -55,24 +55,24 @@ export default async function dashboard() {
   const upcoming = t
     ? trackPath(t, activeOption)
       .map((id) => ({ id, st: courseState(id) }))
-      .filter((x) => x.st === 'atual' || x.st === 'disponivel')
+      .filter((x) => x.st === 'current' || x.st === 'available')
       .slice(0, 4)
     : [];
 
   el.innerHTML =
-    '<header class="tela-head">' +
+    '<header class="view-head">' +
       '<h1>' + txt('Hello') + ', ' + esc(session?.name || txt('student')) + '</h1>' +
     '</header>' +
 
     resume +
 
     (t
-      ? '<section class="bloco">' +
-          '<div class="bloco-topo">' +
+      ? '<section class="block">' +
+          '<div class="block-top">' +
             '<h2>' + esc(t.name) + '</h2>' +
-            '<a class="bloco-link" href="#/trilha">' + txt('see the map') + ' →</a>' +
+            '<a class="block-link" href="#/track">' + txt('see the map') + ' →</a>' +
           '</div>' +
-          '<div class="trilha-numeros">' +
+          '<div class="track-numbers">' +
             '<span><b>' + pt.pct + '%</b>' + txt(' of the track') + '</span>' +
             '<span><b>' + pt.feitas + '/' + pt.total + '</b>' + txt('sections') + '</span>' +
             '<span><b>' + pt.courses + '</b>' + txt('courses on the path') + '</span>' +
@@ -80,22 +80,22 @@ export default async function dashboard() {
           '</div>' +
           bar(pt.pct, pt.pct + '%') +
         '</section>'
-      : '<section class="bloco"><p class="vazio">' + txt('You have not chosen a track yet.') + '</p></section>') +
+      : '<section class="block"><p class="empty">' + txt('You have not chosen a track yet.') + '</p></section>') +
 
     (upcoming.length
-      ? '<section class="bloco">' +
-          '<div class="bloco-topo"><h2>' + txt('Next steps') + '</h2></div>' +
-          '<div class="cartoes">' +
+      ? '<section class="block">' +
+          '<div class="block-top"><h2>' + txt('Next steps') + '</h2></div>' +
+          '<div class="cards">' +
             upcoming.map(({ id, st }) => {
               const c = courseById(id);
               const p = courseProgress(id);
-              return '<a class="cartao no-' + st + '" href="#/curso/' + esc(id) + '">' +
-                '<span class="no-estado" data-estado="' + st + '">' +
-                  txt(st === 'atual' ? 'in progress' : 'available') + '</span>' +
-                '<span class="cartao-nome">' + esc(c.name) + '</span>' +
-                '<span class="cartao-meta">' + c.hours + 'h · ' + txt(c.level) + '</span>' +
+              return '<a class="card no-' + st + '" href="#/course/' + esc(id) + '">' +
+                '<span class="node-state" data-state="' + st + '">' +
+                  txt(st === 'current' ? 'in progress' : 'available') + '</span>' +
+                '<span class="card-name">' + esc(c.name) + '</span>' +
+                '<span class="card-meta">' + c.hours + 'h · ' + txt(c.level) + '</span>' +
                 bar(p.pct, p.feitas + ' de ' + p.total) +
-                '<span class="cartao-conta">' + p.feitas + '/' + p.total + ' ' + txt('sections') + '</span>' +
+                '<span class="card-count">' + p.feitas + '/' + p.total + ' ' + txt('sections') + '</span>' +
               '</a>';
             }).join('') +
           '</div>' +

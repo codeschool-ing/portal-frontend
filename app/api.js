@@ -36,7 +36,7 @@ export function signOut() {
   return echo(null);
 }
 
-/* FUTURE: `PATCH /conta/email`, and the change only takes effect once confirmed
+/* FUTURE: `PATCH /account/email`, and the change only takes effect once confirmed
    at the NEW address — otherwise changing the e-mail becomes the easiest way to
    take over an account. Here it takes effect right away, because there is
    nowhere to send the confirmation. */
@@ -45,7 +45,7 @@ export function changeEmail(email) {
   return echo(state.now().session);
 }
 
-/* FUTURE: `PATCH /conta/senha`, with the current password checked ON THE
+/* FUTURE: `PATCH /account/senha`, with the current password checked ON THE
    SERVER. The new password is not stored anywhere here — see state.js. */
 export function changePassword() {
   state.markPasswordChange();
@@ -135,8 +135,8 @@ async function gradeOnServer(ex, answer) {
     correct: null,                                 // null = it was not checked
     simulated: true,
     detail: ex.type === 'expression-answer'
-      ? 'Equivalência simbólica exige o CAS no servidor.'
-      : 'A execução dos casos de teste exige o contêiner no servidor.',
-    resposta: answer,
+      ? 'Symbolic equivalence needs the CAS on the server.'
+      : 'Running the test cases needs the container on the server.',
+    response: answer,
   };
 }

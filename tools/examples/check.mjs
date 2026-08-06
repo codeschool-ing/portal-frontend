@@ -1,11 +1,11 @@
 /* ==========================================================================
-   Checks the `exemplo` blocks in the content.
+   Checks the `example` blocks in the content.
 
    It assembles each block's program — concatenating the `partes[].codigo` in
    order — runs it in a real Node and compares against the `saida` written in the
    content.
 
-   WHY THIS EXISTS. The `exemplo` block is the Go By Example format: a continuous
+   WHY THIS EXISTS. The `example` block is the Go By Example format: a continuous
    program with the explanation of each snippet beside it. A program with invented
    output is worse than no example at all — it teaches the wrong thing with the
    authority of someone who showed the result, and the student only finds out when
@@ -25,7 +25,7 @@
        node tools/examples/check.mjs assets/lessons-javascript.js
 
    CARE WHEN EXTENDING IT: only examples in a language Node runs are checked. A
-   CSS or HTML `exemplo` has no program output and is skipped — that is not a
+   CSS or HTML `example` has no program output and is skipped — that is not a
    failure, it is the absence of a question.
    ========================================================================== */
 

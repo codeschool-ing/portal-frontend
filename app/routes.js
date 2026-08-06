@@ -15,7 +15,7 @@
 const routes = [];
 
 export function route(pattern, load) {
-  // '/curso/:id/aula/:ix' → a regex with named groups
+  // '/course/:id/lesson/:ix' → a regex with named groups
   const names = [];
   const re = new RegExp('^' + pattern.replace(/:([a-z]+)/gi, (_, n) => {
     names.push(n);
@@ -28,7 +28,7 @@ export const goTo = (path) => { location.hash = '#' + path; };
 
 export function currentPath() {
   const h = location.hash.replace(/^#/, '');
-  return h || '/painel';
+  return h || '/dashboard';
 }
 
 function match(path) {

@@ -64,7 +64,7 @@ await p.waitForFunction(() => location.hash.length > 1);
 
 /* The portal only writes back when something changes, so nudge it once: mark a
    section. That is also the realistic path — a returning student does something. */
-await p.evaluate(() => location.hash = '#/curso/javascript/aula/0/let-const');
+await p.evaluate(() => location.hash = '#/course/javascript/lesson/0/let-const');
 await p.waitForTimeout(400);
 
 const doc = await p.evaluate((k) => JSON.parse(localStorage.getItem(k) || '{}'), KEY);

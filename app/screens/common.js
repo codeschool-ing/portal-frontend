@@ -32,8 +32,8 @@ export function trackProgress(t) {
 }
 
 export function bar(pct, label) {
-  return '<span class="barra" role="img" aria-label="' + esc(label || pct + '%') + '">' +
-    '<span class="barra-cheia" style="width:' + pct + '%"></span></span>';
+  return '<span class="bar" role="img" aria-label="' + esc(label || pct + '%') + '">' +
+    '<span class="bar-fill" style="width:' + pct + '%"></span></span>';
 }
 
 export const studentTrack = () => {
@@ -43,7 +43,7 @@ export const studentTrack = () => {
 
 export function empty(message) {
   const el = document.createElement('div');
-  el.className = 'tela tela-vazia';
-  el.innerHTML = '<p class="vazio">' + esc(message) + '</p>';
+  el.className = 'view tela-vazia';
+  el.innerHTML = '<p class="empty">' + esc(message) + '</p>';
   return el;
 }

@@ -1,7 +1,7 @@
 /* ==========================================================================
    Modal — the vitrine's, reused as is.
 
-   The classes (`.modal`, `.modal-caixa`, `html.modal-aberto`) come from
+   The classes (`.modal`, `.modal-box`, `html.modal-open`) come from
    `base.css`, which is a copy of the vitrine's: the dimming, the blur, the
    entrance animation and the frozen background were already solved there, and
    solved for the same reason that would apply here.
@@ -27,7 +27,7 @@ export function closeModal() {
   const { el, focusedBefore } = open;
   open = null;
   el.remove();
-  document.documentElement.classList.remove('modal-aberto');
+  document.documentElement.classList.remove('modal-open');
   if (focusedBefore && document.contains(focusedBefore)) focusedBefore.focus();
 }
 
@@ -43,24 +43,24 @@ export function openModal(content, { className = '', actions = '', label = '' } 
   el.setAttribute('aria-modal', 'true');
   if (label) el.setAttribute('aria-label', label);
   el.innerHTML =
-    '<div class="modal-pilha">' +
-      '<div class="modal-acoes">' +
+    '<div class="modal-stack">' +
+      '<div class="modal-actions">' +
         actions +
-        '<button type="button" class="modal-fechar" aria-label="' + txt('Close') + '">✕</button>' +
+        '<button type="button" class="modal-close" aria-label="' + txt('Close') + '">✕</button>' +
       '</div>' +
-      '<div class="modal-caixa">' + content + '</div>' +
+      '<div class="modal-box">' + content + '</div>' +
     '</div>';
 
   /* Clicking OUTSIDE closes; clicking inside does not. The target has to be the
-     veil itself — `closest('.modal-caixa')` is not enough, because the stack is
+     veil itself — `closest('.modal-box')` is not enough, because the stack is
      also background. */
   el.addEventListener('click', (e) => {
-    if (e.target === el || e.target.closest('.modal-fechar')) closeModal();
+    if (e.target === el || e.target.closest('.modal-close')) closeModal();
   });
 
   document.body.appendChild(el);
-  document.documentElement.classList.add('modal-aberto');
+  document.documentElement.classList.add('modal-open');
   open = { el, focusedBefore: document.activeElement };
-  el.querySelector('.modal-fechar').focus();
+  el.querySelector('.modal-close').focus();
   return el;
 }
