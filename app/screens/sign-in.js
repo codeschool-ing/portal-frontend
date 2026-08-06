@@ -17,7 +17,7 @@ export default async function signIn() {
 
   const options = TRACKS_BY_FAMILY().map(([family, list]) =>
     '<optgroup label="' + txt('trilhas por ' + family) + '">' +
-      list.map((t) => '<option value="' + esc(t.id) + '">' + esc(t.nome) + '</option>').join('') +
+      list.map((t) => '<option value="' + esc(t.id) + '">' + esc(t.name) + '</option>').join('') +
     '</optgroup>').join('');
 
   el.innerHTML =
@@ -46,7 +46,7 @@ export default async function signIn() {
     e.preventDefault();
     const name = el.querySelector('#e-nome').value.trim();
     if (!name) return el.querySelector('#e-nome').focus();
-    await api.signIn({ nome: name });
+    await api.signIn({ name: name });
     await api.enrol(el.querySelector('#e-trilha').value);
     goTo('/painel');
   });

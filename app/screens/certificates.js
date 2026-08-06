@@ -112,7 +112,7 @@ function card({ label, name, meta, who, when, key, sample, grade }) {
    cannot be the day we find out the format was something else. And the button
    says so, instead of pretending. */
 const LINKEDIN = 'https://www.linkedin.com';
-const validationUrl = (c) => 'https://codeschool.ing/certificado/' + encodeURIComponent(c);
+const validationUrl = (c) => 'https://codeschool.ing/certificate/' + encodeURIComponent(c);
 
 function linkedInButtons({ name, code: certCode, when }) {
   const d = new Date(when);
@@ -149,42 +149,42 @@ export default async function certificates() {
   const el = document.createElement('div');
   el.className = 'tela tela-certificados';
 
-  const who = now().sessao?.nome || 'Aluno';
+  const who = now().session?.name || 'Aluno';
   const today = DATE(new Date());
   const t = studentTrack();
   const onPath = t ? trackPath(t, activeOption) : [];
 
   /* Course completed AND exam passed. Both conditions, and in this order,
      because that is how the screen explains what is missing when something is. */
-  const done = CURSOS.filter((c) => courseDone(c.id) && examPassed('curso:' + c.id));
-  const almostDone = CURSOS.filter((c) => courseDone(c.id) && !examPassed('curso:' + c.id));
+  const done = COURSES.filter((c) => courseDone(c.id) && examPassed('course:' + c.id));
+  const almostDone = COURSES.filter((c) => courseDone(c.id) && !examPassed('course:' + c.id));
 
   const trackReady = Boolean(t)
     && onPath.length > 0
     && onPath.every((id) => courseDone(id))
-    && examPassed('trilha:' + t.id);
+    && examPassed('track:' + t.id);
 
   const issued =
     (trackReady
       ? card({
         label: 'trilha concluída',
-        name: t.nome,
+        name: t.name,
         meta: onPath.length + ' ' + txt('cursos') + ' · ' +
-          onPath.reduce((s, id) => s + (courseById(id)?.horas || 0), 0) + 'h',
+          onPath.reduce((s, id) => s + (courseById(id)?.hours || 0), 0) + 'h',
         who: who,
         when: today,
         key: 'trilha.' + t.id,
-        grade: txt('prova da trilha:') + ' ' + examResult('trilha:' + t.id).melhor + '%',
+        grade: txt('prova da trilha:') + ' ' + examResult('track:' + t.id).best + '%',
       })
       : '') +
     done.map((c) => card({
       label: 'curso concluído',
-      name: c.nome,
-      meta: c.horas + 'h · ' + txt(c.nivel) + (onPath.includes(c.id) && t ? ' · ' + t.nome : ''),
+      name: c.name,
+      meta: c.hours + 'h · ' + txt(c.level) + (onPath.includes(c.id) && t ? ' · ' + t.name : ''),
       who: who,
       when: today,
       key: c.id,
-      grade: txt('prova final:') + ' ' + examResult('curso:' + c.id).melhor + '%',
+      grade: txt('prova final:') + ' ' + examResult('course:' + c.id).best + '%',
     })).join('');
 
   /* The examples: one of each kind the student does not have yet. Someone who
@@ -195,12 +195,12 @@ export default async function certificates() {
      track — and not from invented names. That way the example is already in the
      right language (the catalogue is translated at runtime) and shows the
      certificate they will actually earn, not a generic one. */
-  const model = courseById(onPath[0]) || CURSOS[0];
+  const model = courseById(onPath[0]) || COURSES[0];
   const examples =
     (done.length ? '' : card({
       label: 'curso concluído',
-      name: model.nome,
-      meta: model.horas + 'h · ' + txt(model.nivel) + (t ? ' · ' + t.nome : ''),
+      name: model.name,
+      meta: model.hours + 'h · ' + txt(model.level) + (t ? ' · ' + t.name : ''),
       who: who,
       when: today,
       key: 'exemplo.curso',
@@ -209,9 +209,9 @@ export default async function certificates() {
     })) +
     (trackReady ? '' : card({
       label: 'trilha concluída',
-      name: t ? t.nome : TRILHAS[0].nome,
+      name: t ? t.name : TRACKS[0].name,
       meta: (onPath.length || 10) + ' ' + txt('cursos') + ' · ' +
-        (onPath.reduce((s, id) => s + (courseById(id)?.horas || 0), 0) || 380) + 'h',
+        (onPath.reduce((s, id) => s + (courseById(id)?.hours || 0), 0) || 380) + 'h',
       who: who,
       when: today,
       key: 'exemplo.trilha',
@@ -232,7 +232,7 @@ export default async function certificates() {
           '<div class="bloco-topo"><h2>' + txt('Falta só a prova') + '</h2></div>' +
           '<ul class="cert-falta">' +
             almostDone.map((c) => '<li>' +
-              '<span>' + esc(c.nome) + ' — ' + txt('conteúdo concluído') + '</span>' +
+              '<span>' + esc(c.name) + ' — ' + txt('conteúdo concluído') + '</span>' +
               '<a class="btn btn-primary" href="#/curso/' + esc(c.id) + '/prova">' +
                 txt('Fazer a prova') + ' →</a>' +
             '</li>').join('') +

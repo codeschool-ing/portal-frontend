@@ -111,64 +111,61 @@ function missingTranslations() {
 }
 
 /* ---------- catalogue content ----------
-   The original Portuguese of each field is stored and, on a language switch, the
-   CURSOS/TRILHAS/DEPOIMENTOS objects are rewritten in place. That way the rest
-   of the code goes on reading `c.nome` without knowing a translation exists —
-   and each field falls back to Portuguese by itself when the translated version
-   is missing. */
-const PT_BASE = { cursos: {}, trilhas: {}, depoimentos: [] };
+   The authored strings of each field are stored once and, on a language switch,
+   the COURSES/TRACKS objects are rewritten in place. The rest of the code goes
+   on reading `c.name` without knowing a translation exists, and each field falls
+   back to the base by itself when a translated version is missing.
 
-function savePtBase() {
-  CURSOS.forEach((c) => {
-    PT_BASE.cursos[c.id] = {
-      nome: c.nome, resumo: c.resumo, ementa: c.ementa,
-      topicos: c.topicos, requisitos: c.requisitos,
+   THE BASE IS ENGLISH NOW. It used to be Portuguese, because Portuguese was the
+   source language and therefore needed no dictionary. English is the source
+   language now and Portuguese is the fifth translation, in
+   assets/i18n-courses-pt.js. The mechanism did not change — only the language
+   the fallback lands on. */
+const BASE = { courses: {}, tracks: {} };
+
+function saveBase() {
+  COURSES.forEach((c) => {
+    BASE.courses[c.id] = {
+      name: c.name, summary: c.summary, syllabus: c.syllabus,
+      topics: c.topics, prerequisites: c.prerequisites,
     };
   });
-  TRILHAS.forEach((tr) => {
+  TRACKS.forEach((tr) => {
     const steps = {};
-    tr.cursos.forEach((item, ix) => {
+    tr.courses.forEach((item, ix) => {
       if (isChoice(item)) {
-        steps[ix] = { escolha: item.escolha, nota: item.nota, opcoes: item.opcoes.map((o) => o.nome) };
+        steps[ix] = { choice: item.choice, note: item.note, options: item.options.map((o) => o.name) };
       }
     });
-    PT_BASE.trilhas[tr.id] = { nome: tr.nome, objetivo: tr.objetivo, saida: tr.saida, etapas: steps };
+    BASE.tracks[tr.id] = { name: tr.name, goal: tr.goal, outcome: tr.outcome, steps };
   });
-  DEPOIMENTOS.forEach((d) => PT_BASE.depoimentos.push({ texto: d.texto, autor: d.autor, contexto: d.contexto }));
 }
 
 function applyContent() {
   const dic = (window.I18N && window.I18N[LANG]) || {};
-  const dc = dic.cursos || {}, dt = dic.trilhas || {}, dd = dic.depoimentos || [];
+  const dc = dic.courses || {}, dt = dic.tracks || {};
 
-  CURSOS.forEach((c) => {
-    const pt = PT_BASE.cursos[c.id], tr = dc[c.id] || {};
-    c.nome = tr.nome || pt.nome;
-    c.resumo = tr.resumo || pt.resumo;
-    c.ementa = tr.ementa || pt.ementa;
-    c.topicos = tr.topicos || pt.topicos;
-    c.requisitos = tr.requisitos !== undefined ? tr.requisitos : pt.requisitos;
+  COURSES.forEach((c) => {
+    const base = BASE.courses[c.id], tr = dc[c.id] || {};
+    c.name = tr.name || base.name;
+    c.summary = tr.summary || base.summary;
+    c.syllabus = tr.syllabus || base.syllabus;
+    c.topics = tr.topics || base.topics;
+    c.prerequisites = tr.prerequisites !== undefined ? tr.prerequisites : base.prerequisites;
   });
 
-  TRILHAS.forEach((track) => {
-    const pt = PT_BASE.trilhas[track.id], tr = dt[track.id] || {};
-    track.nome = tr.nome || pt.nome;
-    track.objetivo = tr.objetivo || pt.objetivo;
-    track.saida = tr.saida || pt.saida;
-    track.cursos.forEach((item, ix) => {
+  TRACKS.forEach((track) => {
+    const base = BASE.tracks[track.id], tr = dt[track.id] || {};
+    track.name = tr.name || base.name;
+    track.goal = tr.goal || base.goal;
+    track.outcome = tr.outcome || base.outcome;
+    track.courses.forEach((item, ix) => {
       if (!isChoice(item)) return;
-      const ptStep = pt.etapas[ix], trStep = (tr.etapas || {})[ix] || {};
-      item.escolha = trStep.escolha || ptStep.escolha;
-      item.nota = trStep.nota || ptStep.nota;
-      item.opcoes.forEach((o, io) => { o.nome = (trStep.opcoes && trStep.opcoes[io]) || ptStep.opcoes[io]; });
+      const baseStep = base.steps[ix], trStep = (tr.steps || {})[ix] || {};
+      item.choice = trStep.choice || baseStep.choice;
+      item.note = trStep.note || baseStep.note;
+      item.options.forEach((o, io) => { o.name = (trStep.options && trStep.options[io]) || baseStep.options[io]; });
     });
-  });
-
-  DEPOIMENTOS.forEach((d, i) => {
-    const pt = PT_BASE.depoimentos[i], tr = dd[i] || {};
-    d.texto = tr.texto || pt.texto;
-    d.autor = tr.autor || pt.autor;
-    d.contexto = tr.contexto || pt.contexto;
   });
 }
 

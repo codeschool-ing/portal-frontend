@@ -10,19 +10,19 @@
    "trilha" é `parcours`; nome próprio de tecnologia fica intacto. Nomes de
    curso seguem o uso do mercado francófono, não a tradução literal.
    ========================================================================== */
-window.I18N.fr.cursos = {
+window.I18N.fr.courses = {
 
 'web-fundamentos': {
-  nome: 'Fondamentaux du Web et d’Internet',
-  resumo: 'Comprenez ce qui se passe entre le moment où l’on tape une adresse et celui où la page apparaît — la base de toute carrière web.',
-  ementa: [
+  name: 'Fondamentaux du Web et d’Internet',
+  summary: 'Comprenez ce qui se passe entre le moment où l’on tape une adresse et celui où la page apparaît — la base de toute carrière web.',
+  syllabus: [
     'Comment fonctionne internet : paquets, protocoles et serveurs',
     'HTTP et HTTPS : requêtes, réponses, codes de statut',
     'Domaines, DNS et hébergement en pratique',
     'Comment les navigateurs affichent une page',
     'Outils de développement et premiers diagnostics',
   ],
-  topicos: [
+  topics: [
     'Client, serveur et hôte : qui demande et qui répond',
     'Paquet, trame et socket',
     'Bande passante, latence et débit',
@@ -35,20 +35,20 @@ window.I18N.fr.cursos = {
     'Comment le navigateur construit la page : DOM, CSSOM et rendu',
     'Outils de développement : réseau, console et éléments',
   ],
-  requisitos: 'Savoir utiliser un ordinateur et internet au quotidien.',
+  prerequisites: 'Savoir utiliser un ordinateur et internet au quotidien.',
 },
 
 'git': {
-  nome: 'Git et Contrôle de Versions',
-  resumo: 'Versionnez votre code, travaillez en équipe et ne perdez plus jamais votre travail.',
-  ementa: [
+  name: 'Git et Contrôle de Versions',
+  summary: 'Versionnez votre code, travaillez en équipe et ne perdez plus jamais votre travail.',
+  syllabus: [
     'Dépôts, commits et historique',
     'Branches, fusion et résolution de conflits',
     'GitHub et GitLab : dépôts distants, pull requests et revue de code',
     'Flux de travail en équipe (feature branch, trunk based)',
     'Bonnes pratiques de messages et d’organisation',
   ],
-  topicos: [
+  topics: [
     'Ce qu’est le contrôle de versions et pourquoi il existe',
     'Dépôt, zone de préparation (staging) et commit',
     'Historique : log, diff, blame et show',
@@ -64,16 +64,16 @@ window.I18N.fr.cursos = {
 },
 
 'javascript': {
-  nome: 'JavaScript',
-  resumo: 'Le langage du web : logique, interactivité et dialogue avec les serveurs.',
-  ementa: [
+  name: 'JavaScript',
+  summary: 'Le langage du web : logique, interactivité et dialogue avec les serveurs.',
+  syllabus: [
     'Syntaxe moderne (ES6+), types, fonctions et portée',
     'Manipulation du DOM, événements et formulaires',
     'Asynchronisme : promesses, async/await et fetch',
     'API web du navigateur : stockage, géolocalisation, notifications',
     'Gestionnaires de paquets (npm, pnpm, yarn) et modules',
   ],
-  topicos: [
+  topics: [
     'Syntaxe ES6+ : let/const, fonctions fléchées et littéraux de gabarit',
     'Types, coercition, égalité stricte et valeurs falsy',
     'Objets, tableaux, décomposition et déstructuration',
@@ -90,9 +90,9 @@ window.I18N.fr.cursos = {
 },
 
 'ia-dev': {
-  nome: 'L’IA dans le Développement',
-  resumo: 'Programmez accompagné : assistants de code, agents et intégration de l’IA dans vos propres projets.',
-  ementa: [
+  name: 'L’IA dans le Développement',
+  summary: 'Programmez accompagné : assistants de code, agents et intégration de l’IA dans vos propres projets.',
+  syllabus: [
     'Comment fonctionnent les modèles de langage : embeddings, vecteurs et RAG',
     'Assistants de code dans l’éditeur : revue, refactorisation et documentation',
     'Techniques de prompting pour les tâches de programmation',
@@ -100,7 +100,7 @@ window.I18N.fr.cursos = {
     'Modèles d’intégration : streaming, sorties structurées et function calling',
     'Fournisseurs (Anthropic, OpenAI, Google) avec coût et sécurité maîtrisés',
   ],
-  topicos: [
+  topics: [
     'Comment un modèle de langage génère du texte : tokens, embeddings et contexte',
     'Fenêtre de contexte, coût par token et limites pratiques',
     'Assistants de code dans l’éditeur : compléter, refactoriser et documenter',
@@ -113,20 +113,20 @@ window.I18N.fr.cursos = {
     'Fournisseurs : Anthropic, OpenAI et Google — clés, limites et coût',
     'Risques : hallucination, fuite de données et injection de prompt',
   ],
-  requisitos: 'L’un des deux langages suffit.',
+  prerequisites: 'L’un des deux langages suffit.',
 },
 
 'html-css': {
-  nome: 'HTML et CSS',
-  resumo: 'Construisez et stylez des pages à partir de zéro, avec une mise en page vraiment responsive.',
-  ementa: [
+  name: 'HTML et CSS',
+  summary: 'Construisez et stylez des pages à partir de zéro, avec une mise en page vraiment responsive.',
+  syllabus: [
     'HTML sémantique et structure des documents',
     'Sélecteurs, cascade, spécificité et variables CSS',
     'Mise en page avec Flexbox et Grid',
     'Responsive, media queries et mobile first',
     'Frameworks CSS : Tailwind en pratique',
   ],
-  topicos: [
+  topics: [
     'Structure d’un document HTML et métadonnées',
     'HTML sémantique : header, nav, main, section, article et footer',
     'Formulaires, champs, libellés et validation native',
@@ -144,9 +144,9 @@ window.I18N.fr.cursos = {
 },
 
 'react-ts': {
-  nome: 'Front-end avec React et TypeScript',
-  resumo: 'Le standard du marché : composants, état typé et l’outillage professionnel.',
-  ementa: [
+  name: 'Front-end avec React et TypeScript',
+  summary: 'Le standard du marché : composants, état typé et l’outillage professionnel.',
+  syllabus: [
     'Composants, props, état et hooks',
     'Routage, formulaires et consommation d’API',
     'TypeScript appliqué aux composants et aux données',
@@ -154,7 +154,7 @@ window.I18N.fr.cursos = {
     'Linters et formateurs (ESLint, Prettier, Biome)',
     'Panorama des alternatives : Vue, Angular, Svelte',
   ],
-  topicos: [
+  topics: [
     'Composants, props et composition',
     'État local avec useState et effets avec useEffect',
     'Hooks : useMemo, useCallback, useRef et hooks personnalisés',
@@ -168,20 +168,20 @@ window.I18N.fr.cursos = {
     'ESLint, Prettier et Biome',
     'Panorama de Vue, Angular et Svelte',
   ],
-  requisitos: 'Les deux sont nécessaires.',
+  prerequisites: 'Les deux sont nécessaires.',
 },
 
 'front-qualidade': {
-  nome: 'Tests, Sécurité et Accessibilité',
-  resumo: 'Ce qui sépare un site qui marche d’un produit auquel on peut se fier.',
-  ementa: [
+  name: 'Tests, Sécurité et Accessibilité',
+  summary: 'Ce qui sépare un site qui marche d’un produit auquel on peut se fier.',
+  syllabus: [
     'Tests unitaires et de composants (Vitest, Jest)',
     'Tests de bout en bout (Playwright, Cypress)',
     'Stratégies d’authentification : sessions, JWT, OAuth',
     'Sécurité web : CORS, HTTPS, CSP et risques OWASP',
     'Accessibilité : WCAG, clavier, lecteurs d’écran et contraste',
   ],
-  topicos: [
+  topics: [
     'La pyramide des tests appliquée au front-end',
     'Tests unitaires et de composants avec Vitest et Jest',
     'Testing Library : tester comme l’utilisateur utilise',
@@ -199,16 +199,16 @@ window.I18N.fr.cursos = {
 },
 
 'front-performance': {
-  nome: 'Rendu, Performance et PWA',
-  resumo: 'Des sites rapides, bien positionnés sur Google et qui fonctionnent même hors ligne.',
-  ementa: [
+  name: 'Rendu, Performance et PWA',
+  summary: 'Des sites rapides, bien positionnés sur Google et qui fonctionnent même hors ligne.',
+  syllabus: [
     'Rendu côté serveur (SSR) avec Next.js et similaires',
     'Sites statiques (SSG) et quand choisir chaque stratégie',
     'Mesure de la performance : Lighthouse, Core Web Vitals, DevTools',
     'Cache, service workers et réponses en streaming',
     'Progressive Web Apps : installation et usage hors ligne',
   ],
-  topicos: [
+  topics: [
     'Rendu côté client, côté serveur (SSR) et hybride',
     'Next.js : routage, server components et génération statique',
     'Génération de sites statiques (SSG) et régénération incrémentale',
@@ -224,16 +224,16 @@ window.I18N.fr.cursos = {
 },
 
 'front-entrega': {
-  nome: 'Déploiement, Design Systems et GraphQL',
-  resumo: 'Publier, normaliser et intégrer — le travail de celui qui livre un produit, pas une page.',
-  ementa: [
+  name: 'Déploiement, Design Systems et GraphQL',
+  summary: 'Publier, normaliser et intégrer — le travail de celui qui livre un produit, pas une page.',
+  syllabus: [
     'Publication sur Vercel, Netlify, Cloudflare et GitHub Pages',
     'Intégration continue et environnements de prévisualisation',
     'Design systems : tokens, composants et documentation',
     'Web Components : custom elements et shadow DOM',
     'Consommation d’API GraphQL (Apollo, Relay)',
   ],
-  topicos: [
+  topics: [
     'Publication sur Vercel, Netlify, Cloudflare Pages et GitHub Pages',
     'Variables d’environnement et secrets dans le processus de build',
     'Intégration continue et environnements de prévisualisation par pull request',
@@ -249,16 +249,16 @@ window.I18N.fr.cursos = {
 },
 
 'front-multiplataforma': {
-  nome: 'Applications Bureau et Mobiles avec le Web',
-  resumo: 'Emportez ce que vous savez déjà du web vers les boutiques d’applications et le bureau.',
-  ementa: [
+  name: 'Applications Bureau et Mobiles avec le Web',
+  summary: 'Emportez ce que vous savez déjà du web vers les boutiques d’applications et le bureau.',
+  syllabus: [
     'Applications mobiles avec React Native',
     'Panorama de Flutter et Ionic',
     'Applications de bureau avec Electron et Tauri',
     'Empaquetage, signature et publication',
     'Projet final : une application publiée dans votre portfolio',
   ],
-  topicos: [
+  topics: [
     'React Native : composants, navigation et styles',
     'Accès aux ressources de l’appareil : caméra, notifications et stockage',
     'Expo : développement, build et mises à jour à distance',
@@ -273,16 +273,16 @@ window.I18N.fr.cursos = {
 },
 
 'node': {
-  nome: 'Node.js : JavaScript côté Serveur',
-  resumo: 'Le choix de langage de la feuille de route : emportez le JavaScript que vous connaissez déjà côté serveur.',
-  ementa: [
+  name: 'Node.js : JavaScript côté Serveur',
+  summary: 'Le choix de langage de la feuille de route : emportez le JavaScript que vous connaissez déjà côté serveur.',
+  syllabus: [
     'Pourquoi choisir un langage et le maîtriser avant de sauter à un autre',
     'Runtime, boucle d’événements et programmation asynchrone côté serveur',
     'Modules, paquets et organisation des projets',
     'Serveur HTTP et routage avec Express',
     'Lecture de fichiers, variables d’environnement et processus',
   ],
-  topicos: [
+  topics: [
     'Pourquoi maîtriser un langage avant de sauter à un autre',
     'Le runtime de Node : V8, boucle d’événements et file de tâches',
     'Modules CommonJS et ES Modules',
@@ -295,13 +295,13 @@ window.I18N.fr.cursos = {
     'Processus, workers et exécution en cluster',
     'Panorama d’autres langages serveur : Python, Go, Java, PHP et C#',
   ],
-  requisitos: 'Les deux sont nécessaires.',
+  prerequisites: 'Les deux sont nécessaires.',
 },
 
 'python-back': {
-  nome: 'Back-end avec Python : Django et FastAPI',
-  resumo: 'La voie Python vers le serveur : deux frameworks, deux styles, le même résultat professionnel.',
-  ementa: [
+  name: 'Back-end avec Python : Django et FastAPI',
+  summary: 'La voie Python vers le serveur : deux frameworks, deux styles, le même résultat professionnel.',
+  syllabus: [
     'Django : le framework qui arrive avec tout',
     'FastAPI : des API modernes, rapides et typées',
     'Routes, vues, gabarits et sérialisation',
@@ -309,7 +309,7 @@ window.I18N.fr.cursos = {
     'Authentification et permissions',
     'Tests, environnements et mise en production',
   ],
-  topicos: [
+  topics: [
     'Choisir entre Django et FastAPI : ce que chacun présuppose',
     'Django : projet, apps, urls et vues',
     'Gabarits Django et fichiers statiques',
@@ -328,13 +328,13 @@ window.I18N.fr.cursos = {
     'Servir en production : Gunicorn, Uvicorn et proxy inverse',
     'Mettre en conteneur et publier',
   ],
-  requisitos: 'Les deux sont nécessaires.',
+  prerequisites: 'Les deux sont nécessaires.',
 },
 
 'java-back': {
-  nome: 'Back-end avec Java et Spring',
-  resumo: 'L’écosystème qui fait tourner la banque, l’industrie et l’administration : Spring Boot, persistance et l’outillage le plus mûr du marché.',
-  ementa: [
+  name: 'Back-end avec Java et Spring',
+  summary: 'L’écosystème qui fait tourner la banque, l’industrie et l’administration : Spring Boot, persistance et l’outillage le plus mûr du marché.',
+  syllabus: [
     'Maven et Gradle : dépendances, build et organisation du projet',
     'Spring Boot : autoconfiguration, injection de dépendances et profils',
     'Spring MVC : contrôleurs, DTO et validation',
@@ -342,7 +342,7 @@ window.I18N.fr.cursos = {
     'Spring Security, journalisation structurée et documentation',
     'Tests en couches et publication de l’artefact',
   ],
-  topicos: [
+  topics: [
     'Maven : dépendances, cycle de build, plugins et dépôt',
     'Gradle : script de build, tâches et build incrémental',
     'Panorama de Bazel et où il apparaît',
@@ -367,13 +367,13 @@ window.I18N.fr.cursos = {
     'Actuator, métriques et vérification de santé',
     'Empaqueter en jar, en image de conteneur et publier',
   ],
-  requisitos: 'Exige le langage et sa bibliothèque standard : ce cours commence à l’écosystème.',
+  prerequisites: 'Exige le langage et sa bibliothèque standard : ce cours commence à l’écosystème.',
 },
 
 'java': {
-  nome: 'Java',
-  resumo: 'Le langage le plus employé du monde de l’entreprise : typage fort, vraie orientation objet et trente ans de compatibilité.',
-  ementa: [
+  name: 'Java',
+  summary: 'Le langage le plus employé du monde de l’entreprise : typage fort, vraie orientation objet et trente ans de compatibilité.',
+  syllabus: [
     'La JVM, le cycle de vie d’un programme et la syntaxe du langage',
     'Types, conversions, chaînes, tableaux et contrôle de flux',
     'Orientation objet complète : classes, héritage, interfaces et encapsulation',
@@ -381,7 +381,7 @@ window.I18N.fr.cursos = {
     'Collections et génériques : choisir la bonne structure',
     'Exceptions, annotations et le système de modules',
   ],
-  topicos: [
+  topics: [
     'La JVM : compilation, bytecode, exécution et versions LTS',
     'Cycle de vie d’un programme : du fichier source au processus',
     'Syntaxe de base, conventions et le premier programme',
@@ -423,13 +423,13 @@ window.I18N.fr.cursos = {
     'Annotations : celles du langage, celles des frameworks et les vôtres',
     'Système de modules (JPMS) : `module-info` et encapsulation forte',
   ],
-  requisitos: 'Aucun. Ce cours enseigne le langage depuis zéro — c’est le point d’entrée pour qui n’a jamais programmé en Java.',
+  prerequisites: 'Aucun. Ce cours enseigne le langage depuis zéro — c’est le point d’entrée pour qui n’a jamais programmé en Java.',
 },
 
 'java-funcional': {
-  nome: 'Java : Fonctionnel et Concurrent',
-  resumo: 'Le Java qui a changé : lambdas, streams, threads virtuels et la bibliothèque standard qu’on utilise tous les jours.',
-  ementa: [
+  name: 'Java : Fonctionnel et Concurrent',
+  summary: 'Le Java qui a changé : lambdas, streams, threads virtuels et la bibliothèque standard qu’on utilise tous les jours.',
+  syllabus: [
     'Lambdas, interfaces fonctionnelles et composition',
     'Stream API : transformer une collection sans boucle',
     '`Optional` et la fin du `NullPointerException` par inadvertance',
@@ -437,7 +437,7 @@ window.I18N.fr.cursos = {
     'Modèle mémoire, `volatile` et synchronisation',
     'Bibliothèque standard : fichiers, date et heure, réseau, expressions régulières et cryptographie',
   ],
-  topicos: [
+  topics: [
     'Expressions lambda : syntaxe, capture et ce qu’elles remplacent',
     'Interfaces fonctionnelles : `Function`, `Predicate`, `Supplier` et `Consumer`',
     'Références de méthode et de constructeur',
@@ -465,13 +465,13 @@ window.I18N.fr.cursos = {
     'Cryptographie : empreinte, chiffrement symétrique, asymétrique et `KeyStore`',
     'Génération d’aléas sûre et stockage des mots de passe',
   ],
-  requisitos: 'Exige le cours de Java : on suppose ici l’orientation objet, les collections et les exceptions.',
+  prerequisites: 'Exige le cours de Java : on suppose ici l’orientation objet, les collections et les exceptions.',
 },
 
 'go-back': {
-  nome: 'Back-end avec Go',
-  resumo: 'Le serveur en Go : HTTP avec la bibliothèque standard, gRPC, base de données et temps réel — du premier endpoint au binaire publié.',
-  ementa: [
+  name: 'Back-end avec Go',
+  summary: 'Le serveur en Go : HTTP avec la bibliothèque standard, gRPC, base de données et temps réel — du premier endpoint au binaire publié.',
+  syllabus: [
     'Serveur HTTP avec net/http et routage',
     'Frameworks : quand utiliser Gin, Echo, Fiber ou aucun',
     'Accès à la base de données avec pgx, GORM et migrations',
@@ -479,7 +479,7 @@ window.I18N.fr.cursos = {
     'Journalisation structurée et communication en temps réel',
     'Publication : un binaire unique dans un conteneur minimal',
   ],
-  topicos: [
+  topics: [
     'Serveur HTTP avec net/http : handlers, mux et le routage de la 1.22',
     'Middlewares : journalisation, récupération de panique, CORS et authentification',
     'JSON en entrée et en sortie, validation et erreurs normalisées',
@@ -498,13 +498,13 @@ window.I18N.fr.cursos = {
     'Compilation croisée et binaire unique dans un conteneur distroless',
     'Vérification de santé, métriques et arrêt en douceur',
   ],
-  requisitos: 'Exige le langage et la concurrence : ce cours commence au serveur.',
+  prerequisites: 'Exige le langage et la concurrence : ce cours commence au serveur.',
 },
 
 'go': {
-  nome: 'Go',
-  resumo: 'Le langage choisi par Docker, Kubernetes et Terraform : peu de syntaxe à retenir, beaucoup de logiciels à construire.',
-  ementa: [
+  name: 'Go',
+  summary: 'Le langage choisi par Docker, Kubernetes et Terraform : peu de syntaxe à retenir, beaucoup de logiciels à construire.',
+  syllabus: [
     'Syntaxe, types, constantes et conversions',
     'Types composés : tableaux, slices, maps et structs',
     'Fonctions, closures et pointeurs sans arithmétique',
@@ -512,7 +512,7 @@ window.I18N.fr.cursos = {
     'Génériques : fonctions et types génériques avec contraintes',
     'Erreurs comme valeurs, modules et organisation du projet',
   ],
-  topicos: [
+  topics: [
     'Pourquoi Go existe : compilation rapide, binaire unique et simplicité',
     'Histoire du langage et cycle de versions',
     'Installation, GOPATH, workspace et la commande `go`',
@@ -554,13 +554,13 @@ window.I18N.fr.cursos = {
     'Paquets, règles d’import et ce que signifie la majuscule',
     'Utiliser des paquets tiers et publier son propre module',
   ],
-  requisitos: 'Aucun. Ce cours enseigne le langage depuis zéro — c’est le point d’entrée pour qui n’a jamais programmé en Go.',
+  prerequisites: 'Aucun. Ce cours enseigne le langage depuis zéro — c’est le point d’entrée pour qui n’a jamais programmé en Go.',
 },
 
 'go-concorrencia': {
-  nome: 'Go : Concurrence et Tests',
-  resumo: 'La partie de Go qui n’existe pas ailleurs : des milliers de tâches en même temps, sans framework et sans frayeur.',
-  ementa: [
+  name: 'Go : Concurrence et Tests',
+  summary: 'La partie de Go qui n’existe pas ailleurs : des milliers de tâches en même temps, sans framework et sans frayeur.',
+  syllabus: [
     'Goroutines et canaux : de la concurrence bon marché',
     'Synchronisation avec `sync`, mutex et groupes d’attente',
     'Annulation et échéance avec le paquet `context`',
@@ -568,7 +568,7 @@ window.I18N.fr.cursos = {
     'Détection des conditions de course',
     'Bibliothèque standard et vrais tests : table-driven, mocks et benchmarks',
   ],
-  topicos: [
+  topics: [
     'Concurrence n’est pas parallélisme : ce que Go promet vraiment',
     'Goroutines : coût, ordonnanceur et ce qui se passe dans `main`',
     'Canaux : envoyer, recevoir, fermer et parcourir',
@@ -600,13 +600,13 @@ window.I18N.fr.cursos = {
     'Benchmarks : les écrire, lire le résultat et ne pas se tromper',
     'Couverture de test : la mesurer et savoir ce qu’elle ne dit pas',
   ],
-  requisitos: 'Exige le cours de Go : on suppose ici la syntaxe, les interfaces et les erreurs.',
+  prerequisites: 'Exige le cours de Go : on suppose ici la syntaxe, les interfaces et les erreurs.',
 },
 
 'go-producao': {
-  nome: 'Go en Production : CLI, Outillage et Performance',
-  resumo: 'L’outillage qui fait de Go le langage de l’infrastructure : ligne de commande, profilage, compilation croisée et les recoins avancés.',
-  ementa: [
+  name: 'Go en Production : CLI, Outillage et Performance',
+  summary: 'L’outillage qui fait de Go le langage de l’infrastructure : ligne de commande, profilage, compilation croisée et les recoins avancés.',
+  syllabus: [
     'Programmes en ligne de commande avec Cobra et bubbletea',
     'L’outillage complet : build, vet, linters et analyse de sécurité',
     'Profilage avec pprof et trace : trouver le vrai goulot d’étranglement',
@@ -614,7 +614,7 @@ window.I18N.fr.cursos = {
     'Génération de code, tags de compilation et réflexion',
     'Les recoins avancés : escape analysis, `unsafe` et CGO',
   ],
-  topicos: [
+  topics: [
     'Programme en ligne de commande : arguments, sous-commandes et sortie',
     'Cobra : commandes, flags, aide et autocomplétion',
     'urfave/cli comme alternative plus légère',
@@ -640,13 +640,13 @@ window.I18N.fr.cursos = {
     'CGO : appeler du C depuis Go et ce qu’on y perd',
     'Plugins et chargement dynamique : les vraies limites de l’approche',
   ],
-  requisitos: 'Exige la concurrence et un peu d’expérience de projet : c’est le cours le plus avancé du parcours.',
+  prerequisites: 'Exige la concurrence et un peu d’expérience de projet : c’est le cours le plus avancé du parcours.',
 },
 
 'bancos-sql': {
-  nome: 'Bases de Données Relationnelles et SQL',
-  resumo: 'Modélisez, interrogez et protégez les données qui soutiennent n’importe quel système.',
-  ementa: [
+  name: 'Bases de Données Relationnelles et SQL',
+  summary: 'Modélisez, interrogez et protégez les données qui soutiennent n’importe quel système.',
+  syllabus: [
     'Modélisation relationnelle et normalisation',
     'SELECT, JOIN, agrégations et sous-requêtes',
     'Transactions, ACID et modes de défaillance',
@@ -654,7 +654,7 @@ window.I18N.fr.cursos = {
     'Index et analyse des performances des requêtes',
     'Panorama : PostgreSQL, MySQL, MariaDB, SQLite',
   ],
-  topicos: [
+  topics: [
     'Modèle relationnel : tables, clés primaires et étrangères',
     'Normalisation jusqu’à la troisième forme normale et quand dénormaliser',
     'Création et modification de tables, types de données et contraintes',
@@ -669,13 +669,13 @@ window.I18N.fr.cursos = {
     'PostgreSQL, MySQL, MariaDB et SQLite : quand choisir chacun',
     'Oracle et le monde de l’entreprise',
   ],
-  requisitos: 'Ne demande pas de savoir programmer : SQL s’apprend sans programmation.',
+  prerequisites: 'Ne demande pas de savoir programmer : SQL s’apprend sans programmation.',
 },
 
 'apis': {
-  nome: 'API et Authentification',
-  resumo: 'La porte d’entrée de votre système : des contrats clairs, un accès maîtrisé et de la sécurité.',
-  ementa: [
+  name: 'API et Authentification',
+  summary: 'La porte d’entrée de votre système : des contrats clairs, un accès maîtrisé et de la sécurité.',
+  syllabus: [
     'Styles d’API : REST, JSON, GraphQL, gRPC et SOAP',
     'Spécification avec OpenAPI et documentation vivante',
     'Authentification : basique, par jeton, session/cookie, JWT et OAuth',
@@ -683,7 +683,7 @@ window.I18N.fr.cursos = {
     'Algorithmes de hachage (bcrypt, scrypt) et stockage des mots de passe',
     'Bonnes pratiques de sécurité d’API : CORS, HTTPS, CSP, risques OWASP',
   ],
-  topicos: [
+  topics: [
     'REST : ressources, verbes, codes de statut et versionnement',
     'JSON et bonnes pratiques de contrat',
     'GraphQL : schéma, resolvers et le problème de la sur-récupération',
@@ -701,16 +701,16 @@ window.I18N.fr.cursos = {
 },
 
 'servidores-cache': {
-  nome: 'Serveurs Web et Cache',
-  resumo: 'Mettez l’application en ligne et faites-la répondre vite sous charge.',
-  ementa: [
+  name: 'Serveurs Web et Cache',
+  summary: 'Mettez l’application en ligne et faites-la répondre vite sous charge.',
+  syllabus: [
     'Serveurs et proxys inverses : Nginx, Apache, Caddy',
     'Certificats, SSL/TLS et sécurité du serveur',
     'Cache HTTP : en-têtes, validation et invalidation',
     'Cache côté serveur avec Redis et Memcached',
     'Stratégies de cache et pièges courants',
   ],
-  topicos: [
+  topics: [
     'Serveurs web : Nginx, Apache et Caddy',
     'Proxy inverse, répartition de charge et service des fichiers statiques',
     'Certificats TLS, émission gratuite et renouvellement automatique',
@@ -726,16 +726,16 @@ window.I18N.fr.cursos = {
 },
 
 'testes-cicd': {
-  nome: 'Tests Automatisés et CI/CD',
-  resumo: 'Livrez souvent sans crainte : automatisez la vérification et la mise en production.',
-  ementa: [
+  name: 'Tests Automatisés et CI/CD',
+  summary: 'Livrez souvent sans crainte : automatisez la vérification et la mise en production.',
+  syllabus: [
     'Tests unitaires, d’intégration et fonctionnels',
     'Doublures de test, fixtures et jeux de données',
     'Couverture : ce qu’elle dit et ce qu’elle ne dit pas',
     'Chaînes d’intégration et de livraison continues',
     'Environnements, secrets et stratégies de mise en production',
   ],
-  topicos: [
+  topics: [
     'Tests unitaires, d’intégration, fonctionnels et d’acceptation',
     'Doublures de test : stub, mock, spy et fake',
     'Fixtures, fabriques et jeux de données de test',
@@ -751,9 +751,9 @@ window.I18N.fr.cursos = {
 },
 
 'docker': {
-  nome: 'Docker et Conteneurs',
-  resumo: 'Empaquetez votre application une fois et exécutez-la partout — du portable du collègue au serveur de production.',
-  ementa: [
+  name: 'Docker et Conteneurs',
+  summary: 'Empaquetez votre application une fois et exécutez-la partout — du portable du collègue au serveur de production.',
+  syllabus: [
     'Ce qu’est un conteneur et pourquoi il a remplacé la machine virtuelle',
     'Images, couches et Dockerfile au build efficace',
     'Volumes, montages liés et persistance des données',
@@ -761,7 +761,7 @@ window.I18N.fr.cursos = {
     'Registres, versionnement d’image et sécurité',
     'Panorama du déploiement : Swarm, Nomad, Kubernetes et PaaS',
   ],
-  topicos: [
+  topics: [
     'Ce qu’est un conteneur et quel problème il résout',
     'Bare metal, machine virtuelle et conteneur : ce qui change dans chacun',
     'Docker et le standard OCI : pourquoi la spécification compte',
@@ -791,13 +791,13 @@ window.I18N.fr.cursos = {
     'Panorama du déploiement : Docker Swarm, Nomad, Kubernetes et PaaS',
     'Panorama des alternatives : Podman, containerd et LXC',
   ],
-  requisitos: 'Exige la ligne de commande Linux. N’exige pas de savoir programmer dans un langage particulier.',
+  prerequisites: 'Exige la ligne de commande Linux. N’exige pas de savoir programmer dans un langage particulier.',
 },
 
 'kubernetes': {
-  nome: 'Kubernetes : Orchestration en Production',
-  resumo: 'Un conteneur, c’est facile ; des centaines, avec mise à jour sans coupure et mise à l’échelle automatique, c’est Kubernetes.',
-  ementa: [
+  name: 'Kubernetes : Orchestration en Production',
+  summary: 'Un conteneur, c’est facile ; des centaines, avec mise à jour sans coupure et mise à l’échelle automatique, c’est Kubernetes.',
+  syllabus: [
     'Architecture du cluster et la première application en ligne',
     'Deployments, services, Ingress et le réseau entre pods',
     'Configuration, secrets et stockage persistant avec CSI',
@@ -805,7 +805,7 @@ window.I18N.fr.cursos = {
     'Sécurité du cluster : RBAC, politiques réseau et sécurité des pods',
     'Helm, patrons de mise en production, extension par CRD et exploitation au quotidien',
   ],
-  topicos: [
+  topics: [
     'Pourquoi orchestrer : ce que Compose ne résout pas',
     'Panorama de Kubernetes et le vocabulaire du cluster',
     'Alternatives : Swarm, Nomad, ECS et PaaS — quand Kubernetes est excessif',
@@ -855,13 +855,13 @@ window.I18N.fr.cursos = {
     'Installer le plan de contrôle et ajouter des nœuds de travail',
     'Plusieurs clusters : contextes multiples, fédération et stratégie de région',
   ],
-  requisitos: 'Exige Docker. C’est le cours d’infrastructure le plus avancé du catalogue. GitOps, observabilité et chaînes n’y sont qu’un panorama — chacun a son propre cours après celui-ci.',
+  prerequisites: 'Exige Docker. C’est le cours d’infrastructure le plus avancé du catalogue. GitOps, observabilité et chaînes n’y sont qu’un panorama — chacun a son propre cours après celui-ci.',
 },
 
 'arquitetura': {
-  nome: 'Architecture des Systèmes',
-  resumo: 'Les décisions qui déterminent si un système grandit ou se bloque — et comment les faire comprendre.',
-  ementa: [
+  name: 'Architecture des Systèmes',
+  summary: 'Les décisions qui déterminent si un système grandit ou se bloque — et comment les faire comprendre.',
+  syllabus: [
     'Monolithe, microservices, SOA, serverless et service mesh',
     'Les douze facteurs des applications modernes',
     'Messagerie asynchrone avec Kafka et RabbitMQ',
@@ -869,7 +869,7 @@ window.I18N.fr.cursos = {
     'Données en temps réel : WebSockets, SSE et polling',
     'Documenter et défendre les décisions d’architecture',
   ],
-  topicos: [
+  topics: [
     'Monolithe : quand c’est encore le bon choix',
     'Microservices : frontières, communication et coût d’exploitation',
     'SOA, serverless et service mesh',
@@ -885,16 +885,16 @@ window.I18N.fr.cursos = {
 },
 
 'escala': {
-  nome: 'Montée en Charge et Observabilité',
-  resumo: 'Ce qui arrive quand le système grandit — et comment voir ce qui se passe vraiment.',
-  ementa: [
+  name: 'Montée en Charge et Observabilité',
+  summary: 'Ce qui arrive quand le système grandit — et comment voir ce qui se passe vraiment.',
+  syllabus: [
     'Faire monter les bases de données : index, répliques, sharding et théorème CAP',
     'Bases NoSQL : document, clé-valeur, colonne, graphe et séries temporelles',
     'Observabilité : instrumentation, supervision et télémétrie',
     'Stratégies d’atténuation : throttling, backpressure, disjoncteur',
     'Dégradation en douceur et planification de capacité',
   ],
-  topicos: [
+  topics: [
     'Montée en charge verticale et horizontale : la limite de chacune',
     'Répliques de lecture, partitionnement et sharding',
     'Théorème CAP et cohérence à terme',
@@ -911,9 +911,9 @@ window.I18N.fr.cursos = {
 },
 
 'linux-terminal': {
-  nome: 'Linux et Ligne de Commande',
-  resumo: 'Le système qui fait tourner internet : maîtrisez le terminal et cessez de dépendre d’une interface graphique.',
-  ementa: [
+  name: 'Linux et Ligne de Commande',
+  summary: 'Le système qui fait tourner internet : maîtrisez le terminal et cessez de dépendre d’une interface graphique.',
+  syllabus: [
     'Systèmes d’exploitation : Linux, Unix et Windows en exploitation',
     'Distributions : Ubuntu/Debian, RHEL et dérivées, SUSE',
     'Terminal : navigation, permissions, utilisateurs et processus',
@@ -922,7 +922,7 @@ window.I18N.fr.cursos = {
     'Supervision des processus et des performances en ligne de commande',
     'Éditeurs en terminal : Vim, Nano, Emacs',
   ],
-  topicos: [
+  topics: [
     'Linux, Unix et Windows : différences dans l’exploitation quotidienne',
     'Distributions : Ubuntu/Debian, RHEL, Rocky, Alma et SUSE',
     'Système de fichiers, chemins absolus et relatifs',
@@ -940,9 +940,9 @@ window.I18N.fr.cursos = {
 },
 
 'redes': {
-  nome: 'Réseaux et Protocoles',
-  resumo: 'Comment les données voyagent — et quoi faire quand elles cessent de voyager.',
-  ementa: [
+  name: 'Réseaux et Protocoles',
+  summary: 'Comment les données voyagent — et quoi faire quand elles cessent de voyager.',
+  syllabus: [
     'Modèle OSI et pile TCP/IP',
     'DNS, HTTP, HTTPS et SSL/TLS en pratique',
     'SSH : accès distant, clés et tunnels',
@@ -950,7 +950,7 @@ window.I18N.fr.cursos = {
     'Protocoles de courrier : SMTP, IMAP, POP3S, SPF, DKIM et DMARC',
     'Diagnostic réseau : dig, traceroute, tcpdump',
   ],
-  topicos: [
+  topics: [
     'Modèle OSI : les sept couches et ce qui vit dans chacune',
     'Modèle TCP/IP et sa correspondance avec l’OSI',
     'TCP et UDP : ports, poignée de main et quand utiliser chacun',
@@ -965,16 +965,16 @@ window.I18N.fr.cursos = {
 },
 
 'nuvem': {
-  nome: 'Cloud et Serverless',
-  resumo: 'Là où vit l’infrastructure aujourd’hui : fournisseurs, services managés et informatique sans serveur.',
-  ementa: [
+  name: 'Cloud et Serverless',
+  summary: 'Là où vit l’infrastructure aujourd’hui : fournisseurs, services managés et informatique sans serveur.',
+  syllabus: [
     'Modèles de cloud : IaaS, PaaS, SaaS',
     'Panorama des fournisseurs : AWS, Azure, Google Cloud et alternatives',
     'Calcul, stockage, réseau et identité dans le cloud',
     'Serverless : AWS Lambda, Cloudflare Workers, Vercel, Netlify',
     'Coûts : comment les estimer, les mesurer et éviter les surprises',
   ],
-  topicos: [
+  topics: [
     'IaaS, PaaS et SaaS : ce que chaque modèle livre et ce qu’il vous laisse',
     'Cloud public, privé et hybride',
     'Fournisseurs : AWS, Azure, Google Cloud, DigitalOcean, Hetzner et Linode',
@@ -989,9 +989,9 @@ window.I18N.fr.cursos = {
 },
 
 'iac': {
-  nome: 'Infrastructure as Code',
-  resumo: 'Cessez de configurer les serveurs à la main : décrivez l’infrastructure dans des fichiers versionnés.',
-  ementa: [
+  name: 'Infrastructure as Code',
+  summary: 'Cessez de configurer les serveurs à la main : décrivez l’infrastructure dans des fichiers versionnés.',
+  syllabus: [
     'Provisionnement déclaratif avec Terraform',
     'Panorama de Pulumi, CloudFormation et AWS CDK',
     'État, planification et application sûre des changements',
@@ -999,7 +999,7 @@ window.I18N.fr.cursos = {
     'Modules réutilisables et environnements multiples',
     'Infrastructure éphémère et reproductible',
   ],
-  topicos: [
+  topics: [
     'Provisionnement et gestion de configuration : deux tâches différentes',
     'Terraform : providers, ressources, variables et sorties',
     'État de Terraform : fichier d’état, backend distant et verrouillage',
@@ -1014,16 +1014,16 @@ window.I18N.fr.cursos = {
 },
 
 'gitops': {
-  nome: 'GitOps, Artefacts et Secrets',
-  resumo: 'Le dépôt comme source de vérité : des livraisons traçables, réversibles et sûres.',
-  ementa: [
+  name: 'GitOps, Artefacts et Secrets',
+  summary: 'Le dépôt comme source de vérité : des livraisons traçables, réversibles et sûres.',
+  syllabus: [
     'Principes du GitOps et flux d’approbation',
     'ArgoCD et FluxCD en pratique',
     'Gestion des artefacts : Artifactory, Nexus, registres d’images',
     'Gestion des secrets : Vault, Sealed Secrets, SOPS et services cloud',
     'Rotation des identifiants et principe du moindre privilège',
   ],
-  topicos: [
+  topics: [
     'Principes du GitOps : déclaratif, versionné et réconcilié',
     'Le dépôt comme source de vérité et le flux d’approbation',
     'ArgoCD : applications, synchronisation et dérive d’état',
@@ -1040,9 +1040,9 @@ window.I18N.fr.cursos = {
 },
 
 'observabilidade': {
-  nome: 'Observabilité et Exploitation',
-  resumo: 'Voir ce qui se passe en production — et agir avant que l’utilisateur s’en aperçoive.',
-  ementa: [
+  name: 'Observabilité et Exploitation',
+  summary: 'Voir ce qui se passe en production — et agir avant que l’utilisateur s’en aperçoive.',
+  syllabus: [
     'Métriques avec Prometheus et tableaux de bord avec Grafana',
     'Centralisation des journaux : Elastic Stack, Loki, Graylog',
     'Traçage distribué avec Jaeger et OpenTelemetry',
@@ -1050,7 +1050,7 @@ window.I18N.fr.cursos = {
     'Service mesh : Istio, Linkerd et Envoy',
     'Patrons de conception pour le cloud : disponibilité, résilience et données',
   ],
-  topicos: [
+  topics: [
     'Les trois piliers : métriques, journaux et traces',
     'Prometheus : collecte, PromQL, exporteurs et Alertmanager',
     'Grafana : tableaux de bord, sources de données et annotations',
@@ -1065,9 +1065,9 @@ window.I18N.fr.cursos = {
 },
 
 'python': {
-  nome: 'Python',
-  resumo: 'Le langage recommandé pour les données, l’automatisation et l’IA — des bases aux structures que le marché exige.',
-  ementa: [
+  name: 'Python',
+  summary: 'Le langage recommandé pour les données, l’automatisation et l’IA — des bases aux structures que le marché exige.',
+  syllabus: [
     'Syntaxe, types, collections et fonctions',
     'Orientation objet et modules',
     'Structures de données et algorithmes : listes, dictionnaires, complexité',
@@ -1075,7 +1075,7 @@ window.I18N.fr.cursos = {
     'Environnements virtuels, paquets et organisation des projets',
     'Bibliothèques essentielles : pandas et requests',
   ],
-  topicos: [
+  topics: [
     'Installation, interpréteur et le premier script',
     'Types, variables, opérateurs et formatage des chaînes',
     'Collections : listes, tuples, dictionnaires et ensembles',
@@ -1092,9 +1092,9 @@ window.I18N.fr.cursos = {
 },
 
 'dados-fundamentos': {
-  nome: 'Fondamentaux de l’Ingénierie des Données',
-  resumo: 'La carte du métier : ce que fait un ingénieur données et comment la donnée traverse l’entreprise.',
-  ementa: [
+  name: 'Fondamentaux de l’Ingénierie des Données',
+  summary: 'La carte du métier : ce que fait un ingénieur données et comment la donnée traverse l’entreprise.',
+  syllabus: [
     'Ce qu’est l’ingénierie des données et en quoi elle diffère de la science des données',
     'Compétences, responsabilités et comment choisir les technologies',
     'Le cycle de vie de la donnée : génération, stockage, ingestion et livraison',
@@ -1102,7 +1102,7 @@ window.I18N.fr.cursos = {
     'Considérations de collecte : volume, fréquence, qualité et coût',
     'Notions de systèmes distribués',
   ],
-  topicos: [
+  topics: [
     'Ce que fait un ingénieur données et en quoi il diffère du data scientist',
     'Responsabilités, compétences et critères de choix des technologies',
     'Le cycle de vie de la donnée : génération, ingestion, stockage, transformation et livraison',
@@ -1117,9 +1117,9 @@ window.I18N.fr.cursos = {
 },
 
 'modelagem-dw': {
-  nome: 'Modélisation des Données et Entrepôt',
-  resumo: 'Organisez la donnée pour répondre à des questions métier, pas seulement pour stocker des enregistrements.',
-  ementa: [
+  name: 'Modélisation des Données et Entrepôt',
+  summary: 'Organisez la donnée pour répondre à des questions métier, pas seulement pour stocker des enregistrements.',
+  syllabus: [
     'OLTP et OLAP : deux mondes, deux modélisations',
     'Modélisation dimensionnelle : faits, dimensions, étoile et flocon',
     'Dimensions qui changent avec le temps (SCD)',
@@ -1127,7 +1127,7 @@ window.I18N.fr.cursos = {
     'Entrepôt, lac et lakehouse : BigQuery, Snowflake, Redshift, Delta Lake',
     'Data mart, data mesh et architectures orientées métadonnées',
   ],
-  topicos: [
+  topics: [
     'OLTP et OLAP : des charges différentes exigent des modèles différents',
     'Modélisation dimensionnelle : tables de faits et tables de dimensions',
     'Schéma en étoile et schéma en flocon',
@@ -1144,9 +1144,9 @@ window.I18N.fr.cursos = {
 },
 
 'pipelines-etl': {
-  nome: 'Chaînes de Données et ETL',
-  resumo: 'La colonne vertébrale du métier : déplacer et transformer des données de façon fiable et répétable.',
-  ementa: [
+  name: 'Chaînes de Données et ETL',
+  summary: 'La colonne vertébrale du métier : déplacer et transformer des données de façon fiable et répétable.',
+  syllabus: [
     'Types d’ingestion : par lots, en temps réel et hybride',
     'ETL et ELT : extraire, transformer et charger',
     'Orchestration avec Apache Airflow : DAG, planification et reprises',
@@ -1154,7 +1154,7 @@ window.I18N.fr.cursos = {
     'Panorama de Luigi et Prefect',
     'Idempotence, retraitement et gestion des échecs',
   ],
-  topicos: [
+  topics: [
     'Ingestion par lots, en temps réel et hybride',
     'ETL et ELT : où la transformation a lieu',
     'Capture des changements (CDC) et chargements incrémentaux',
@@ -1170,9 +1170,9 @@ window.I18N.fr.cursos = {
 },
 
 'bigdata': {
-  nome: 'Big Data et Calcul Distribué',
-  resumo: 'Quand la donnée ne tient plus sur une machine : traitez-la en grappe.',
-  ementa: [
+  name: 'Big Data et Calcul Distribué',
+  summary: 'Quand la donnée ne tient plus sur une machine : traitez-la en grappe.',
+  syllabus: [
     'Fondamentaux du calcul en grappe et ordonnancement des tâches',
     'Systèmes de fichiers distribués et HDFS',
     'Apache Spark : RDD, DataFrames et traitement en mémoire',
@@ -1180,7 +1180,7 @@ window.I18N.fr.cursos = {
     'Gestion de grappe avec Kubernetes',
     'Systèmes de messagerie pour les données : Kafka, RabbitMQ, SQS et SNS',
   ],
-  topicos: [
+  topics: [
     'Quand la donnée cesse de tenir sur une machine',
     'Calcul en grappe : nœuds, ordonnanceur et tolérance aux pannes',
     'Systèmes de fichiers distribués et HDFS',
@@ -1197,9 +1197,9 @@ window.I18N.fr.cursos = {
 },
 
 'dados-governanca': {
-  nome: 'Sécurité, Gouvernance et Confidentialité des Données',
-  resumo: 'La donnée est une responsabilité : protégez-la, tracez-la et respectez la loi.',
-  ementa: [
+  name: 'Sécurité, Gouvernance et Confidentialité des Données',
+  summary: 'La donnée est une responsabilité : protégez-la, tracez-la et respectez la loi.',
+  syllabus: [
     'Authentification et autorisation sur les plateformes de données',
     'Chiffrement au repos et en transit',
     'Tokenisation, masquage et obscurcissement des données',
@@ -1207,7 +1207,7 @@ window.I18N.fr.cursos = {
     'La LGPD brésilienne en pratique (et panorama du RGPD et de l’AI Act européen)',
     'Politiques de conservation et anonymisation',
   ],
-  topicos: [
+  topics: [
     'Authentification et autorisation sur les plateformes de données',
     'Contrôle d’accès par rôle, par attribut et par ligne ou colonne',
     'Chiffrement au repos et en transit',
@@ -1223,9 +1223,9 @@ window.I18N.fr.cursos = {
 },
 
 'analytics-bi': {
-  nome: 'Analytique, BI et Reverse ETL',
-  resumo: 'Le bout que le métier voit : transformer une donnée traitée en décision.',
-  ementa: [
+  name: 'Analytique, BI et Reverse ETL',
+  summary: 'Le bout que le métier voit : transformer une donnée traitée en décision.',
+  syllabus: [
     'Analyse exploratoire et les indicateurs qui comptent',
     'Business intelligence et modélisation en libre-service',
     'Tableaux de bord avec Power BI (et panorama de Tableau, Looker, Streamlit)',
@@ -1233,7 +1233,7 @@ window.I18N.fr.cursos = {
     'Outils : Hightouch, Census, Segment',
     'Raconter des histoires avec les données sans tromper',
   ],
-  topicos: [
+  topics: [
     'Analyse exploratoire : distribution, corrélation et valeurs aberrantes',
     'Indicateurs, dimensions et définitions partagées entre équipes',
     'Couche sémantique et modélisation en libre-service',
@@ -1248,16 +1248,16 @@ window.I18N.fr.cursos = {
 },
 
 'ml-mlops': {
-  nome: 'Apprentissage Automatique et MLOps',
-  resumo: 'Là où l’ingénierie des données rencontre l’intelligence artificielle.',
-  ementa: [
+  name: 'Apprentissage Automatique et MLOps',
+  summary: 'Là où l’ingénierie des données rencontre l’intelligence artificielle.',
+  syllabus: [
     'Panorama de l’apprentissage automatique : supervisé et non supervisé',
     'Le rôle de l’ingénieur données dans le cycle de vie d’un modèle',
     'Feature stores et préparation des données pour l’entraînement',
     'MLOps : versionnement des modèles, déploiement et supervision',
     'Détection de dérive et réentraînement',
   ],
-  topicos: [
+  topics: [
     'Apprentissage supervisé, non supervisé et par renforcement',
     'Tâches courantes : classification, régression, regroupement et recommandation',
     'Découpage entraînement/validation/test et fuite de données',
@@ -1272,9 +1272,9 @@ window.I18N.fr.cursos = {
 },
 
 'redes-enderecamento': {
-  nome: 'Adressage, Routage et Commutation',
-  resumo: 'Le cœur du réseau : découper les adresses, choisir les chemins et relier les équipements qui font arriver le paquet.',
-  ementa: [
+  name: 'Adressage, Routage et Commutation',
+  summary: 'Le cœur du réseau : découper les adresses, choisir les chemins et relier les équipements qui font arriver le paquet.',
+  syllabus: [
     'Équipements réseau et le rôle de chacun',
     'Topologies et principes de conception réseau',
     'Adressage IPv4 et IPv6 en pratique',
@@ -1283,7 +1283,7 @@ window.I18N.fr.cursos = {
     'Commutation, VLAN et spanning tree',
     'Travaux pratiques en simulateurs (Packet Tracer, GNS3)',
   ],
-  topicos: [
+  topics: [
     'Équipements : routeur, commutateur, concentrateur, modem, point d’accès, pare-feu et répartiteur',
     'Carte réseau, répéteur, pont et passerelle',
     'Topologies : bus, étoile, anneau, maillée et hybride',
@@ -1310,9 +1310,9 @@ window.I18N.fr.cursos = {
 },
 
 'redes-disponibilidade': {
-  nome: 'VPN, Sans-fil et Haute Disponibilité',
-  resumo: 'Un réseau qui ne tombe pas et qui arrive partout : tunnels, wi-fi bien conçu, redondance et diagnostic par capture de paquets.',
-  ementa: [
+  name: 'VPN, Sans-fil et Haute Disponibilité',
+  summary: 'Un réseau qui ne tombe pas et qui arrive partout : tunnels, wi-fi bien conçu, redondance et diagnostic par capture de paquets.',
+  syllabus: [
     'Tunnels et VPN : site à site et accès distant',
     'Réseaux sans fil : normes, canaux et sécurité',
     'Analyse de paquets avec Wireshark et tcpdump',
@@ -1320,7 +1320,7 @@ window.I18N.fr.cursos = {
     'Gestion du trafic : QoS et répartition de charge',
     'Méthode de diagnostic couche par couche',
   ],
-  topicos: [
+  topics: [
     'Encapsulation et tunnels : GRE et IP-in-IP',
     'IPsec : modes transport et tunnel, IKE et associations de sécurité',
     'VPN SSL/TLS et VPN de couche 2',
@@ -1348,9 +1348,9 @@ window.I18N.fr.cursos = {
 },
 
 'redes-seguranca': {
-  nome: 'Sécurité des Réseaux',
-  resumo: 'Défendre le réseau pour de vrai : un pare-feu bien configuré, une cryptographie comprise, des attaques connues et un accès au moindre privilège.',
-  ementa: [
+  name: 'Sécurité des Réseaux',
+  summary: 'Défendre le réseau pour de vrai : un pare-feu bien configuré, une cryptographie comprise, des attaques connues et un accès au moindre privilège.',
+  syllabus: [
     'Pare-feu, proxys et DMZ',
     'Attaques courantes et comment chacune fonctionne',
     'Fondamentaux de la cryptographie et certificats',
@@ -1358,7 +1358,7 @@ window.I18N.fr.cursos = {
     'Listes de contrôle d’accès (ACL)',
     'Architecture Zero Trust et contrôle d’accès au réseau',
   ],
-  topicos: [
+  topics: [
     'Pare-feu avec et sans état (stateful et stateless)',
     'Pare-feu de nouvelle génération (NGFW) et inspection profonde des paquets',
     'Pare-feu applicatif web (WAF) et proxy inverse',
@@ -1386,9 +1386,9 @@ window.I18N.fr.cursos = {
 },
 
 'redes-automacao': {
-  nome: 'Automatisation des Réseaux',
-  resumo: 'Cessez de configurer équipement par équipement : décrivez le réseau en code, validez et appliquez à l’échelle.',
-  ementa: [
+  name: 'Automatisation des Réseaux',
+  summary: 'Cessez de configurer équipement par équipement : décrivez le réseau en code, validez et appliquez à l’échelle.',
+  syllabus: [
     'API réseau : REST, NETCONF, RESTCONF et gNMI',
     'Modélisation avec YANG, JSON et XML',
     'Automatisation avec Python : Netmiko, NAPALM et Nornir',
@@ -1396,7 +1396,7 @@ window.I18N.fr.cursos = {
     'Gabarits de configuration avec Jinja2',
     'Source de vérité, sauvegarde et validation de configuration',
   ],
-  topicos: [
+  topics: [
     'Pourquoi automatiser : erreur humaine, échelle et répétabilité',
     'API REST sur les équipements réseau : authentification, verbes et pagination',
     'NETCONF et RESTCONF : configuration structurée et transactionnelle',
@@ -1413,13 +1413,13 @@ window.I18N.fr.cursos = {
     'Intégration continue appliquée au réseau',
     'Panorama des réseaux définis par logiciel (SDN) et des contrôleurs',
   ],
-  requisitos: 'Les deux sont nécessaires.',
+  prerequisites: 'Les deux sont nécessaires.',
 },
 
 'prompt-engineering': {
-  nome: 'Ingénierie de Prompt',
-  resumo: 'Bavarder avec un modèle est facile ; obtenir la bonne réponse à chaque fois est un métier. Concevez, réglez et testez vraiment vos prompts.',
-  ementa: [
+  name: 'Ingénierie de Prompt',
+  summary: 'Bavarder avec un modèle est facile ; obtenir la bonne réponse à chaque fois est un métier. Concevez, réglez et testez vraiment vos prompts.',
+  syllabus: [
     'Comment fonctionne un modèle de langage et ce qu’est un prompt',
     'Terminologie : tokens, contexte, hallucination, RAG et agents',
     'Paramètres d’échantillonnage : température, top-k et top-p',
@@ -1428,7 +1428,7 @@ window.I18N.fr.cursos = {
     'Techniques : zero-shot, few-shot, chaîne de pensée, ToT, ReAct',
     'Génération automatique de prompts par le modèle lui-même',
   ],
-  topicos: [
+  topics: [
     'Ce qu’est un modèle de langage et comment il prédit le prochain token',
     'Ce qu’est un prompt et ce qu’est l’ingénierie de prompt',
     'Tokens, tokenisation et pourquoi le coût se mesure ainsi',
@@ -1461,13 +1461,13 @@ window.I18N.fr.cursos = {
     'Prompt tuning : des prompts appris plutôt qu’écrits',
     'Ingénierie automatique de prompt : utiliser le LLM pour générer des prompts',
   ],
-  requisitos: 'Savoir utiliser un ordinateur et internet au quotidien.',
+  prerequisites: 'Savoir utiliser un ordinateur et internet au quotidien.',
 },
 
 'prompt-confiabilidade': {
-  nome: 'Prompts Fiables : Évaluation et Bonnes Pratiques',
-  resumo: 'La distance entre un prompt de démonstration et un prompt qui tourne en production : mesurer, versionner et ne plus compter sur la chance.',
-  ementa: [
+  name: 'Prompts Fiables : Évaluation et Bonnes Pratiques',
+  summary: 'La distance entre un prompt de démonstration et un prompt qui tourne en production : mesurer, versionner et ne plus compter sur la chance.',
+  syllabus: [
     'Les bonnes pratiques qui tiennent un prompt en production',
     'Délimitation, variables et instructions claires',
     'Évaluation automatisée et tests de sortie',
@@ -1475,7 +1475,7 @@ window.I18N.fr.cursos = {
     'Fiabilité : débiaisement, ensembles et auto-évaluation',
     'Coût et latence dans les chaînes réelles',
   ],
-  topicos: [
+  topics: [
     'Donner des exemples few-shot pour fixer la structure et le style de sortie',
     'Garder le prompt court, direct et sans instructions contradictoires',
     'Demander une sortie structurée quand cela facilite la consommation',
@@ -1501,9 +1501,9 @@ window.I18N.fr.cursos = {
 },
 
 'ia-seguranca': {
-  nome: 'Sécurité de l’IA et Red Teaming',
-  resumo: 'Les systèmes à base d’IA échouent d’une façon nouvelle. Apprenez à attaquer les vôtres avant qu’un autre ne le fasse — et à les défendre.',
-  ementa: [
+  name: 'Sécurité de l’IA et Red Teaming',
+  summary: 'Les systèmes à base d’IA échouent d’une façon nouvelle. Apprenez à attaquer les vôtres avant qu’un autre ne le fasse — et à les défendre.',
+  syllabus: [
     'Comment les applications à LLM échouent et comment on les attaque',
     'Injection de prompt directe et indirecte',
     'Fuite de données et d’instructions système',
@@ -1512,7 +1512,7 @@ window.I18N.fr.cursos = {
     'Red teaming : planifier, exécuter et rapporter',
     'Défenses : filtres, isolation des outils et relecture humaine',
   ],
-  topicos: [
+  topics: [
     'La surface d’attaque d’une application à LLM',
     'Injection de prompt directe : contourner les instructions système',
     'Injection indirecte : contenu malveillant dans des pages, fichiers et courriels',
@@ -1539,9 +1539,9 @@ window.I18N.fr.cursos = {
 },
 
 'ia-modelos': {
-  nome: 'Modèles d’IA : Choix, Plateformes et API',
-  resumo: 'Il n’existe pas de meilleur modèle — il existe le bon modèle pour votre tâche, dans votre budget. Apprenez à choisir et à intégrer.',
-  ementa: [
+  name: 'Modèles d’IA : Choix, Plateformes et API',
+  summary: 'Il n’existe pas de meilleur modèle — il existe le bon modèle pour votre tâche, dans votre budget. Apprenez à choisir et à intégrer.',
+  syllabus: [
     'Types de modèles : pré-entraîné, fermé, ouvert et auto-hébergé',
     'Comment choisir le bon modèle pour chaque tâche',
     'Modèles fermés : Claude, Gemini, GPT, Cohere et Mistral',
@@ -1549,7 +1549,7 @@ window.I18N.fr.cursos = {
     'Hugging Face, Ollama, LM Studio et OpenRouter',
     'API et SDK des principaux fournisseurs',
   ],
-  topicos: [
+  topics: [
     'Modèles pré-entraînés : ce qui arrive déjà prêt',
     'Modèles fermés et à code ouvert : licence, coût et contrôle',
     'Modèles auto-hébergés : quand cela vaut la peine de les faire tourner soi-même',
@@ -1572,20 +1572,20 @@ window.I18N.fr.cursos = {
     'API compatibles avec le standard OpenAI',
     'Clés, quotas, limites de débit et maîtrise de la dépense',
   ],
-  requisitos: 'Les deux sont nécessaires.',
+  prerequisites: 'Les deux sont nécessaires.',
 },
 
 'embeddings-vetores': {
-  nome: 'Embeddings et Bases Vectorielles',
-  resumo: 'Chercher par le sens, pas par le mot. La base technique du RAG, de la recommandation et de la classification.',
-  ementa: [
+  name: 'Embeddings et Bases Vectorielles',
+  summary: 'Chercher par le sens, pas par le mot. La base technique du RAG, de la recommandation et de la classification.',
+  syllabus: [
     'Ce que sont les embeddings et pourquoi ils changent la recherche',
     'Cas d’usage : recherche sémantique, classification, recommandation et anomalies',
     'Modèles d’embedding propriétaires et ouverts',
     'Bases vectorielles : comment choisir et exploiter',
     'Indexation des embeddings et recherche par similarité',
   ],
-  topicos: [
+  topics: [
     'Ce qu’est un embedding : le sens transformé en vecteur',
     'Dimensions, distance et similarité cosinus',
     'Recherche sémantique : trouver par le sens, pas par le mot exact',
@@ -1608,16 +1608,16 @@ window.I18N.fr.cursos = {
 },
 
 'rag': {
-  nome: 'RAG et Ingénierie du Contexte',
-  resumo: 'Faites répondre le modèle sur ce qu’il n’a jamais vu : les documents de votre entreprise, avec la source citée.',
-  ementa: [
+  name: 'RAG et Ingénierie du Contexte',
+  summary: 'Faites répondre le modèle sur ce qu’il n’a jamais vu : les documents de votre entreprise, avec la source citée.',
+  syllabus: [
     'Ce qu’est le RAG et quand il vaut mieux que l’affinage',
     'La chaîne complète : découper, indexer, retrouver et générer',
     'Frameworks : LangChain, LlamaIndex, Haystack et RAGFlow',
     'Ingénierie du contexte : mémoire externe et filtres dynamiques',
     'Compaction et isolation du contexte',
   ],
-  topicos: [
+  topics: [
     'Le problème que résout le RAG : une connaissance que le modèle n’a pas',
     'Cas d’usage : documentation, support, juridique et base interne',
     'RAG contre affinage : coût, fraîcheur et traçabilité',
@@ -1639,9 +1639,9 @@ window.I18N.fr.cursos = {
 },
 
 'agentes-mcp': {
-  nome: 'Agents d’IA et MCP',
-  resumo: 'Quand le modèle cesse de répondre et se met à agir : outils, boucle de décision, multi-agents et le protocole MCP.',
-  ementa: [
+  name: 'Agents d’IA et MCP',
+  summary: 'Quand le modèle cesse de répondre et se met à agir : outils, boucle de décision, multi-agents et le protocole MCP.',
+  syllabus: [
     'Ce qu’est un agent et quand c’est la bonne réponse',
     'Outils, appel de fonctions et boucle de décision',
     'Systèmes multi-agents et orchestration',
@@ -1649,7 +1649,7 @@ window.I18N.fr.cursos = {
     'Model Context Protocol : hôte, client, serveur et transport',
     'Construire un serveur et un client MCP',
   ],
-  topicos: [
+  topics: [
     'Agent, assistant et automatisation : où est la différence',
     'Cas d’usage des agents — et quand ils sont excessifs',
     'La boucle raisonner-et-agir (ReAct) en pratique',
@@ -1672,9 +1672,9 @@ window.I18N.fr.cursos = {
 },
 
 'llm-observabilidade': {
-  nome: 'Observabilité et Évaluation des LLM en Production',
-  resumo: '« Ça marchait dans la démo » n’est pas « ça marche » : instrumentez, évaluez et testez la non-régression à chaque changement.',
-  ementa: [
+  name: 'Observabilité et Évaluation des LLM en Production',
+  summary: '« Ça marchait dans la démo » n’est pas « ça marche » : instrumentez, évaluez et testez la non-régression à chaque changement.',
+  syllabus: [
     'Traçage et journalisation des appels aux modèles',
     'Supervision du coût, de la latence et de la qualité en production',
     'Outils : LangSmith, Langfuse, Helicone et Arize AI',
@@ -1682,7 +1682,7 @@ window.I18N.fr.cursos = {
     'Métriques et outils d’évaluation (DeepEval, RAGAS)',
     'Test de non-régression à chaque changement de prompt ou de modèle',
   ],
-  topicos: [
+  topics: [
     'Traçage d’un appel et d’une chaîne d’appels',
     'Journalisation des entrées et sorties sans fuiter de données personnelles',
     'Suivi du coût par requête, par utilisateur et par fonctionnalité',
@@ -1703,16 +1703,16 @@ window.I18N.fr.cursos = {
 },
 
 'multimodal': {
-  nome: 'IA Multimodale : Image, Audio et Vidéo',
-  resumo: 'Le modèle voit et entend aussi : lisez des documents, générez des images, transcrivez de l’audio et comprenez la vidéo.',
-  ementa: [
+  name: 'IA Multimodale : Image, Audio et Vidéo',
+  summary: 'Le modèle voit et entend aussi : lisez des documents, générez des images, transcrivez de l’audio et comprenez la vidéo.',
+  syllabus: [
     'Ce qui change quand le modèle voit et entend',
     'Compréhension et génération d’images',
     'Compréhension de la vidéo et traitement de l’audio',
     'Synthèse et reconnaissance vocales',
     'API : Vision, DALL-E, Whisper et alternatives',
   ],
-  topicos: [
+  topics: [
     'Cas d’usage de l’IA multimodale dans des produits réels',
     'Compréhension d’images : description, extraction et lecture de documents',
     'Génération d’images : prompt, style et limites',
@@ -1731,9 +1731,9 @@ window.I18N.fr.cursos = {
 },
 
 'arquitetura-papel': {
-  nome: 'Le Rôle de l’Architecte Logiciel',
-  resumo: 'L’architecte n’est pas le développeur le plus ancien de la salle : c’est celui qui décide, documente et répond des choix structurels.',
-  ementa: [
+  name: 'Le Rôle de l’Architecte Logiciel',
+  summary: 'L’architecte n’est pas le développeur le plus ancien de la salle : c’est celui qui décide, documente et répond des choix structurels.',
+  syllabus: [
     'Ce qu’est l’architecture logicielle — et ce qu’elle n’est pas',
     'Ce que fait un architecte au quotidien',
     'Niveaux : architecture d’application, de solution et d’entreprise',
@@ -1741,7 +1741,7 @@ window.I18N.fr.cursos = {
     'Simplifier plutôt que compliquer',
     'L’équilibre entre technique, délai et coût',
   ],
-  topicos: [
+  topics: [
     'Ce qu’est l’architecture logicielle : composants, interaction et environnement',
     'Ce que l’architecture n’est pas : ni un joli diagramme ni la technologie à la mode',
     'Ce qu’est un architecte logiciel et d’où vient son autorité',
@@ -1760,13 +1760,13 @@ window.I18N.fr.cursos = {
     'Architecte, tech lead et ingénieur senior : les frontières du rôle',
     'Antipatrons : l’architecte PowerPoint, la tour d’ivoire et la sur-ingénierie',
   ],
-  requisitos: 'Parcours Développement Back-end terminé — ou expérience équivalente.',
+  prerequisites: 'Parcours Développement Back-end terminé — ou expérience équivalente.',
 },
 
 'padroes-projeto': {
-  nome: 'Patrons et Principes de Conception',
-  resumo: 'Le vocabulaire structurel du métier : SOLID, DDD, CQRS, TDD et les paradigmes qui soutiennent les décisions de conception.',
-  ementa: [
+  name: 'Patrons et Principes de Conception',
+  summary: 'Le vocabulaire structurel du métier : SOLID, DDD, CQRS, TDD et les paradigmes qui soutiennent les décisions de conception.',
+  syllabus: [
     'L’orientation objet au-delà de la syntaxe',
     'SOLID et les principes d’un code durable',
     'Patrons de présentation : MVC, MVP et MVVM',
@@ -1774,7 +1774,7 @@ window.I18N.fr.cursos = {
     'Domain-Driven Design et développement piloté par les tests',
     'Programmation fonctionnelle, réactive et le modèle d’acteurs',
   ],
-  topicos: [
+  topics: [
     'Orientation objet : encapsulation, héritage, polymorphisme et composition',
     'Composition plutôt qu’héritage : pourquoi presque toujours',
     'SOLID : responsabilité unique, ouvert/fermé, substitution de Liskov',
@@ -1798,9 +1798,9 @@ window.I18N.fr.cursos = {
 },
 
 'modelagem-arquitetura': {
-  nome: 'Modélisation et Cadres d’Architecture',
-  resumo: 'Dessiner pour être compris : des diagrammes qui communiquent, des décisions consignées et les cadres que le monde de l’entreprise exige.',
-  ementa: [
+  name: 'Modélisation et Cadres d’Architecture',
+  summary: 'Dessiner pour être compris : des diagrammes qui communiquent, des décisions consignées et les cadres que le monde de l’entreprise exige.',
+  syllabus: [
     'UML et les diagrammes qu’on utilise vraiment',
     'Modèle C4 : quatre niveaux de zoom sur l’architecture',
     'Registres de décision d’architecture (ADR)',
@@ -1808,7 +1808,7 @@ window.I18N.fr.cursos = {
     'BABOK et analyse des exigences métier',
     'Une documentation qui survit au projet',
   ],
-  topicos: [
+  topics: [
     'À quoi sert un diagramme : communiquer, pas décorer',
     'UML : cas d’utilisation, classes, séquence, composants et déploiement',
     'Modèle C4 : contexte, conteneurs, composants et code',
@@ -1827,16 +1827,16 @@ window.I18N.fr.cursos = {
 },
 
 'software-corporativo': {
-  nome: 'Logiciel d’Entreprise et Intégration',
-  resumo: 'La réalité des grandes entreprises : ERP, CRM, BPM et le travail d’intégrer des systèmes que personne n’a le droit d’éteindre.',
-  ementa: [
+  name: 'Logiciel d’Entreprise et Intégration',
+  summary: 'La réalité des grandes entreprises : ERP, CRM, BPM et le travail d’intégrer des systèmes que personne n’a le droit d’éteindre.',
+  syllabus: [
     'L’écosystème d’entreprise : ERP, CRM, BPM et gestion documentaire',
     'SAP, Salesforce et Microsoft Dynamics',
     'Automatisation des processus avec BPM et BPEL',
     'Bus de services (ESB) et intégration du patrimoine existant',
     'Stratégies de migration et de coexistence',
   ],
-  topicos: [
+  topics: [
     'Ce qu’est un ERP et pourquoi il conditionne l’architecture',
     'SAP : ERP, HANA et Business Objects',
     'Microsoft Dynamics et l’écosystème Microsoft en entreprise',
@@ -1856,9 +1856,9 @@ window.I18N.fr.cursos = {
 },
 
 'gestao-processos': {
-  nome: 'Gestion, Processus et Estimations',
-  resumo: 'L’architecte vit entre la technique et la gestion : comprenez les méthodes, les rituels et comment estimer sans inventer de chiffres.',
-  ementa: [
+  name: 'Gestion, Processus et Estimations',
+  summary: 'L’architecte vit entre la technique et la gestion : comprenez les méthodes, les rituels et comment estimer sans inventer de chiffres.',
+  syllabus: [
     'Modèles agiles : Scrum, Kanban et XP',
     'Agile à l’échelle : SAFe et LeSS',
     'Modèles classiques : PMI, Prince2, RUP et ITIL',
@@ -1866,7 +1866,7 @@ window.I18N.fr.cursos = {
     'Des indicateurs de livraison qui ne virent pas à la surveillance',
     'Panorama des certifications du marché',
   ],
-  topicos: [
+  topics: [
     'Cascade, itératif et agile : ce que chacun présuppose du monde',
     'Scrum : rôles, rituels, artefacts et ce qui rate d’habitude',
     'Kanban : flux, limite d’encours et temps de cycle',
@@ -1886,9 +1886,9 @@ window.I18N.fr.cursos = {
 },
 
 'arquiteto-comunicacao': {
-  nome: 'Communication, Conseil et Leadership Technique',
-  resumo: 'La part qui fait tomber plus d’architectes que n’importe quelle difficulté technique : expliquer, convaincre, former et savoir dire non.',
-  ementa: [
+  name: 'Communication, Conseil et Leadership Technique',
+  summary: 'La part qui fait tomber plus d’architectes que n’importe quelle difficulté technique : expliquer, convaincre, former et savoir dire non.',
+  syllabus: [
     'Écrire pour être lu : documentation et propositions',
     'Présenter des décisions techniques à des non-techniciens',
     'Conseil interne : diagnostiquer avant de prescrire',
@@ -1896,7 +1896,7 @@ window.I18N.fr.cursos = {
     'Négocier délai, périmètre et dette technique',
     'Bâtir une réputation technique sans devenir commercial',
   ],
-  topicos: [
+  topics: [
     'Écrire clairement : structure, précision et économie de mots',
     'Document d’une page, proposition technique et RFC interne',
     'Adapter le message : direction, produit, équipe et client',
@@ -1917,9 +1917,9 @@ window.I18N.fr.cursos = {
 },
 
 'informatica-essencial': {
-  nome: 'Informatique Essentielle',
-  resumo: 'Le début de tout : comprendre l’ordinateur de l’intérieur, maîtriser les outils du quotidien et ne plus avoir peur d’y toucher.',
-  ementa: [
+  name: 'Informatique Essentielle',
+  summary: 'Le début de tout : comprendre l’ordinateur de l’intérieur, maîtriser les outils du quotidien et ne plus avoir peur d’y toucher.',
+  syllabus: [
     'Composants matériels et le rôle de chacun',
     'Types de connexion : câble, Wi-Fi, Bluetooth, NFC',
     'Windows, fichiers, dossiers et organisation',
@@ -1927,7 +1927,7 @@ window.I18N.fr.cursos = {
     'Nuage personnel et travail collaboratif',
     'Notions de réseau domestique et premiers diagnostics',
   ],
-  topicos: [
+  topics: [
     'Processeur, mémoire vive, stockage et carte mère',
     'Carte graphique, alimentation, refroidissement et boîtier',
     'Périphériques : écran, clavier, souris, imprimante et scanner',
@@ -1945,13 +1945,13 @@ window.I18N.fr.cursos = {
     'Signes d’un problème matériel et quand ne pas insister',
     'Usage éclairé : mots de passe, mises à jour et arnaques courantes',
   ],
-  requisitos: 'Aucun. C’est le premier cours de l’école.',
+  prerequisites: 'Aucun. C’est le premier cours de l’école.',
 },
 
 'sistemas-operacionais': {
-  nome: 'Systèmes d’Exploitation : Windows, Linux et macOS',
-  resumo: 'Les trois systèmes que vous croiserez dans n’importe quelle entreprise — installés, configurés et administrés par vous.',
-  ementa: [
+  name: 'Systèmes d’Exploitation : Windows, Linux et macOS',
+  summary: 'Les trois systèmes que vous croiserez dans n’importe quelle entreprise — installés, configurés et administrés par vous.',
+  syllabus: [
     'Installation et configuration des trois systèmes',
     'Versions, éditions et différences entre elles',
     'Navigation en interface graphique et en ligne de commande',
@@ -1959,7 +1959,7 @@ window.I18N.fr.cursos = {
     'Installation de logiciels et gestion des fichiers',
     'Commandes courantes et résolution de problèmes',
   ],
-  topicos: [
+  topics: [
     'Ce que fait un système d’exploitation : processus, mémoire et périphériques',
     'Installation et configuration initiale de Windows',
     'Installation et configuration initiale d’une distribution Linux',
@@ -1981,9 +1981,9 @@ window.I18N.fr.cursos = {
 },
 
 'virtualizacao': {
-  nome: 'Virtualisation et Laboratoires',
-  resumo: 'Montez votre labo : plusieurs machines sur un seul ordinateur, pour tester, se tromper et revenir en arrière sans crainte.',
-  ementa: [
+  name: 'Virtualisation et Laboratoires',
+  summary: 'Montez votre labo : plusieurs machines sur un seul ordinateur, pour tester, se tromper et revenir en arrière sans crainte.',
+  syllabus: [
     'Ce qu’est la virtualisation et à quoi elle sert',
     'Hyperviseur, système hôte et système invité',
     'VirtualBox et VMware en pratique',
@@ -1991,7 +1991,7 @@ window.I18N.fr.cursos = {
     'Instantanés, clones et réseaux virtuels',
     'Monter un laboratoire d’étude depuis zéro',
   ],
-  topicos: [
+  topics: [
     'Ce qu’est une machine virtuelle et ce qu’elle fait économiser',
     'Hyperviseur de type 1 et de type 2 : la différence qui compte',
     'Système hôte et système invité',
@@ -2011,9 +2011,9 @@ window.I18N.fr.cursos = {
 },
 
 'suporte-tecnico': {
-  nome: 'Support Technique et Assistance',
-  resumo: 'La moitié du métier est technique ; l’autre moitié consiste à comprendre la personne en face et à consigner ce qui a été fait.',
-  ementa: [
+  name: 'Support Technique et Assistance',
+  summary: 'La moitié du métier est technique ; l’autre moitié consiste à comprendre la personne en face et à consigner ce qui a été fait.',
+  syllabus: [
     'Méthode de diagnostic : du symptôme à la cause',
     'Assistance aux utilisateurs sans jargon',
     'Tickets, priorité et escalade',
@@ -2021,7 +2021,7 @@ window.I18N.fr.cursos = {
     'Accès distant et outils d’assistance',
     'Éthique, confidentialité et limites du technicien',
   ],
-  topicos: [
+  topics: [
     'Méthode de diagnostic : reproduire, isoler, tester et confirmer',
     'Poser la bonne question : ce que l’utilisateur a fait, pas ce qu’il a cru',
     'Couches de cause : utilisateur, application, système, réseau et matériel',
@@ -2041,9 +2041,9 @@ window.I18N.fr.cursos = {
 },
 
 'seguranca-fundamentos': {
-  nome: 'Fondamentaux de la Sécurité de l’Information',
-  resumo: 'Le vocabulaire et l’état d’esprit du domaine : ce qu’est le risque, ce qu’est la défense en profondeur et pourquoi la confiance est le problème.',
-  ementa: [
+  name: 'Fondamentaux de la Sécurité de l’Information',
+  summary: 'Le vocabulaire et l’état d’esprit du domaine : ce qu’est le risque, ce qu’est la défense en profondeur et pourquoi la confiance est le problème.',
+  syllabus: [
     'La triade CID et ce qu’elle guide en pratique',
     'Risque : définition, évaluation et traitement',
     'Défense en profondeur et segmentation',
@@ -2051,7 +2051,7 @@ window.I18N.fr.cursos = {
     'Équipes bleue, rouge et violette',
     'Normes et cadres : ISO, NIST, CIS, CSF et RMF',
   ],
-  topicos: [
+  topics: [
     'Triade CID : confidentialité, intégrité et disponibilité',
     'Définition du risque : menace, vulnérabilité et impact',
     'Évaluer et traiter le risque : accepter, atténuer, transférer ou éviter',
@@ -2074,9 +2074,9 @@ window.I18N.fr.cursos = {
 },
 
 'criptografia': {
-  nome: 'Cryptographie Appliquée',
-  resumo: 'Sans comprendre la cryptographie, on ne fait que recopier la configuration d’un tutoriel. Ici, vous comprenez ce que chaque option protège.',
-  ementa: [
+  name: 'Cryptographie Appliquée',
+  summary: 'Sans comprendre la cryptographie, on ne fait que recopier la configuration d’un tutoriel. Ici, vous comprenez ce que chaque option protège.',
+  syllabus: [
     'Cryptographie symétrique et asymétrique',
     'Hachage, sel et stockage des mots de passe',
     'Échange de clés et infrastructure à clés publiques',
@@ -2084,7 +2084,7 @@ window.I18N.fr.cursos = {
     'Protocoles sûrs et leurs équivalents non sûrs',
     'Cryptographie dans les réseaux sans fil',
   ],
-  topicos: [
+  topics: [
     'Cryptographie symétrique : AES, modes d’opération et vecteur d’initialisation',
     'Cryptographie asymétrique : RSA, courbes elliptiques et taille de clé',
     'Clé publique et clé privée : qui chiffre et qui vérifie',
@@ -2106,9 +2106,9 @@ window.I18N.fr.cursos = {
 },
 
 'ataques-ameacas': {
-  nome: 'Attaques, Menaces et Ingénierie Sociale',
-  resumo: 'Connaître l’attaque pour la reconnaître : comment chacune fonctionne, quelle trace elle laisse et ce qui l’arrête vraiment.',
-  ementa: [
+  name: 'Attaques, Menaces et Ingénierie Sociale',
+  summary: 'Connaître l’attaque pour la reconnaître : comment chacune fonctionne, quelle trace elle laisse et ce qui l’arrête vraiment.',
+  syllabus: [
     'Ingénierie sociale : les attaques qui n’utilisent pas de code',
     'Attaques réseau, applicatives et sur les mots de passe',
     'Maliciels : types, comportement et propagation',
@@ -2116,7 +2116,7 @@ window.I18N.fr.cursos = {
     'Cadres : Cyber Kill Chain, Diamond Model et MITRE ATT&CK',
     'Web : l’OWASP Top 10 en pratique',
   ],
-  topicos: [
+  topics: [
     'Ingénierie sociale : pourquoi l’être humain est le chemin le plus court',
     'Hameçonnage, vishing (voix), smishing (SMS) et whaling (grosses cibles)',
     'Pourriel et spim : ce qui change et pourquoi cela compte',
@@ -2147,9 +2147,9 @@ window.I18N.fr.cursos = {
 },
 
 'defesa-hardening': {
-  nome: 'Défense des Postes et Durcissement',
-  resumo: 'Réduire la surface d’attaque machine par machine : configuration durcie, protection du poste et correctifs à jour.',
-  ementa: [
+  name: 'Défense des Postes et Durcissement',
+  summary: 'Réduire la surface d’attaque machine par machine : configuration durcie, protection du poste et correctifs à jour.',
+  syllabus: [
     'Durcissement du système d’exploitation',
     'Stratégies de groupe et configuration centralisée',
     'Antivirus, antimaliciel, EDR et DLP',
@@ -2157,7 +2157,7 @@ window.I18N.fr.cursos = {
     'Gestion des vulnérabilités et des correctifs',
     'Serveur rebond, contrôle d’accès et segmentation des postes',
   ],
-  topicos: [
+  topics: [
     'Durcissement du système : services, comptes et fonctions inutiles',
     'Guides de configuration sûre (CIS Benchmarks) et automatisation',
     'Stratégies de groupe (Group Policy) et configuration centralisée',
@@ -2181,9 +2181,9 @@ window.I18N.fr.cursos = {
 },
 
 'soc-resposta': {
-  nome: 'SOC, Supervision et Réponse aux Incidents',
-  resumo: 'Le travail de l’équipe bleue : voir ce qui se passe, décider s’il s’agit d’un incident et mener la réponse jusqu’au rapport.',
-  ementa: [
+  name: 'SOC, Supervision et Réponse aux Incidents',
+  summary: 'Le travail de l’équipe bleue : voir ce qui se passe, décider s’il s’agit d’un incident et mener la réponse jusqu’au rapport.',
+  syllabus: [
     'Où se trouvent les journaux et comment les lire',
     'SIEM et SOAR : centraliser, corréler et automatiser',
     'Chasse aux menaces et renseignement sur les menaces',
@@ -2191,7 +2191,7 @@ window.I18N.fr.cursos = {
     'Notions d’informatique légale',
     'Communiquer pendant et après l’incident',
   ],
-  topicos: [
+  topics: [
     'Sources de journaux : journaux d’événements, syslog, netflow, capture de paquets et pare-feu',
     'Où vit chaque journal sous Windows et sous Linux',
     'Conservation, intégrité et chaîne de possession du journal',
@@ -2217,9 +2217,9 @@ window.I18N.fr.cursos = {
 },
 
 'pentest': {
-  nome: 'Test d’Intrusion et Équipe Rouge',
-  resumo: 'Attaquer avec une autorisation écrite, une méthode et un rapport. Sans contrat, ce n’est pas un test d’intrusion — c’est un délit.',
-  ementa: [
+  name: 'Test d’Intrusion et Équipe Rouge',
+  summary: 'Attaquer avec une autorisation écrite, une méthode et un rapport. Sans contrat, ce n’est pas un test d’intrusion — c’est un délit.',
+  syllabus: [
     'Règles d’engagement, périmètre et autorisation',
     'Kali Linux, ParrotOS et l’arsenal du testeur',
     'Reconnaissance, balayage et énumération',
@@ -2227,7 +2227,7 @@ window.I18N.fr.cursos = {
     'Test des applications web',
     'Rapport, preuves et pratique sur les plateformes de CTF',
   ],
-  topicos: [
+  topics: [
     'Règles d’engagement : périmètre, fenêtre, limites et contact d’urgence',
     'Autorisation écrite : le document qui sépare le métier du délit',
     'Types de test : boîte noire, grise et blanche ; interne et externe',
@@ -2251,13 +2251,13 @@ window.I18N.fr.cursos = {
     'Panorama des certifications : OSCP, CEH, GPEN, GWAPT et CREST',
     'Limites légales au Brésil et responsabilité du testeur',
   ],
-  requisitos: 'Les deux sont nécessaires.',
+  prerequisites: 'Les deux sont nécessaires.',
 },
 
 'nuvem-seguranca': {
-  nome: 'Sécurité du Cloud',
-  resumo: 'Dans le cloud la faute est partagée, mais la facture est pour vous : comprenez le modèle de responsabilité et où les failles arrivent.',
-  ementa: [
+  name: 'Sécurité du Cloud',
+  summary: 'Dans le cloud la faute est partagée, mais la facture est pour vous : comprenez le modèle de responsabilité et où les failles arrivent.',
+  syllabus: [
     'Cloud et serveur local : ce qui change pour la sécurité',
     'Responsabilité partagée avec le fournisseur',
     'Identité et accès : le nouveau périmètre',
@@ -2265,7 +2265,7 @@ window.I18N.fr.cursos = {
     'Sécurité de l’infrastructure as code et du serverless',
     'Journalisation, audit et conformité dans le cloud',
   ],
-  topicos: [
+  topics: [
     'Différences entre cloud et infrastructure sur site (on-premises)',
     'Modèle de responsabilité partagée : ce qui est à vous et ce qui est au fournisseur',
     'SaaS, PaaS et IaaS : où bascule votre part de responsabilité',
@@ -2287,9 +2287,9 @@ window.I18N.fr.cursos = {
 },
 
 'codigo-seguro': {
-  nome: 'Codage Sécurisé',
-  resumo: 'La plupart des failles ne sont pas forcées : elles sont écrites. Apprenez à coder pour que l’attaque n’ait pas d’entrée.',
-  ementa: [
+  name: 'Codage Sécurisé',
+  summary: 'La plupart des failles ne sont pas forcées : elles sont écrites. Apprenez à coder pour que l’attaque n’ait pas d’entrée.',
+  syllabus: [
     'Pourquoi la plupart des failles naissent dans le code',
     'Validation des entrées et traitement des sorties',
     'Prévention des injections SQL et de commandes',
@@ -2297,7 +2297,7 @@ window.I18N.fr.cursos = {
     'Secrets, dépendances et code tiers',
     'Revue de code avec un œil sécurité',
   ],
-  topicos: [
+  topics: [
     'Où naît la faille : exigence, conception ou implémentation',
     'Ne jamais faire confiance à l’entrée : validation par liste d’autorisation',
     'Validation côté client et côté serveur : pourquoi les deux',
@@ -2322,9 +2322,9 @@ window.I18N.fr.cursos = {
 },
 
 'modelagem-ameacas': {
-  nome: 'Modélisation des Menaces et Risque',
-  resumo: 'Découvrir la faille à la conception coûte une réunion ; la découvrir en production coûte un incident. Modélisez avant de construire.',
-  ementa: [
+  name: 'Modélisation des Menaces et Risque',
+  summary: 'Découvrir la faille à la conception coûte une réunion ; la découvrir en production coûte un incident. Modélisez avant de construire.',
+  syllabus: [
     'Modéliser la menace avant d’écrire du code',
     'STRIDE, PASTA et autres méthodologies',
     'Cartographie de la surface d’attaque',
@@ -2332,7 +2332,7 @@ window.I18N.fr.cursos = {
     'Audit, conformité et correspondance des contrôles',
     'Modélisation continue, pas un document mort',
   ],
-  topicos: [
+  topics: [
     'Ce qu’est la modélisation des menaces et à quel moment la faire',
     'Diagramme de flux de données et frontières de confiance',
     'STRIDE : usurpation, altération, répudiation, divulgation, déni et élévation',
@@ -2352,9 +2352,9 @@ window.I18N.fr.cursos = {
 },
 
 'pipeline-seguro': {
-  nome: 'Sécurité de la Chaîne et de l’Approvisionnement',
-  resumo: 'De la sécurité qui tourne à chaque commit : analyse dans la chaîne, image durcie, dépendances maîtrisées et politique en tant que code.',
-  ementa: [
+  name: 'Sécurité de la Chaîne et de l’Approvisionnement',
+  summary: 'De la sécurité qui tourne à chaque commit : analyse dans la chaîne, image durcie, dépendances maîtrisées et politique en tant que code.',
+  syllabus: [
     'DevSecOps : ce qui change par rapport à DevOps',
     'SAST, DAST, SCA et recherche de secrets dans le CI/CD',
     'Sécurité des images et des conteneurs à l’exécution',
@@ -2362,7 +2362,7 @@ window.I18N.fr.cursos = {
     'Durcissement de la chaîne de build',
     'Correction automatisée et politique en tant que code',
   ],
-  topicos: [
+  topics: [
     'DevSecOps et DevOps : ce qui change vraiment au quotidien',
     'Décaler la sécurité vers la gauche sans bloquer la livraison',
     'Analyse statique (SAST) : configurer, calibrer et vivre avec les faux positifs',
@@ -2384,13 +2384,13 @@ window.I18N.fr.cursos = {
     'Politique en tant que code : OPA, Conftest et vérification de l’infrastructure',
     'Indicateurs : délai de correction, couverture d’analyse et dette de sécurité',
   ],
-  requisitos: 'Les deux sont nécessaires.',
+  prerequisites: 'Les deux sont nécessaires.',
 },
 
 'bi-negocio': {
-  nome: 'La BI pour le Métier : KPI et Applications',
-  resumo: 'La question vient avant l’outil. Comprenez comment fonctionne une entreprise et quel chiffre change réellement une décision.',
-  ementa: [
+  name: 'La BI pour le Métier : KPI et Applications',
+  summary: 'La question vient avant l’outil. Comprenez comment fonctionne une entreprise et quel chiffre change réellement une décision.',
+  syllabus: [
     'Ce qu’est la business intelligence et pourquoi elle compte',
     'Les fonctions de l’entreprise : finance, marketing, opérations et RH',
     'Les quatre types d’analyse, du descriptif au prescriptif',
@@ -2398,7 +2398,7 @@ window.I18N.fr.cursos = {
     'BI opérationnelle, tactique et stratégique',
     'Applications par secteur : commerce, santé, industrie et finance',
   ],
-  topicos: [
+  topics: [
     'Ce qu’est la business intelligence et ce qu’elle n’est pas',
     'Pourquoi la BI compte : décider par la donnée plutôt que par l’opinion',
     'Analyste BI, analyste de données, ingénieur données et data scientist : qui fait quoi',
@@ -2424,9 +2424,9 @@ window.I18N.fr.cursos = {
 },
 
 'excel-analitico': {
-  nome: 'Excel pour l’Analyse de Données',
-  resumo: 'L’outil que toute entreprise possède déjà — utilisé pour de vrai : tableaux croisés, Power Query et modèle de données.',
-  ementa: [
+  name: 'Excel pour l’Analyse de Données',
+  summary: 'L’outil que toute entreprise possède déjà — utilisé pour de vrai : tableaux croisés, Power Query et modèle de données.',
+  syllabus: [
     'Des formules qui résolvent de vrais problèmes',
     'Fonctions de recherche et de référence',
     'Tableaux, validation et mise en forme conditionnelle',
@@ -2434,7 +2434,7 @@ window.I18N.fr.cursos = {
     'Power Query : importer, nettoyer et combiner',
     'Power Pivot, mesures et tableaux de bord dans Excel',
   ],
-  topicos: [
+  topics: [
     'Organiser la feuille pour l’analyse : une ligne par enregistrement',
     'Références relatives, absolues et noms définis',
     'Fonctions logiques : SI, ET, OU et SIERREUR',
@@ -2457,9 +2457,9 @@ window.I18N.fr.cursos = {
 },
 
 'estatistica': {
-  nome: 'Statistiques pour l’Analyse de Données',
-  resumo: 'La base qui sépare celui qui lit un chiffre de celui qui le comprend : décrire, comparer, tester et ne pas confondre corrélation et cause.',
-  ementa: [
+  name: 'Statistiques pour l’Analyse de Données',
+  summary: 'La base qui sépare celui qui lit un chiffre de celui qui le comprend : décrire, comparer, tester et ne pas confondre corrélation et cause.',
+  syllabus: [
     'Variables et types de données',
     'Statistiques descriptives : centre, dispersion et forme',
     'Distributions et ce qu’elles révèlent',
@@ -2467,7 +2467,7 @@ window.I18N.fr.cursos = {
     'Corrélation, causalité et régression',
     'Tests d’hypothèse, valeur p et intervalle de confiance',
   ],
-  topicos: [
+  topics: [
     'Variables catégorielles et numériques',
     'Variables discrètes et continues ; échelles nominale, ordinale, d’intervalle et de rapport',
     'Mesures de tendance centrale : moyenne, médiane et mode',
@@ -2494,9 +2494,9 @@ window.I18N.fr.cursos = {
 },
 
 'dados-limpeza': {
-  nome: 'Nettoyage et Préparation des Données',
-  resumo: 'Quatre-vingts pour cent du travail est ici : donnée sale en entrée, décision fausse en sortie. Apprenez à la traiter avant de l’analyser.',
-  ementa: [
+  name: 'Nettoyage et Préparation des Données',
+  summary: 'Quatre-vingts pour cent du travail est ici : donnée sale en entrée, décision fausse en sortie. Apprenez à la traiter avant de l’analyser.',
+  syllabus: [
     'Diagnostic de la qualité des données',
     'Valeurs manquantes, doublons et incohérences',
     'Normalisation des formats, des textes et des catégories',
@@ -2504,7 +2504,7 @@ window.I18N.fr.cursos = {
     'Transformation et enrichissement',
     'Analyse exploratoire (EDA) comme étape de travail',
   ],
-  topicos: [
+  topics: [
     'Dimensions de la qualité des données : exactitude, complétude, cohérence et fraîcheur',
     'Profilage : connaître la table avant d’y toucher',
     'Valeurs manquantes : pourquoi elles manquent et ce que cela signifie',
@@ -2523,13 +2523,13 @@ window.I18N.fr.cursos = {
     'Outils : Excel, SQL, pandas et dplyr',
     'Consigner chaque transformation : reproductibilité et audit',
   ],
-  requisitos: 'Les deux sont nécessaires.',
+  prerequisites: 'Les deux sont nécessaires.',
 },
 
 'visualizacao': {
-  nome: 'Visualisation de Données',
-  resumo: 'Le bon graphique fait parler la donnée ; le mauvais ment sans le vouloir. Apprenez à choisir, à dessiner et à ne pas tromper.',
-  ementa: [
+  name: 'Visualisation de Données',
+  summary: 'Le bon graphique fait parler la donnée ; le mauvais ment sans le vouloir. Apprenez à choisir, à dessiner et à ne pas tromper.',
+  syllabus: [
     'Fondamentaux : ce que l’œil comprend vite',
     'Familles de graphiques et quand utiliser chacune',
     'Théorie des couleurs appliquée aux données',
@@ -2537,7 +2537,7 @@ window.I18N.fr.cursos = {
     'Les graphiques qui trompent — et comment ne pas en faire',
     'Tableaux de bord responsives et lecture sur mobile',
   ],
-  topicos: [
+  topics: [
     'Encodage visuel : position, longueur, angle, aire, couleur et forme',
     'Hiérarchie de précision : pourquoi la barre bat le camembert',
     'Graphiques en barres et en colonnes : tri et ligne de base à zéro',
@@ -2562,9 +2562,9 @@ window.I18N.fr.cursos = {
 },
 
 'bi-tecnicas': {
-  nome: 'Techniques Analytiques : Séries Temporelles, Tests A/B et Cohortes',
-  resumo: 'Les trois analyses que l’entreprise demande le plus : où allons-nous, quelle version est meilleure et pourquoi le client s’en va.',
-  ementa: [
+  name: 'Techniques Analytiques : Séries Temporelles, Tests A/B et Cohortes',
+  summary: 'Les trois analyses que l’entreprise demande le plus : où allons-nous, quelle version est meilleure et pourquoi le client s’en va.',
+  syllabus: [
     'Séries temporelles : tendance, saisonnalité et bruit',
     'Prévision et évaluation de l’erreur',
     'Test A/B : conception, taille d’échantillon et lecture',
@@ -2572,7 +2572,7 @@ window.I18N.fr.cursos = {
     'Apprentissage automatique appliqué à la BI',
     'Reconnaître le biais algorithmique',
   ],
-  topicos: [
+  topics: [
     'Composantes d’une série temporelle : tendance, saisonnalité, cycle et bruit',
     'Décomposition et moyennes mobiles',
     'Lissage exponentiel et panorama d’ARIMA et Prophet',
@@ -2596,9 +2596,9 @@ window.I18N.fr.cursos = {
 },
 
 'dados-storytelling': {
-  nome: 'Communication et Storytelling avec les Données',
-  resumo: 'Une analyse que personne ne comprend ne change rien. Apprenez à raconter l’histoire de la donnée et à être pris au sérieux en réunion.',
-  ementa: [
+  name: 'Communication et Storytelling avec les Données',
+  summary: 'Une analyse que personne ne comprend ne change rien. Apprenez à raconter l’histoire de la donnée et à être pris au sérieux en réunion.',
+  syllabus: [
     'La structure d’une histoire racontée avec des données',
     'Adapter le message au public',
     'Conception de présentations et de tableaux de bord',
@@ -2606,7 +2606,7 @@ window.I18N.fr.cursos = {
     'Sens des affaires et esprit critique',
     'Gestion des parties prenantes et du changement',
   ],
-  topicos: [
+  topics: [
     'Pourquoi la donnée seule ne convainc pas',
     'Structure du récit : contexte, conflit, preuve et recommandation',
     'Commencer par la conclusion : la pyramide inversée',
@@ -2627,9 +2627,9 @@ window.I18N.fr.cursos = {
 },
 
 'qa-fundamentos': {
-  nome: 'Fondamentaux de la Qualité Logicielle',
-  resumo: 'Tester n’est pas chercher des défauts à la fin : c’est décider ce qui vaut la peine d’être vérifié, et quand.',
-  ementa: [
+  name: 'Fondamentaux de la Qualité Logicielle',
+  summary: 'Tester n’est pas chercher des défauts à la fin : c’est décider ce qui vaut la peine d’être vérifié, et quand.',
+  syllabus: [
     'Ce qu’est l’assurance qualité et ce qu’elle n’est pas',
     'L’état d’esprit du testeur : doute systématique, pas méfiance',
     'Approches de test : boîte noire, grise et blanche',
@@ -2637,7 +2637,7 @@ window.I18N.fr.cursos = {
     'Méthodologies : TDD, BDD, ATDD et analyse de cause racine',
     'Oracles de test et priorisation : par où commencer quand le temps manque',
   ],
-  topicos: [
+  topics: [
     'Ce qu’est l’assurance qualité : prévenir contre détecter',
     'Qualité du produit et qualité du processus',
     'Coût du défaut au fil du cycle : pourquoi le trouver tôt coûte moins cher',
@@ -2661,13 +2661,13 @@ window.I18N.fr.cursos = {
     'Critères d’entrée et de sortie d’un cycle de test',
     'Indicateurs utiles et indicateurs qui tournent au théâtre',
   ],
-  requisitos: 'Ne demande pas de savoir programmer. C’est le point d’entrée du parcours Qualité.',
+  prerequisites: 'Ne demande pas de savoir programmer. C’est le point d’entrée du parcours Qualité.',
 },
 
 'testes-manuais': {
-  nome: 'Test Manuel et Gestion des Tests',
-  resumo: 'La part du métier qu’aucun outil ne fait : comprendre le produit, écrire le cas et prouver le défaut.',
-  ementa: [
+  name: 'Test Manuel et Gestion des Tests',
+  summary: 'La part du métier qu’aucun outil ne fait : comprendre le produit, écrire le cas et prouver le défaut.',
+  syllabus: [
     'Planification des tests : périmètre, risque, environnement et critères',
     'Cas et scénarios : écrire ce qu’une autre personne peut exécuter',
     'Vérification et validation, et tests de compatibilité',
@@ -2675,7 +2675,7 @@ window.I18N.fr.cursos = {
     'Panorama des techniques non fonctionnelles',
     'Gestion : Jira, TestRail, Zephyr, rapports et jeux de données',
   ],
-  topicos: [
+  topics: [
     'Plan de test : périmètre, risque, ressources, environnement et calendrier',
     'Cas et scénarios de test : préalable, étape, résultat attendu',
     'Écrire un cas qu’une autre personne exécute sans rien demander',
@@ -2699,13 +2699,13 @@ window.I18N.fr.cursos = {
     'Environnements de test et le problème du « chez moi ça marche »',
     'Test des courriels : Mailinator, Gmail Tester et flux de confirmation',
   ],
-  requisitos: 'Ne demande pas de savoir programmer.',
+  prerequisites: 'Ne demande pas de savoir programmer.',
 },
 
 'automacao-web': {
-  nome: 'Automatisation des Tests Web',
-  resumo: 'Le robot qui exécute toute la régression en quelques minutes — et qui ne vaut le coup que s’il ne casse pas à chaque changement d’écran.',
-  ementa: [
+  name: 'Automatisation des Tests Web',
+  summary: 'Le robot qui exécute toute la régression en quelques minutes — et qui ne vaut le coup que s’il ne casse pas à chaque changement d’écran.',
+  syllabus: [
     'Comment le navigateur fonctionne à l’intérieur : DOM, réseau et rendu',
     'Selenium, Cypress et Playwright : quand chacun convient',
     'Localisateurs stables et le patron Page Object',
@@ -2713,7 +2713,7 @@ window.I18N.fr.cursos = {
     'Exécution sans interface et en parallèle',
     'La pyramide des tests : quoi automatiser et quoi non',
   ],
-  topicos: [
+  topics: [
     'Outils de développement du navigateur : éléments, réseau et console',
     'DOM, sélecteurs CSS et XPath : choisir un localisateur qui ne casse pas',
     'Ajax et chargement asynchrone : pourquoi le test « clignote »',
@@ -2737,13 +2737,13 @@ window.I18N.fr.cursos = {
     'La pyramide des tests : coût, vitesse et confiance à chaque couche',
     'Ce qu’il ne faut pas automatiser : le test qui coûte plus cher que le défaut',
   ],
-  requisitos: 'Exige la logique de programmation et des bases de JavaScript.',
+  prerequisites: 'Exige la logique de programmation et des bases de JavaScript.',
 },
 
 'automacao-api-mobile': {
-  nome: 'Automatisation des API et du Mobile',
-  resumo: 'Tester là où le défaut coûte le moins cher à trouver : à l’API, avant l’écran — et dans l’application, là où est l’utilisateur.',
-  ementa: [
+  name: 'Automatisation des API et du Mobile',
+  summary: 'Tester là où le défaut coûte le moins cher à trouver : à l’API, avant l’écran — et dans l’application, là où est l’utilisateur.',
+  syllabus: [
     'HTTP, REST et contrat d’API pour les testeurs',
     'Postman et Newman : de la collection manuelle à l’exécution dans la chaîne',
     'REST Assured et Karate : tests d’API en code',
@@ -2751,7 +2751,7 @@ window.I18N.fr.cursos = {
     'Automatisation mobile : Appium, Espresso et Detox',
     'Émulateur, appareil réel et parc d’appareils dans le cloud',
   ],
-  topicos: [
+  topics: [
     'HTTP pour les testeurs : méthodes, codes de statut et en-têtes',
     'REST, JSON et le contrat que l’API promet de tenir',
     'Authentification d’API : clé, jeton, JWT et OAuth',
@@ -2775,13 +2775,13 @@ window.I18N.fr.cursos = {
     'Gestes, permissions et états de l’application dans les tests',
     'Tester l’application hors ligne et avec un réseau dégradé',
   ],
-  requisitos: 'Exige des notions de programmation. Ne dépend pas du cours d’automatisation web — les deux peuvent être suivis dans n’importe quel ordre.',
+  prerequisites: 'Exige des notions de programmation. Ne dépend pas du cours d’automatisation web — les deux peuvent être suivis dans n’importe quel ordre.',
 },
 
 'testes-nao-funcionais': {
-  nome: 'Tests Non Fonctionnels',
-  resumo: 'Le système fait ce qu’il doit — mais tient-il la charge, est-il accessible et résiste-t-il à qui veut le casser exprès ?',
-  ementa: [
+  name: 'Tests Non Fonctionnels',
+  summary: 'Le système fait ce qu’il doit — mais tient-il la charge, est-il accessible et résiste-t-il à qui veut le casser exprès ?',
+  syllabus: [
     'Charge, stress et performance : planifier le test avant de le lancer',
     'JMeter, K6, Gatling et Locust en pratique',
     'Performance côté front-end avec Lighthouse et WebPageTest',
@@ -2789,7 +2789,7 @@ window.I18N.fr.cursos = {
     'Tests de sécurité : OWASP Top 10, vecteurs et analyse',
     'Supervision et surveillance de ce que le test n’attrape pas',
   ],
-  topicos: [
+  topics: [
     'L’exigence non fonctionnelle : transformer « ça doit être rapide » en chiffre',
     'Charge, stress, pic, endurance et évolutivité : la différence',
     'Modéliser la charge : utilisateur virtuel, temps de réflexion et montée en puissance',

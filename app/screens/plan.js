@@ -42,9 +42,9 @@ export default async function plan() {
     return { title: txt('Meu plano'), el };
   }
 
-  const since = account.desde
+  const since = account.since
     ? new Intl.DateTimeFormat(document.documentElement.lang || 'pt-BR',
-      { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(account.desde))
+      { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(account.since))
     : null;
 
   /* Every feature ANY plan offers becomes a row, in the order they appear in

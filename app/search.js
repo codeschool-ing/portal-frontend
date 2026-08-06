@@ -47,7 +47,7 @@ const fold = (s) => String(s || '')
 const plainText = (body) => (body || [])
   .map((b) => {
     if (Array.isArray(b)) return b.join(' ');
-    if (b && typeof b === 'object') return b.texto || '';
+    if (b && typeof b === 'object') return b.text || '';
     return b;
   })
   .join(' ');
@@ -79,20 +79,20 @@ function buildIndex() {
     items.push({ group, title, sub, href, raw, target: fold(raw), bodyAt: head.length + 1 });
   };
 
-  CURSOS.forEach((c) => {
-    add('cursos', c.nome, c.categoria + ' · ' + c.horas + 'h', '#/curso/' + c.id,
-      c.resumo, c.categoria, (c.ementa || []).join(' '));
+  COURSES.forEach((c) => {
+    add('cursos', c.name, c.category + ' · ' + c.hours + 'h', '#/curso/' + c.id,
+      c.summary, c.category, (c.syllabus || []).join(' '));
 
     const lessons = courseLessons(c.id);
     const hasContent = Boolean(window.LESSONS?.[c.id]);
 
     lessons.forEach((a) => {
-      const sections = lessonSections(c.id, a.chave);
+      const sections = lessonSections(c.id, a.key);
       const first = '#/curso/' + c.id + '/aula/' + a.ix + '/' + sections[0].id;
       /* The translated title AND the Portuguese key: see the header of this
          file. In Portuguese the two are the same string, and then the key stays
          out — repeated, it would become the excerpt of the result. */
-      add('aulas', a.titulo, c.nome, first, a.chave === a.titulo ? '' : a.chave);
+      add('aulas', a.title, c.name, first, a.key === a.title ? '' : a.key);
 
       /* A section only becomes a result where the content was written. In the 84
          courses with no text, the "section" is a wrapper with the same name as
@@ -100,28 +100,28 @@ function buildIndex() {
       if (hasContent) {
         sections.forEach((s) => {
           if (s.tipo !== 'conteudo') return;
-          add('secoes', s.titulo, c.nome + ' · ' + a.titulo,
+          add('secoes', s.title, c.name + ' · ' + a.title,
             '#/curso/' + c.id + '/aula/' + a.ix + '/' + s.id,
-            plainText(s.corpo));
+            plainText(s.body));
         });
       }
 
       /* Only the prompt. The type was here once and left: nobody searches for
          "ordenacao", and as the item's body it became a one-word excerpt under
          every exercise. */
-      lessonExercises(c.id, a.chave).forEach((ex) => {
-        add('exercicios', ex.statement, c.nome + ' · ' + a.titulo,
+      lessonExercises(c.id, a.key).forEach((ex) => {
+        add('exercicios', ex.prompt, c.name + ' · ' + a.title,
           '#/curso/' + c.id + '/aula/' + a.ix + '/avaliacao');
       });
     });
   });
 
   allNotes().forEach((note) => {
-    const c = courseById(note.cursoId);
-    const a = courseLessons(note.cursoId)[note.aulaIx];
+    const c = courseById(note.courseId);
+    const a = courseLessons(note.courseId)[note.lessonIx];
     if (!c || !a) return;
-    add('notas', note.texto, c.nome + ' · ' + a.titulo,
-      '#/curso/' + note.cursoId + '/aula/' + note.aulaIx + '/' + note.secId);
+    add('notas', note.text, c.name + ' · ' + a.title,
+      '#/curso/' + note.courseId + '/aula/' + note.lessonIx + '/' + note.sectionId);
   });
 
   return items;
@@ -129,7 +129,7 @@ function buildIndex() {
 
 const GROUPS = ['secoes', 'aulas', 'cursos', 'exercicios', 'notas'];
 export const GROUP_LABEL = {
-  secoes: 'seções', aulas: 'aulas', cursos: 'cursos', exercicios: 'exercícios', notas: 'suas notas',
+  sections: 'seções', lessons: 'aulas', courses: 'cursos', exercises: 'exercícios', notes: 'suas notas',
 };
 
 const PER_GROUP = 5;

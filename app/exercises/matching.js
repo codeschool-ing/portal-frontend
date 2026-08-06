@@ -20,7 +20,7 @@
    The right-hand column stays SORTED ALPHABETICALLY. In the JSON the correct
    pair is `pairs[i].left ↔ pairs[i].right`, and presenting it in written
    order would hand over the key by position. It is the same reason the
-   pipeline's probe sorts. The `right_distractors` go in with it, so the last
+   pipeline's probe sorts. The `rightDistractors` go in with it, so the last
    pair cannot fall out by elimination.
    ========================================================================== */
 
@@ -37,7 +37,7 @@ export default {
 
   body(ex, uid) {
     const left = shuffleWith(uid + ':e', ex.pairs.map((p) => p.left));
-    const right = [...ex.pairs.map((p) => p.right), ...(ex.right_distractors || [])]
+    const right = [...ex.pairs.map((p) => p.right), ...(ex.rightDistractors || [])]
       .sort((a, b) => a.localeCompare(b, 'pt'));
     const spare = right.length - ex.pairs.length;
 
@@ -63,7 +63,7 @@ export default {
     const key = {};
     exercise.pairs.forEach((p) => { key[p.left] = p.right; });
 
-    const state = { left: null, wrong: 0, done: 0, map: {}, locked: false };
+    const state = { left: null, errors: 0, done: 0, map: {}, locked: false };
     const total = exercise.pairs.length;
 
     const clear = () => {
@@ -100,13 +100,13 @@ export default {
         root.querySelector('.assoc-feitos').textContent = state.done;
         if (state.done === total) {
           state.locked = true;
-          done({ map: state.map, wrong: state.wrong });
+          done({ map: state.map, errors: state.errors });
         }
         return;
       }
 
       // wrong: mark both, count it, and let go after a moment
-      state.wrong += 1;
+      state.errors += 1;
       const pair = [state.left, f];
       pair.forEach((el) => el.classList.add('ficha-errada'));
       state.locked = true;
@@ -122,17 +122,17 @@ export default {
     // the wrapper only calls this if the student hits "Responder" before closing
     // every pair — that answer is partial, and partial is not a pass
     const done = Number(root.querySelector('.assoc-feitos').textContent);
-    return done > 0 ? { map: {}, wrong: -1, partial: true } : null;
+    return done > 0 ? { map: {}, errors: -1, partial: true } : null;
   },
 
   reveal(root, ex, v) {
     root.querySelectorAll('.ficha').forEach((f) => { f.disabled = true; });
-    if (v.wrong > 0) {
+    if (v.errors > 0) {
       const p = document.createElement('p');
       p.className = 'assoc-erros';
-      p.textContent = v.wrong === 1
+      p.textContent = v.errors === 1
         ? txt('1 par foi tentado errado antes de fechar.')
-        : v.wrong + ' ' + txt('pares foram tentados errado antes de fechar.');
+        : v.errors + ' ' + txt('pares foram tentados errado antes de fechar.');
       root.appendChild(p);
     }
   },

@@ -26,20 +26,80 @@ import { lessonSections, countableSections, sectionCount } from './lessons.js';
 const KEY = 'codeschool-portal';
 
 const EMPTY = {
-  sessao: null,                 // { nome, email }
-  matricula: null,              // { trilhaId, escolhas: { 'backend:3': 1 } }
-  progresso: {},                // { cursoId: { aulas: { ix: { secoes, exercicios } } } }
-  notas: {},                    // { cursoId: { aulaIx: { secId: text } } }
-  provas: {},                   // { 'curso:javascript': { tentativas, melhor, aprovado } }
-  conta: null,                  // { planoId, desde } — fiction today, billing tomorrow
-  ultima: null,                 // { cursoId, aulaIx, secId } — the "carry on from here"
+  session: null,      // { name, email }
+  enrollment: null,   // { trackId, choices: { 'backend:3': 1 } }
+  progress: {},       // { courseId: { lessons: { ix: { sections, exercises } } } }
+  notes: {},          // { courseId: { lessonIx: { sectionId: text } } }
+  exams: {},          // { 'course:javascript': { attempts, best, passed } }
+  account: null,      // { planId, since } — fiction today, billing tomorrow
+  last: null,         // { courseId, lessonIx, sectionId } — the "carry on from here"
 };
+
+/* ---------- the Portuguese → English migration ----------
+
+   RENAMING THE STORED KEYS WITHOUT THIS SILENTLY ZEROES EVERY STUDENT. A
+   browser that already holds `{ progresso: {...} }` would be read against a
+   shape that asks for `progress`, find nothing, and fall back to EMPTY — no
+   error, no warning, just a portal that says the student never started. That
+   is the single most expensive thing this rename could break, so it is handled
+   at the only place the old shape can still be seen: the read.
+
+   It is the same move `ensureLesson` already makes one level down, where the
+   old one-checkbox-per-lesson record becomes a set of sections on first write.
+   This one runs one level up and rewrites the whole document at once, because
+   every top-level key moved together.
+
+   It is idempotent by construction: it only fires when a legacy key is present,
+   and the new shape has none of them. Running it twice is running it once.
+
+   The exam scope keys move with the values — `curso:javascript` becomes
+   `course:javascript` — because the scope is part of the key, not of the
+   record. Miss that and a passed exam becomes a second, empty one. */
+const LEGACY_TOP = {
+  sessao: 'session', matricula: 'enrollment', progresso: 'progress',
+  notas: 'notes', provas: 'exams', conta: 'account', ultima: 'last',
+};
+const LEGACY_FIELDS = {
+  nome: 'name', trilhaId: 'trackId', escolhas: 'choices',
+  aulas: 'lessons', secoes: 'sections', exercicios: 'exercises', concluida: 'completed',
+  tentativas: 'attempts', melhor: 'best', aprovado: 'passed',
+  ultimoPct: 'lastPct', ultimoCertos: 'lastCorrect', ultimoTotal: 'lastTotal',
+  ultimaEm: 'lastAt', acertou: 'correct', conferido: 'checked',
+  planoId: 'planId', desde: 'since', senhaEm: 'passwordAt',
+  cursoId: 'courseId', aulaIx: 'lessonIx', secId: 'sectionId',
+};
+
+/* Renames keys everywhere in the tree. It cannot rename VALUES, and it must not
+   try: a note's text is a value, and a note that happens to read "aulas" is the
+   student's sentence, not a key of ours. */
+function renameKeys(node) {
+  if (Array.isArray(node)) return node.map(renameKeys);
+  if (!node || typeof node !== 'object') return node;
+  const out = {};
+  Object.entries(node).forEach(([k, v]) => { out[LEGACY_FIELDS[k] || k] = renameKeys(v); });
+  return out;
+}
+
+export function migrate(raw) {
+  const legacy = Object.keys(LEGACY_TOP).filter((k) => k in raw);
+  if (!legacy.length) return raw;
+
+  const out = { ...raw };
+  legacy.forEach((k) => { out[LEGACY_TOP[k]] = out[k]; delete out[k]; });
+
+  const moved = renameKeys(out);
+  if (moved.exams) {
+    moved.exams = Object.fromEntries(Object.entries(moved.exams).map(([k, v]) =>
+      [k.replace(/^curso:/, 'course:').replace(/^trilha:/, 'track:'), v]));
+  }
+  return moved;
+}
 
 function read() {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return structuredClone(EMPTY);
-    return { ...structuredClone(EMPTY), ...JSON.parse(raw) };
+    return { ...structuredClone(EMPTY), ...migrate(JSON.parse(raw)) };
   } catch (e) {
     return structuredClone(EMPTY);   // private mode or corrupted JSON
   }
@@ -71,16 +131,16 @@ export function reset() {
    same question and two computations of the same number diverge on the day one
    of them changes. */
 
-const lessonRecord = (courseId, ix) => state.progresso[courseId]?.aulas?.[ix];
+const lessonRecord = (courseId, ix) => state.progress[courseId]?.lessons?.[ix];
 
-export function sectionDone(courseId, ix, secId) {
+export function sectionDone(courseId, ix, sectionId) {
   const r = lessonRecord(courseId, ix);
   if (!r) return false;
   /* Compatibility with the earlier shape, where the whole lesson was a single
      checkbox: an old record marked as finished counts for every section.
      Without this, anyone who already had progress would watch it reset. */
-  if (r.secoes === undefined) return Boolean(r.concluida);
-  return Boolean(r.secoes[secId]);
+  if (r.sections === undefined) return Boolean(r.completed);
+  return Boolean(r.sections[sectionId]);
 }
 
 export function lessonProgress(courseId, ix) {
@@ -88,7 +148,7 @@ export function lessonProgress(courseId, ix) {
   if (!a) return { feitas: 0, total: 0, pct: 0 };
   // only the countable ones: an assessment with no exercises yet shows on
   // screen but stays out of the denominator, or the course would never close
-  const sections = countableSections(courseId, a.chave);
+  const sections = countableSections(courseId, a.key);
   const done = sections.filter((s) => sectionDone(courseId, ix, s.id)).length;
   return { feitas: done, total: sections.length, pct: sections.length ? Math.round((done / sections.length) * 100) : 0 };
 }
@@ -102,7 +162,7 @@ export function courseProgress(courseId) {
   const total = sectionCount(courseId);
   let done = 0;
   courseLessons(courseId).forEach((a, ix) => {
-    countableSections(courseId, a.chave).forEach((s) => {
+    countableSections(courseId, a.key).forEach((s) => {
       if (sectionDone(courseId, ix, s.id)) done += 1;
     });
   });
@@ -121,79 +181,79 @@ export const courseDone = (courseId) => {
 
    The attempt count is what seeds the draw for the next exam: same attempt,
    same exam; new attempt, new exam. */
-export const examResult = (key) => state.provas[key] || null;
-export const examPassed = (key) => Boolean(state.provas[key]?.aprovado);
-export const examAttempts = (key) => state.provas[key]?.tentativas || 0;
+export const examResult = (key) => state.exams[key] || null;
+export const examPassed = (key) => Boolean(state.exams[key]?.passed);
+export const examAttempts = (key) => state.exams[key]?.attempts || 0;
 
-export function saveExam(key, { pct, aprovado, certos, total }) {
+export function saveExam(key, { pct, passed, lastCorrect, total }) {
   change(() => {
-    const before = state.provas[key] || { tentativas: 0, melhor: 0, aprovado: false };
-    state.provas[key] = {
-      tentativas: before.tentativas + 1,
-      melhor: Math.max(before.melhor, pct),
-      aprovado: before.aprovado || aprovado,
-      ultimoPct: pct,
-      ultimoCertos: certos,
-      ultimoTotal: total,
-      ultimaEm: new Date().toISOString(),
+    const before = state.exams[key] || { attempts: 0, best: 0, passed: false };
+    state.exams[key] = {
+      attempts: before.attempts + 1,
+      best: Math.max(before.best, pct),
+      passed: before.passed || passed,
+      lastPct: pct,
+      lastCorrect,
+      lastTotal: total,
+      lastAt: new Date().toISOString(),
     };
   });
 }
 
 export const answerFor = (courseId, ix, exId) =>
-  lessonRecord(courseId, ix)?.exercicios?.[exId] || null;
+  lessonRecord(courseId, ix)?.exercises?.[exId] || null;
 
 /* ---------- writes ---------- */
 
 function ensureLesson(courseId, ix) {
-  const p = state.progresso;
-  p[courseId] = p[courseId] || { aulas: {} };
-  const r = p[courseId].aulas[ix] || {};
-  if (r.secoes === undefined) {
+  const p = state.progress;
+  p[courseId] = p[courseId] || { lessons: {} };
+  const r = p[courseId].lessons[ix] || {};
+  if (r.sections === undefined) {
     // migrate the old shape on the first write, instead of carrying both
     const a = courseLessons(courseId)[ix];
-    const all = a ? lessonSections(courseId, a.chave) : [];
-    r.secoes = {};
-    if (r.concluida) all.forEach((s) => { r.secoes[s.id] = true; });
-    delete r.concluida;
+    const all = a ? lessonSections(courseId, a.key) : [];
+    r.sections = {};
+    if (r.completed) all.forEach((s) => { r.sections[s.id] = true; });
+    delete r.completed;
   }
-  r.exercicios = r.exercicios || {};
-  p[courseId].aulas[ix] = r;
+  r.exercises = r.exercises || {};
+  p[courseId].lessons[ix] = r;
   return r;
 }
 
-export function markSection(courseId, ix, secId, done = true) {
+export function markSection(courseId, ix, sectionId, done = true) {
   change(() => {
     const r = ensureLesson(courseId, ix);
-    if (done) r.secoes[secId] = true;
-    else delete r.secoes[secId];
-    state.ultima = { cursoId: courseId, aulaIx: ix, secId };
+    if (done) r.sections[sectionId] = true;
+    else delete r.sections[sectionId];
+    state.last = { courseId: courseId, lessonIx: ix, sectionId };
   });
 }
 
-export function visitSection(courseId, ix, secId) {
+export function visitSection(courseId, ix, sectionId) {
   change(() => {
     ensureLesson(courseId, ix);
-    state.ultima = { cursoId: courseId, aulaIx: ix, secId };
+    state.last = { courseId: courseId, lessonIx: ix, sectionId };
   });
 }
 
 export function saveAnswer(courseId, ix, exId, verdict) {
   change(() => {
     const r = ensureLesson(courseId, ix);
-    const before = r.exercicios[exId] || { tentativas: 0, acertou: false, conferido: false };
-    r.exercicios[exId] = {
-      tentativas: before.tentativas + 1,
+    const before = r.exercises[exId] || { attempts: 0, correct: false, checked: false };
+    r.exercises[exId] = {
+      attempts: before.attempts + 1,
       // once right, still right: redoing it to practise does not take the credit
-      acertou: before.acertou || verdict.acertou === true,
+      correct: before.correct || verdict.correct === true,
       /* `conferido` separates "got it wrong" from "nobody checked". Without it,
          a code exercise that was answered and never executed was
          indistinguishable from a mistake, and the performance screen would
          count as a failure something that was never judged — the same confusion
          that "unjudged never becomes passed" avoids from the other side of the
          ruler. */
-      conferido: before.conferido || verdict.acertou !== null,
-      ultimaEm: new Date().toISOString(),
+      checked: before.checked || verdict.correct !== null,
+      lastAt: new Date().toISOString(),
     };
   });
 }
@@ -202,20 +262,20 @@ export function saveAnswer(courseId, ix, exId, verdict) {
    One per section, free text. It is the only thing in the portal the STUDENT
    writes, and that is why it does not get lost even when the content changes:
    the key is the same one progress uses — course, lesson index, section id. */
-export const noteFor = (courseId, ix, secId) =>
-  state.notas[courseId]?.[ix]?.[secId] || '';
+export const noteFor = (courseId, ix, sectionId) =>
+  state.notes[courseId]?.[ix]?.[sectionId] || '';
 
-export function saveNote(courseId, ix, secId, text) {
+export function saveNote(courseId, ix, sectionId, text) {
   change(() => {
     const clean = String(text || '').trim();
     if (!clean) {
       // an empty note is a deleted note: not worth the space nor a row in the list
-      if (state.notas[courseId]?.[ix]) delete state.notas[courseId][ix][secId];
+      if (state.notes[courseId]?.[ix]) delete state.notes[courseId][ix][sectionId];
       return;
     }
-    state.notas[courseId] = state.notas[courseId] || {};
-    state.notas[courseId][ix] = state.notas[courseId][ix] || {};
-    state.notas[courseId][ix][secId] = clean;
+    state.notes[courseId] = state.notes[courseId] || {};
+    state.notes[courseId][ix] = state.notes[courseId][ix] || {};
+    state.notes[courseId][ix][sectionId] = clean;
   });
 }
 
@@ -223,10 +283,10 @@ export function saveNote(courseId, ix, secId, text) {
    readings of one source. */
 export function allNotes() {
   const out = [];
-  Object.entries(state.notas).forEach(([courseId, lessons]) => {
+  Object.entries(state.notes).forEach(([courseId, lessons]) => {
     Object.entries(lessons).forEach(([ix, sections]) => {
-      Object.entries(sections).forEach(([secId, text]) => {
-        out.push({ cursoId: courseId, aulaIx: Number(ix), secId, texto: text });
+      Object.entries(sections).forEach(([sectionId, text]) => {
+        out.push({ courseId: courseId, lessonIx: Number(ix), sectionId, text: text });
       });
     });
   });
@@ -238,10 +298,10 @@ export function allNotes() {
    never showing them. This is only the read: the screen is what interprets. */
 export function answersGiven() {
   const out = [];
-  Object.entries(state.progresso).forEach(([courseId, course]) => {
-    Object.entries(course.aulas || {}).forEach(([ix, lesson]) => {
-      Object.entries(lesson.exercicios || {}).forEach(([exId, r]) => {
-        out.push({ cursoId: courseId, aulaIx: Number(ix), exId, ...r });
+  Object.entries(state.progress).forEach(([courseId, course]) => {
+    Object.entries(course.lessons || {}).forEach(([ix, lesson]) => {
+      Object.entries(lesson.exercises || {}).forEach(([exId, r]) => {
+        out.push({ courseId: courseId, lessonIx: Number(ix), exId, ...r });
       });
     });
   });
@@ -257,23 +317,23 @@ export function answersGiven() {
    "none": a portal with no plan at all has states that do not exist in real
    life, and every one of them becomes an `if` nobody will ever exercise. */
 export function studentAccount() {
-  const c = state.conta;
-  const planId = c?.planoId || (window.PLANS?.[0]?.id ?? 'estudante');
-  return { planoId: planId, desde: c?.desde || null, email: state.sessao?.email || '' };
+  const c = state.account;
+  const planId = c?.planId || (window.PLANS?.[0]?.id ?? 'estudante');
+  return { planId: planId, since: c?.since || null, email: state.session?.email || '' };
 }
 
 export const currentPlan = () =>
-  (window.PLANS || []).find((p) => p.id === studentAccount().planoId) || (window.PLANS || [])[0] || null;
+  (window.PLANS || []).find((p) => p.id === studentAccount().planId) || (window.PLANS || [])[0] || null;
 
 export function changePlan(planId) {
   change(() => {
-    state.conta = { ...(state.conta || {}), planoId: planId, desde: new Date().toISOString() };
+    state.account = { ...(state.account || {}), planId: planId, since: new Date().toISOString() };
   });
 }
 
 export function changeEmail(email) {
   change(() => {
-    state.sessao = { ...(state.sessao || {}), email: String(email || '').trim() };
+    state.session = { ...(state.session || {}), email: String(email || '').trim() };
   });
 }
 
@@ -284,18 +344,18 @@ export function changeEmail(email) {
    server will confirm in Stage 2. */
 export function markPasswordChange() {
   change(() => {
-    state.conta = { ...(state.conta || {}), senhaEm: new Date().toISOString() };
+    state.account = { ...(state.account || {}), passwordAt: new Date().toISOString() };
   });
 }
 
 export function activeOption(trackId, idx) {
-  return state.matricula?.escolhas?.[trackId + ':' + idx] ?? 0;
+  return state.enrollment?.choices?.[trackId + ':' + idx] ?? 0;
 }
 
 export function chooseOption(trackId, idx, option) {
   change(() => {
-    state.matricula = state.matricula || { trilhaId: trackId, escolhas: {} };
-    state.matricula.escolhas = state.matricula.escolhas || {};
-    state.matricula.escolhas[trackId + ':' + idx] = option;
+    state.enrollment = state.enrollment || { trackId: trackId, choices: {} };
+    state.enrollment.choices = state.enrollment.choices || {};
+    state.enrollment.choices[trackId + ':' + idx] = option;
   });
 }

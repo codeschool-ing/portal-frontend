@@ -36,11 +36,11 @@ export default async function course({ id }) {
       '<span class="no-estado" data-estado="' + st + '">' + txt({
         concluido: 'concluído', atual: 'em andamento', disponivel: 'disponível', adiante: 'mais adiante',
       }[st]) + '</span>' +
-      '<h1>' + esc(c.nome) + '</h1>' +
-      '<p class="curso-resumo">' + esc(c.resumo) + '</p>' +
+      '<h1>' + esc(c.name) + '</h1>' +
+      '<p class="curso-resumo">' + esc(c.summary) + '</p>' +
       '<div class="curso-meta">' +
-        '<span>' + c.horas + 'h</span>' +
-        '<span>' + txt(c.nivel) + '</span>' +
+        '<span>' + c.hours + 'h</span>' +
+        '<span>' + txt(c.level) + '</span>' +
         '<span>' + lessons.length + ' ' + txt('aulas') + '</span>' +
         '<span>' + txt('em') + ' ' + tracksWithCourse(id).length + ' ' + txt('trilhas') + '</span>' +
       '</div>' +
@@ -58,14 +58,14 @@ export default async function course({ id }) {
         '<ol class="aulas">' +
           lessons.map((a) => {
             const done = lessonDone(id, a.ix);
-            const sections = lessonSections(id, a.chave);
+            const sections = lessonSections(id, a.key);
             const pa = lessonProgress(id, a.ix);
             const hasAssessment = sections.some((s) => s.tipo === 'avaliacao');
             return '<li><a class="aula-linha' + (done ? ' feita' : '') + '" ' +
               'href="#/curso/' + esc(id) + '/aula/' + a.ix + '/' + esc(sections[0].id) + '">' +
               '<span class="aula-marca" aria-hidden="true">' + (done ? '✓' : '') + '</span>' +
               '<span class="aula-num">' + String(a.ix + 1).padStart(2, '0') + '</span>' +
-              '<span class="aula-tit">' + esc(a.titulo) + '</span>' +
+              '<span class="aula-tit">' + esc(a.title) + '</span>' +
               '<span class="aula-secoes">' +
                 (sections.length > 1 ? sections.length + ' ' + txt('seções') : txt('1 seção')) +
                 (hasAssessment ? ' · ' + txt('com avaliação') : '') +
@@ -80,7 +80,7 @@ export default async function course({ id }) {
          of the course, and its place is after the last lesson. */
       (exam.items.length
         ? examCard({
-          key: exam.key, href: '#/curso/' + esc(id) + '/prova', scope: 'curso',
+          key: exam.key, href: '#/curso/' + esc(id) + '/prova', scope: 'course',
           count: exam.items.length, progress: p.pct,
         })
         : '') +
@@ -90,17 +90,17 @@ export default async function course({ id }) {
         (materials.length
           ? '<section class="bloco">' + materialList(materials, { title: 'Material do curso' }) + '</section>'
           : '') +
-        (c.ementa?.length
+        (c.syllabus?.length
           ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('Ementa') + '</h2></div>' +
-            '<ul class="ementa">' + c.ementa.map((l) => '<li>' + esc(l) + '</li>').join('') + '</ul></section>'
+            '<ul class="ementa">' + c.syllabus.map((l) => '<li>' + esc(l) + '</li>').join('') + '</ul></section>'
           : '') +
-        (c.requisitos
+        (c.prerequisites
           ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('Pré-requisitos') + '</h2></div>' +
-            '<p class="requisitos">' + formatted(c.requisitos) + '</p></section>'
+            '<p class="requisitos">' + formatted(c.prerequisites) + '</p></section>'
           : '') +
-        ((c.depende || []).length
+        ((c.requires || []).length
           ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('Depois de') + '</h2></div>' +
-            '<div class="ligados">' + c.depende.map((d) => link(d, 'antes')).join('') + '</div></section>'
+            '<div class="ligados">' + c.requires.map((d) => link(d, 'antes')).join('') + '</div></section>'
           : '') +
         (opens.length
           ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('Abre caminho para') + '</h2></div>' +
@@ -109,11 +109,11 @@ export default async function course({ id }) {
       '</aside>' +
     '</div>';
 
-  return { title: c.nome, el };
+  return { title: c.name, el };
 }
 
 function link(id, dir) {
   const c = courseById(id);
   if (!c) return '';
-  return '<a class="elo elo-' + dir + '" href="#/curso/' + esc(id) + '">' + esc(c.nome) + '</a>';
+  return '<a class="elo elo-' + dir + '" href="#/curso/' + esc(id) + '">' + esc(c.name) + '</a>';
 }

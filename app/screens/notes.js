@@ -28,7 +28,7 @@ export default async function notes() {
   /* Grouped by course: that is how you look for a note — "the thing I wrote in
      HTML and CSS" — not by date. */
   const byCourse = {};
-  list.forEach((n) => { (byCourse[n.cursoId] = byCourse[n.cursoId] || []).push(n); });
+  list.forEach((n) => { (byCourse[n.courseId] = byCourse[n.courseId] || []).push(n); });
 
   const el = document.createElement('div');
   el.className = 'tela tela-notas';
@@ -42,17 +42,17 @@ export default async function notes() {
       const lessons = courseLessons(courseId);
       return '<section class="bloco">' +
         '<div class="bloco-topo">' +
-          '<h2>' + esc(c ? c.nome : courseId) + '</h2>' +
+          '<h2>' + esc(c ? c.name : courseId) + '</h2>' +
           '<a class="bloco-link" href="#/curso/' + esc(courseId) + '">' + txt('abrir o curso') + ' →</a>' +
         '</div>' +
         ofCourse.map((n) => {
-          const a = lessons[n.aulaIx];
-          const s = a && lessonSections(courseId, a.chave).find((x) => x.id === n.secId);
+          const a = lessons[n.lessonIx];
+          const s = a && lessonSections(courseId, a.key).find((x) => x.id === n.sectionId);
           return '<article class="nota-item">' +
-            '<a class="nota-onde" href="#/curso/' + esc(courseId) + '/aula/' + n.aulaIx + '/' + esc(n.secId) + '">' +
-              (a ? esc(a.titulo) : '') + (s ? ' · ' + esc(s.titulo) : '') + ' →' +
+            '<a class="nota-onde" href="#/curso/' + esc(courseId) + '/aula/' + n.lessonIx + '/' + esc(n.sectionId) + '">' +
+              (a ? esc(a.title) : '') + (s ? ' · ' + esc(s.title) : '') + ' →' +
             '</a>' +
-            '<p class="nota-texto">' + esc(n.texto) + '</p>' +
+            '<p class="nota-texto">' + esc(n.text) + '</p>' +
           '</article>';
         }).join('') +
       '</section>';

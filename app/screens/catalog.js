@@ -16,7 +16,7 @@ export default async function catalogue() {
   const el = document.createElement('div');
   el.className = 'tela tela-catalogo';
 
-  const categories = ['todas', ...new Set(CURSOS.map((c) => c.categoria))];
+  const categories = ['todas', ...new Set(COURSES.map((c) => c.category))];
 
   el.innerHTML =
     '<header class="tela-head">' +
@@ -56,11 +56,11 @@ export default async function catalogue() {
 
   function paint() {
     const term = field.value.trim().toLowerCase();
-    const list = CURSOS.filter((c) => {
-      if (category !== 'todas' && c.categoria !== category) return false;
+    const list = COURSES.filter((c) => {
+      if (category !== 'todas' && c.category !== category) return false;
       if (!term) return true;
       // searches name, summary, syllabus and topics — as on the vitrine
-      const target = [c.nome, c.resumo, ...(c.ementa || []), ...(c.topicos || [])].join(' ').toLowerCase();
+      const target = [c.name, c.summary, ...(c.syllabus || []), ...(c.topics || [])].join(' ').toLowerCase();
       return target.includes(term);
     });
 
@@ -69,10 +69,10 @@ export default async function catalogue() {
       const p = courseProgress(c.id);
       const st = courseState(c.id);
       return '<a class="cartao no-' + st + '" href="#/curso/' + esc(c.id) + '">' +
-        '<span class="cartao-cat">' + esc(c.categoria) + '</span>' +
-        '<span class="cartao-nome">' + esc(c.nome) + '</span>' +
-        '<span class="cartao-resumo">' + esc(c.resumo) + '</span>' +
-        '<span class="cartao-meta">' + c.horas + 'h · ' + txt(c.nivel) + ' · ' + lessons + ' ' + txt('aulas') + '</span>' +
+        '<span class="cartao-cat">' + esc(c.category) + '</span>' +
+        '<span class="cartao-nome">' + esc(c.name) + '</span>' +
+        '<span class="cartao-resumo">' + esc(c.summary) + '</span>' +
+        '<span class="cartao-meta">' + c.hours + 'h · ' + txt(c.level) + ' · ' + lessons + ' ' + txt('aulas') + '</span>' +
         (p.feitas ? bar(p.pct, p.feitas + ' de ' + p.total) : '') +
       '</a>';
     }).join('');

@@ -91,7 +91,7 @@ function globalRail(path) {
     const st = courseState(id);
     return '<a class="trilho-curso no-' + st + '" href="#/curso/' + esc(id) + '">' +
       '<span class="tc-marca" data-estado="' + st + '" aria-hidden="true"></span>' +
-      '<span class="tc-nome">' + esc(c.nome) + '</span>' +
+      '<span class="tc-nome">' + esc(c.name) + '</span>' +
       '<span class="tc-conta">' + p.feitas + '/' + p.total + '</span>' +
     '</a>';
   }).join('');
@@ -99,7 +99,7 @@ function globalRail(path) {
   return (
     '<nav class="trilho-nav">' + links + '</nav>' +
     '<div class="trilho-sec">' +
-      '<span class="trilho-tit">' + esc(t.nome) + '</span>' +
+      '<span class="trilho-tit">' + esc(t.name) + '</span>' +
       '<div class="trilho-cursos">' + courses + '</div>' +
     '</div>'
   );
@@ -117,7 +117,7 @@ function courseRail(params, path) {
   const currentSec = here && here[2] ? decodeURIComponent(here[2]) : null;
 
   const rows = lessons.map((a) => {
-    const sections = lessonSections(id, a.chave);
+    const sections = lessonSections(id, a.key);
     const done = lessonDone(id, a.ix);
     const isCurrent = a.ix === currentIx;
     const pa = lessonProgress(id, a.ix);
@@ -133,7 +133,7 @@ function courseRail(params, path) {
           'aria-expanded="' + open + '" aria-label="' + txt('Mostrar seções') + '">' + ICON_CHEVRON + '</button>' +
         '<a class="ta-titulo" href="#/curso/' + esc(id) + '/aula/' + a.ix + '/' + esc(sections[0].id) + '">' +
           '<span class="ta-num">' + txt('aula') + ' ' + String(a.ix + 1).padStart(2, '0') + '</span>' +
-          '<span class="ta-tit">' + esc(a.titulo) + '</span>' +
+          '<span class="ta-tit">' + esc(a.title) + '</span>' +
         '</a>' +
         '<span class="ta-conta">' + pa.feitas + '/' + pa.total + '</span>' +
       '</div>';
@@ -154,8 +154,8 @@ function courseRail(params, path) {
         'href="#/curso/' + esc(id) + '/aula/' + a.ix + '/' + esc(s.id) + '">' +
         '<span class="ts-marca" aria-hidden="true">' + mark + '</span>' +
         '<span class="ts-meio">' +
-          '<span class="ts-tit">' + esc(s.titulo) + '</span>' +
-          (s.duracao ? '<span class="ts-dur mono">' + esc(s.duracao) + '</span>' : '') +
+          '<span class="ts-tit">' + esc(s.title) + '</span>' +
+          (s.duration ? '<span class="ts-dur mono">' + esc(s.duration) + '</span>' : '') +
         '</span>' +
       '</a>';
     }).join('');
@@ -181,7 +181,7 @@ function courseRail(params, path) {
   return (
     '<a class="trilho-voltar" href="#/trilha">← ' + txt('minha trilha') + '</a>' +
     '<div class="trilho-sec">' +
-      '<span class="trilho-tit">' + esc(c.nome) + '</span>' +
+      '<span class="trilho-tit">' + esc(c.name) + '</span>' +
       bar(p.pct, p.feitas + ' de ' + p.total) +
       '<span class="trilho-conta">' + p.feitas + '/' + p.total + ' ' + txt('seções') + '</span>' +
       '<div class="trilho-aulas">' + rows + '</div>' +

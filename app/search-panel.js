@@ -88,7 +88,7 @@ function paint() {
       const ctx = excerpt(it, term);
       return '<button type="button" class="busca-item' + (i === 0 ? ' on' : '') + '" ' +
         'data-ix="' + i + '" role="option">' +
-        '<span class="bi-tit">' + esc(it.titulo) + '</span>' +
+        '<span class="bi-tit">' + esc(it.title) + '</span>' +
         '<span class="bi-sub">' + esc(it.sub) + '</span>' +
         (ctx ? '<span class="bi-ctx">' + esc(ctx) + '</span>' : '') +
       '</button>';

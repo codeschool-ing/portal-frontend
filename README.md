@@ -457,8 +457,8 @@ before closing an exercise.
 (any name gets in), the lessons' text, the certificate with no validation code.
 
 **Settled:** the exercise format — the fields are exactly the ones the pipeline
-emits (`statement`, `socratic_hint`, `options[].{text,correct,why}`, `items`,
-`trap`, `pairs`, `right_distractors`,
+emits (`prompt`, `socraticHint`, `options[].{text,correct,why}`, `items`,
+`trap`, `pairs`, `rightDistractors`,
 `tests[].{description,input,expected_output}`, `check_*`). The portal adds
 two fields that are its own, not the exercise's: `id` and `curso`.
 
@@ -1071,7 +1071,7 @@ inertia:
 | --- | --- |
 | CSS classes, `data-*`, element ids, route paths | the DOM contract shared with `base.css`, which is a verbatim copy of the vitrine |
 | catalogue fields (`cursos`, `topicos`, `depende`, `ligacoes`, `nome`, `nivel`) | `dados.js` is a verbatim copy of the vitrine's catalogue |
-| ~~exercise fields~~ — **no longer**: the pipeline renamed its schema to English and the portal followed (`type`, `statement`, `options`, `items`, `pairs`, `trap`, `socratic_hint`, `_verification`) | it was the pipeline's contract, and the contract moved |
+| ~~exercise fields~~ — **no longer**: the pipeline renamed its schema to English and the portal followed (`type`, `prompt`, `choices`, `items`, `pairs`, `trap`, `socraticHint`, `_verification`) | it was the pipeline's contract, and the contract moved |
 | the i18n keys and the persisted `localStorage` shape | the key *is* the Portuguese text, by design; and a renamed storage key silently resets everyone's progress |
 
 The lesson content itself is content, not code, and stays in Portuguese too —

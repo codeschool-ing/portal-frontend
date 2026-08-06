@@ -31,10 +31,10 @@ export default {
     const assumptions = vars.filter((v) => String(v).includes(':'));
 
     return (
-      (ex.check_source
+      (ex.checkOrigin
         ? '<div class="expr-origem">' +
-            '<span class="expr-rot">' + txt(OP_NAME[ex.check_operation] || 'expressão') + ' ' + txt('de') + '</span>' +
-            '<code class="expr-cod">' + esc(ex.check_source) + '</code>' +
+            '<span class="expr-rot">' + txt(OP_NAME[ex.checkOperation] || 'expressão') + ' ' + txt('de') + '</span>' +
+            '<code class="expr-cod">' + esc(ex.checkOrigin) + '</code>' +
           '</div>'
         : '') +
       '<label class="ex-rotulo" for="expr-' + uid + '">' + txt('sua resposta') + '</label>' +
@@ -47,7 +47,7 @@ export default {
         ? '<p class="ex-nota ex-nota-dom">' + txt('Suposições de domínio') + ': <code>' +
             esc(assumptions.join(', ')) + '</code></p>'
         : '') +
-      (ex.check_operation === 'none'
+      (ex.checkOperation === 'none'
         ? '<p class="ex-nota ex-nota-aviso">' + formatted(txt('Este exercício não declara recálculo — o gabarito não foi conferido por ninguém.')) + '</p>'
         : '')
     );

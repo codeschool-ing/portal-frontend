@@ -36,7 +36,7 @@ export default async function redo() {
 
   /* One context per exercise, and not a single one for the whole wizard: each
      answer has to be stored against the lesson it came from. */
-  const contextByIndex = list.map((r) => ({ cursoId: r.cursoId, aulaIx: r.aulaIx }));
+  const contextByIndex = list.map((r) => ({ courseId: r.courseId, lessonIx: r.lessonIx }));
   el.querySelector('.bloco').appendChild(
     buildAssessment(list.map((r) => r.ex), contextByIndex),
   );

@@ -45,28 +45,28 @@ function build(exam, progress) {
     '<nav class="migalhas">' +
       '<a href="' + exam.backTo + '">' + esc(exam.title) + '</a>' +
       '<span aria-hidden="true">›</span>' +
-      '<span>' + txt(exam.scope === 'trilha' ? 'prova da trilha' : 'prova final') + '</span>' +
+      '<span>' + txt(exam.scope === 'track' ? 'prova da trilha' : 'prova final') + '</span>' +
     '</nav>' +
 
     '<header class="tela-head">' +
-      '<h1>' + txt(exam.scope === 'trilha' ? 'Prova da trilha' : 'Prova final do curso') + '</h1>' +
+      '<h1>' + txt(exam.scope === 'track' ? 'Prova da trilha' : 'Prova final do curso') + '</h1>' +
       '<p>' + esc(exam.title) + '</p>' +
     '</header>' +
 
     '<section class="bloco prova-regras">' +
       '<ul class="prosa-lista">' +
         '<li>' + exam.items.length + ' ' + txt('questões, sorteadas do banco do') + ' ' +
-          txt(exam.scope === 'trilha' ? 'conjunto de cursos da trilha.' : 'curso.') + '</li>' +
+          txt(exam.scope === 'track' ? 'conjunto de cursos da trilha.' : 'curso.') + '</li>' +
         '<li>' + txt('O resultado de cada questão só aparece no fim — aqui a prova mede, não ensina.') + '</li>' +
         '<li>' + txt('Mínimo para passar:') + ' <strong>' + PASS_MARK + '%</strong>.</li>' +
         '<li>' + txt('Refazer sorteia uma prova diferente. Vale o melhor resultado.') + '</li>' +
       '</ul>' +
       (previous
-        ? '<p class="prova-antes' + (previous.aprovado ? ' passou' : '') + '">' +
-            (previous.aprovado ? '✓ ' + txt('Você já passou nesta prova.') : txt('Sua melhor nota até agora:')) +
-            ' <strong>' + previous.melhor + '%</strong> ' +
-            txt('em') + ' ' + previous.tentativas + ' ' +
-            txt(previous.tentativas === 1 ? 'tentativa' : 'tentativas') + '.' +
+        ? '<p class="prova-antes' + (previous.passed ? ' passou' : '') + '">' +
+            (previous.passed ? '✓ ' + txt('Você já passou nesta prova.') : txt('Sua melhor nota até agora:')) +
+            ' <strong>' + previous.best + '%</strong> ' +
+            txt('em') + ' ' + previous.attempts + ' ' +
+            txt(previous.attempts === 1 ? 'tentativa' : 'tentativas') + '.' +
           '</p>'
         : '') +
       (ready
@@ -86,17 +86,17 @@ function build(exam, progress) {
   const onSubmit = ({ states }) => {
     const n = examScore(states);
     saveExam(exam.key, {
-      pct: n.pct, aprovado: n.aprovado, certos: n.certos, total: n.judged,
+      pct: n.pct, passed: n.passed, lastCorrect: n.lastCorrect, total: n.judged,
     });
     return {
       html:
-        '<span class="wz-res-rot">' + txt(n.aprovado ? 'aprovado' : 'ainda não') + '</span>' +
-        '<p class="wz-res-nota prova-nota' + (n.aprovado ? ' passou' : ' faltou') + '">' +
+        '<span class="wz-res-rot">' + txt(n.passed ? 'aprovado' : 'ainda não') + '</span>' +
+        '<p class="wz-res-nota prova-nota' + (n.passed ? ' passou' : ' faltou') + '">' +
           '<strong>' + n.pct + '%</strong>' +
         '</p>' +
-        '<p class="wz-res-obs">' + n.certos + ' ' + txt('de') + ' ' + n.judged + ' ' +
+        '<p class="wz-res-obs">' + n.lastCorrect + ' ' + txt('de') + ' ' + n.judged + ' ' +
           txt('questões corrigidas') + ' · ' + txt('mínimo') + ' ' + PASS_MARK + '%</p>' +
-        (n.aprovado
+        (n.passed
           ? '<p class="wz-res-obs">' + txt('O certificado sai na tela de Certificados.') + '</p>'
           : '<p class="wz-res-obs">' + txt('Refaça quando quiser: a próxima prova é sorteada de novo.') + '</p>'),
     };
@@ -116,15 +116,15 @@ function build(exam, progress) {
 export async function courseExamScreen({ id }) {
   const c = courseById(id);
   if (!c) return { title: txt('Prova'), el: empty(txt('Curso não encontrado.')) };
-  const exam = courseExam(id, examAttempts('curso:' + id));
-  return { title: txt('Prova') + ' · ' + c.nome, el: build(exam, courseProgress(id)) };
+  const exam = courseExam(id, examAttempts('course:' + id));
+  return { title: txt('Prova') + ' · ' + c.name, el: build(exam, courseProgress(id)) };
 }
 
 export async function trackExamScreen() {
   const t = studentTrack();
   if (!t) return { title: txt('Prova'), el: empty(txt('Você ainda não escolheu uma trilha.')) };
-  const exam = trackExam(t, activeOption, examAttempts('trilha:' + t.id));
-  return { title: txt('Prova') + ' · ' + t.nome, el: build(exam, trackProgress(t)) };
+  const exam = trackExam(t, activeOption, examAttempts('track:' + t.id));
+  return { title: txt('Prova') + ' · ' + t.name, el: build(exam, trackProgress(t)) };
 }
 
 /* The card that announces the exam, at the end of the course page and of the
@@ -132,17 +132,17 @@ export async function trackExamScreen() {
    promise. */
 export function examCard({ key, href, scope, count, progress }) {
   const r = examResult(key);
-  const state = r?.aprovado ? 'passou' : (r ? 'tentou' : 'novo');
+  const state = r?.passed ? 'passou' : (r ? 'tentou' : 'novo');
   return '<section class="bloco prova-cartao ' + state + '">' +
     '<div class="prova-cartao-texto">' +
       '<span class="prova-cartao-rot mono">' +
-        txt(scope === 'trilha' ? 'fim da trilha' : 'fim do curso') + '</span>' +
-      '<h2>' + txt(scope === 'trilha' ? 'Prova da trilha' : 'Prova final') + '</h2>' +
+        txt(scope === 'track' ? 'fim da trilha' : 'fim do curso') + '</span>' +
+      '<h2>' + txt(scope === 'track' ? 'Prova da trilha' : 'Prova final') + '</h2>' +
       '<p>' + count + ' ' + txt('questões sorteadas') + ' · ' + txt('mínimo') + ' ' + PASS_MARK + '% · ' +
         txt('resultado só no fim') + '</p>' +
       (r
-        ? '<p class="prova-cartao-nota' + (r.aprovado ? ' passou' : '') + '">' +
-            (r.aprovado ? '✓ ' + txt('aprovado com') : txt('melhor nota:')) + ' ' + r.melhor + '%</p>'
+        ? '<p class="prova-cartao-nota' + (r.passed ? ' passou' : '') + '">' +
+            (r.passed ? '✓ ' + txt('aprovado com') : txt('melhor nota:')) + ' ' + r.best + '%</p>'
         : '') +
     '</div>' +
     '<div class="prova-cartao-acao">' +

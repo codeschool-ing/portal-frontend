@@ -231,81 +231,81 @@ window.I18N = {
       'feito no Brasil · para qualquer lugar': 'made in Brazil · for anywhere',
     },
 
-    trilhas: {
-      frontend: { objetivo:
+    tracks: {
+      frontend: { goal:
           'The complete training for whoever builds what the user sees: from the first static page to the published app. Sequence based on the community Front-end roadmap at roadmap.sh, adapted to our method.',
-        nome: 'Front-end Development', saida: 'Junior Front-end Developer' },
+        name: 'Front-end Development', outcome: 'Junior Front-end Developer' },
       backend: {
-        objetivo:
+        goal:
           'Training for whoever builds what holds the application up: data, APIs, servers and scale. Based on the community Back-end roadmap at roadmap.sh — the server language is your choice, and the path converges again after it.',
-        nome: 'Back-end Development', saida: 'Junior Back-end Developer',
-        etapas: { 3: {
-          escolha: 'the server language',
-          nota: 'Master one properly before jumping to another. The rest of the track is the same on any path.',
-          opcoes: ['JavaScript / Node.js', 'Python', 'Java', 'Go'],
+        name: 'Back-end Development', outcome: 'Junior Back-end Developer',
+        steps: { 3: {
+          choice: 'the server language',
+          note: 'Master one properly before jumping to another. The rest of the track is the same on any path.',
+          options: ['JavaScript / Node.js', 'Python', 'Java', 'Go'],
         } },
       },
-      devops: { objetivo:
+      devops: { goal:
           'Training for whoever keeps the operation running: systems, networks, cloud, automation and observability. Sequence based on the community DevOps roadmap at roadmap.sh. Half the courses come from earlier tracks — anyone who did Front-end or Back-end starts halfway there.',
-        nome: 'DevOps and SRE', saida: 'Junior DevOps Engineer / SRE' },
-      dados: { objetivo:
+        name: 'DevOps and SRE', outcome: 'Junior DevOps Engineer / SRE' },
+      dados: { goal:
           'Training for whoever builds the infrastructure behind decisions: modelling, pipelines, big data and governance. Sequence based on the community Data Engineer roadmap at roadmap.sh, which recommends Python and SQL as prerequisites. Half the courses come from earlier tracks.',
-        nome: 'Data Engineering', saida: 'Junior Data Engineer' },
-      'redes-infra': { objetivo:
+        name: 'Data Engineering', outcome: 'Junior Data Engineer' },
+      'redes-infra': { goal:
           'Training for whoever gets the packet through: addressing, routing, wi-fi, security and automation. Sequence based on the community Network Engineer roadmap at roadmap.sh — seven of the eleven courses come from earlier tracks.',
-        nome: 'Networks and Infrastructure', saida: 'Junior Network Engineer' },
-      prompt: { objetivo:
+        name: 'Networks and Infrastructure', outcome: 'Junior Network Engineer' },
+      prompt: { goal:
           'The shortest track in the catalogue and the only one that needs no programming: whoever writes, supports, teaches or decides needs this too. Covers the whole community Prompt Engineering roadmap at roadmap.sh, including the AI Red Teaming one it references.',
-        nome: 'Prompt Engineering', saida: 'Prompt Engineering Specialist' },
-      ia: { objetivo:
+        name: 'Prompt Engineering', outcome: 'Prompt Engineering Specialist' },
+      ia: { goal:
           'Training for whoever builds products with AI: model choice, embeddings, RAG, agents, MCP, evaluation and multimodal. Sequence based on the community AI Engineer roadmap at roadmap.sh — the programming foundation comes from Python.',
-        nome: 'AI Engineering', saida: 'Junior AI Engineer' },
-      'arquitetura-software': { objetivo:
+        name: 'AI Engineering', outcome: 'Junior AI Engineer' },
+      'arquitetura-software': { goal:
           'The only track in the catalogue that requires another one first: it is a career continuation, not an entry point. For whoever already develops and is about to start deciding — patterns, modelling, enterprise integration, management and communication. Sequence based on the community Software Architect roadmap at roadmap.sh, which asks for Back-end as a prerequisite.',
-        nome: 'Software Architecture', saida: 'Software Architect' },
-      'ti-suporte': { objetivo:
+        name: 'Software Architecture', outcome: 'Software Architect' },
+      'ti-suporte': { goal:
           'The school\'s entry point and the first track that requires nothing: it starts with the case open and ends with you supporting, diagnosing and documenting. Covers the Fundamental IT Skills and Operating Systems blocks and the networking base of the community Cyber Security roadmap at roadmap.sh.',
-        nome: 'IT Fundamentals and Support', saida: 'Support Technician / Help Desk' },
-      seguranca: { objetivo:
+        name: 'IT Fundamentals and Support', outcome: 'Support Technician / Help Desk' },
+      seguranca: { goal:
           'Attack and defence on the same path: fundamentals, cryptography, threats, hardening, SOC, penetration testing and cloud. It is the larger half of the community Cyber Security roadmap at roadmap.sh — the other half became the IT Fundamentals and Support track, which serves as its base.',
-        nome: 'Cyber Security', saida: 'Information Security Analyst' },
-      devsecops: { objetivo:
+        name: 'Cyber Security', outcome: 'Information Security Analyst' },
+      devsecops: { goal:
           'The cheapest track in the catalogue: it sits at the intersection of DevOps and Security, and 80% of it already exists. Security that runs on every commit — secure code, threat modelling, pipeline scanning, hardened images and a supply chain under control. Sequence based on the community DevSecOps roadmap at roadmap.sh.',
-        nome: 'DevSecOps', saida: 'DevSecOps Engineer' },
-      bi: { objetivo:
+        name: 'DevSecOps', outcome: 'DevSecOps Engineer' },
+      bi: { goal:
           'The track for whoever wants to work with data without becoming a programmer: statistics, real Excel, SQL, visualisation and the conversation with the business. Sequence based on the community BI Analyst roadmap at roadmap.sh. It is the track that brought in the statistics the whole catalogue was missing.',
-        nome: 'Business Intelligence', saida: 'BI Analyst / Data Analyst' },
-      qa: { objetivo:
+        name: 'Business Intelligence', outcome: 'BI Analyst / Data Analyst' },
+      qa: { goal:
           'Training for whoever makes sure the software does what it promises — and holds up to what was promised for it. Sequence based on the community QA Engineer roadmap at roadmap.sh. As in BI, nobody needs to program to start: there are 330h before the first programming course, and it is the catalogue\'s second entry point for career changers.',
-        nome: 'Software Quality and Testing', saida: 'Junior QA Engineer' },
+        name: 'Software Quality and Testing', outcome: 'Junior QA Engineer' },
       'python-tec': {
-        objetivo:
+        goal:
           'For whoever wants to master the language, not a job title. The trunk is the same for everyone — the language properly learned, with version control — and at the end you choose where to apply it: on the server, in data or in AI. Based on the community Python roadmap at roadmap.sh.',
-        nome: 'Python', saida: 'Command of Python',
-        etapas: { 3: {
-          escolha: 'where to apply Python',
-          nota: 'The track does not converge again here: each path is a different application of the same language.',
-          opcoes: ['Server and APIs', 'Data', 'AI'],
+        name: 'Python', outcome: 'Command of Python',
+        steps: { 3: {
+          choice: 'where to apply Python',
+          note: 'The track does not converge again here: each path is a different application of the same language.',
+          options: ['Server and APIs', 'Data', 'AI'],
         } },
       },
       'go-tec': {
-        objetivo:
+        goal:
           'The language Docker, Kubernetes and Terraform were written in. The trunk runs from syntax to concurrency — the part of Go that does not exist in other languages — and at the end you pick your side: build services, or build the tooling. Based on the public Go roadmap at roadmap.sh.',
-        nome: 'Go', saida: 'Command of Go',
-        etapas: { 3: {
-          escolha: 'which side of Go',
-          nota: 'Both start from the same concurrency: one builds the service, the other builds the tooling that runs it.',
-          opcoes: ['Services and APIs', 'Tooling and Infrastructure'],
+        name: 'Go', outcome: 'Command of Go',
+        steps: { 3: {
+          choice: 'which side of Go',
+          note: 'Both start from the same concurrency: one builds the service, the other builds the tooling that runs it.',
+          options: ['Services and APIs', 'Tooling and Infrastructure'],
         } },
       },
       'sql-tec': {
-        objetivo:
+        goal:
           'The technology that employs the most and demands the least: SQL is learned without knowing how to program. It is the track for whoever comes from admin, accounting or management and is tired of asking someone else for a report. After the database, you choose what to do with the data. Based on the community SQL and PostgreSQL roadmaps at roadmap.sh.',
-        nome: 'SQL and Databases', saida: 'Command of SQL and databases',
-        etapas: { 2: {
-          escolha: 'what to do with the data',
-          nota: 'Both paths start from the same database: one looks at the decision, the other at the volume.',
-          opcoes: ['Analytics and BI', 'Data Engineering'],
+        name: 'SQL and Databases', outcome: 'Command of SQL and databases',
+        steps: { 2: {
+          choice: 'what to do with the data',
+          note: 'Both paths start from the same database: one looks at the decision, the other at the volume.',
+          options: ['Analytics and BI', 'Data Engineering'],
         } },
       },
     },
@@ -537,81 +537,81 @@ window.I18N = {
       'feito no Brasil · para qualquer lugar': 'hecho en Brasil · para cualquier lugar',
     },
 
-    trilhas: {
-      frontend: { objetivo:
+    tracks: {
+      frontend: { goal:
           'La formación completa de quien construye lo que el usuario ve: de la primera página estática a la aplicación publicada. Secuencia basada en el roadmap público de Front-end de la comunidad roadmap.sh, adaptada a nuestra metodología.',
-        nome: 'Desarrollo Front-end', saida: 'Front-end Developer júnior' },
+        name: 'Desarrollo Front-end', outcome: 'Front-end Developer júnior' },
       backend: {
-        objetivo:
+        goal:
           'La formación de quien construye lo que sostiene la aplicación: datos, APIs, servidores y escala. Basada en el roadmap público de Back-end de la comunidad roadmap.sh — el lenguaje del servidor lo eliges tú, y el camino vuelve a unirse después.',
-        nome: 'Desarrollo Back-end', saida: 'Back-end Developer júnior',
-        etapas: { 3: {
-          escolha: 'el lenguaje del servidor',
-          nota: 'Domina uno bien antes de saltar a otro. El resto del itinerario es igual en cualquier camino.',
-          opcoes: ['JavaScript / Node.js', 'Python', 'Java', 'Go'],
+        name: 'Desarrollo Back-end', outcome: 'Back-end Developer júnior',
+        steps: { 3: {
+          choice: 'el lenguaje del servidor',
+          note: 'Domina uno bien antes de saltar a otro. El resto del itinerario es igual en cualquier camino.',
+          options: ['JavaScript / Node.js', 'Python', 'Java', 'Go'],
         } },
       },
-      devops: { objetivo:
+      devops: { goal:
           'La formación de quien sostiene la operación: sistemas, redes, nube, automatización y observabilidad. Secuencia basada en el roadmap público de DevOps de la comunidad roadmap.sh. La mitad de los cursos viene de itinerarios anteriores — quien ya hizo Front-end o Back-end entra con medio camino hecho.',
-        nome: 'DevOps y SRE', saida: 'DevOps Engineer / SRE júnior' },
-      dados: { objetivo:
+        name: 'DevOps y SRE', outcome: 'DevOps Engineer / SRE júnior' },
+      dados: { goal:
           'La formación de quien construye la infraestructura que sostiene las decisiones: modelado, pipelines, big data y gobernanza. Secuencia basada en el roadmap público de Data Engineer de la comunidad roadmap.sh, que recomienda Python y SQL como requisitos previos. La mitad de los cursos viene de itinerarios anteriores.',
-        nome: 'Ingeniería de Datos', saida: 'Data Engineer júnior' },
-      'redes-infra': { objetivo:
+        name: 'Ingeniería de Datos', outcome: 'Data Engineer júnior' },
+      'redes-infra': { goal:
           'La formación de quien hace que el paquete llegue: direccionamiento, enrutamiento, wi-fi, seguridad y automatización. Secuencia basada en el roadmap público de Network Engineer de la comunidad roadmap.sh — siete de los once cursos vienen de itinerarios anteriores.',
-        nome: 'Redes e Infraestructura', saida: 'Network Engineer júnior' },
-      prompt: { objetivo:
+        name: 'Redes e Infraestructura', outcome: 'Network Engineer júnior' },
+      prompt: { goal:
           'El itinerario más corto del catálogo y el único que no exige saber programar: quien escribe, atiende, enseña o decide también lo necesita. Cubre entero el roadmap público de Prompt Engineering de la comunidad roadmap.sh, incluido el de AI Red Teaming que referencia.',
-        nome: 'Ingeniería de Prompt', saida: 'Especialista en Ingeniería de Prompt' },
-      ia: { objetivo:
+        name: 'Ingeniería de Prompt', outcome: 'Especialista en Ingeniería de Prompt' },
+      ia: { goal:
           'La formación de quien construye productos con IA: elección de modelo, embeddings, RAG, agentes, MCP, evaluación y multimodal. Secuencia basada en el roadmap público de AI Engineer de la comunidad roadmap.sh — la base de programación viene de Python.',
-        nome: 'Ingeniería de IA', saida: 'AI Engineer júnior' },
-      'arquitetura-software': { objetivo:
+        name: 'Ingeniería de IA', outcome: 'AI Engineer júnior' },
+      'arquitetura-software': { goal:
           'El único itinerario del catálogo que exige otro antes: es continuación de carrera, no puerta de entrada. Para quien ya desarrolla y va a pasar a decidir — patrones, modelado, integración corporativa, gestión y comunicación. Secuencia basada en el roadmap público de Software Architect de la comunidad roadmap.sh, que pide Back-end como requisito previo.',
-        nome: 'Arquitectura de Software', saida: 'Arquitecto(a) de Software' },
-      'ti-suporte': { objetivo:
+        name: 'Arquitectura de Software', outcome: 'Arquitecto(a) de Software' },
+      'ti-suporte': { goal:
           'La puerta de entrada de la escuela y el primer itinerario que no exige nada: empieza con la torre abierta y termina contigo atendiendo, diagnosticando y documentando. Cubre los bloques Fundamental IT Skills y Operating Systems y la base de red del roadmap público de Cyber Security de la comunidad roadmap.sh.',
-        nome: 'Fundamentos de TI y Soporte', saida: 'Técnico(a) de Soporte / Help Desk' },
-      seguranca: { objetivo:
+        name: 'Fundamentos de TI y Soporte', outcome: 'Técnico(a) de Soporte / Help Desk' },
+      seguranca: { goal:
           'Ataque y defensa en el mismo camino: fundamentos, criptografía, amenazas, hardening, SOC, test de intrusión y nube. Es la mitad grande del roadmap público de Cyber Security de la comunidad roadmap.sh — la otra mitad se convirtió en el itinerario de Fundamentos de TI y Soporte, que le sirve de base.',
-        nome: 'Seguridad Informática', saida: 'Analista de Seguridad de la Información' },
-      devsecops: { objetivo:
+        name: 'Seguridad Informática', outcome: 'Analista de Seguridad de la Información' },
+      devsecops: { goal:
           'El itinerario más barato del catálogo: está en la intersección de DevOps y Seguridad, y el 80% ya existe. Seguridad que corre en cada commit — código seguro, modelado de amenazas, escaneo en la cadena de montaje, imagen endurecida y cadena de suministro bajo control. Secuencia basada en el roadmap público de DevSecOps de la comunidad roadmap.sh.',
-        nome: 'DevSecOps', saida: 'Ingeniero(a) DevSecOps' },
-      bi: { objetivo:
+        name: 'DevSecOps', outcome: 'Ingeniero(a) DevSecOps' },
+      bi: { goal:
           'El itinerario para quien quiere trabajar con datos sin volverse programador: estadística, Excel de verdad, SQL, visualización y la conversación con el negocio. Secuencia basada en el roadmap público de BI Analyst de la comunidad roadmap.sh. Es el itinerario que trajo la estadística que le faltaba a todo el catálogo.',
-        nome: 'Business Intelligence', saida: 'Analista de BI / Analista de Datos' },
-      qa: { objetivo:
+        name: 'Business Intelligence', outcome: 'Analista de BI / Analista de Datos' },
+      qa: { goal:
           'La formación de quien garantiza que el software hace lo que promete — y aguanta lo que prometieron por él. Secuencia basada en el roadmap público de QA Engineer de la comunidad roadmap.sh. Como en BI, nadie necesita programar para empezar: son 330h hasta el primer curso de programación, y es la segunda puerta de entrada del catálogo para quien cambia de carrera.',
-        nome: 'Calidad y Pruebas de Software', saida: 'QA Engineer júnior' },
+        name: 'Calidad y Pruebas de Software', outcome: 'QA Engineer júnior' },
       'python-tec': {
-        objetivo:
+        goal:
           'Para quien quiere dominar el lenguaje, no un puesto. El tronco es igual para todos — el lenguaje bien aprendido, con control de versiones — y al final eliges dónde aplicarlo: en el servidor, en datos o en IA. Basada en el roadmap público de Python de la comunidad roadmap.sh.',
-        nome: 'Python', saida: 'Dominio de Python',
-        etapas: { 3: {
-          escolha: 'dónde aplicar Python',
-          nota: 'Aquí el itinerario no vuelve a unirse: cada camino es una aplicación distinta del mismo lenguaje.',
-          opcoes: ['Servidor y APIs', 'Datos', 'IA'],
+        name: 'Python', outcome: 'Dominio de Python',
+        steps: { 3: {
+          choice: 'dónde aplicar Python',
+          note: 'Aquí el itinerario no vuelve a unirse: cada camino es una aplicación distinta del mismo lenguaje.',
+          options: ['Servidor y APIs', 'Datos', 'IA'],
         } },
       },
       'go-tec': {
-        objetivo:
+        goal:
           'El lenguaje en el que se escribieron Docker, Kubernetes y Terraform. El tronco va de la sintaxis a la concurrencia — la parte de Go que no existe en otros lenguajes — y al final eliges el lado: construir servicios o la herramienta que los opera. Basada en el roadmap público de Go de roadmap.sh.',
-        nome: 'Go', saida: 'Dominio de Go',
-        etapas: { 3: {
-          escolha: 'el lado de Go',
-          nota: 'Los dos parten de la misma concurrencia: uno construye el servicio, el otro la herramienta que lo opera.',
-          opcoes: ['Servicios y APIs', 'Herramientas e Infraestructura'],
+        name: 'Go', outcome: 'Dominio de Go',
+        steps: { 3: {
+          choice: 'el lado de Go',
+          note: 'Los dos parten de la misma concurrencia: uno construye el servicio, el otro la herramienta que lo opera.',
+          options: ['Servicios y APIs', 'Herramientas e Infraestructura'],
         } },
       },
       'sql-tec': {
-        objetivo:
+        goal:
           'La tecnología que más emplea y menos exige: SQL se aprende sin saber programar. Es el itinerario de quien viene de administración, contabilidad o gestión y se cansó de pedirle el informe a alguien. Después de la base de datos, eliges qué hacer con el dato. Basada en los roadmaps públicos de SQL y PostgreSQL de la comunidad roadmap.sh.',
-        nome: 'SQL y Bases de Datos', saida: 'Dominio de SQL y bases de datos',
-        etapas: { 2: {
-          escolha: 'qué hacer con el dato',
-          nota: 'Los dos caminos parten de la misma base: uno mira a la decisión, el otro al volumen.',
-          opcoes: ['Análisis y BI', 'Ingeniería de Datos'],
+        name: 'SQL y Bases de Datos', outcome: 'Dominio de SQL y bases de datos',
+        steps: { 2: {
+          choice: 'qué hacer con el dato',
+          note: 'Los dos caminos parten de la misma base: uno mira a la decisión, el otro al volumen.',
+          options: ['Análisis y BI', 'Ingeniería de Datos'],
         } },
       },
     },
@@ -842,105 +842,105 @@ window.I18N = {
       'feito no Brasil · para qualquer lugar': 'fait au Brésil · pour partout',
     },
 
-    trilhas: {
+    tracks: {
       frontend: {
-        nome: 'Développement Front-end',
-        objetivo: 'La formation complète de celui qui construit ce que l’utilisateur voit : de la première page statique à l’application publiée. Séquence fondée sur la feuille de route Front-end publique de la communauté roadmap.sh, adaptée à notre méthode.',
-        saida: 'Développeur Front-end junior',
+        name: 'Développement Front-end',
+        goal: 'La formation complète de celui qui construit ce que l’utilisateur voit : de la première page statique à l’application publiée. Séquence fondée sur la feuille de route Front-end publique de la communauté roadmap.sh, adaptée à notre méthode.',
+        outcome: 'Développeur Front-end junior',
       },
       backend: {
-        nome: 'Développement Back-end',
-        objetivo: 'La formation de celui qui construit ce qui soutient l’application : données, API, serveurs et montée en charge. Fondée sur la feuille de route Back-end publique de roadmap.sh — le langage du serveur est votre choix, et le chemin se rejoint ensuite.',
-        saida: 'Développeur Back-end junior',
-        etapas: { 3: {
-          escolha: 'le langage du serveur',
-          nota: 'Maîtrisez-en un correctement avant d’en essayer un autre. Le reste du parcours est identique quel que soit le chemin.',
-          opcoes: ['JavaScript / Node.js', 'Python', 'Java', 'Go'],
+        name: 'Développement Back-end',
+        goal: 'La formation de celui qui construit ce qui soutient l’application : données, API, serveurs et montée en charge. Fondée sur la feuille de route Back-end publique de roadmap.sh — le langage du serveur est votre choix, et le chemin se rejoint ensuite.',
+        outcome: 'Développeur Back-end junior',
+        steps: { 3: {
+          choice: 'le langage du serveur',
+          note: 'Maîtrisez-en un correctement avant d’en essayer un autre. Le reste du parcours est identique quel que soit le chemin.',
+          options: ['JavaScript / Node.js', 'Python', 'Java', 'Go'],
         } },
       },
       devops: {
-        nome: 'DevOps et SRE',
-        objetivo: 'La formation de celui qui fait tourner l’exploitation : systèmes, réseaux, cloud, automatisation et observabilité. Séquence fondée sur la feuille de route DevOps publique de roadmap.sh. La moitié des cours vient des parcours précédents — qui a fait Front-end ou Back-end démarre à mi-chemin.',
-        saida: 'Ingénieur DevOps / SRE junior',
+        name: 'DevOps et SRE',
+        goal: 'La formation de celui qui fait tourner l’exploitation : systèmes, réseaux, cloud, automatisation et observabilité. Séquence fondée sur la feuille de route DevOps publique de roadmap.sh. La moitié des cours vient des parcours précédents — qui a fait Front-end ou Back-end démarre à mi-chemin.',
+        outcome: 'Ingénieur DevOps / SRE junior',
       },
       dados: {
-        nome: 'Ingénierie des Données',
-        objetivo: 'La formation de celui qui construit l’infrastructure des décisions : modélisation, pipelines, big data et gouvernance. Séquence fondée sur la feuille de route Data Engineer publique de roadmap.sh, qui recommande Python et SQL comme prérequis. La moitié des cours vient des parcours précédents.',
-        saida: 'Ingénieur Données junior',
+        name: 'Ingénierie des Données',
+        goal: 'La formation de celui qui construit l’infrastructure des décisions : modélisation, pipelines, big data et gouvernance. Séquence fondée sur la feuille de route Data Engineer publique de roadmap.sh, qui recommande Python et SQL comme prérequis. La moitié des cours vient des parcours précédents.',
+        outcome: 'Ingénieur Données junior',
       },
       'redes-infra': {
-        nome: 'Réseaux et Infrastructure',
-        objetivo: 'La formation de celui qui fait arriver le paquet : adressage, routage, wi-fi, sécurité et automatisation. Séquence fondée sur la feuille de route Network Engineer publique de roadmap.sh — sept des onze cours viennent des parcours précédents.',
-        saida: 'Ingénieur Réseaux junior',
+        name: 'Réseaux et Infrastructure',
+        goal: 'La formation de celui qui fait arriver le paquet : adressage, routage, wi-fi, sécurité et automatisation. Séquence fondée sur la feuille de route Network Engineer publique de roadmap.sh — sept des onze cours viennent des parcours précédents.',
+        outcome: 'Ingénieur Réseaux junior',
       },
       prompt: {
-        nome: 'Ingénierie de Prompt',
-        objetivo: 'Le parcours le plus court du catalogue et le seul qui n’exige pas de savoir programmer : qui écrit, conseille, enseigne ou décide en a besoin aussi. Il couvre entièrement la feuille de route Prompt Engineering publique de roadmap.sh, y compris celle d’AI Red Teaming qu’elle référence.',
-        saida: 'Spécialiste en ingénierie de prompt',
+        name: 'Ingénierie de Prompt',
+        goal: 'Le parcours le plus court du catalogue et le seul qui n’exige pas de savoir programmer : qui écrit, conseille, enseigne ou décide en a besoin aussi. Il couvre entièrement la feuille de route Prompt Engineering publique de roadmap.sh, y compris celle d’AI Red Teaming qu’elle référence.',
+        outcome: 'Spécialiste en ingénierie de prompt',
       },
       ia: {
-        nome: 'Ingénierie de l’IA',
-        objetivo: 'La formation de celui qui construit des produits avec l’IA : choix du modèle, embeddings, RAG, agents, MCP, évaluation et multimodal. Séquence fondée sur la feuille de route AI Engineer publique de roadmap.sh — la base de programmation vient de Python.',
-        saida: 'Ingénieur IA junior',
+        name: 'Ingénierie de l’IA',
+        goal: 'La formation de celui qui construit des produits avec l’IA : choix du modèle, embeddings, RAG, agents, MCP, évaluation et multimodal. Séquence fondée sur la feuille de route AI Engineer publique de roadmap.sh — la base de programmation vient de Python.',
+        outcome: 'Ingénieur IA junior',
       },
       'arquitetura-software': {
-        nome: 'Architecture Logicielle',
-        objetivo: 'Le seul parcours du catalogue qui en exige un autre avant : c’est une suite de carrière, pas une porte d’entrée. Pour qui développe déjà et va se mettre à décider — patrons, modélisation, intégration en entreprise, gestion et communication. Séquence fondée sur la feuille de route Software Architect publique de roadmap.sh, qui demande le Back-end comme prérequis.',
-        saida: 'Architecte logiciel',
+        name: 'Architecture Logicielle',
+        goal: 'Le seul parcours du catalogue qui en exige un autre avant : c’est une suite de carrière, pas une porte d’entrée. Pour qui développe déjà et va se mettre à décider — patrons, modélisation, intégration en entreprise, gestion et communication. Séquence fondée sur la feuille de route Software Architect publique de roadmap.sh, qui demande le Back-end comme prérequis.',
+        outcome: 'Architecte logiciel',
       },
       'ti-suporte': {
-        nome: 'Fondamentaux de l’Informatique et Support',
-        objetivo: 'La porte d’entrée de l’école et le premier parcours qui n’exige rien : il commence par le boîtier ouvert et se termine avec vous en train d’assister, de diagnostiquer et de documenter. Il couvre les blocs Fundamental IT Skills, Operating Systems et la base réseau de la feuille de route Cyber Security publique de roadmap.sh.',
-        saida: 'Technicien support / Help Desk',
+        name: 'Fondamentaux de l’Informatique et Support',
+        goal: 'La porte d’entrée de l’école et le premier parcours qui n’exige rien : il commence par le boîtier ouvert et se termine avec vous en train d’assister, de diagnostiquer et de documenter. Il couvre les blocs Fundamental IT Skills, Operating Systems et la base réseau de la feuille de route Cyber Security publique de roadmap.sh.',
+        outcome: 'Technicien support / Help Desk',
       },
       seguranca: {
-        nome: 'Cybersécurité',
-        objetivo: 'Attaque et défense sur le même chemin : fondamentaux, cryptographie, menaces, durcissement, SOC, test d’intrusion et cloud. C’est la grande moitié de la feuille de route Cyber Security publique de roadmap.sh — l’autre moitié est devenue le parcours Fondamentaux de l’Informatique, qui sert de base à celui-ci.',
-        saida: 'Analyste en sécurité de l’information',
+        name: 'Cybersécurité',
+        goal: 'Attaque et défense sur le même chemin : fondamentaux, cryptographie, menaces, durcissement, SOC, test d’intrusion et cloud. C’est la grande moitié de la feuille de route Cyber Security publique de roadmap.sh — l’autre moitié est devenue le parcours Fondamentaux de l’Informatique, qui sert de base à celui-ci.',
+        outcome: 'Analyste en sécurité de l’information',
       },
       devsecops: {
-        nome: 'DevSecOps',
-        objetivo: 'Le parcours le moins coûteux du catalogue : il se situe à l’intersection de DevOps et de la Sécurité, et 80 % existe déjà. De la sécurité qui tourne à chaque commit — code sûr, modélisation des menaces, analyse dans la chaîne, image durcie et chaîne d’approvisionnement sous contrôle. Séquence fondée sur la feuille de route DevSecOps publique de roadmap.sh.',
-        saida: 'Ingénieur DevSecOps',
+        name: 'DevSecOps',
+        goal: 'Le parcours le moins coûteux du catalogue : il se situe à l’intersection de DevOps et de la Sécurité, et 80 % existe déjà. De la sécurité qui tourne à chaque commit — code sûr, modélisation des menaces, analyse dans la chaîne, image durcie et chaîne d’approvisionnement sous contrôle. Séquence fondée sur la feuille de route DevSecOps publique de roadmap.sh.',
+        outcome: 'Ingénieur DevSecOps',
       },
       bi: {
-        nome: 'Business Intelligence',
-        objetivo: 'Le parcours pour qui veut travailler avec les données sans devenir développeur : statistiques, Excel pour de vrai, SQL, visualisation et la conversation avec le métier. Séquence fondée sur la feuille de route BI Analyst publique de roadmap.sh. C’est le parcours qui apporte les statistiques qui manquaient à tout le catalogue.',
-        saida: 'Analyste BI / Analyste de données',
+        name: 'Business Intelligence',
+        goal: 'Le parcours pour qui veut travailler avec les données sans devenir développeur : statistiques, Excel pour de vrai, SQL, visualisation et la conversation avec le métier. Séquence fondée sur la feuille de route BI Analyst publique de roadmap.sh. C’est le parcours qui apporte les statistiques qui manquaient à tout le catalogue.',
+        outcome: 'Analyste BI / Analyste de données',
       },
       qa: {
-        nome: 'Qualité et Tests Logiciels',
-        objetivo: 'La formation de celui qui garantit que le logiciel fait ce qu’il promet — et tient ce qu’on a promis pour lui. Séquence fondée sur la feuille de route QA Engineer publique de roadmap.sh. Comme en BI, nul besoin de programmer pour commencer : 330 h séparent du premier cours de programmation, et c’est la deuxième porte d’entrée du catalogue pour qui change de métier.',
-        saida: 'Ingénieur QA junior',
+        name: 'Qualité et Tests Logiciels',
+        goal: 'La formation de celui qui garantit que le logiciel fait ce qu’il promet — et tient ce qu’on a promis pour lui. Séquence fondée sur la feuille de route QA Engineer publique de roadmap.sh. Comme en BI, nul besoin de programmer pour commencer : 330 h séparent du premier cours de programmation, et c’est la deuxième porte d’entrée du catalogue pour qui change de métier.',
+        outcome: 'Ingénieur QA junior',
       },
       'python-tec': {
-        nome: 'Python',
-        objetivo: 'Pour qui veut maîtriser le langage, pas un poste. Le tronc est le même pour tous — le langage bien appris, avec la gestion de versions — et à la fin vous choisissez où l’appliquer : au serveur, aux données ou à l’IA. Fondé sur la feuille de route Python publique de roadmap.sh.',
-        saida: 'Maîtrise de Python',
-        etapas: { 3: {
-          escolha: 'où appliquer Python',
-          nota: 'Ici le parcours ne se rejoint plus : chaque chemin est une application différente du même langage.',
-          opcoes: ['Serveur et API', 'Données', 'IA'],
+        name: 'Python',
+        goal: 'Pour qui veut maîtriser le langage, pas un poste. Le tronc est le même pour tous — le langage bien appris, avec la gestion de versions — et à la fin vous choisissez où l’appliquer : au serveur, aux données ou à l’IA. Fondé sur la feuille de route Python publique de roadmap.sh.',
+        outcome: 'Maîtrise de Python',
+        steps: { 3: {
+          choice: 'où appliquer Python',
+          note: 'Ici le parcours ne se rejoint plus : chaque chemin est une application différente du même langage.',
+          options: ['Serveur et API', 'Données', 'IA'],
         } },
       },
       'go-tec': {
-        nome: 'Go',
-        objetivo: 'Le langage dans lequel Docker, Kubernetes et Terraform ont été écrits. Le tronc va de la syntaxe à la concurrence — la partie de Go qui n’existe pas ailleurs — et à la fin vous choisissez votre camp : construire des services ou l’outil d’infrastructure. Fondé sur la feuille de route Go publique de roadmap.sh.',
-        saida: 'Maîtrise de Go',
-        etapas: { 3: {
-          escolha: 'le camp de Go',
-          nota: 'Les deux partent de la même concurrence : l’un construit le service, l’autre construit l’outil qui exploite le service.',
-          opcoes: ['Services et API', 'Outils et Infrastructure'],
+        name: 'Go',
+        goal: 'Le langage dans lequel Docker, Kubernetes et Terraform ont été écrits. Le tronc va de la syntaxe à la concurrence — la partie de Go qui n’existe pas ailleurs — et à la fin vous choisissez votre camp : construire des services ou l’outil d’infrastructure. Fondé sur la feuille de route Go publique de roadmap.sh.',
+        outcome: 'Maîtrise de Go',
+        steps: { 3: {
+          choice: 'le camp de Go',
+          note: 'Les deux partent de la même concurrence : l’un construit le service, l’autre construit l’outil qui exploite le service.',
+          options: ['Services et API', 'Outils et Infrastructure'],
         } },
       },
       'sql-tec': {
-        nome: 'SQL et Bases de Données',
-        objetivo: 'La technologie qui emploie le plus et exige le moins : SQL s’apprend sans savoir programmer. C’est le parcours de qui vient de l’administratif, de la comptabilité ou de la gestion et en a assez de demander un rapport à quelqu’un. Après la base, vous choisissez quoi faire de la donnée. Fondé sur les feuilles de route SQL et PostgreSQL publiques de roadmap.sh.',
-        saida: 'Maîtrise de SQL et des bases de données',
-        etapas: { 2: {
-          escolha: 'quoi faire de la donnée',
-          nota: 'Les deux chemins partent de la même base : l’un regarde la décision, l’autre le volume.',
-          opcoes: ['Analyse et BI', 'Ingénierie des Données'],
+        name: 'SQL et Bases de Données',
+        goal: 'La technologie qui emploie le plus et exige le moins : SQL s’apprend sans savoir programmer. C’est le parcours de qui vient de l’administratif, de la comptabilité ou de la gestion et en a assez de demander un rapport à quelqu’un. Après la base, vous choisissez quoi faire de la donnée. Fondé sur les feuilles de route SQL et PostgreSQL publiques de roadmap.sh.',
+        outcome: 'Maîtrise de SQL et des bases de données',
+        steps: { 2: {
+          choice: 'quoi faire de la donnée',
+          note: 'Les deux chemins partent de la même base : l’un regarde la décision, l’autre le volume.',
+          options: ['Analyse et BI', 'Ingénierie des Données'],
         } },
       },
     },
@@ -1170,105 +1170,105 @@ window.I18N = {
       'feito no Brasil · para qualquer lugar': 'fatto in Brasile · per ovunque',
     },
 
-    trilhas: {
+    tracks: {
       frontend: {
-        nome: 'Sviluppo Front-end',
-        objetivo: 'La formazione completa di chi costruisce ciò che l’utente vede: dalla prima pagina statica all’applicazione pubblicata. Sequenza basata sulla roadmap pubblica Front-end della comunità roadmap.sh, adattata al nostro metodo.',
-        saida: 'Sviluppatore Front-end junior',
+        name: 'Sviluppo Front-end',
+        goal: 'La formazione completa di chi costruisce ciò che l’utente vede: dalla prima pagina statica all’applicazione pubblicata. Sequenza basata sulla roadmap pubblica Front-end della comunità roadmap.sh, adattata al nostro metodo.',
+        outcome: 'Sviluppatore Front-end junior',
       },
       backend: {
-        nome: 'Sviluppo Back-end',
-        objetivo: 'La formazione di chi costruisce ciò che regge l’applicazione: dati, API, server e scalabilità. Basata sulla roadmap pubblica Back-end di roadmap.sh — il linguaggio del server lo scegli tu, e poi il percorso torna a unirsi.',
-        saida: 'Sviluppatore Back-end junior',
-        etapas: { 3: {
-          escolha: 'il linguaggio del server',
-          nota: 'Impara bene uno prima di passare a un altro. Il resto del percorso è identico su qualsiasi strada.',
-          opcoes: ['JavaScript / Node.js', 'Python', 'Java', 'Go'],
+        name: 'Sviluppo Back-end',
+        goal: 'La formazione di chi costruisce ciò che regge l’applicazione: dati, API, server e scalabilità. Basata sulla roadmap pubblica Back-end di roadmap.sh — il linguaggio del server lo scegli tu, e poi il percorso torna a unirsi.',
+        outcome: 'Sviluppatore Back-end junior',
+        steps: { 3: {
+          choice: 'il linguaggio del server',
+          note: 'Impara bene uno prima di passare a un altro. Il resto del percorso è identico su qualsiasi strada.',
+          options: ['JavaScript / Node.js', 'Python', 'Java', 'Go'],
         } },
       },
       devops: {
-        nome: 'DevOps e SRE',
-        objetivo: 'La formazione di chi tiene in piedi l’esercizio: sistemi, reti, cloud, automazione e osservabilità. Sequenza basata sulla roadmap pubblica DevOps di roadmap.sh. Metà dei corsi viene dai percorsi precedenti — chi ha fatto Front-end o Back-end parte già a metà strada.',
-        saida: 'Ingegnere DevOps / SRE junior',
+        name: 'DevOps e SRE',
+        goal: 'La formazione di chi tiene in piedi l’esercizio: sistemi, reti, cloud, automazione e osservabilità. Sequenza basata sulla roadmap pubblica DevOps di roadmap.sh. Metà dei corsi viene dai percorsi precedenti — chi ha fatto Front-end o Back-end parte già a metà strada.',
+        outcome: 'Ingegnere DevOps / SRE junior',
       },
       dados: {
-        nome: 'Ingegneria dei Dati',
-        objetivo: 'La formazione di chi costruisce l’infrastruttura che sostiene le decisioni: modellazione, pipeline, big data e governance. Sequenza basata sulla roadmap pubblica Data Engineer di roadmap.sh, che raccomanda Python e SQL come prerequisiti. Metà dei corsi viene dai percorsi precedenti.',
-        saida: 'Ingegnere dei Dati junior',
+        name: 'Ingegneria dei Dati',
+        goal: 'La formazione di chi costruisce l’infrastruttura che sostiene le decisioni: modellazione, pipeline, big data e governance. Sequenza basata sulla roadmap pubblica Data Engineer di roadmap.sh, che raccomanda Python e SQL come prerequisiti. Metà dei corsi viene dai percorsi precedenti.',
+        outcome: 'Ingegnere dei Dati junior',
       },
       'redes-infra': {
-        nome: 'Reti e Infrastruttura',
-        objetivo: 'La formazione di chi fa arrivare il pacchetto: indirizzamento, instradamento, wi-fi, sicurezza e automazione. Sequenza basata sulla roadmap pubblica Network Engineer di roadmap.sh — sette degli undici corsi vengono dai percorsi precedenti.',
-        saida: 'Ingegnere di Rete junior',
+        name: 'Reti e Infrastruttura',
+        goal: 'La formazione di chi fa arrivare il pacchetto: indirizzamento, instradamento, wi-fi, sicurezza e automazione. Sequenza basata sulla roadmap pubblica Network Engineer di roadmap.sh — sette degli undici corsi vengono dai percorsi precedenti.',
+        outcome: 'Ingegnere di Rete junior',
       },
       prompt: {
-        nome: 'Ingegneria del Prompt',
-        objetivo: 'Il percorso più breve del catalogo e l’unico che non richiede di saper programmare: serve anche a chi scrive, assiste, insegna o decide. Copre per intero la roadmap pubblica Prompt Engineering di roadmap.sh, inclusa quella di AI Red Teaming a cui rimanda.',
-        saida: 'Specialista in ingegneria del prompt',
+        name: 'Ingegneria del Prompt',
+        goal: 'Il percorso più breve del catalogo e l’unico che non richiede di saper programmare: serve anche a chi scrive, assiste, insegna o decide. Copre per intero la roadmap pubblica Prompt Engineering di roadmap.sh, inclusa quella di AI Red Teaming a cui rimanda.',
+        outcome: 'Specialista in ingegneria del prompt',
       },
       ia: {
-        nome: 'Ingegneria dell’IA',
-        objetivo: 'La formazione di chi costruisce prodotti con l’IA: scelta del modello, embedding, RAG, agenti, MCP, valutazione e multimodale. Sequenza basata sulla roadmap pubblica AI Engineer di roadmap.sh — la base di programmazione viene da Python.',
-        saida: 'Ingegnere IA junior',
+        name: 'Ingegneria dell’IA',
+        goal: 'La formazione di chi costruisce prodotti con l’IA: scelta del modello, embedding, RAG, agenti, MCP, valutazione e multimodale. Sequenza basata sulla roadmap pubblica AI Engineer di roadmap.sh — la base di programmazione viene da Python.',
+        outcome: 'Ingegnere IA junior',
       },
       'arquitetura-software': {
-        nome: 'Architettura del Software',
-        objetivo: 'L’unico percorso del catalogo che ne richiede un altro prima: è un seguito di carriera, non una porta d’ingresso. Per chi già sviluppa e passerà a decidere — pattern, modellazione, integrazione aziendale, gestione e comunicazione. Sequenza basata sulla roadmap pubblica Software Architect di roadmap.sh, che chiede il Back-end come prerequisito.',
-        saida: 'Architetto del software',
+        name: 'Architettura del Software',
+        goal: 'L’unico percorso del catalogo che ne richiede un altro prima: è un seguito di carriera, non una porta d’ingresso. Per chi già sviluppa e passerà a decidere — pattern, modellazione, integrazione aziendale, gestione e comunicazione. Sequenza basata sulla roadmap pubblica Software Architect di roadmap.sh, che chiede il Back-end come prerequisito.',
+        outcome: 'Architetto del software',
       },
       'ti-suporte': {
-        nome: 'Fondamenti di Informatica e Supporto',
-        objetivo: 'La porta d’ingresso della scuola e il primo percorso che non richiede nulla: inizia dal case aperto e finisce con te che assisti, diagnostichi e documenti. Copre i blocchi Fundamental IT Skills, Operating Systems e la base di rete della roadmap pubblica Cyber Security di roadmap.sh.',
-        saida: 'Tecnico di supporto / Help Desk',
+        name: 'Fondamenti di Informatica e Supporto',
+        goal: 'La porta d’ingresso della scuola e il primo percorso che non richiede nulla: inizia dal case aperto e finisce con te che assisti, diagnostichi e documenti. Copre i blocchi Fundamental IT Skills, Operating Systems e la base di rete della roadmap pubblica Cyber Security di roadmap.sh.',
+        outcome: 'Tecnico di supporto / Help Desk',
       },
       seguranca: {
-        nome: 'Sicurezza Informatica',
-        objetivo: 'Attacco e difesa sullo stesso cammino: fondamenti, crittografia, minacce, hardening, SOC, penetration test e cloud. È la metà grande della roadmap pubblica Cyber Security di roadmap.sh — l’altra metà è diventata il percorso Fondamenti di Informatica, che fa da base a questo.',
-        saida: 'Analista di sicurezza informatica',
+        name: 'Sicurezza Informatica',
+        goal: 'Attacco e difesa sullo stesso cammino: fondamenti, crittografia, minacce, hardening, SOC, penetration test e cloud. È la metà grande della roadmap pubblica Cyber Security di roadmap.sh — l’altra metà è diventata il percorso Fondamenti di Informatica, che fa da base a questo.',
+        outcome: 'Analista di sicurezza informatica',
       },
       devsecops: {
-        nome: 'DevSecOps',
-        objetivo: 'Il percorso più economico del catalogo: sta all’incrocio tra DevOps e Sicurezza, e l’80% esiste già. Sicurezza che gira a ogni commit — codice sicuro, modellazione delle minacce, scansione nella pipeline, immagine irrobustita e catena di fornitura sotto controllo. Sequenza basata sulla roadmap pubblica DevSecOps di roadmap.sh.',
-        saida: 'Ingegnere DevSecOps',
+        name: 'DevSecOps',
+        goal: 'Il percorso più economico del catalogo: sta all’incrocio tra DevOps e Sicurezza, e l’80% esiste già. Sicurezza che gira a ogni commit — codice sicuro, modellazione delle minacce, scansione nella pipeline, immagine irrobustita e catena di fornitura sotto controllo. Sequenza basata sulla roadmap pubblica DevSecOps di roadmap.sh.',
+        outcome: 'Ingegnere DevSecOps',
       },
       bi: {
-        nome: 'Business Intelligence',
-        objetivo: 'Il percorso per chi vuole lavorare con i dati senza diventare programmatore: statistica, Excel per davvero, SQL, visualizzazione e il dialogo con il business. Sequenza basata sulla roadmap pubblica BI Analyst di roadmap.sh. È il percorso che porta la statistica che mancava a tutto il catalogo.',
-        saida: 'Analista BI / Analista dei dati',
+        name: 'Business Intelligence',
+        goal: 'Il percorso per chi vuole lavorare con i dati senza diventare programmatore: statistica, Excel per davvero, SQL, visualizzazione e il dialogo con il business. Sequenza basata sulla roadmap pubblica BI Analyst di roadmap.sh. È il percorso che porta la statistica che mancava a tutto il catalogo.',
+        outcome: 'Analista BI / Analista dei dati',
       },
       qa: {
-        nome: 'Qualità e Test del Software',
-        objetivo: 'La formazione di chi garantisce che il software faccia ciò che promette — e regga ciò che è stato promesso al posto suo. Sequenza basata sulla roadmap pubblica QA Engineer di roadmap.sh. Come in BI, non serve programmare per iniziare: ci sono 330 ore prima del primo corso di programmazione, ed è la seconda porta d’ingresso del catalogo per chi cambia carriera.',
-        saida: 'Ingegnere QA junior',
+        name: 'Qualità e Test del Software',
+        goal: 'La formazione di chi garantisce che il software faccia ciò che promette — e regga ciò che è stato promesso al posto suo. Sequenza basata sulla roadmap pubblica QA Engineer di roadmap.sh. Come in BI, non serve programmare per iniziare: ci sono 330 ore prima del primo corso di programmazione, ed è la seconda porta d’ingresso del catalogo per chi cambia carriera.',
+        outcome: 'Ingegnere QA junior',
       },
       'python-tec': {
-        nome: 'Python',
-        objetivo: 'Per chi vuole padroneggiare il linguaggio, non un ruolo. Il tronco è uguale per tutti — il linguaggio imparato bene, con il versionamento — e alla fine scegli dove applicarlo: al server, ai dati o all’IA. Basato sulla roadmap pubblica Python di roadmap.sh.',
-        saida: 'Padronanza di Python',
-        etapas: { 3: {
-          escolha: 'dove applicare Python',
-          nota: 'Qui il percorso non torna a unirsi: ogni strada è un’applicazione diversa dello stesso linguaggio.',
-          opcoes: ['Server e API', 'Dati', 'IA'],
+        name: 'Python',
+        goal: 'Per chi vuole padroneggiare il linguaggio, non un ruolo. Il tronco è uguale per tutti — il linguaggio imparato bene, con il versionamento — e alla fine scegli dove applicarlo: al server, ai dati o all’IA. Basato sulla roadmap pubblica Python di roadmap.sh.',
+        outcome: 'Padronanza di Python',
+        steps: { 3: {
+          choice: 'dove applicare Python',
+          note: 'Qui il percorso non torna a unirsi: ogni strada è un’applicazione diversa dello stesso linguaggio.',
+          options: ['Server e API', 'Dati', 'IA'],
         } },
       },
       'go-tec': {
-        nome: 'Go',
-        objetivo: 'Il linguaggio in cui sono scritti Docker, Kubernetes e Terraform. Il tronco va dalla sintassi alla concorrenza — la parte di Go che non esiste altrove — e alla fine scegli il lato: costruire servizi o lo strumento di infrastruttura. Basato sulla roadmap pubblica Go di roadmap.sh.',
-        saida: 'Padronanza di Go',
-        etapas: { 3: {
-          escolha: 'il lato di Go',
-          nota: 'I due partono dalla stessa concorrenza: uno costruisce il servizio, l’altro costruisce lo strumento che lo gestisce.',
-          opcoes: ['Servizi e API', 'Strumenti e Infrastruttura'],
+        name: 'Go',
+        goal: 'Il linguaggio in cui sono scritti Docker, Kubernetes e Terraform. Il tronco va dalla sintassi alla concorrenza — la parte di Go che non esiste altrove — e alla fine scegli il lato: costruire servizi o lo strumento di infrastruttura. Basato sulla roadmap pubblica Go di roadmap.sh.',
+        outcome: 'Padronanza di Go',
+        steps: { 3: {
+          choice: 'il lato di Go',
+          note: 'I due partono dalla stessa concorrenza: uno costruisce il servizio, l’altro costruisce lo strumento che lo gestisce.',
+          options: ['Servizi e API', 'Strumenti e Infrastruttura'],
         } },
       },
       'sql-tec': {
-        nome: 'SQL e Basi di Dati',
-        objetivo: 'La tecnologia che impiega di più e richiede di meno: SQL si impara senza saper programmare. È il percorso di chi viene dall’amministrazione, dalla contabilità o dalla gestione ed è stanco di chiedere un report a qualcun altro. Dopo la base di dati, scegli cosa farne del dato. Basato sulle roadmap pubbliche SQL e PostgreSQL di roadmap.sh.',
-        saida: 'Padronanza di SQL e basi di dati',
-        etapas: { 2: {
-          escolha: 'cosa fare del dato',
-          nota: 'Le due strade partono dalla stessa base: una guarda alla decisione, l’altra al volume.',
-          opcoes: ['Analisi e BI', 'Ingegneria dei Dati'],
+        name: 'SQL e Basi di Dati',
+        goal: 'La tecnologia che impiega di più e richiede di meno: SQL si impara senza saper programmare. È il percorso di chi viene dall’amministrazione, dalla contabilità o dalla gestione ed è stanco di chiedere un report a qualcun altro. Dopo la base di dati, scegli cosa farne del dato. Basato sulle roadmap pubbliche SQL e PostgreSQL di roadmap.sh.',
+        outcome: 'Padronanza di SQL e basi di dati',
+        steps: { 2: {
+          choice: 'cosa fare del dato',
+          note: 'Le due strade partono dalla stessa base: una guarda alla decisione, l’altra al volume.',
+          options: ['Analisi e BI', 'Ingegneria dei Dati'],
         } },
       },
     },

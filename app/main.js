@@ -3,7 +3,7 @@
 
    LOAD ORDER, and it matters: `dados.js`, the dictionaries and `i18n-runtime.js`
    are CLASSIC scripts, loaded before this module by index.html. Functions
-   declared there (`txt`, `applyLanguage`, `savePtBase`…) live in the global
+   declared there (`txt`, `applyLanguage`, `saveBase`…) live in the global
    scope and are visible here; the reverse is not automatic, so what the runtime
    needs from us is published by hand just below. It is the price of reusing the
    vitrine's i18n without touching it — and it is cheap next to rewriting five
@@ -75,8 +75,8 @@ let leaving = null;
 
 whenChanged(async (path, found) => {
   // with no session only the sign-in screen exists — the rest assumes a student
-  if (!now().sessao && path !== '/entrar') return goTo('/entrar');
-  if (now().sessao && path === '/entrar') return goTo('/painel');
+  if (!now().session && path !== '/entrar') return goTo('/entrar');
+  if (now().session && path === '/entrar') return goTo('/painel');
 
   if (leaving) { leaving(); leaving = null; }
 
@@ -107,7 +107,7 @@ whenChanged(async (path, found) => {
   if (after) after();
   leaving = onLeave || null;
 
-  const signedIn = Boolean(now().sessao);
+  const signedIn = Boolean(now().session);
   document.body.classList.toggle('sem-trilho', !signedIn);
   if (signedIn) buildRail(rail, path, found.params);
   else rail.innerHTML = '';
@@ -121,7 +121,7 @@ whenChanged(async (path, found) => {
    day one of them changes. */
 function paintContext() {
   const cx = $('#nav-contexto');
-  const t = now().sessao ? studentTrack() : null;
+  const t = now().session ? studentTrack() : null;
   if (!t) { cx.innerHTML = ''; return; }
   const p = trackProgress(t);
 
@@ -132,7 +132,7 @@ function paintContext() {
   cx.innerHTML =
     '<div class="ctx-caixa">' +
       '<button type="button" class="ctx" aria-haspopup="true" aria-expanded="false">' +
-        '<span class="ctx-nome">' + esc(t.nome) + '</span>' +
+        '<span class="ctx-nome">' + esc(t.name) + '</span>' +
         '<span class="ctx-barra"><span style="width:' + p.pct + '%"></span></span>' +
         '<span class="ctx-pct">' + p.pct + '%</span>' +
         '<span class="ctx-seta" aria-hidden="true">▾</span>' +
@@ -142,7 +142,7 @@ function paintContext() {
         TRACKS_BY_FAMILY().map(([family, list]) =>
           '<span class="ctx-grupo">' + txt('trilhas por ' + family) + '</span>' +
           list.map((x) => '<button type="button" class="ctx-op' + (x.id === t.id ? ' on' : '') + '" ' +
-            'data-trilha="' + esc(x.id) + '">' + esc(x.nome) + '</button>').join('')).join('') +
+            'data-trilha="' + esc(x.id) + '">' + esc(x.name) + '</button>').join('')).join('') +
       '</div>' +
     '</div>';
 }
@@ -163,8 +163,8 @@ $('#nav-contexto').addEventListener('click', async (e) => {
 
 /* ---------- the account menu ---------- */
 function paintAccount() {
-  const s = now().sessao;
-  $('#conta-avatar').textContent = (s?.nome || '·').trim().charAt(0).toUpperCase() || '·';
+  const s = now().session;
+  $('#conta-avatar').textContent = (s?.name || '·').trim().charAt(0).toUpperCase() || '·';
   $('#conta-menu').innerHTML = s
     ? '<a class="conta-op" href="#/conta">' + txt('Minha conta') + '</a>' +
       '<a class="conta-op" href="#/plano">' + txt('Meu plano') + '</a>' +
@@ -259,7 +259,7 @@ addEventListener('keydown', (e) => {
    otherwise the top bar disagrees with the screen, which is the kind of
    divergence that erodes trust in the number. */
 subscribe(() => {
-  if (now().sessao) buildRail(rail, currentPath(), routeParams());
+  if (now().session) buildRail(rail, currentPath(), routeParams());
   paintContext();
   paintAccount();
 });
@@ -273,7 +273,7 @@ function routeParams() {
 wireCopy();
 
 /* ---------- i18n: the vitrine's sequence, in the same order ---------- */
-savePtBase();     // stores the Portuguese of CURSOS/TRILHAS/DEPOIMENTOS
+saveBase();     // stores the Portuguese of COURSES/TRACKS/DEPOIMENTOS
 mapTexts();       // walks the text nodes of the static skeleton
 applyLanguage();  // applies content + texts + selector, and rebuilds the screen
 

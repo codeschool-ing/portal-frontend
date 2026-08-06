@@ -23,16 +23,16 @@ const echo = (v) => Promise.resolve(v);
 
 /* ---------- session ---------- */
 
-export const session = () => echo(state.now().sessao);
+export const session = () => echo(state.now().session);
 
 // FUTURE: real authentication. Today any name gets in — it is a skeleton.
-export function signIn({ nome, email }) {
-  state.change((e) => { e.sessao = { nome: nome || 'Aluno', email: email || '' }; });
-  return echo(state.now().sessao);
+export function signIn({ name, email }) {
+  state.change((e) => { e.session = { name: name || 'Aluno', email: email || '' }; });
+  return echo(state.now().session);
 }
 
 export function signOut() {
-  state.change((e) => { e.sessao = null; });
+  state.change((e) => { e.session = null; });
   return echo(null);
 }
 
@@ -42,7 +42,7 @@ export function signOut() {
    nowhere to send the confirmation. */
 export function changeEmail(email) {
   state.changeEmail(email);
-  return echo(state.now().sessao);
+  return echo(state.now().session);
 }
 
 /* FUTURE: `PATCH /conta/senha`, with the current password checked ON THE
@@ -62,21 +62,21 @@ export function changePlan(planId) {
 
 /* ---------- enrolment ---------- */
 
-export const enrolment = () => echo(state.now().matricula);
+export const enrolment = () => echo(state.now().enrollment);
 
 export function enrol(trackId) {
   state.change((e) => {
-    e.matricula = { trilhaId: trackId, escolhas: e.matricula?.escolhas || {} };
+    e.enrollment = { trackId: trackId, choices: e.enrollment?.choices || {} };
   });
-  return echo(state.now().matricula);
+  return echo(state.now().enrollment);
 }
 
 /* ---------- progress ---------- */
 
-export const progress = () => echo(state.now().progresso);
+export const progress = () => echo(state.now().progress);
 
-export function completeSection(courseId, ix, secId, done = true) {
-  state.markSection(courseId, ix, secId, done);
+export function completeSection(courseId, ix, sectionId, done = true) {
+  state.markSection(courseId, ix, sectionId, done);
   return echo(true);
 }
 
@@ -90,18 +90,18 @@ export function resumeFrom() {
   const e = state.now();
   const firstSection = (courseId, ix) => {
     const a = courseLessons(courseId)[ix];
-    return a ? lessonSections(courseId, a.chave)[0]?.id : undefined;
+    return a ? lessonSections(courseId, a.key)[0]?.id : undefined;
   };
 
-  if (e.ultima && courseById(e.ultima.cursoId)) {
-    const { cursoId, aulaIx } = e.ultima;
-    return echo({ ...e.ultima, secId: e.ultima.secId || firstSection(cursoId, aulaIx) });
+  if (e.last && courseById(e.last.courseId)) {
+    const { courseId, lessonIx } = e.last;
+    return echo({ ...e.last, sectionId: e.last.sectionId || firstSection(cursoId, aulaIx) });
   }
-  const t = e.matricula && trackById(e.matricula.trilhaId);
+  const t = e.enrollment && trackById(e.enrollment.trackId);
   if (!t) return echo(null);
-  const first = t.cursos.find((i) => typeof i === 'string');
+  const first = t.courses.find((i) => typeof i === 'string');
   if (!first) return echo(null);
-  return echo({ cursoId: first, aulaIx: 0, secId: firstSection(first, 0) });
+  return echo({ courseId: first, lessonIx: 0, sectionId: firstSection(first, 0) });
 }
 
 /* ---------- exercises ----------
@@ -132,8 +132,8 @@ export async function grade(ex, answer) {
 async function gradeOnServer(ex, answer) {
   await new Promise((r) => setTimeout(r, 420));   // the wait is part of the UI
   return {
-    acertou: null,                                 // null = it was not checked
-    simulado: true,
+    correct: null,                                 // null = it was not checked
+    simulated: true,
     detail: ex.type === 'expression-answer'
       ? 'Equivalência simbólica exige o CAS no servidor.'
       : 'A execução dos casos de teste exige o contêiner no servidor.',
