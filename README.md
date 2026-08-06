@@ -707,6 +707,40 @@ The first version here got two things wrong, and both were fixed:
    column has to look like a file, and continuity is the whole argument. There is
    a test that measures whether the snippets join with no gap.
 
+### One door out, and it is the copy button
+
+The only thing a student can put on the clipboard is code, through that button.
+Selecting a paragraph and pressing Ctrl+C does nothing: the content is
+`user-select:none`, and a document-level listener cancels `copy` and `cut`
+anywhere outside a field. The button is unaffected, because it writes with
+`navigator.clipboard` and never fires a `copy` event — and when the
+`execCommand` fallback runs, its off-screen textarea *is* a field, so it passes
+through the same exemption.
+
+**What the student writes stays theirs.** Name, e-mail, password, search, notes
+and every answer field, the code editor included, remain selectable, copyable
+and pasteable. That work is not the school's content, and a field you cannot
+select is a field you cannot fix a typo in. Blocking paste there was considered
+and left out: it breaks password managers, and it stops someone pasting a
+solution they wrote in their own editor — which is not the thing being
+protected.
+
+**This is friction, not protection, and the repository makes that obvious.**
+`portal-aluno.html` ships every lesson inline, so view-source, DevTools or
+JavaScript turned off all read the whole course. What actually protects content
+is a server that does not serve what the student has not bought — Stage 2's job,
+not this layer's. It is worth writing down so nobody later mistakes the one for
+the other.
+
+**The cost is real, and it is not the usual one.** Screen readers still read,
+find-in-page still finds, browser translation still translates — none of them
+need a selection. What is lost is the reader who highlights a line to keep their
+place, and the one who copies an unfamiliar term to go look it up. That second
+one is a student doing exactly what a school wants.
+
+Right-click is **not** blocked. It stops nobody who knows Ctrl+U, and it breaks
+"open in a new tab" for every link on the page.
+
 ### The copy button hands over the file, not the fragment
 
 Every code component has a button in the top-right corner, as on

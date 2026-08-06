@@ -1,4 +1,34 @@
 /* ==========================================================================
+   The clipboard policy: one door out, and it is the code button.
+
+   THE BUTTON IS THE ONLY SANCTIONED WAY OUT. Selecting the prose of a lesson
+   and pressing Ctrl+C does nothing; the code button does. Everything below is
+   in service of that single rule, and it is worth being precise about what it
+   buys, because the file this repository ships makes the limit obvious:
+   `portal-aluno.html` carries every lesson inline, so view-source, DevTools or
+   JavaScript turned off all read the whole course. This is friction, not
+   protection. What protects content is a server that does not serve what the
+   student has not bought — which is Stage 2's job, not this file's.
+
+   WHAT STAYS SELECTABLE: anything the student types into. The name and e-mail
+   fields, the password, the search box, the notes, and the answer fields —
+   including the code editor. Those hold the student's own work, not the
+   school's content, and a field you cannot select is a field you cannot correct
+   a typo in. Blocking paste there was considered and left out: it would break
+   password managers, and stop someone pasting a solution they wrote in their
+   own editor, which is not the thing being protected.
+
+   THE COST IS REAL AND IT IS NOT SECURITY THEATRE'S USUAL ONE. Screen readers
+   still read, find-in-page still finds, browser translation still translates —
+   none of them need a selection. What is lost is the reader who highlights a
+   line to keep their place, and the one who copies an unfamiliar term to go
+   look it up. That second one is a student doing exactly what a school wants,
+   and it is the price this rule charges.
+
+   Right-click is NOT blocked. It stops nobody who knows Ctrl+U, and it breaks
+   "open in a new tab" for every link on the page.
+
+   ---------------------------------------------------------------------------
    Copying a code block to the clipboard.
 
    ONE LISTENER FOR THE WHOLE DOCUMENT, and not one per block. Code blocks are
@@ -92,6 +122,13 @@ function flash(button, ok) {
   }, HELD);
 }
 
+/* A field the student writes in, or the off-screen textarea the fallback above
+   builds. Both are places where a selection belongs to the person, not to the
+   school, so the clipboard stays theirs. `closest` and not a tag test: the
+   event target inside a field is the field, but this also survives the day a
+   `contenteditable` shows up. */
+const ownField = (node) => Boolean(node?.closest?.('input, textarea, [contenteditable="true"]'));
+
 export function wireCopy() {
   document.addEventListener('click', async (e) => {
     const button = e.target.closest('[data-copiar]');
@@ -99,5 +136,16 @@ export function wireCopy() {
     const code = codeToCopy(button);
     if (!code) return;
     flash(button, await toClipboard(code));
+  });
+
+  /* Content does not leave by hand. The button writes with
+     `navigator.clipboard`, which fires no `copy` event, so blocking the event
+     never blocks the sanctioned path — and when the fallback runs, its
+     textarea is a field, so it passes through here too. */
+  ['copy', 'cut'].forEach((kind) => {
+    document.addEventListener(kind, (e) => {
+      if (ownField(e.target)) return;
+      e.preventDefault();
+    });
   });
 }

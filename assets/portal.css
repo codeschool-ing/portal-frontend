@@ -42,7 +42,18 @@ html[data-tema="claro"]{color-scheme:light}
    not be seen yet (the justification of a choice, for example). */
 [hidden]{display:none !important}
 
-.portal-body{overflow-y:auto}
+/* THE CONTENT IS NOT SELECTABLE, and the code button is the one way out.
+   See app/copy.js for what this buys and what it does not: the shipped
+   single-file bundle carries every lesson inline, so this is friction, not
+   protection.
+
+   The exemption is everything the student writes into — name, e-mail, password,
+   search, notes and the answer fields, the code editor included. That work is
+   theirs, and a field you cannot select is a field you cannot fix a typo in.
+   The rule lives on the two properties on purpose: Safari still wants the
+   prefixed one, and losing it there would silently undo the whole thing. */
+.portal-body{overflow-y:auto;-webkit-user-select:none;user-select:none}
+input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:text}
 
 /* `base.css` styles the `nav` ELEMENT — the vitrine has exactly one, the fixed
    top bar, and it never needed a class. The portal has others: the side rail
