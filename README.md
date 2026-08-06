@@ -26,6 +26,7 @@ Checking that it still stands:
 npm i playwright
 node tools/smoke/smoke.mjs      # the whole portal, in a browser
 node tools/examples/check.mjs   # the code examples really do run
+node tools/i18n/check.mjs       # nothing on screen is stuck in English
 ```
 
 ## A single file, to open off disk
@@ -521,6 +522,7 @@ tools/examples/                runs the `example` blocks and checks the output
 app/screens/*.js               one per screen
 app/exercises/*.js             one per type, plus the wrapper and the grading
 tools/smoke/                   the smoke suite
+tools/i18n/                    every string on screen has all four translations
 tools/bundle/                  generates the single HTML file
 ```
 

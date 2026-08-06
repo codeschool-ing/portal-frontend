@@ -88,7 +88,7 @@ export default async function account() {
         '<div class="field">' +
           '<label for="c-email">' + txt('sign-in e-mail') + '</label>' +
           '<input type="email" id="c-email" autocomplete="email" value="' + esc(acc.email) + '" ' +
-            'placeholder="voce@example.com">' +
+            'placeholder="' + txt('you@example.com') + '">' +
         '</div>' +
         '<div class="account-action">' +
           '<button type="submit" class="btn btn-primary">' + txt('Change e-mail') + '</button>' +
@@ -179,20 +179,20 @@ export default async function account() {
     const repeat = el.querySelector('#c-password-repeat').value;
     const say = (text, good) => {
       passwordNotice.className = 'account-notice mono ' + (good ? 'good' : 'bad');
-      passwordNotice.textContent = txt(text);
+      passwordNotice.textContent = text;
     };
     /* The order of the checks is the order the person filled the form in:
        pointing at the last field when the first is empty tells them to fix the
        wrong thing. */
-    if (!currentPassword) return say('type your current password', false);
-    if (!passwordStrength(fresh.value).ok) return say('the new password needs at least 8 characters', false);
-    if (fresh.value !== repeat) return say('the two new passwords do not match', false);
-    if (fresh.value === currentPassword) return say('the new password is the same as the current', false);
+    if (!currentPassword) return say(txt('type your current password'), false);
+    if (!passwordStrength(fresh.value).ok) return say(txt('the new password needs at least 8 characters'), false);
+    if (fresh.value !== repeat) return say(txt('the two new passwords do not match'), false);
+    if (fresh.value === currentPassword) return say(txt('the new password is the same as the current'), false);
     await api.changePassword(fresh.value);
     el.querySelectorAll('#f-password input').forEach((i) => { i.value = ''; });
     meter.style.width = '0';
     label.textContent = '';
-    return say('password changed', true);
+    return say(txt('password changed'), true);
   });
 
   const confirm = el.querySelector('#c-confirm');

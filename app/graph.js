@@ -61,7 +61,7 @@ function courseCard(id, order, deps) {
       (trackCount > 1 ? '<span class="tag-shared">' + txt('in') + ' ' + trackCount + ' ' + txt('tracks') + '</span>' : '') +
       '<span class="meta">' + c.hours + 'h · ' + txt(c.level) + '</span>' +
       (p.total
-        ? '<span class="node-bar" role="img" aria-label="' + p.done + ' de ' + p.total + '">' +
+        ? '<span class="node-bar" role="img" aria-label="' + p.done + ' ' + txt('of') + ' ' + p.total + '">' +
             '<span class="node-bar-fill" style="width:' + p.pct + '%"></span>' +
           '</span>' +
           '<span class="node-count">' + p.done + '/' + p.total + ' ' + txt('sections') + '</span>'
