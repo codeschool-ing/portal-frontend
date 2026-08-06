@@ -64,7 +64,7 @@ export const COPY_ICONS = { copy: ICON_COPY, copied: ICON_COPIED };
      { example: { … } }            → annotated code, Go By Example style
 
    The code block arrived when the first PRACTICAL course was written. In
-   `web-fundamentos`, which is conceptual, a backtick mid-sentence was enough;
+   `web-fundamentals`, which is conceptual, a backtick mid-sentence was enough;
    in `html-css` there is no way to teach a selector without showing it over
    three lines with the indentation intact. The content asked for it, the
    architecture did not foresee it — and that is why the shape is still only

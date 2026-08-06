@@ -81,9 +81,81 @@ function renameKeys(node) {
   return out;
 }
 
+/* Course and track ids moved too, and they are stored as KEYS, not only as
+   values: progress and notes are keyed by course id, the exam scope keys carry
+   both, and the enrolment carries a track id plus fork choices keyed by it.
+   Renaming the catalogue without moving these unjoins every student from their
+   own progress — same silence as above, one level down. */
+const MOVED_IDS = {
+  'web-fundamentos': 'web-fundamentals', 'ia-dev': 'ai-dev',
+  'front-qualidade': 'front-quality', 'front-entrega': 'front-delivery',
+  'front-multiplataforma': 'front-multiplatform', 'java-funcional': 'java-functional',
+  'go-concorrencia': 'go-concurrency', 'go-producao': 'go-production',
+  'bancos-sql': 'sql-databases', 'servidores-cache': 'servers-cache',
+  'testes-cicd': 'testing-cicd', 'arquitetura': 'architecture', 'escala': 'scale',
+  'redes': 'networks', 'nuvem': 'cloud', 'observabilidade': 'observability',
+  'dados-fundamentos': 'data-fundamentals', 'modelagem-dw': 'warehouse-modeling',
+  'dados-governanca': 'data-governance', 'redes-enderecamento': 'networks-addressing',
+  'redes-disponibilidade': 'networks-availability', 'redes-seguranca': 'networks-security',
+  'redes-automacao': 'networks-automation', 'prompt-confiabilidade': 'prompt-reliability',
+  'ia-seguranca': 'ai-security', 'ia-modelos': 'ai-models',
+  'embeddings-vetores': 'embeddings-vectors', 'agentes-mcp': 'agents-mcp',
+  'llm-observabilidade': 'llm-observability', 'arquitetura-papel': 'architecture-role',
+  'padroes-projeto': 'design-patterns', 'modelagem-arquitetura': 'architecture-modeling',
+  'software-corporativo': 'enterprise-software', 'gestao-processos': 'process-management',
+  'arquiteto-comunicacao': 'architect-communication',
+  'informatica-essencial': 'computing-essentials',
+  'sistemas-operacionais': 'operating-systems', 'virtualizacao': 'virtualization',
+  'suporte-tecnico': 'tech-support', 'seguranca-fundamentos': 'security-fundamentals',
+  'criptografia': 'cryptography', 'ataques-ameacas': 'attacks-threats',
+  'defesa-hardening': 'defense-hardening', 'soc-resposta': 'soc-response',
+  'nuvem-seguranca': 'cloud-security', 'codigo-seguro': 'secure-code',
+  'modelagem-ameacas': 'threat-modeling', 'pipeline-seguro': 'secure-pipeline',
+  'bi-negocio': 'bi-business', 'excel-analitico': 'excel-analytics',
+  'estatistica': 'statistics', 'dados-limpeza': 'data-cleaning',
+  'visualizacao': 'visualization', 'bi-tecnicas': 'bi-techniques',
+  'dados-storytelling': 'data-storytelling', 'qa-fundamentos': 'qa-fundamentals',
+  'testes-manuais': 'manual-testing', 'automacao-web': 'web-automation',
+  'automacao-api-mobile': 'api-mobile-automation',
+  'testes-nao-funcionais': 'non-functional-testing', 'dados': 'data',
+  'redes-infra': 'networks-infra', 'ia': 'ai', 'arquitetura-software': 'software-architecture',
+  'ti-suporte': 'it-support', 'seguranca': 'security', 'python-tec': 'python-tech',
+  'go-tec': 'go-tech', 'sql-tec': 'sql-tech',
+};
+
+const movedId = (id) => MOVED_IDS[id] || id;
+
+function moveIds(doc) {
+  const keyed = (o) => (o ? Object.fromEntries(Object.entries(o).map(([k, v]) => [movedId(k), v])) : o);
+  const out = { ...doc };
+  if (out.progress) out.progress = keyed(out.progress);
+  if (out.notes) out.notes = keyed(out.notes);
+  if (out.exams) {
+    out.exams = Object.fromEntries(Object.entries(out.exams).map(([k, v]) => {
+      const [scope, id] = [k.slice(0, k.indexOf(':') + 1), k.slice(k.indexOf(':') + 1)];
+      return [scope + movedId(id), v];
+    }));
+  }
+  if (out.last?.courseId) out.last = { ...out.last, courseId: movedId(out.last.courseId) };
+  if (out.enrollment) {
+    const e = { ...out.enrollment };
+    if (e.trackId) e.trackId = movedId(e.trackId);
+    if (e.choices) {
+      e.choices = Object.fromEntries(Object.entries(e.choices).map(([k, v]) => {
+        const cut = k.lastIndexOf(':');
+        return [movedId(k.slice(0, cut)) + k.slice(cut), v];
+      }));
+    }
+    out.enrollment = e;
+  }
+  return out;
+}
+
 export function migrate(raw) {
   const legacy = Object.keys(LEGACY_TOP).filter((k) => k in raw);
-  if (!legacy.length) return raw;
+  /* The two stages are independent: a browser migrated by the shape rename
+     before the ids moved still needs the second one. */
+  if (!legacy.length) return moveIds(raw);
 
   const out = { ...raw };
   legacy.forEach((k) => { out[LEGACY_TOP[k]] = out[k]; delete out[k]; });
@@ -99,7 +171,7 @@ export function migrate(raw) {
     moved.exams = Object.fromEntries(Object.entries(moved.exams).map(([k, v]) =>
       [k.replace(/^curso:/, 'course:').replace(/^trilha:/, 'track:'), v]));
   }
-  return moved;
+  return moveIds(moved);
 }
 
 function read() {

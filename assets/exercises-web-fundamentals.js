@@ -1,5 +1,5 @@
 /* ==========================================================================
-   `web-fundamentos` exercises — one file per course, as the pipeline does.
+   `web-fundamentals` exercises — one file per course, as the pipeline does.
 
    The pipeline emits `exercises-<course>.json`. Here the extension is `.js`
    because the portal has no server yet to fetch JSON from (and a `fetch` from
@@ -9,10 +9,10 @@
    SIX OF THE SEVEN TYPES, AND THAT IS NOT AN OVERSIGHT
    `code` does not appear here, and the reason is a rule of the generator: an
    exercise from topic N may only require what topics 1..N taught.
-   `web-fundamentos` teaches no language — it is the school's first course, with
+   `web-fundamentals` teaches no language — it is the school's first course, with
    no prerequisite — so asking for a program to be written would require what the
    course did not give. It is the same finding `RULES.md` recorded in
-   `arquiteto-comunicacao`: in a course with no code, three of the seven types
+   `architect-communication`: in a course with no code, three of the seven types
    are inapplicable. Here only one is, because the last lesson covers the console.
 
    `expression-answer` genuinely fits in lesson 03: bandwidth, latency and
@@ -30,7 +30,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   /* ============================================================== lesson 01 */
   {
     id: 'wf-01-quiz',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Client, server and host: who asks and who answers',
     type: 'quiz',
     difficulty: 'easy',
@@ -63,7 +63,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
   {
     id: 'wf-01-assoc',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Client, server and host: who asks and who answers',
     type: 'matching',
     difficulty: 'medium',
@@ -86,7 +86,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   /* ============================================================== lesson 02 */
   {
     id: 'wf-02-quiz',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Packet, frame and socket',
     type: 'quiz',
     difficulty: 'medium',
@@ -119,7 +119,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
   {
     id: 'wf-02-assoc',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Packet, frame and socket',
     type: 'matching',
     difficulty: 'medium',
@@ -139,7 +139,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   /* ============================================================== lesson 03 */
   {
     id: 'wf-03-quiz',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Bandwidth, latency and throughput',
     type: 'quiz',
     difficulty: 'medium',
@@ -172,7 +172,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
   {
     id: 'wf-03-expr',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Bandwidth, latency and throughput',
     type: 'expression-answer',
     difficulty: 'medium',
@@ -189,7 +189,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   /* ============================================================== lesson 04 */
   {
     id: 'wf-04-mult',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'IP address, MAC address and ARP',
     type: 'multiple-choice',
     difficulty: 'medium',
@@ -207,7 +207,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
   {
     id: 'wf-04-quiz',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'IP address, MAC address and ARP',
     type: 'quiz',
     difficulty: 'hard',
@@ -242,7 +242,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   /* ============================================================== lesson 05 */
   {
     id: 'wf-05-ord',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Layered networks: from the cable to the browser',
     type: 'ordering',
     difficulty: 'medium',
@@ -260,7 +260,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
   {
     id: 'wf-05-quiz',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Layered networks: from the cable to the browser',
     type: 'quiz',
     difficulty: 'easy',
@@ -295,7 +295,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   /* ============================================================== lesson 06 */
   {
     id: 'wf-06-quiz',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'HTTP and HTTPS: methods, headers and status codes',
     type: 'quiz',
     difficulty: 'medium',
@@ -328,7 +328,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
   {
     id: 'wf-06-assoc',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'HTTP and HTTPS: methods, headers and status codes',
     type: 'matching',
     difficulty: 'medium',
@@ -350,7 +350,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
   {
     id: 'wf-06-mult',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'HTTP and HTTPS: methods, headers and status codes',
     type: 'multiple-choice',
     difficulty: 'hard',
@@ -370,7 +370,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   /* ============================================================== lesson 07 */
   {
     id: 'wf-07-quiz',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Cookies, sessions and browser cache',
     type: 'quiz',
     difficulty: 'hard',
@@ -403,7 +403,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
   {
     id: 'wf-07-assoc',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Cookies, sessions and browser cache',
     type: 'matching',
     difficulty: 'medium',
@@ -426,7 +426,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   /* ============================================================== lesson 08 */
   {
     id: 'wf-08-ord',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Domains: registration, DNS, propagation and subdomains',
     type: 'ordering',
     difficulty: 'hard',
@@ -445,7 +445,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
   {
     id: 'wf-08-quiz',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Domains: registration, DNS, propagation and subdomains',
     type: 'quiz',
     difficulty: 'medium',
@@ -480,7 +480,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   /* ============================================================== lesson 09 */
   {
     id: 'wf-09-mult',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Hosting: shared, VPS, cloud and CDN',
     type: 'multiple-choice',
     difficulty: 'medium',
@@ -498,7 +498,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
   {
     id: 'wf-09-quiz',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Hosting: shared, VPS, cloud and CDN',
     type: 'quiz',
     difficulty: 'medium',
@@ -533,7 +533,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   /* ============================================================== lesson 10 */
   {
     id: 'wf-10-ord',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'How the browser builds the page: DOM, CSSOM and rendering',
     type: 'ordering',
     difficulty: 'medium',
@@ -553,7 +553,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
   {
     id: 'wf-10-quiz',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'How the browser builds the page: DOM, CSSOM and rendering',
     type: 'quiz',
     difficulty: 'medium',
@@ -588,7 +588,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   /* ============================================================== lesson 11 */
   {
     id: 'wf-11-saida',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Developer tools: network, console and elements',
     type: 'expected-output',
     difficulty: 'easy',
@@ -602,7 +602,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
   {
     id: 'wf-11-quiz',
-    course: 'web-fundamentos',
+    course: 'web-fundamentals',
     topic: 'Developer tools: network, console and elements',
     type: 'quiz',
     difficulty: 'medium',

@@ -65,7 +65,7 @@
 
 window.LESSONS = Object.assign(window.LESSONS || {}, {
 
-  'web-fundamentos': {
+  'web-fundamentals': {
 
     /* --------------------------------------------------------------- 01 */
     'Client, server and host: who asks and who answers': [

@@ -14,7 +14,7 @@
    ========================================================================== */
 window.I18N.es.courses = {
 
-'web-fundamentos': {
+'web-fundamentals': {
   name: 'Fundamentos de la Web e Internet',
   summary: 'Entendé qué pasa entre escribir una dirección y ver la página — la base que sostiene cualquier carrera web.',
   syllabus: [
@@ -91,7 +91,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'ia-dev': {
+'ai-dev': {
   name: 'IA en el Desarrollo',
   summary: 'Programá acompañado: asistentes de código, agentes e integración de IA en tus proyectos.',
   syllabus: [
@@ -173,7 +173,7 @@ window.I18N.es.courses = {
   prerequisites: 'Los dos son necesarios.',
 },
 
-'front-qualidade': {
+'front-quality': {
   name: 'Pruebas, Seguridad y Accesibilidad',
   summary: 'Lo que separa un sitio que funciona de un producto confiable.',
   syllabus: [
@@ -225,7 +225,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'front-entrega': {
+'front-delivery': {
   name: 'Despliegue, Design Systems y GraphQL',
   summary: 'Publicá, estandarizá e integrá — el trabajo de quien entrega producto, no páginas.',
   syllabus: [
@@ -250,7 +250,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'front-multiplataforma': {
+'front-multiplatform': {
   name: 'Apps de Escritorio y Móviles con Web',
   summary: 'Llevá lo que ya sabés de web a las tiendas de aplicaciones y al escritorio.',
   syllabus: [
@@ -428,7 +428,7 @@ window.I18N.es.courses = {
   prerequisites: 'Ninguno. Este curso enseña el lenguaje desde cero — es el punto de entrada para quien nunca programó en Java.',
 },
 
-'java-funcional': {
+'java-functional': {
   name: 'Java: Funcional y Concurrente',
   summary: 'El Java que cambió: lambdas, streams, hilos virtuales y la biblioteca estándar que se usa todos los días.',
   syllabus: [
@@ -559,7 +559,7 @@ window.I18N.es.courses = {
   prerequisites: 'Ninguno. Este curso enseña el lenguaje desde cero — es el punto de entrada para quien nunca programó en Go.',
 },
 
-'go-concorrencia': {
+'go-concurrency': {
   name: 'Go: Concurrencia y Pruebas',
   summary: 'La parte de Go que no existe en otros lenguajes: miles de tareas al mismo tiempo, sin framework y sin sustos.',
   syllabus: [
@@ -605,7 +605,7 @@ window.I18N.es.courses = {
   prerequisites: 'Exige el curso de Go: aquí se asumen sintaxis, interfaces y errores.',
 },
 
-'go-producao': {
+'go-production': {
   name: 'Go en Producción: CLIs, Herramientas y Rendimiento',
   summary: 'Las herramientas que hacen de Go el lenguaje de la infraestructura: línea de comandos, perfilado, compilación cruzada y los rincones avanzados.',
   syllabus: [
@@ -645,7 +645,7 @@ window.I18N.es.courses = {
   prerequisites: 'Exige concurrencia y algo de experiencia de proyecto: es el curso más avanzado de la ruta.',
 },
 
-'bancos-sql': {
+'sql-databases': {
   name: 'Bases de Datos Relacionales y SQL',
   summary: 'Modelá, consultá y protegé los datos que sostienen cualquier sistema.',
   syllabus: [
@@ -702,7 +702,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'servidores-cache': {
+'servers-cache': {
   name: 'Servidores Web y Caché',
   summary: 'Poné la aplicación en línea y hacé que responda rápido bajo carga.',
   syllabus: [
@@ -727,7 +727,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'testes-cicd': {
+'testing-cicd': {
   name: 'Pruebas Automatizadas y CI/CD',
   summary: 'Entregá seguido y sin miedo: automatizá la verificación y la publicación.',
   syllabus: [
@@ -860,7 +860,7 @@ window.I18N.es.courses = {
   prerequisites: 'Exige Docker. Es el curso de infraestructura más avanzado del catálogo. GitOps, observabilidad y tuberías aparecen como panorama — cada uno tiene su propio curso después de este.',
 },
 
-'arquitetura': {
+'architecture': {
   name: 'Arquitectura de Sistemas',
   summary: 'Las decisiones que definen si un sistema crece o se traba — y cómo comunicarlas.',
   syllabus: [
@@ -886,7 +886,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'escala': {
+'scale': {
   name: 'Escala y Observabilidad',
   summary: 'Qué pasa cuando el sistema crece — y cómo ver lo que está ocurriendo.',
   syllabus: [
@@ -941,7 +941,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'redes': {
+'networks': {
   name: 'Redes y Protocolos',
   summary: 'Cómo viajan los datos — y qué hacer cuando dejan de viajar.',
   syllabus: [
@@ -966,7 +966,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'nuvem': {
+'cloud': {
   name: 'Nube y Serverless',
   summary: 'Donde vive la infraestructura hoy: proveedores, servicios gestionados y computación sin servidores.',
   syllabus: [
@@ -1041,7 +1041,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'observabilidade': {
+'observability': {
   name: 'Observabilidad y Operación',
   summary: 'Ver lo que pasa en producción — y actuar antes de que el usuario lo note.',
   syllabus: [
@@ -1093,7 +1093,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'dados-fundamentos': {
+'data-fundamentals': {
   name: 'Fundamentos de Ingeniería de Datos',
   summary: 'El mapa de la profesión: qué hace un ingeniero de datos y cómo el dato recorre la empresa.',
   syllabus: [
@@ -1118,7 +1118,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'modelagem-dw': {
+'warehouse-modeling': {
   name: 'Modelado de Datos y Data Warehouse',
   summary: 'Organizá el dato para responder preguntas de negocio, no sólo para guardar registros.',
   syllabus: [
@@ -1198,7 +1198,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'dados-governanca': {
+'data-governance': {
   name: 'Seguridad, Gobernanza y Privacidad de Datos',
   summary: 'El dato es una responsabilidad: protegelo, rastrealo y cumplí la ley.',
   syllabus: [
@@ -1273,7 +1273,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'redes-enderecamento': {
+'networks-addressing': {
   name: 'Direccionamiento, Enrutamiento y Conmutación',
   summary: 'El corazón de la red: dividir direcciones, elegir caminos y conectar los equipos que hacen llegar el paquete.',
   syllabus: [
@@ -1311,7 +1311,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'redes-disponibilidade': {
+'networks-availability': {
   name: 'VPNs, Wireless y Alta Disponibilidad',
   summary: 'Red que no se cae y que llega a todos lados: túneles, wi-fi bien diseñado, redundancia y diagnóstico con captura de paquetes.',
   syllabus: [
@@ -1349,7 +1349,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'redes-seguranca': {
+'networks-security': {
   name: 'Seguridad de Redes',
   summary: 'Defender la red de verdad: firewall bien configurado, criptografía entendida, ataques conocidos y acceso por mínimo privilegio.',
   syllabus: [
@@ -1387,7 +1387,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'redes-automacao': {
+'networks-automation': {
   name: 'Automatización de Redes',
   summary: 'Dejá de configurar equipo por equipo: describí la red en código, validala y aplicala a escala.',
   syllabus: [
@@ -1466,7 +1466,7 @@ window.I18N.es.courses = {
   prerequisites: 'Saber usar computadora e internet en el día a día.',
 },
 
-'prompt-confiabilidade': {
+'prompt-reliability': {
   name: 'Prompts Confiables: Evaluación y Buenas Prácticas',
   summary: 'La distancia entre un prompt de demostración y uno que corre en producción: medir, versionar y no confiar en la suerte.',
   syllabus: [
@@ -1502,7 +1502,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'ia-seguranca': {
+'ai-security': {
   name: 'Seguridad en IA y Red Teaming',
   summary: 'Los sistemas con IA fallan de formas nuevas. Aprendé a atacar los tuyos antes de que lo haga otro — y a defenderlos.',
   syllabus: [
@@ -1540,7 +1540,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'ia-modelos': {
+'ai-models': {
   name: 'Modelos de IA: Elección, Plataformas y APIs',
   summary: 'No existe el mejor modelo — existe el modelo correcto para tu tarea y tu presupuesto. Aprendé a elegir e integrar.',
   syllabus: [
@@ -1577,7 +1577,7 @@ window.I18N.es.courses = {
   prerequisites: 'Los dos son necesarios.',
 },
 
-'embeddings-vetores': {
+'embeddings-vectors': {
   name: 'Embeddings y Bases Vectoriales',
   summary: 'Búsqueda por significado, no por palabra. La base técnica que sostiene RAG, recomendación y clasificación.',
   syllabus: [
@@ -1640,7 +1640,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'agentes-mcp': {
+'agents-mcp': {
   name: 'Agentes de IA y MCP',
   summary: 'Cuando el modelo deja de responder y empieza a actuar: herramientas, bucle de decisión, multiagentes y el protocolo MCP.',
   syllabus: [
@@ -1673,7 +1673,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'llm-observabilidade': {
+'llm-observability': {
   name: 'Observabilidad y Evaluación de LLM en Producción',
   summary: '«Funcionó en la demo» no es «funcionó»: instrumentá, evaluá y probá regresión en cada cambio.',
   syllabus: [
@@ -1732,7 +1732,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'arquitetura-papel': {
+'architecture-role': {
   name: 'El Papel del Arquitecto de Software',
   summary: 'El arquitecto no es el programador más antiguo de la sala: es quien decide, documenta y responde por las elecciones estructurales.',
   syllabus: [
@@ -1765,7 +1765,7 @@ window.I18N.es.courses = {
   prerequisites: 'Ruta de Desarrollo Back-end completada — o experiencia equivalente.',
 },
 
-'padroes-projeto': {
+'design-patterns': {
   name: 'Patrones y Principios de Diseño',
   summary: 'El vocabulario estructural de la profesión: SOLID, DDD, CQRS, TDD y los paradigmas que sostienen las decisiones de diseño.',
   syllabus: [
@@ -1799,7 +1799,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'modelagem-arquitetura': {
+'architecture-modeling': {
   name: 'Modelado y Frameworks de Arquitectura',
   summary: 'Dibujar para ser entendido: diagramas que comunican, decisiones registradas y los frameworks que exige el mercado corporativo.',
   syllabus: [
@@ -1828,7 +1828,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'software-corporativo': {
+'enterprise-software': {
   name: 'Software Corporativo e Integración',
   summary: 'La realidad de las empresas grandes: ERP, CRM, BPM y el trabajo de integrar sistemas que nadie puede apagar.',
   syllabus: [
@@ -1857,7 +1857,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'gestao-processos': {
+'process-management': {
   name: 'Gestión, Procesos y Estimaciones',
   summary: 'El arquitecto vive entre la técnica y la gestión: entendé los métodos, las ceremonias y cómo estimar sin inventar números.',
   syllabus: [
@@ -1887,7 +1887,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'arquiteto-comunicacao': {
+'architect-communication': {
   name: 'Comunicación, Consultoría y Liderazgo Técnico',
   summary: 'La parte que tumba a más arquitectos que cualquier dificultad técnica: explicar, convencer, formar gente y decir que no.',
   syllabus: [
@@ -1918,7 +1918,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'informatica-essencial': {
+'computing-essentials': {
   name: 'Informática Esencial',
   summary: 'El comienzo de todo: entender la computadora por dentro, dominar las herramientas del día a día y perderle el miedo.',
   syllabus: [
@@ -1950,7 +1950,7 @@ window.I18N.es.courses = {
   prerequisites: 'Ninguno. Es el primer curso de la escuela.',
 },
 
-'sistemas-operacionais': {
+'operating-systems': {
   name: 'Sistemas Operativos: Windows, Linux y macOS',
   summary: 'Los tres sistemas que vas a encontrar en cualquier empresa — instalados, configurados y administrados por vos.',
   syllabus: [
@@ -1982,7 +1982,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'virtualizacao': {
+'virtualization': {
   name: 'Virtualización y Laboratorios',
   summary: 'Armá tu laboratorio: varias máquinas en una sola computadora, para probar, equivocarte y volver atrás sin miedo.',
   syllabus: [
@@ -2012,7 +2012,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'suporte-tecnico': {
+'tech-support': {
   name: 'Soporte Técnico y Atención',
   summary: 'La mitad del trabajo es técnica; la otra mitad es entender a la persona del otro lado y registrar lo que se hizo.',
   syllabus: [
@@ -2042,7 +2042,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'seguranca-fundamentos': {
+'security-fundamentals': {
   name: 'Fundamentos de Seguridad de la Información',
   summary: 'El vocabulario y la mentalidad del área: qué es el riesgo, qué es la defensa en capas y por qué la confianza es el problema.',
   syllabus: [
@@ -2075,7 +2075,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'criptografia': {
+'cryptography': {
   name: 'Criptografía Aplicada',
   summary: 'Sin entender criptografía sólo repetís configuraciones de tutorial. Acá entendés qué protege cada opción.',
   syllabus: [
@@ -2107,7 +2107,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'ataques-ameacas': {
+'attacks-threats': {
   name: 'Ataques, Amenazas e Ingeniería Social',
   summary: 'Conocer el ataque para reconocerlo: cómo funciona cada golpe, qué rastro deja y qué lo impide de verdad.',
   syllabus: [
@@ -2148,7 +2148,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'defesa-hardening': {
+'defense-hardening': {
   name: 'Defensa de Endpoints y Hardening',
   summary: 'Reducir la superficie de ataque máquina por máquina: configuración endurecida, protección de endpoint y parches al día.',
   syllabus: [
@@ -2182,7 +2182,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'soc-resposta': {
+'soc-response': {
   name: 'SOC, Monitoreo y Respuesta a Incidentes',
   summary: 'El trabajo del equipo azul: ver lo que está pasando, decidir si es incidente y conducir la respuesta hasta el informe.',
   syllabus: [
@@ -2256,7 +2256,7 @@ window.I18N.es.courses = {
   prerequisites: 'Los dos son necesarios.',
 },
 
-'nuvem-seguranca': {
+'cloud-security': {
   name: 'Seguridad en la Nube',
   summary: 'En la nube la culpa se reparte, pero la cuenta es tuya: entendé el modelo de responsabilidad y dónde ocurren las fallas.',
   syllabus: [
@@ -2288,7 +2288,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'codigo-seguro': {
+'secure-code': {
   name: 'Codificación Segura',
   summary: 'La mayoría de las fallas no se invaden: se escriben. Aprendé a programar de modo que el ataque no tenga por dónde entrar.',
   syllabus: [
@@ -2323,7 +2323,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'modelagem-ameacas': {
+'threat-modeling': {
   name: 'Modelado de Amenazas y Riesgo',
   summary: 'Descubrir la falla en el diseño cuesta una reunión; descubrirla en producción cuesta un incidente. Modelá antes de construir.',
   syllabus: [
@@ -2353,7 +2353,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'pipeline-seguro': {
+'secure-pipeline': {
   name: 'Seguridad en la Tubería y la Cadena de Suministro',
   summary: 'Seguridad que corre en cada commit: escaneo en la tubería, imagen endurecida, dependencias bajo control y política como código.',
   syllabus: [
@@ -2389,7 +2389,7 @@ window.I18N.es.courses = {
   prerequisites: 'Los dos son necesarios.',
 },
 
-'bi-negocio': {
+'bi-business': {
   name: 'BI para el Negocio: KPIs y Aplicaciones',
   summary: 'Antes de la herramienta viene la pregunta. Entendé cómo funciona la empresa y qué número cambia realmente una decisión.',
   syllabus: [
@@ -2425,7 +2425,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'excel-analitico': {
+'excel-analytics': {
   name: 'Excel para Análisis de Datos',
   summary: 'La herramienta que toda empresa ya tiene — usada de verdad: tabla dinámica, Power Query y modelo de datos.',
   syllabus: [
@@ -2458,7 +2458,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'estatistica': {
+'statistics': {
   name: 'Estadística para Análisis de Datos',
   summary: 'La base que separa a quien lee números de quien los entiende: describir, comparar, probar y no confundir correlación con causa.',
   syllabus: [
@@ -2495,7 +2495,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'dados-limpeza': {
+'data-cleaning': {
   name: 'Limpieza y Preparación de Datos',
   summary: 'El ochenta por ciento del trabajo está acá: dato sucio entra, decisión equivocada sale. Aprendé a tratarlo antes de analizarlo.',
   syllabus: [
@@ -2528,7 +2528,7 @@ window.I18N.es.courses = {
   prerequisites: 'Los dos son necesarios.',
 },
 
-'visualizacao': {
+'visualization': {
   name: 'Visualización de Datos',
   summary: 'El gráfico correcto hace hablar al dato; el equivocado miente sin querer. Aprendé a elegir, dibujar y no engañar.',
   syllabus: [
@@ -2563,7 +2563,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'bi-tecnicas': {
+'bi-techniques': {
   name: 'Técnicas Analíticas: Series Temporales, Pruebas A/B y Cohortes',
   summary: 'Los tres análisis que más pide la empresa: hacia dónde vamos, qué versión es mejor y por qué se va el cliente.',
   syllabus: [
@@ -2597,7 +2597,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'dados-storytelling': {
+'data-storytelling': {
   name: 'Comunicación y Storytelling con Datos',
   summary: 'Un análisis que nadie entiende no cambia nada. Aprendé a contar la historia del dato y a que te tomen en serio en la reunión.',
   syllabus: [
@@ -2628,7 +2628,7 @@ window.I18N.es.courses = {
   ],
 },
 
-'qa-fundamentos': {
+'qa-fundamentals': {
   name: 'Fundamentos de Calidad de Software',
   summary: 'Probar no es buscar defectos al final: es decidir qué vale la pena verificar, y cuándo.',
   syllabus: [
@@ -2666,7 +2666,7 @@ window.I18N.es.courses = {
   prerequisites: 'No exige programación. Es el punto de entrada de la ruta de Calidad.',
 },
 
-'testes-manuais': {
+'manual-testing': {
   name: 'Prueba Manual y Gestión de Pruebas',
   summary: 'La parte del trabajo que ninguna herramienta hace: entender el producto, escribir el caso y probar el defecto.',
   syllabus: [
@@ -2704,7 +2704,7 @@ window.I18N.es.courses = {
   prerequisites: 'No exige programación.',
 },
 
-'automacao-web': {
+'web-automation': {
   name: 'Automatización de Pruebas Web',
   summary: 'El robot que ejecuta toda la regresión en minutos — y que sólo compensa si no se rompe con cada cambio de pantalla.',
   syllabus: [
@@ -2742,7 +2742,7 @@ window.I18N.es.courses = {
   prerequisites: 'Exige lógica de programación y JavaScript básico.',
 },
 
-'automacao-api-mobile': {
+'api-mobile-automation': {
   name: 'Automatización de API y Mobile',
   summary: 'Probar donde el defecto es más barato de encontrar: en la API, antes de la pantalla — y en la app, donde está el usuario.',
   syllabus: [
@@ -2780,7 +2780,7 @@ window.I18N.es.courses = {
   prerequisites: 'Exige nociones de programación. No depende del curso de automatización web — los dos pueden hacerse en cualquier orden.',
 },
 
-'testes-nao-funcionais': {
+'non-functional-testing': {
   name: 'Pruebas No Funcionales',
   summary: 'El sistema hace lo que debe — pero ¿aguanta, es accesible y resiste a quien quiere romperlo a propósito?',
   syllabus: [

@@ -2,7 +2,7 @@
    Lesson content for `html-css` — 13 lessons, 5.4h each in the catalogue.
 
    It is the first PRACTICAL course written for the portal, and it is what forced
-   the prose to gain a code block. In `web-fundamentos`, which is conceptual, a
+   the prose to gain a code block. In `web-fundamentals`, which is conceptual, a
    backtick mid-sentence was enough; here there is no way to teach a selector
    without showing it in three lines with the indentation preserved. The shape
    grew because the content asked for it, and only as much as it asked — see
@@ -14,7 +14,7 @@
    the pending assessment in its place: it appears in the structure, marked, with
    no complete button and outside the progress denominator.
 
-   `codigo` still does not show up, for the same reason as `web-fundamentos` by a
+   `codigo` still does not show up, for the same reason as `web-fundamentals` by a
    different route: the pipeline's validator executes python, javascript and sql.
    HTML and CSS are not executed against test cases — what would be verified is
    the rendering, and no interpreter judges that.

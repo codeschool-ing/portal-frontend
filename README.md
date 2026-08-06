@@ -74,7 +74,7 @@ The identity is the same school, so nearly everything crosses over:
 
 ### The catalogue has diverged from the vitrine
 
-`assets/dados.js` used to be byte-identical to the vitrine's, and the vitrine's
+`assets/data.js` used to be byte-identical to the vitrine's, and the vitrine's
 README says so. **That is no longer true**, and this note exists so that whoever
 next syncs the two finds out here rather than by overwriting one with the other.
 
@@ -353,7 +353,7 @@ of assigning it: none of them may depend on being the first to load.
 
 | course | lessons written | sections | assessments | what it exercises |
 | --- | --- | --- | --- | --- |
-| `web-fundamentos` | 11 of 11 | 39 | 11 of 11, 23 exercises | prose, inline diagram, material, video-only section |
+| `web-fundamentals` | 11 of 11 | 39 | 11 of 11, 23 exercises | prose, inline diagram, material, video-only section |
 | `html-css` | 13 of 13 | 39 | 4 of 13, 8 exercises | code block, figure from a file |
 | `javascript` | 4 of 12 | 11 | 3 of 12, 9 exercises | annotated `example`, all 7 types, video-only section |
 
@@ -365,13 +365,13 @@ denominator) and the lesson with no text yet (which falls back to the
 single-section wrapper).
 
 **Neither of the first two has `code`, and the absence is information.** In
-`web-fundamentos`, writing a program would demand what the course does not give —
+`web-fundamentals`, writing a program would demand what the course does not give —
 it is the school's first course, with no language prerequisite, and asking for it
 would violate the generator's rule that an exercise from topic N may only require
 what topics 1..N taught. In `html-css` the reason is different: the pipeline's
 validator executes python, javascript and sql, and HTML/CSS are not verified
 against test cases because what would be verified is the rendering. It is the
-same finding `RULES.md` recorded in `arquiteto-comunicacao`, where three of the
+same finding `RULES.md` recorded in `architect-communication`, where three of the
 seven types were inapplicable. All seven together are still in `javascript`,
 lesson 2.
 
@@ -823,7 +823,7 @@ create an import cycle that `bundle.py` refuses.
 
 ### Where it pays off most: the JavaScript course
 
-In `web-fundamentos` the subject is concepts and prose is enough. In `html-css`
+In `web-fundamentals` the subject is concepts and prose is enough. In `html-css`
 the code appears in short fragments. In `javascript` the subject is a
 **language**, and a language is learned by reading programs — the first four
 lessons were written almost entirely in `exemplo`.

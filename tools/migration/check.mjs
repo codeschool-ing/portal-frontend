@@ -35,8 +35,9 @@ const ok = (name, cond, extra = '') => {
    account, and a resume pointer. */
 const LEGACY = {
   sessao: { nome: 'Alexandre', email: 'a@exemplo.com' },
-  matricula: { trilhaId: 'backend', escolhas: { 'backend:3': 1 } },
+  matricula: { trilhaId: 'seguranca', escolhas: { 'seguranca:3': 1 } },
   progresso: {
+    'web-fundamentos': { aulas: { 0: { secoes: { apresentacao: true } } } },
     javascript: {
       aulas: {
         0: {
@@ -47,8 +48,8 @@ const LEGACY = {
       },
     },
   },
-  notas: { javascript: { 0: { 'let-const': 'minha anotação' } } },
-  provas: { 'curso:javascript': { tentativas: 1, melhor: 80, aprovado: true, ultimoPct: 80, ultimoCertos: 8, ultimoTotal: 10, ultimaEm: '2026-01-01T00:00:00.000Z' } },
+  notas: { javascript: { 0: { 'let-const': 'minha anotação' } }, criptografia: { 0: { intro: 'nota' } } },
+  provas: { 'curso:web-fundamentos': { tentativas: 1, melhor: 70, aprovado: false, ultimaEm: '2026-01-01T00:00:00.000Z' }, 'curso:javascript': { tentativas: 1, melhor: 80, aprovado: true, ultimoPct: 80, ultimoCertos: 8, ultimoTotal: 10, ultimaEm: '2026-01-01T00:00:00.000Z' } },
   conta: { planoId: 'pro', desde: '2026-01-01', senhaEm: '2026-01-02' },
   ultima: { cursoId: 'javascript', aulaIx: 0, secId: 'let-const' },
 };
@@ -76,8 +77,8 @@ ok('no Portuguese top-level key survives', !legacyKeys.some((k) => k in doc), Ob
 console.log('\n== and every value came across ==');
 const lesson0 = doc.progress?.javascript?.lessons?.[0];
 ok('the name survived', doc.session?.name === 'Alexandre', doc.session?.name);
-ok('the enrolment and its fork choice survived',
-  doc.enrollment?.trackId === 'backend' && doc.enrollment?.choices?.['backend:3'] === 1,
+ok('the enrolment and its fork choice survived, both under the new track id',
+  doc.enrollment?.trackId === 'security' && doc.enrollment?.choices?.['security:3'] === 1,
   JSON.stringify(doc.enrollment));
 ok('the finished sections survived',
   Object.keys(lesson0?.sections || {}).length >= 2, Object.keys(lesson0?.sections || {}).join(', '));
@@ -101,6 +102,19 @@ ok('the account survived',
 ok('the resume pointer survived',
   doc.last?.courseId === 'javascript' && typeof doc.last?.lessonIx === 'number' && Boolean(doc.last?.sectionId),
   JSON.stringify(doc.last));
+
+console.log('\n== and the courses and tracks that were renamed came with it ==');
+ok('progress moved from web-fundamentos to web-fundamentals',
+  Boolean(doc.progress?.['web-fundamentals']) && !doc.progress?.['web-fundamentos'],
+  Object.keys(doc.progress || {}).join(', '));
+ok('its finished section came along',
+  doc.progress?.['web-fundamentals']?.lessons?.[0]?.sections?.apresentacao === true);
+ok('the note moved from criptografia to cryptography',
+  doc.notes?.cryptography?.[0]?.intro === 'nota' && !doc.notes?.criptografia,
+  Object.keys(doc.notes || {}).join(', '));
+ok('the exam scope key carried the new course id',
+  Boolean(doc.exams?.['course:web-fundamentals']) && !doc.exams?.['course:web-fundamentos'],
+  Object.keys(doc.exams || {}).join(', '));
 
 console.log('\n== running it twice is running it once ==');
 await p.reload();

@@ -292,7 +292,7 @@ await p.waitForTimeout(400);
 ok('it survived the reload', (await p.locator('.ctx-pct').innerText()) === pctBefore, pctBefore);
 
 console.log('\n== 8. written sections ==');
-await p.goto(BASE + PAGE + '#/course/web-fundamentos/lesson/8');
+await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/8');
 await p.waitForSelector('.step');
 const steps = await p.$$eval('.step-title', (e) => e.map((x) => x.textContent));
 ok('the hosting topic became 5 sections + assessment', steps.length === 6, steps.join(' · '));
@@ -309,7 +309,7 @@ ok('the rail opens the current lesson sections', (await p.locator('.rail-section
 ok('the join survived the language switch', (await p.locator('.lesson-title').innerText()) !== '');
 
 // the last section of a lesson leads to the first of the next lesson
-await p.goto(BASE + PAGE + '#/course/web-fundamentos/lesson/8/assessment');
+await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/8/assessment');
 await p.waitForSelector('.side-right');
 await p.click('.side-right');
 await p.waitForFunction(() => /\/lesson\/9\//.test(location.hash), null, { timeout: 5000 });
@@ -318,7 +318,7 @@ ok('next crosses the lesson boundary', true);
 /* Every lesson ends in an assessment, with or without exercises. The empty one
    shows — the structure is predictable — but does not count towards progress,
    or no course would close while the content did not exist. */
-await p.goto(BASE + PAGE + '#/course/web-fundamentos/lesson/8/assessment');
+await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/8/assessment');
 await p.waitForSelector('.wizard');
 // the wizard keeps only one question on screen; the marker row is what counts
 ok('the hosting assessment has 2 questions', (await p.locator('.wz-dot').count()) === 2);
@@ -442,7 +442,7 @@ console.log('\n== 11. performance, redo and notes ==');
 /* Get one wrong on purpose: with no mistake there is nothing for the performance
    screen to show nor for the redo screen to gather, and the test would pass
    without exercising anything. */
-await p.goto(BASE + PAGE + '#/course/web-fundamentos/lesson/2/assessment');
+await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/2/assessment');
 await p.waitForSelector('.wizard');
 await goToType('quiz');
 const wrongIx = await p.evaluate(() =>
@@ -469,7 +469,7 @@ await p.waitForSelector('.wizard');
 ok('redo builds the wizard with the wrong ones', (await p.locator('.wz-dot').count()) === wrongCount);
 
 // one note, written in a section and found again on the notes screen and in search
-await p.goto(BASE + PAGE + '#/course/web-fundamentos/lesson/8/vps');
+await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/8/vps');
 await p.waitForSelector('.note summary');
 // the note is born collapsed: it only asks for attention from whoever will use it
 ok('the note starts collapsed', (await p.locator('.note-field:visible').count()) === 0);
@@ -680,7 +680,7 @@ ok('the figure has a caption and an choice', (await p.locator('.fig figcaption')
   && Boolean(await p.locator('.fig img').getAttribute('choice')));
 
 console.log('\n== 14. the course exam ==');
-await p.goto(BASE + PAGE + '#/course/web-fundamentos');
+await p.goto(BASE + PAGE + '#/course/web-fundamentals');
 await p.waitForSelector('.exam-card');
 ok('the course announces the exam', await p.locator('.exam-card').isVisible());
 ok('the exam shows in the rail', (await p.locator('.rail-exam').count()) === 1);
@@ -726,7 +726,7 @@ await p.waitForSelector('.wz-result');
 const score = await p.locator('.exam-score').innerText();
 ok('the exam closes with a score', /%/.test(score), score);
 ok('the result is stored', await p.evaluate(() =>
-  Boolean(JSON.parse(localStorage.getItem('codeschool-portal')).exams['course:web-fundamentos'])));
+  Boolean(JSON.parse(localStorage.getItem('codeschool-portal')).exams['course:web-fundamentals'])));
 
 /* Walks the questions one by one: the wizard keeps ONE in the document at a
    time, so counting across the whole document would measure only the one on
@@ -771,13 +771,13 @@ console.log('\n== 17. the two shapes of a section ==');
 /* THE REGRESSION THIS BLOCK GUARDS: the video frame used to be in EVERY content
    section, reserved. A text section with a grey rectangle on top promises a
    video that never comes — and the promise does not expire. */
-await p.goto(BASE + PAGE + '#/course/web-fundamentos/lesson/0/papeis');
+await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/0/papeis');
 await p.waitForSelector('.lesson-text');
 ok('a text section has no video frame', (await p.locator('.video-facade').count()) === 0);
 ok('and the text starts at the top', await p.evaluate(() =>
   document.querySelector('.crumbs').getBoundingClientRect().top < 200));
 
-await p.goto(BASE + PAGE + '#/course/web-fundamentos/lesson/0/apresentacao');
+await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/0/apresentacao');
 await p.waitForSelector('.video-facade');
 ok('a video section has the frame', true);
 ok('a video-only section does not invent a text block', (await p.locator('.lesson-text').count()) === 0);
@@ -862,7 +862,7 @@ ok('in a short window the player shrinks without deforming', Math.abs(shortWindo
   shortWindow.width + '×' + shortWindow.height);
 ok('and it starts again where the text starts', shortWindow.left < 2, shortWindow.left.toFixed(1) + 'px out of line');
 await p.setViewportSize({ width: 1440, height: 900 });
-await p.goto(BASE + PAGE + '#/course/web-fundamentos/lesson/0/apresentacao');
+await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/0/apresentacao');
 await p.waitForSelector('.video-facade');
 
 /* In the rail the icon says the NATURE of the section, not only its state. */
@@ -1193,7 +1193,7 @@ console.log('\n== 22. the browser knows the page is dark ==');
    in Chromium, without appearing in Firefox. `color-scheme` is the declaration
    that was missing; `scrollbar-color` is the per-container patch the vitrine
    already used and the rail had been left without. */
-await p.goto(BASE + PAGE + '#/course/web-fundamentos');
+await p.goto(BASE + PAGE + '#/course/web-fundamentals');
 await p.waitForSelector('.rail-lesson');
 const scheme = await p.evaluate(() => {
   const colour = (s) => getComputedStyle(document.querySelector(s)).scrollbarColor;

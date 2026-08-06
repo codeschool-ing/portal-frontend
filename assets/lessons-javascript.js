@@ -2,7 +2,7 @@
    Lesson content — JavaScript.
 
    WHY THIS COURSE USES `exemplo` THE MOST
-   In `web-fundamentos` the subject is concepts: what a packet is, why
+   In `web-fundamentals` the subject is concepts: what a packet is, why
    propagation takes time. Prose covers it. In `html-css` the code shows up, but
    in short fragments — one selector, three properties.
 
@@ -19,7 +19,7 @@
    own console.
 
    Join key: course + the topic's text IN PORTUGUESE (see the header of
-   lessons-web-fundamentos.js).
+   lessons-web-fundamentals.js).
    ========================================================================== */
 
 window.LESSONS = Object.assign(window.LESSONS || {}, {

@@ -21,7 +21,7 @@
    ONE DELIBERATE IMPURITY: `expression-answer` in a JavaScript lesson makes no
    pedagogical sense — the type exists for mathematics. It is here so that the
    demonstration lesson exercises all seven renderers on a single screen. The
-   same type turns up again in `estatistica`, where it is legitimate.
+   same type turns up again in `statistics`, where it is legitimate.
    ========================================================================== */
 
 /* Concatenates instead of assigning: there is one file per course, as in the
@@ -236,7 +236,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   {
     /* here `expression-answer` is in the right place: a statistics course */
     id: 'est-derivada-1',
-    course: 'estatistica',
+    course: 'statistics',
     topic: 'Measures of central tendency: mean, median and mode',
     type: 'expression-answer',
     difficulty: 'medium',
