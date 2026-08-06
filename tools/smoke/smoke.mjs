@@ -44,7 +44,14 @@ const ok = (name, cond, extra = '') => {
   console.log((cond ? '  ok   ' : '  FAIL ') + ' ' + name + (extra ? ' — ' + extra : ''));
 };
 
-await p.goto(BASE + PAGE, { waitUntil: 'networkidle' });
+/* `networkidle` is not the signal we want, and it made this block flaky: the
+   page asks Google for fonts, that request fails outright from `file://`, and
+   the idle window can close before the deferred module has run. Then block 1
+   reports "landed on /entrar with no session" — which reads like a routing bug
+   and is really a stopwatch problem. What we are actually waiting for is the
+   router having booted, and the router says so by putting a route in the hash. */
+await p.goto(BASE + PAGE);
+await p.waitForFunction(() => location.hash.length > 1);
 
 console.log('\n== 1. load and redirect ==');
 ok('landed on /entrar with no session', p.url().includes('#/entrar'), p.url());
@@ -1261,6 +1268,69 @@ ok('redo is hidden', (await p2.locator('.ex-refazer:visible').count()) === 0);
 ok('justifications are hidden', (await p2.locator('.alt-porque:visible').count()) === 0);
 ok('verdicts are empty', (await p2.locator('.ex-veredito:visible').count()) === 0);
 await b2.close();
+
+/* ==========================================================================
+   25. ONE DOOR OUT, AND IT IS THE CODE BUTTON
+
+   The content does not leave by hand: selecting a paragraph and pressing Ctrl+C
+   has to leave the clipboard as it was. The button still works, because it
+   writes with `navigator.clipboard` and never fires a `copy` event.
+
+   What the student writes stays theirs — the notes field selects, copies and
+   pastes like any other field. That exemption is the part most likely to be
+   broken by a careless `user-select:none`, and it is the one that would make
+   the portal hostile rather than merely closed.
+
+   The sentinel is the whole method: put a known string on the clipboard first,
+   then check it survived. Asserting "nothing was copied" any other way cannot
+   tell a blocked copy from a copy that quietly wrote an empty string. */
+console.log('\n== 25. one door out, and it is the code button ==');
+const b3 = await chromium.launch({ executablePath: CHROME });
+const c3 = await b3.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
+const p3 = await c3.newPage();
+await p3.goto(BASE + PAGE + '#/entrar');
+await p3.fill('#e-nome', 'Alexandre'); await p3.selectOption('#e-trilha', 'backend');
+await p3.click('#form-entrar button[type=submit]');
+await p3.waitForFunction(() => location.hash === '#/painel');
+await p3.goto(BASE + PAGE + '#/curso/javascript/aula/0/let-const');
+await p3.waitForSelector('.aula-texto p');
+
+const SENTINEL = 'SENTINEL-do-teste';
+await p3.evaluate((v) => navigator.clipboard.writeText(v), SENTINEL);
+await p3.evaluate(() => {
+  const el = document.querySelector('.aula-texto p');
+  const range = document.createRange(); range.selectNodeContents(el);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+});
+await p3.keyboard.press('Control+c');
+await p3.waitForTimeout(200);
+ok('the lesson prose does not reach the clipboard',
+  (await p3.evaluate(() => navigator.clipboard.readText())) === SENTINEL);
+ok('and it is not selectable in the first place',
+  (await p3.evaluate(() => getComputedStyle(document.querySelector('.aula-texto p')).userSelect)) === 'none');
+
+await p3.locator('.exemplo .cod-copiar').first().click();
+await p3.waitForTimeout(250);
+const throughButton = await p3.evaluate(() => navigator.clipboard.readText());
+ok('but the code button still does', throughButton !== SENTINEL && throughButton.split('\n').length > 3,
+  throughButton.split('\n').length + ' lines');
+
+/* The student's own field: selectable, copyable and pasteable. Blocking paste
+   here was considered and left out — it breaks password managers and stops
+   someone pasting work they wrote in their own editor. */
+await p3.locator('.nota summary').first().click();
+await p3.locator('.nota-campo').first().fill('minha anotação');
+ok('what the student writes stays selectable',
+  (await p3.evaluate(() => getComputedStyle(document.querySelector('.nota-campo')).userSelect)) === 'text');
+await p3.locator('.nota-campo').first().selectText();
+await p3.keyboard.press('Control+c');
+await p3.waitForTimeout(200);
+ok('and copyable', (await p3.evaluate(() => navigator.clipboard.readText())) === 'minha anotação');
+await p3.locator('.nota-campo').first().fill('');
+await p3.keyboard.press('Control+v');
+await p3.waitForTimeout(200);
+ok('and pasteable', (await p3.locator('.nota-campo').first().inputValue()) === 'minha anotação');
+await b3.close();
 
 console.log(failures ? `\n${failures} FAILURE(S)` : '\neverything passed');
 process.exit(failures ? 1 : 0);
