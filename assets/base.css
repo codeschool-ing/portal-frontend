@@ -85,7 +85,7 @@ nav{
    the name and does not get between "codeschool", the dot and "ing".
    Upper case only here, on the bar's sign: in the footer, in the title and in
    the addresses the brand stays lower case, which is how it is written. */
-.brand-nome{white-space:nowrap;text-transform:uppercase;letter-spacing:.01em}
+.brand-name{white-space:nowrap;text-transform:uppercase;letter-spacing:.01em}
 .brand-sep{color:var(--paper-dim);font-weight:400}
 .brand .led{width:9px;height:9px;border-radius:50%;background:var(--phosphor);box-shadow:0 0 10px var(--phosphor);animation:blink 2.4s steps(1) infinite}
 @keyframes blink{0%,88%{opacity:1}90%,100%{opacity:.25}}
