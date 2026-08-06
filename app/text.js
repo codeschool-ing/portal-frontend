@@ -21,6 +21,39 @@ export function formatted(s) {
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 }
 
+/* ---------- copying the code ----------
+
+   THE BUTTON COPIES A PROGRAM, NOT A SCREEN REGION. In an `exemplo` the code is
+   deliberately cut into snippets with a note beside each one, and that is the
+   whole point of the block — but nobody wants a third of a program. So the
+   button gathers EVERY snippet of the block, in order, and hands over the file
+   as it would be written. It is what gobyexample.com does, and it is the same
+   argument the block itself makes: the right column is one file.
+
+   The output of an `exemplo` is not copyable. It is what the program prints,
+   not something anyone pastes into an editor — offering it would be offering
+   the wrong half.
+
+   `textContent` is what reads the code back, and that is deliberate rather than
+   convenient: the snippets go through `highlight()` and come out wrapped in
+   `<span>`s, so anything reading `innerHTML` would paste markup. The browser
+   also decodes the entities `esc()` wrote, which is exactly the round trip we
+   want — what is copied is what the author typed. */
+const ICON_COPY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+  'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+  '<rect x="9" y="9" width="11" height="11" rx="2"/>' +
+  '<path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>';
+
+const ICON_COPIED = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+  'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+
+export const copyButton = () =>
+  '<button type="button" class="cod-copiar" data-copiar ' +
+    'title="' + txt('Copiar o código') + '" aria-label="' + txt('Copiar o código') + '">' +
+    ICON_COPY + '</button>';
+
+export const COPY_ICONS = { copy: ICON_COPY, copied: ICON_COPIED };
+
 /* The prose of a lesson section. Six block forms, and nothing beyond them:
 
      'text'                        → paragraph, with `code` and **bold**
@@ -58,8 +91,14 @@ export function prose(body) {
         // `esc` and not `formatted`: inside a code block a backtick is a
         // backtick and an asterisk is an asterisk — marking them up would eat
         // the code itself
+        /* The bar now renders even with no language to show: it carries the
+           copy button, and a block you cannot copy because its author left the
+           label out would be an odd thing to explain. */
         return '<div class="cod-bloco prosa-cod">' +
-          (block.codigo ? '<div class="cod-barra"><span class="cod-ling">' + esc(block.codigo) + '</span></div>' : '') +
+          '<div class="cod-barra">' +
+            '<span class="cod-ling">' + esc(block.codigo || '') + '</span>' +
+            copyButton() +
+          '</div>' +
           '<pre class="cod"><code>' + esc(block.texto) + '</code></pre>' +
         '</div>';
       }
@@ -127,11 +166,10 @@ function figure(b) {
 function annotatedExample(ex) {
   const parts = ex.partes || [];
   return '<div class="exemplo">' +
-    (ex.arquivo || ex.linguagem
-      ? '<div class="exemplo-barra">' +
-          '<span class="exemplo-arq mono dim">' + esc(ex.arquivo || ex.linguagem) + '</span>' +
-        '</div>'
-      : '') +
+    '<div class="exemplo-barra">' +
+      '<span class="exemplo-arq mono dim">' + esc(ex.arquivo || ex.linguagem || '') + '</span>' +
+      (parts.length ? copyButton() : '') +
+    '</div>' +
     '<div class="exemplo-grade">' +
       parts.map((p) => (
         '<p class="exemplo-nota">' + (p.nota ? formatted(p.nota) : '') + '</p>' +

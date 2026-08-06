@@ -707,6 +707,45 @@ The first version here got two things wrong, and both were fixed:
    column has to look like a file, and continuity is the whole argument. There is
    a test that measures whether the snippets join with no gap.
 
+### The copy button hands over the file, not the fragment
+
+Every code component has a button in the top-right corner, as on
+gobyexample.com: the annotated `exemplo`, the prose code block and the given
+code of a `expected-output` exercise.
+
+**In an `exemplo` it copies the WHOLE program.** The block cuts the file into
+snippets precisely so each one can carry a note beside it — that is the entire
+argument for the shape. A button that handed over the snippet under the cursor
+would answer a question nobody asked; the reader wants the program. So it
+gathers every `.exemplo-cod` in order and joins them back. The output block is
+deliberately *not* copyable: it is what the program prints, not something
+anyone pastes into an editor.
+
+It reads `textContent` and never `innerHTML`. The snippets have been through
+the highlighter and are wrapped in `<span>`s, so reading the markup would paste
+the colours along with the code; `textContent` also decodes what `esc()` wrote,
+which is the round trip that returns exactly what the author typed. A test
+checks that what leaves carries no markup.
+
+**Two ways to write, because of `file://`.** The portal has to work opened off
+disk — that is what the bundle exists for. `navigator.clipboard` is available
+there in Chromium and Firefox, which treat `file://` as a secure context
+(measured in both, not assumed), but it also rejects when the document is not
+focused or the permission is denied. So the async API is tried first and the
+old `execCommand` selection is the fallback.
+
+**And when both fail, the button says so.** Always showing the check would be
+easy and nobody would notice until they pasted. It is the same rule the grading
+follows at the other end of the portal: not checked never becomes passed, so
+not copied never becomes copied. That also makes the test cheap — the `copiado`
+class only appears when the write resolved, so asserting the class proves the
+copy happened, with no clipboard-read permission needed.
+
+One listener for the whole document, not one per block: code blocks are rebuilt
+on every section change and every language switch, and a listener per block
+would leak one on each rebuild — the same reasoning the graph already follows
+with its edge highlight.
+
 Below 1466px the two columns become one, with the note *before* the snippet — and
 it is the same cut at which the whole lesson goes back to the narrow column.
 These are not two decisions: it is the block's width that defines the lesson's

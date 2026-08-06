@@ -15,7 +15,7 @@
    The real grading belongs to the server. Here the answer is only collected.
    ========================================================================== */
 
-import { esc } from '../text.js';
+import { esc, copyButton } from '../text.js';
 
 export default {
   types: ['expected-output'],
@@ -23,7 +23,10 @@ export default {
   body(ex, uid) {
     return (
       '<div class="cod-bloco">' +
-        '<div class="cod-barra"><span class="cod-ling">' + esc(ex.language || 'texto') + '</span></div>' +
+        '<div class="cod-barra">' +
+          '<span class="cod-ling">' + esc(ex.language || 'texto') + '</span>' +
+          copyButton() +
+        '</div>' +
         '<pre class="cod"><code>' + esc(ex.given_code) + '</code></pre>' +
       '</div>' +
       '<label class="ex-rotulo" for="saida-' + uid + '">' + txt('o que aparece na tela') + '</label>' +

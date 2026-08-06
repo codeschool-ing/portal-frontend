@@ -540,6 +540,46 @@ ok('the code is continuous, with no seam between snippets', await p.evaluate(() 
     Math.abs(c.getBoundingClientRect().top - cods[i].getBoundingClientRect().bottom) < 1);
 }));
 
+/* COPYING GIVES BACK THE WHOLE PROGRAM, not the snippet under the cursor. The
+   `exemplo` cuts the file into pieces on purpose so each one can be annotated,
+   and a button that handed over a third of a program would be answering a
+   question nobody asked. gobyexample.com copies the file; so does this.
+
+   The `copiado` class IS the assertion. `flash()` only adds it when the write
+   to the clipboard resolved true, so seeing it means the copy really happened —
+   no clipboard-read permission needed to prove it. */
+ok('every example offers a copy button', await p.evaluate(() =>
+  [...document.querySelectorAll('.exemplo')].every((e) => e.querySelector('.exemplo-barra .cod-copiar'))));
+
+const copied = await p.evaluate(async () => {
+  const block = document.querySelector('.exemplo');
+  const whole = [...block.querySelectorAll('.exemplo-cod')].map((c) => c.textContent).join('\n');
+  const button = block.querySelector('.cod-copiar');
+  button.click();
+  await new Promise((r) => setTimeout(r, 250));
+  return {
+    ok: button.classList.contains('copiado'),
+    named: button.getAttribute('aria-label'),
+    snippets: block.querySelectorAll('.exemplo-cod').length,
+    lines: whole.split('\n').length,
+    clean: !/<span|&lt;|&amp;/.test(whole),   // textContent, not innerHTML
+  };
+});
+ok('the copy reaches the clipboard', copied.ok, copied.named);
+ok('and it is the whole file, not one snippet',
+  copied.lines > copied.snippets, copied.snippets + ' snippets, ' + copied.lines + ' lines');
+ok('and it carries no highlighting markup', copied.clean);
+
+/* The button says what happened. An icon that always shows a check would look
+   identical whether the clipboard took it or refused — which is the same lie as
+   marking an unchecked answer as passed. */
+ok('the copied state announces itself and then lets go', await p.evaluate(async () => {
+  const button = document.querySelector('.exemplo .cod-copiar');
+  const during = button.getAttribute('aria-label');
+  await new Promise((r) => setTimeout(r, 1800));
+  return during !== button.getAttribute('aria-label') && !button.classList.contains('copiado');
+}));
+
 /* THE CODE COLUMN'S WIDTH COMES FROM MEASURING THE CONTENT: the longest line in
    the examples is 74 characters, which IBM Plex Mono at .79rem makes 562px; with
    the 36px of padding, 598. The column is 604 — a little more, on purpose. */
@@ -551,6 +591,28 @@ const codeColumn = await p.evaluate(() => {
 ok('the code column fits the longest line, with room to spare',
   codeColumn.width >= 598 && codeColumn.spare >= 0,
   codeColumn.width + 'px, ' + codeColumn.spare + 'px spare');
+
+/* The prose code block is the other component, and it is the same button. Here
+   there is one `<pre>`, so what is copied is that block and nothing around it —
+   not the language label above it, which is a caption and not code. */
+await p.goto(BASE + PAGE + '#/curso/html-css/aula/4/seletores');
+await p.waitForSelector('.prosa-cod');
+const prosePrefix = await p.evaluate(async () => {
+  const block = document.querySelector('.prosa-cod');
+  const button = block.querySelector('.cod-barra .cod-copiar');
+  if (!button) return { missing: true };
+  button.click();
+  await new Promise((r) => setTimeout(r, 250));
+  return {
+    ok: button.classList.contains('copiado'),
+    text: block.querySelector('pre.cod').textContent,
+    label: block.querySelector('.cod-ling').textContent,
+  };
+});
+ok('the prose code block has the button in its bar too', !prosePrefix.missing);
+ok('and copying it works', prosePrefix.ok);
+ok('and the language label is not part of the code',
+  !prosePrefix.text.startsWith(prosePrefix.label), JSON.stringify(prosePrefix.text.slice(0, 28)));
 
 /* The highlighter uses the brand's three colours. The test looks for at least
    two different families in an example that has a keyword and a literal. */
