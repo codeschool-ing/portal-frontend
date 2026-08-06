@@ -12,7 +12,7 @@
                  try until you get it right — and then it stops measuring
                  anything.
 
-   That is why the wizard takes `modo: 'prova'`: the same screens, with the
+   That is why the wizard takes `options.exam`: the same screens, with the
    verdict held back until the end. Without it, an exam would just be a long
    assessment.
 

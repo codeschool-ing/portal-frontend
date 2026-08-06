@@ -106,7 +106,7 @@ function build(exam, progress) {
     buildAssessment(
       exam.items.map((i) => i.ex),
       exam.items.map((i) => i.ctx),
-      { prova: true, onSubmit },
+      { exam: true, onSubmit },
     ),
   );
 

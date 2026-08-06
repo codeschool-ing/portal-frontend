@@ -59,7 +59,7 @@ export const COPY_ICONS = { copy: ICON_COPY, copied: ICON_COPIED };
      'text'                        → paragraph, with `code` and **bold**
      ['a', 'b']                    → list
      { code: 'css', text: … }     → code block
-     { imagem: url, legenda, choice } → figure
+     { image: url, caption, alt }  → figure
      { svg: '<svg…>', legenda }    → diagram drawn right here
      { example: { … } }            → annotated code, Go By Example style
 

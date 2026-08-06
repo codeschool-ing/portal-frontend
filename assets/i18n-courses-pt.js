@@ -2742,7 +2742,13 @@ window.I18N.pt.tracks = {
   "backend": {
     "name": "Desenvolvimento Back-end",
     "goal": "A formação de quem constrói o que sustenta a aplicação: dados, APIs, servidores e escala. Baseada no roadmap público de Back-end da comunidade roadmap.sh — a linguagem do servidor é escolha sua, e o caminho volta a se juntar depois dela.",
-    "outcome": "Back-end Developer júnior"
+    "outcome": "Back-end Developer júnior",
+    "steps": {
+      "3": {
+        "choice": "a linguagem do servidor",
+        "note": "Domine uma bem antes de saltar para outra. O resto da trilha é igual em qualquer caminho."
+      }
+    }
   },
   "devops": {
     "name": "DevOps e SRE",
@@ -2802,16 +2808,47 @@ window.I18N.pt.tracks = {
   "python-tec": {
     "name": "Python",
     "goal": "Para quem quer dominar a linguagem, não um cargo. O tronco é igual para todos — a linguagem bem aprendida, com versionamento — e no fim você escolhe onde aplicá-la: no servidor, em dados ou em IA. Baseada no roadmap público de Python da comunidade roadmap.sh.",
-    "outcome": "Domínio de Python"
+    "outcome": "Domínio de Python",
+    "steps": {
+      "3": {
+        "choice": "onde aplicar o Python",
+        "note": "Aqui a trilha não volta a se juntar: cada caminho é uma aplicação diferente da mesma linguagem.",
+        "options": [
+          "Servidor e APIs",
+          "Dados",
+          "IA"
+        ]
+      }
+    }
   },
   "go-tec": {
     "name": "Go",
     "goal": "A linguagem em que o Docker, o Kubernetes e o Terraform foram escritos. O tronco vai da sintaxe à concorrência — a parte de Go que não existe em outras linguagens — e no fim você escolhe o lado: construir serviços ou ferramenta de infraestrutura. Baseada no roadmap público de Go da roadmap.sh.",
-    "outcome": "Domínio de Go"
+    "outcome": "Domínio de Go",
+    "steps": {
+      "3": {
+        "choice": "o lado do Go",
+        "note": "Os dois partem da mesma concorrência: um constrói o serviço, o outro constrói a ferramenta que opera o serviço.",
+        "options": [
+          "Serviços e APIs",
+          "Ferramentas e Infraestrutura"
+        ]
+      }
+    }
   },
   "sql-tec": {
     "name": "SQL e Bancos de Dados",
     "goal": "A tecnologia que mais emprega e menos exige: SQL se aprende sem saber programar. É a trilha de quem vem do administrativo, do contábil ou da gestão e cansou de pedir relatório para alguém. Depois do banco, você escolhe o que fazer com o dado. Baseada nos roadmaps públicos de SQL e PostgreSQL da comunidade roadmap.sh.",
-    "outcome": "Domínio de SQL e bancos de dados"
+    "outcome": "Domínio de SQL e bancos de dados",
+    "steps": {
+      "2": {
+        "choice": "o que fazer com o dado",
+        "note": "Os dois caminhos partem do mesmo banco: um olha para a decisão, o outro para o volume.",
+        "options": [
+          "Análise e BI",
+          "Engenharia de Dados"
+        ]
+      }
+    }
   }
 };

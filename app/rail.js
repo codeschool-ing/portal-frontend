@@ -35,12 +35,12 @@ import { studentTrack, bar } from './screens/common.js';
 import { esc } from './text.js';
 
 const LINKS = [
-  { href: '#/dashboard', rotulo: 'Painel' },
-  { href: '#/track', rotulo: 'Minha trilha' },
-  { href: '#/catalog', rotulo: 'Catálogo' },
-  { href: '#/performance', rotulo: 'Desempenho' },
-  { href: '#/notes', rotulo: 'Notas' },
-  { href: '#/certificates', rotulo: 'Certificados' },
+  { href: '#/dashboard', label: 'Dashboard' },
+  { href: '#/track', label: 'My track' },
+  { href: '#/catalog', label: 'Catalog' },
+  { href: '#/performance', label: 'Performance' },
+  { href: '#/notes', label: 'Notes' },
+  { href: '#/certificates', label: 'Certificates' },
 ];
 
 const ICON_PLAY = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4.5l5 3.5-5 3.5z" fill="currentColor"/></svg>';
@@ -80,7 +80,7 @@ function globalRail(path) {
   const t = studentTrack();
   const links = LINKS.map((l) =>
     '<a class="rail-link' + (path === l.href.slice(1) ? ' on' : '') + '" href="' + l.href + '">' +
-      txt(l.rotulo) + '</a>').join('');
+      txt(l.label) + '</a>').join('');
 
   if (!t) return '<nav class="rail-nav">' + links + '</nav>';
 
@@ -129,7 +129,7 @@ function courseRail(params, path) {
 
     const head =
       '<div class="rail-lesson' + (done ? ' done' : '') + (isCurrent ? ' on' : '') + (open ? ' is-open' : '') + '">' +
-        '<button type="button" class="ta-open" data-aula="' + a.ix + '" ' +
+        '<button type="button" class="ta-open" data-lesson="' + a.ix + '" ' +
           'aria-expanded="' + open + '" aria-label="' + txt('Show sections') + '">' + ICON_CHEVRON + '</button>' +
         '<a class="ta-title" href="#/course/' + esc(id) + '/lesson/' + a.ix + '/' + esc(sections[0].id) + '">' +
           '<span class="ta-num">' + txt('lesson') + ' ' + String(a.ix + 1).padStart(2, '0') + '</span>' +

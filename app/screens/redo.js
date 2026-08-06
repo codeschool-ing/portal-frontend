@@ -7,7 +7,7 @@
    curriculum — it is the mistake.
 
    EACH EXERCISE'S CONTEXT IS PRESERVED. The wizard stores the answer under
-   `progresso[curso].lessons[ix]`, so each one has to come back with the course and
+   `progress[course].lessons[ix]`, so each one has to come back with the course and
    the lesson it came from; passing a single context would record the correct
    answer against the wrong lesson, and the performance screen would start lying
    about where the person improved.

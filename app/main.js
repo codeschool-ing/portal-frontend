@@ -226,7 +226,7 @@ $('#rail').addEventListener('click', (e) => {
   if (opener) {
     // it is a <button> and does not navigate: it only shows or hides that
     // lesson's sections
-    toggleLesson(routeParams()?.id, Number(opener.dataset.aula));
+    toggleLesson(routeParams()?.id, Number(opener.dataset.lesson));
     buildRail(rail, currentPath(), routeParams());
     return;
   }

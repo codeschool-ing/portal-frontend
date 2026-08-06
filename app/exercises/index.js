@@ -40,7 +40,7 @@ MODULES.forEach((m) => m.types.forEach((t) => { REGISTRY[t] = m; }));
 
 export const isKnownType = (t) => Boolean(REGISTRY[t]);
 
-/* `options.prova` HOLDS THE FEEDBACK BACK. In an exam the student answers and
+/* `options.exam` HOLDS THE FEEDBACK BACK. In an exam the student answers and
    moves on: the verdict, the justification and the "try again" only exist once
    the exam closes. Feedback on every question during an exam is what lets you
    try until you get it right, and then it stops measuring anything. The answer
@@ -48,7 +48,7 @@ export const isKnownType = (t) => Boolean(REGISTRY[t]);
    when. */
 export function buildExercise(ex, ctx, ix, options = {}) {
   const mod = REGISTRY[ex.type];
-  const exam = Boolean(options.prova);
+  const exam = Boolean(options.exam);
   const uid = ex.id || `${ex.course}:${ex.topic}:${ix}`;
   const el = document.createElement('article');
   el.className = 'ex ex-' + ex.type + (exam ? ' ex-prova' : '');
@@ -189,7 +189,7 @@ function markAlreadyDone(el, previous) {
    ========================================================================== */
 
 export function buildAssessment(exercises, ctx, options = {}) {
-  const exam = Boolean(options.prova);
+  const exam = Boolean(options.exam);
   const el = document.createElement('div');
   el.className = 'wizard' + (exam ? ' wizard-prova' : '');
   const states = exercises.map(() => ({ answered: false, correct: null }));
@@ -252,7 +252,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
 
   function show(i) {
     current = i;
-    if (!screens[i]) screens[i] = buildExercise(exercises[i], contextFor(i), i, { prova: exam });
+    if (!screens[i]) screens[i] = buildExercise(exercises[i], contextFor(i), i, { exam });
     stage.textContent = '';
     stage.appendChild(screens[i]);
     paintHeader();

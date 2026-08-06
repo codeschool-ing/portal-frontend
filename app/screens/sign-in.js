@@ -29,11 +29,11 @@ export default async function signIn() {
       '<div class="signin-body">' +
         '<h1>' + txt('Student area') + '</h1>' +
         '<p class="signin-sub">' + txt('Sign in to pick up where you left off.') + '</p>' +
-        '<form id="form-entrar" novalidate>' +
-          '<div class="field"><label for="e-nome">' + txt('name') + '</label>' +
-            '<input id="e-nome" type="text" required autocomplete="name" placeholder="' + txt('your name') + '" /></div>' +
-          '<div class="field"><label for="e-trilha">' + txt('your track') + '</label>' +
-            '<select id="e-trilha">' + options + '</select></div>' +
+        '<form id="form-signin" novalidate>' +
+          '<div class="field"><label for="e-name">' + txt('name') + '</label>' +
+            '<input id="e-name" type="text" required autocomplete="name" placeholder="' + txt('your name') + '" /></div>' +
+          '<div class="field"><label for="e-track">' + txt('your track') + '</label>' +
+            '<select id="e-track">' + options + '</select></div>' +
           '<button type="submit" class="btn btn-primary">' + txt('Sign in') + '</button>' +
         '</form>' +
         '<p class="signin-notice mono dim">' +
@@ -42,14 +42,14 @@ export default async function signIn() {
       '</div>' +
     '</div>';
 
-  el.querySelector('#form-entrar').addEventListener('submit', async (e) => {
+  el.querySelector('#form-signin').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = el.querySelector('#e-nome').value.trim();
-    if (!name) return el.querySelector('#e-nome').focus();
+    const name = el.querySelector('#e-name').value.trim();
+    if (!name) return el.querySelector('#e-name').focus();
     await api.signIn({ name: name });
-    await api.enrol(el.querySelector('#e-trilha').value);
+    await api.enrol(el.querySelector('#e-track').value);
     goTo('/dashboard');
   });
 
-  return { title: txt('Sign in'), el, after: () => el.querySelector('#e-nome').focus() };
+  return { title: txt('Sign in'), el, after: () => el.querySelector('#e-name').focus() };
 }

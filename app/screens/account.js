@@ -58,8 +58,8 @@ export default async function account() {
 
     '<section class="block">' +
       '<div class="block-top"><h2>' + txt('Your track') + '</h2></div>' +
-      '<div class="field"><label for="c-trilha">' + txt('current track') + '</label>' +
-        '<select id="c-trilha">' + options + '</select></div>' +
+      '<div class="field"><label for="c-track">' + txt('current track') + '</label>' +
+        '<select id="c-track">' + options + '</select></div>' +
       (p ? '<p class="account-note">' + p.feitas + '/' + p.total + ' ' + txt('lessons') + ' · ' + p.pct + '%</p>' : '') +
       '<p class="account-note mono dim">' +
         txt('Switching track erases nothing: progress is per course, and a shared course keeps counting.') +
@@ -102,24 +102,24 @@ export default async function account() {
 
     '<section class="block">' +
       '<div class="block-top"><h2>' + txt('Password') + '</h2></div>' +
-      '<form id="f-senha" novalidate>' +
+      '<form id="f-password" novalidate>' +
         '<div class="field">' +
-          '<label for="c-senha-atual">' + txt('current password') + '</label>' +
-          '<input type="password" id="c-senha-atual" autocomplete="current-password">' +
+          '<label for="c-password-current">' + txt('current password') + '</label>' +
+          '<input type="password" id="c-password-current" autocomplete="current-password">' +
         '</div>' +
         '<div class="field">' +
-          '<label for="c-senha-nova">' + txt('new password') + '</label>' +
-          '<input type="password" id="c-senha-nova" autocomplete="new-password">' +
+          '<label for="c-password-new">' + txt('new password') + '</label>' +
+          '<input type="password" id="c-password-new" autocomplete="new-password">' +
           '<span class="password-meter"><span class="bar"><span class="bar-fill" style="width:0"></span></span>' +
             '<span class="password-label mono dim"></span></span>' +
         '</div>' +
         '<div class="field">' +
-          '<label for="c-senha-rep">' + txt('repeat the new password') + '</label>' +
-          '<input type="password" id="c-senha-rep" autocomplete="new-password">' +
+          '<label for="c-password-repeat">' + txt('repeat the new password') + '</label>' +
+          '<input type="password" id="c-password-repeat" autocomplete="new-password">' +
         '</div>' +
         '<div class="account-action">' +
           '<button type="submit" class="btn btn-primary">' + txt('Change password') + '</button>' +
-          '<span class="account-notice mono" id="a-senha" aria-live="polite"></span>' +
+          '<span class="account-notice mono" id="a-password" aria-live="polite"></span>' +
         '</div>' +
       '</form>' +
       '<p class="account-note mono dim">' +
@@ -130,19 +130,19 @@ export default async function account() {
     '<section class="block block-risk">' +
       '<div class="block-top"><h2>' + txt('Erase my progress') + '</h2></div>' +
       '<p class="account-note">' + txt('Removes completed lessons, answers and the enrolment. There is no undo.') + '</p>' +
-      '<button type="button" class="btn btn-ghost btn-risk" id="c-zerar">' + txt('Erase everything') + '</button>' +
-      '<p class="account-confirm" id="c-confirma" hidden>' +
+      '<button type="button" class="btn btn-ghost btn-risk" id="c-erase">' + txt('Erase everything') + '</button>' +
+      '<p class="account-confirm" id="c-confirm" hidden>' +
         '<span>' + txt('Are you sure?') + '</span>' +
-        '<button type="button" class="btn btn-risk" id="c-sim">' + txt('Yes, erase') + '</button>' +
-        '<button type="button" class="btn btn-ghost" id="c-nao">' + txt('Cancel') + '</button>' +
+        '<button type="button" class="btn btn-risk" id="c-yes">' + txt('Yes, erase') + '</button>' +
+        '<button type="button" class="btn btn-ghost" id="c-no">' + txt('Cancel') + '</button>' +
       '</p>' +
     '</section>' +
 
     '<section class="block">' +
-      '<button type="button" class="btn btn-ghost" id="c-sair">' + txt('Sign out') + '</button>' +
+      '<button type="button" class="btn btn-ghost" id="c-signout">' + txt('Sign out') + '</button>' +
     '</section>';
 
-  el.querySelector('#c-trilha').addEventListener('change', async (e) => {
+  el.querySelector('#c-track').addEventListener('change', async (e) => {
     await api.enrol(e.target.value);
     goTo('/track');
   });
@@ -163,7 +163,7 @@ export default async function account() {
   });
 
   /* ---------- password ---------- */
-  const fresh = el.querySelector('#c-senha-nova');
+  const fresh = el.querySelector('#c-password-new');
   const meter = el.querySelector('.password-meter .bar-fill');
   const label = el.querySelector('.password-label');
   fresh.addEventListener('input', () => {
@@ -172,11 +172,11 @@ export default async function account() {
     label.textContent = fresh.value ? txt(f.rotulo) : '';
   });
 
-  const passwordNotice = el.querySelector('#a-senha');
-  el.querySelector('#f-senha').addEventListener('submit', async (e) => {
+  const passwordNotice = el.querySelector('#a-password');
+  el.querySelector('#f-password').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const currentPassword = el.querySelector('#c-senha-atual').value;
-    const repeat = el.querySelector('#c-senha-rep').value;
+    const currentPassword = el.querySelector('#c-password-current').value;
+    const repeat = el.querySelector('#c-password-repeat').value;
     const say = (text, good) => {
       passwordNotice.className = 'account-notice mono ' + (good ? 'good' : 'bad');
       passwordNotice.textContent = txt(text);
@@ -189,17 +189,17 @@ export default async function account() {
     if (fresh.value !== repeat) return say('as duas senhas novas não conferem', false);
     if (fresh.value === currentPassword) return say('a senha nova é igual à current', false);
     await api.changePassword(fresh.value);
-    el.querySelectorAll('#f-senha input').forEach((i) => { i.value = ''; });
+    el.querySelectorAll('#f-password input').forEach((i) => { i.value = ''; });
     meter.style.width = '0';
     label.textContent = '';
     return say('senha trocada', true);
   });
 
-  const confirm = el.querySelector('#c-confirma');
-  el.querySelector('#c-zerar').addEventListener('click', () => { confirm.hidden = false; });
-  el.querySelector('#c-nao').addEventListener('click', () => { confirm.hidden = true; });
-  el.querySelector('#c-sim').addEventListener('click', () => { reset(); goTo('/sign-in'); });
-  el.querySelector('#c-sair').addEventListener('click', async () => { await api.signOut(); goTo('/sign-in'); });
+  const confirm = el.querySelector('#c-confirm');
+  el.querySelector('#c-erase').addEventListener('click', () => { confirm.hidden = false; });
+  el.querySelector('#c-no').addEventListener('click', () => { confirm.hidden = true; });
+  el.querySelector('#c-yes').addEventListener('click', () => { reset(); goTo('/sign-in'); });
+  el.querySelector('#c-signout').addEventListener('click', async () => { await api.signOut(); goTo('/sign-in'); });
 
   return { title: txt('Account'), el };
 }

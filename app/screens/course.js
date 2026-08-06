@@ -2,7 +2,7 @@
    Course — the syllabus the vitrine shows, plus the list of lessons.
 
    LESSON = TOPIC. The catalogue has no concept of a lesson; the finest grain is
-   `topicos`, and the pipeline's exercises are already indexed by the topic text.
+   `topics`, and the pipeline's exercises are already indexed by the topic text.
    Inventing a third key here would create a mapping to keep in sync with two
    ends that already agree with each other.
    ========================================================================== */

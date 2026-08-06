@@ -1,7 +1,7 @@
 /* ==========================================================================
    Checks the `example` blocks in the content.
 
-   It assembles each block's program — concatenating the `partes[].codigo` in
+   It assembles each block's program — concatenating the `parts[].code` in
    order — runs it in a real Node and compares against the `saida` written in the
    content.
 

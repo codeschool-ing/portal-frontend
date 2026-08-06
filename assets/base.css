@@ -492,12 +492,12 @@ html[data-theme="light"] .fork{background:rgba(43,82,201,.045)}
 @media (min-width:861px){
   .fork{
     display:grid;grid-template-columns:1fr minmax(0,24ch);
-    grid-template-areas:"topo note" "cursos cursos";
+    grid-template-areas:"top note" "courses courses";
     column-gap:18px;row-gap:10px;max-width:620px;
   }
-  .fork-top{grid-area:topo}
+  .fork-top{grid-area:top}
   .fork-note{grid-area:note;font-size:.7rem;line-height:1.4;align-self:end}
-  .fork-courses{grid-area:cursos}
+  .fork-courses{grid-area:courses}
   .fork-courses .course-node{flex:1 1 0;min-width:0}
 }
 
@@ -1011,7 +1011,7 @@ html.modal-open .screen{overflow:hidden}
   .btn{padding:11px 18px;font-size:.8rem}
   /* The hero's two buttons side by side, splitting the text's width.
      `flex-basis:0` because the line break is decided by the base size: with
-     `auto` the longest label ("Catálogo de cursos", and worse in the other
+     `auto` the longest label ("Course catalog", and worse in the other
      languages) pushed the second button down before shrinking.
      The side padding drops to 10px to fit 360px screens. */
   .hero-actions{flex-wrap:nowrap;gap:10px}

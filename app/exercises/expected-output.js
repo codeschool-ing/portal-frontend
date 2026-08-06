@@ -24,7 +24,7 @@ export default {
     return (
       '<div class="code-block">' +
         '<div class="code-bar">' +
-          '<span class="code-lang">' + esc(ex.language || 'texto') + '</span>' +
+          '<span class="code-lang">' + esc(ex.language || 'text') + '</span>' +
           copyButton() +
         '</div>' +
         '<pre class="code"><code>' + esc(ex.givenCode) + '</code></pre>' +

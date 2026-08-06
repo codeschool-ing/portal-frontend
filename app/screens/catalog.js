@@ -25,7 +25,7 @@ export default async function catalogue() {
     '<div class="filtros">' +
       '<div class="busca">' +
         '<span class="busca-ico" aria-hidden="true">⌕</span>' +
-        '<input type="search" id="cat-busca" placeholder="' + txt('search courses...') + '" aria-label="' + txt('Search courses') + '" />' +
+        '<input type="search" id="cat-search" placeholder="' + txt('search courses...') + '" aria-label="' + txt('Search courses') + '" />' +
       '</div>' +
       /* THE CATEGORY ROW SCROLLS, AND WITH ARROWS. There are nine categories,
          and not even with the rail closed do they fit on one line: the last ones
@@ -47,11 +47,11 @@ export default async function catalogue() {
           txt('Next categories') + '">→</button>' +
       '</div>' +
     '</div>' +
-    '<div class="cartoes" id="cat-grade"></div>' +
-    '<p class="vazio" id="cat-vazio" hidden>' + txt('no course found — try another term.') + '</p>';
+    '<div class="cards" id="cat-grid"></div>' +
+    '<p class="empty" id="cat-empty" hidden>' + txt('no course found — try another term.') + '</p>';
 
-  const grid = el.querySelector('#cat-grade');
-  const field = el.querySelector('#cat-busca');
+  const grid = el.querySelector('#cat-grid');
+  const field = el.querySelector('#cat-search');
   let category = 'todas';
 
   function paint() {
@@ -76,7 +76,7 @@ export default async function catalogue() {
         (p.feitas ? bar(p.pct, p.feitas + ' de ' + p.total) : '') +
       '</a>';
     }).join('');
-    el.querySelector('#cat-vazio').hidden = list.length > 0;
+    el.querySelector('#cat-empty').hidden = list.length > 0;
   }
 
   field.addEventListener('input', paint);

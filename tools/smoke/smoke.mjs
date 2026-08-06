@@ -59,9 +59,9 @@ ok('catalogue loaded', await p.evaluate(() => typeof COURSES !== 'undefined' && 
 ok('sample exercises loaded', await p.evaluate(() => window.SAMPLE_EXERCISES?.length > 0));
 
 console.log('\n== 2. signing in ==');
-await p.fill('#e-nome', 'Alexandre');
-await p.selectOption('#e-trilha', 'backend');
-await p.click('#form-entrar button[type=submit]');
+await p.fill('#e-name', 'Alexandre');
+await p.selectOption('#e-track', 'backend');
+await p.click('#form-signin button[type=submit]');
 await p.waitForFunction(() => location.hash === '#/dashboard');
 ok('went to the dashboard', true);
 ok('rail built', (await p.locator('.rail-link').count()) === 6);
@@ -1103,16 +1103,16 @@ ok('a plausible e-mail is accepted', (await p.locator('#a-email').getAttribute('
 /* The new password must NOT be stored anywhere: there is no authentication, and
    storing it would give the opposite impression. The test looks for the string
    across the whole storage. */
-await p.fill('#c-senha-atual', 'antiga123');
-await p.fill('#c-senha-nova', 'correta-cavalo-bateria-grampo');
-await p.fill('#c-senha-rep', 'outra-coisa');
-await p.click('#f-senha button[type=submit]');
+await p.fill('#c-password-current', 'antiga123');
+await p.fill('#c-password-new', 'correta-cavalo-bateria-grampo');
+await p.fill('#c-password-repeat', 'outra-coisa');
+await p.click('#f-password button[type=submit]');
 await p.waitForTimeout(150);
-ok('passwords that do not match are refused', (await p.locator('#a-senha').getAttribute('class')).includes('bad'));
-await p.fill('#c-senha-rep', 'correta-cavalo-bateria-grampo');
-await p.click('#f-senha button[type=submit]');
+ok('passwords that do not match are refused', (await p.locator('#a-password').getAttribute('class')).includes('bad'));
+await p.fill('#c-password-repeat', 'correta-cavalo-bateria-grampo');
+await p.click('#f-password button[type=submit]');
 await p.waitForTimeout(150);
-ok('password changed', (await p.locator('#a-senha').getAttribute('class')).includes('good'));
+ok('password changed', (await p.locator('#a-password').getAttribute('class')).includes('good'));
 ok('the password was not stored anywhere',
   !(await p.evaluate(() => JSON.stringify(localStorage).includes('correta-cavalo'))));
 
@@ -1261,8 +1261,8 @@ await b.close();
 const b2 = await chromium.launch({ executablePath: CHROME });
 const p2 = await b2.newPage({ viewport: { width: 1440, height: 900 } });
 await p2.goto(BASE + PAGE + '#/sign-in', { waitUntil: 'networkidle' });
-await p2.fill('#e-nome', 'X'); await p2.selectOption('#e-trilha', 'backend');
-await p2.click('#form-entrar button[type=submit]'); await p2.waitForTimeout(300);
+await p2.fill('#e-name', 'X'); await p2.selectOption('#e-track', 'backend');
+await p2.click('#form-signin button[type=submit]'); await p2.waitForTimeout(300);
 await p2.goto(BASE + PAGE + '#/course/javascript/lesson/1/assessment', { waitUntil: 'networkidle' });
 await p2.waitForSelector('.ex');
 console.log('\n== 24. nothing revealed before answering ==');
@@ -1291,8 +1291,8 @@ const b3 = await chromium.launch({ executablePath: CHROME });
 const c3 = await b3.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
 const p3 = await c3.newPage();
 await p3.goto(BASE + PAGE + '#/sign-in');
-await p3.fill('#e-nome', 'Alexandre'); await p3.selectOption('#e-trilha', 'backend');
-await p3.click('#form-entrar button[type=submit]');
+await p3.fill('#e-name', 'Alexandre'); await p3.selectOption('#e-track', 'backend');
+await p3.click('#form-signin button[type=submit]');
 await p3.waitForFunction(() => location.hash === '#/dashboard');
 await p3.goto(BASE + PAGE + '#/course/javascript/lesson/0/let-const');
 await p3.waitForSelector('.lesson-text p');

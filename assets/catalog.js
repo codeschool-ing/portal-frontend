@@ -3375,8 +3375,8 @@ const TRACKS = [
     'html-css',
     'git',
     {
-      choice: 'a linguagem do servidor',
-      note: 'Domine uma bem antes de saltar para outra. O resto da trilha é igual em qualquer caminho.',
+      choice: 'the server language',
+      note: 'Master one properly before jumping to another. The rest of the track is the same on any path.',
       options: [
         { name: 'JavaScript / Node.js', courses: [
             'javascript',
@@ -3656,20 +3656,20 @@ const TRACKS = [
     'python',
     'git',
     {
-      choice: 'onde aplicar o Python',
-      note: 'Aqui a trilha não volta a se juntar: cada caminho é uma aplicação diferente da mesma linguagem.',
+      choice: 'where to apply Python',
+      note: 'The track does not converge again here: each path is a different application of the same language.',
       options: [
-        { name: 'Servidor e APIs', courses: [
+        { name: 'Server and APIs', courses: [
             'bancos-sql',
             'python-back',
             'apis',
           ] },
-        { name: 'Dados', courses: [
+        { name: 'Data', courses: [
             'bancos-sql',
             'dados-fundamentos',
             'modelagem-dw',
           ] },
-        { name: 'IA', courses: [
+        { name: 'AI', courses: [
             'prompt-engineering',
             'ia-modelos',
             'embeddings-vetores',
@@ -3689,15 +3689,15 @@ const TRACKS = [
     'go',
     'go-concorrencia',
     {
-      choice: 'o lado do Go',
-      note: 'Os dois partem da mesma concorrência: um constrói o serviço, o outro constrói a ferramenta que opera o serviço.',
+      choice: 'which side of Go',
+      note: 'Both start from the same concurrency: one builds the service, the other builds the tooling that runs it.',
       options: [
-        { name: 'Serviços e APIs', courses: [
+        { name: 'Services and APIs', courses: [
             'bancos-sql',
             'go-back',
             'apis',
           ] },
-        { name: 'Ferramentas e Infraestrutura', courses: [
+        { name: 'Tooling and Infrastructure', courses: [
             'linux-terminal',
             'go-producao',
             'docker',
@@ -3716,15 +3716,15 @@ const TRACKS = [
     'informatica-essencial',
     'bancos-sql',
     {
-      choice: 'o que fazer com o dado',
-      note: 'Os dois caminhos partem do mesmo banco: um olha para a decisão, o outro para o volume.',
+      choice: 'what to do with the data',
+      note: 'Both paths start from the same database: one looks at the decision, the other at the volume.',
       options: [
-        { name: 'Análise e BI', courses: [
+        { name: 'Analytics and BI', courses: [
             'bi-negocio',
             'excel-analitico',
             'analytics-bi',
           ] },
-        { name: 'Engenharia de Dados', courses: [
+        { name: 'Data Engineering', courses: [
             'modelagem-dw',
             'pipelines-etl',
           ] },
