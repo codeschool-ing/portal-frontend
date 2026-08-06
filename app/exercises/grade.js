@@ -10,7 +10,7 @@
    Nothing here reads the DOM: each function takes the exercise and the answer
    that was already collected.
 
-   The exercise fields (`type`, `options`, `items`, `pairs`) are the pipeline's
+   The exercise fields (`type`, `choices`, `items`, `pairs`) are the pipeline's
    contract, not ours: they are named exactly as the tool emits them.
    ========================================================================== */
 
@@ -27,21 +27,21 @@ export function gradeLocally(ex, answer) {
   switch (ex.type) {
     case 'quiz': {
       // exactly one, and it has to be the one flagged as correct
-      const right = ex.options.findIndex((a) => a.correct);
-      return verdict(answer === right, { right });
+      const right = ex.choices.findIndex((a) => a.correct);
+      return verdict(answer === right, { answer: right });
     }
 
     case 'multiple-choice': {
       /* Graded as an EXACT SET, and that is deliberate: the pipeline docs
          record that five choices are five chances to get it wrong rather than
          one. Marking almost all of the right ones is not half a point. */
-      const right = ex.options.map((a, i) => (a.correct ? i : -1)).filter((i) => i >= 0);
-      return verdict(sameSet(answer || [], right), { right });
+      const right = ex.choices.map((a, i) => (a.correct ? i : -1)).filter((i) => i >= 0);
+      return verdict(sameSet(answer || [], right), { answers: right });
     }
 
     case 'ordering': {
       // `items` in the JSON is already in the right order — it is the key
-      return verdict(sameSequence(answer || [], ex.items), { right: ex.items });
+      return verdict(sameSequence(answer || [], ex.items), { answer: ex.items });
     }
 
     case 'matching': {
@@ -54,7 +54,7 @@ export function gradeLocally(ex, answer) {
          yardstick applied to the process — getting there by elimination does
          not count as knowing. */
       if (!answer || answer.partial) return verdict(false, { partial: true });
-      return verdict(answer.wrong === 0, { wrong: answer.wrong, total: ex.pairs.length });
+      return verdict(answer.errors === 0, { errors: answer.errors, total: ex.pairs.length });
     }
 
     default:
@@ -62,4 +62,4 @@ export function gradeLocally(ex, answer) {
   }
 }
 
-const verdict = (passed, extra = {}) => ({ acertou: passed, simulado: false, ...extra });
+const verdict = (passed, extra = {}) => ({ correct: passed, simulated: false, ...extra });

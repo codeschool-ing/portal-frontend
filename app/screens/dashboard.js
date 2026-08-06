@@ -27,18 +27,18 @@ export default async function dashboard() {
      scrolling. */
   const resume = (() => {
     if (!next) return '';
-    const c = courseById(next.cursoId);
-    const lessons = courseLessons(next.cursoId);
-    const a = lessons[next.aulaIx] || lessons[0];
+    const c = courseById(next.courseId);
+    const lessons = courseLessons(next.courseId);
+    const a = lessons[next.lessonIx] || lessons[0];
     if (!c || !a) return '';
-    const sections = lessonSections(c.id, a.chave);
-    const s = sections.find((x) => x.id === next.secId) || sections[0];
+    const sections = lessonSections(c.id, a.key);
+    const s = sections.find((x) => x.id === next.sectionId) || sections[0];
     const p = courseProgress(c.id);
     return (
       '<a class="retomar" href="#/curso/' + esc(c.id) + '/aula/' + a.ix + '/' + esc(s.id) + '">' +
         '<span class="retomar-rot">' + txt('continuar de onde parou') + '</span>' +
-        '<span class="retomar-aula">' + esc(s.titulo) + '</span>' +
-        '<span class="retomar-curso">' + esc(c.nome) + ' · ' + esc(a.titulo) + '</span>' +
+        '<span class="retomar-aula">' + esc(s.title) + '</span>' +
+        '<span class="retomar-curso">' + esc(c.name) + ' · ' + esc(a.title) + '</span>' +
         '<span class="retomar-onde mono dim">' +
           txt('aula') + ' ' + (a.ix + 1) + '/' + lessons.length + ' · ' +
           txt('seção') + ' ' + (sections.indexOf(s) + 1) + '/' + sections.length +
@@ -61,7 +61,7 @@ export default async function dashboard() {
 
   el.innerHTML =
     '<header class="tela-head">' +
-      '<h1>' + txt('Olá') + ', ' + esc(session?.nome || txt('aluno')) + '</h1>' +
+      '<h1>' + txt('Olá') + ', ' + esc(session?.name || txt('aluno')) + '</h1>' +
     '</header>' +
 
     resume +
@@ -69,14 +69,14 @@ export default async function dashboard() {
     (t
       ? '<section class="bloco">' +
           '<div class="bloco-topo">' +
-            '<h2>' + esc(t.nome) + '</h2>' +
+            '<h2>' + esc(t.name) + '</h2>' +
             '<a class="bloco-link" href="#/trilha">' + txt('ver o mapa') + ' →</a>' +
           '</div>' +
           '<div class="trilha-numeros">' +
             '<span><b>' + pt.pct + '%</b>' + txt('da trilha') + '</span>' +
             '<span><b>' + pt.feitas + '/' + pt.total + '</b>' + txt('seções') + '</span>' +
-            '<span><b>' + pt.cursos + '</b>' + txt('cursos no caminho') + '</span>' +
-            '<span><b>→</b>' + esc(t.saida) + '</span>' +
+            '<span><b>' + pt.courses + '</b>' + txt('cursos no caminho') + '</span>' +
+            '<span><b>→</b>' + esc(t.outcome) + '</span>' +
           '</div>' +
           bar(pt.pct, pt.pct + '%') +
         '</section>'
@@ -92,8 +92,8 @@ export default async function dashboard() {
               return '<a class="cartao no-' + st + '" href="#/curso/' + esc(id) + '">' +
                 '<span class="no-estado" data-estado="' + st + '">' +
                   txt(st === 'atual' ? 'em andamento' : 'disponível') + '</span>' +
-                '<span class="cartao-nome">' + esc(c.nome) + '</span>' +
-                '<span class="cartao-meta">' + c.horas + 'h · ' + txt(c.nivel) + '</span>' +
+                '<span class="cartao-nome">' + esc(c.name) + '</span>' +
+                '<span class="cartao-meta">' + c.hours + 'h · ' + txt(c.level) + '</span>' +
                 bar(p.pct, p.feitas + ' de ' + p.total) +
                 '<span class="cartao-conta">' + p.feitas + '/' + p.total + ' ' + txt('seções') + '</span>' +
               '</a>';

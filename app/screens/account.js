@@ -48,12 +48,12 @@ export default async function account() {
   const options = TRACKS_BY_FAMILY().map(([family, list]) =>
     '<optgroup label="' + txt('trilhas por ' + family) + '">' +
       list.map((x) => '<option value="' + esc(x.id) + '"' + (t && x.id === t.id ? ' selected' : '') + '>' +
-        esc(x.nome) + '</option>').join('') +
+        esc(x.name) + '</option>').join('') +
     '</optgroup>').join('');
 
   el.innerHTML =
     '<header class="tela-head">' +
-      '<h1>' + esc(session?.nome || txt('aluno')) + '</h1>' +
+      '<h1>' + esc(session?.name || txt('aluno')) + '</h1>' +
     '</header>' +
 
     '<section class="bloco">' +

@@ -67,10 +67,33 @@ The identity is the same school, so nearly everything crosses over:
 | what | how it came |
 | --- | --- |
 | `assets/base.css` | a copy of the vitrine's `style.css`, **unchanged** |
-| `assets/dados.js` | a copy of the catalogue — 86 courses, 16 tracks |
-| `assets/i18n*.js` | a copy of the five languages |
-| `assets/i18n-runtime.js` | a copy, with **one** divergent line (below) |
+| `assets/catalog.js` | was the vitrine's `dados.js` — **has now diverged**, see below |
+| `assets/i18n*.js` | the five languages, **re-keyed** — see below |
+| `assets/i18n-runtime.js` | a copy, with one divergent line, **plus an English base** |
 | the dependency graph | extracted into `app/catalog.js` and `app/graph.js` |
+
+### The catalogue has diverged from the vitrine
+
+`assets/dados.js` used to be byte-identical to the vitrine's, and the vitrine's
+README says so. **That is no longer true**, and this note exists so that whoever
+next syncs the two finds out here rather than by overwriting one with the other.
+
+It is now `assets/catalog.js`, authored in English: `COURSES`/`TRACKS`, English
+field names (`name`, `summary`, `syllabus`, `topics`, `requires`,
+`prerequisites`, `goal`, `outcome`), and English values. The Portuguese moved to
+`assets/i18n-courses-pt.js` and is now the fifth translation, alongside Spanish,
+French and Italian.
+
+Nothing was translated by hand for this: all 86 course names, all 1,503 topic
+titles and all 16 tracks already had an English translation in
+`i18n-cursos-en.js`. The move was an inversion — that file's values became the
+base, and the base became a translation. `i18n-cursos-en.js` would have been an
+identity map afterwards, so it is gone.
+
+**The join key moved with it.** Content is matched by course plus topic title,
+and the title is English now on both the catalogue side and the exercise side.
+The two had to move in the same commit: split across two, all 41 exercises would
+have unjoined from their lessons without a single error being raised anywhere.
 
 **What stayed there: the fullpage.** Each section taking the screen and the
 scroll jumping between them presumes a linear narrative — seven screens, you
@@ -457,8 +480,8 @@ before closing an exercise.
 (any name gets in), the lessons' text, the certificate with no validation code.
 
 **Settled:** the exercise format — the fields are exactly the ones the pipeline
-emits (`statement`, `socratic_hint`, `options[].{text,correct,why}`, `items`,
-`trap`, `pairs`, `right_distractors`,
+emits (`prompt`, `socraticHint`, `options[].{text,correct,why}`, `items`,
+`trap`, `pairs`, `rightDistractors`,
 `tests[].{description,input,expected_output}`, `check_*`). The portal adds
 two fields that are its own, not the exercise's: `id` and `curso`.
 
@@ -1071,7 +1094,7 @@ inertia:
 | --- | --- |
 | CSS classes, `data-*`, element ids, route paths | the DOM contract shared with `base.css`, which is a verbatim copy of the vitrine |
 | catalogue fields (`cursos`, `topicos`, `depende`, `ligacoes`, `nome`, `nivel`) | `dados.js` is a verbatim copy of the vitrine's catalogue |
-| ~~exercise fields~~ — **no longer**: the pipeline renamed its schema to English and the portal followed (`type`, `statement`, `options`, `items`, `pairs`, `trap`, `socratic_hint`, `_verification`) | it was the pipeline's contract, and the contract moved |
+| ~~exercise fields~~ — **no longer**: the pipeline renamed its schema to English and the portal followed (`type`, `prompt`, `choices`, `items`, `pairs`, `trap`, `socraticHint`, `_verification`) | it was the pipeline's contract, and the contract moved |
 | the i18n keys and the persisted `localStorage` shape | the key *is* the Portuguese text, by design; and a renamed storage key silently resets everyone's progress |
 
 The lesson content itself is content, not code, and stays in Portuguese too —

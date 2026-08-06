@@ -11,10 +11,10 @@ import { trackById, trackPath } from '../catalog.js';
 import { courseProgress, activeOption, now } from '../state.js';
 import { esc } from '../text.js';
 
-export const FAMILIES = ['carreira', 'tecnologia'];
+export const FAMILIES = ['career', 'technology'];
 
 export const TRACKS_BY_FAMILY = () =>
-  FAMILIES.map((f) => [f, TRILHAS.filter((t) => (t.familia || 'carreira') === f)]);
+  FAMILIES.map((f) => [f, TRACKS.filter((t) => (t.family || 'career') === f)]);
 
 /* The progress of a whole track, counted in SECTIONS and not in courses or
    lessons: a course with 48 topics and one with 11 are not worth the same, and a
@@ -28,7 +28,7 @@ export function trackProgress(t) {
     total += p.total;
     done += p.feitas;
   });
-  return { feitas: done, total, pct: total ? Math.round((done / total) * 100) : 0, cursos: path.length };
+  return { feitas: done, total, pct: total ? Math.round((done / total) * 100) : 0, courses: path.length };
 }
 
 export function bar(pct, label) {
@@ -37,8 +37,8 @@ export function bar(pct, label) {
 }
 
 export const studentTrack = () => {
-  const m = now().matricula;
-  return m ? trackById(m.trilhaId) : null;
+  const m = now().enrollment;
+  return m ? trackById(m.trackId) : null;
 };
 
 export function empty(message) {

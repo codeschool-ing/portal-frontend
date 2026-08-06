@@ -27,7 +27,7 @@ export default {
           '<span class="cod-ling">' + esc(ex.language || 'texto') + '</span>' +
           copyButton() +
         '</div>' +
-        '<pre class="cod"><code>' + esc(ex.given_code) + '</code></pre>' +
+        '<pre class="cod"><code>' + esc(ex.givenCode) + '</code></pre>' +
       '</div>' +
       '<label class="ex-rotulo" for="saida-' + uid + '">' + txt('o que aparece na tela') + '</label>' +
       '<textarea id="saida-' + uid + '" class="ex-campo mono" rows="4" spellcheck="false" ' +
@@ -43,7 +43,7 @@ export default {
 
   reveal(root, ex, v) {
     root.querySelector('.ex-campo').disabled = true;
-    if (v && v.simulado) return;      // no server: claim nothing
+    if (v && v.simulated) return;      // no server: claim nothing
     const matches = root.querySelector('.ex-campo').value.replace(/\s+$/, '') === String(ex.answer).replace(/\s+$/, '');
     root.querySelector('.ex-campo').classList.toggle('campo-certo', matches);
     root.querySelector('.ex-campo').classList.toggle('campo-errado', !matches);

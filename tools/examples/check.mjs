@@ -57,13 +57,13 @@ let failures = 0;
 for (const course of Object.keys(fakeWindow.LESSONS || {})) {
   for (const topic of Object.keys(fakeWindow.LESSONS[course])) {
     for (const section of fakeWindow.LESSONS[course][topic]) {
-      (section.corpo || []).forEach((block, i) => {
-        const ex = block?.exemplo;
+      (section.body || []).forEach((block, i) => {
+        const ex = block?.example;
         if (!ex) return;
         const where = `${course}/${section.id}[${i}]`;
 
-        if (!RUNNABLE.has(ex.linguagem)) { skipped += 1; return; }
-        if (!ex.saida) {
+        if (!RUNNABLE.has(ex.language)) { skipped += 1; return; }
+        if (!ex.output) {
           /* A runnable example with no `saida` is a gap, not a choice: the
              reader is left not knowing what the program does, and the checker is
              left with nothing to compare. */
@@ -73,7 +73,7 @@ for (const course of Object.keys(fakeWindow.LESSONS || {})) {
         }
 
         const target = join(dir, 'program.mjs');
-        writeFileSync(target, ex.partes.map((p) => p.codigo).join('\n'));
+        writeFileSync(target, ex.parts.map((p) => p.code).join('\n'));
         let actual;
         try {
           actual = execFileSync(process.execPath, [target], { encoding: 'utf8', stdio: 'pipe' });
@@ -82,7 +82,7 @@ for (const course of Object.keys(fakeWindow.LESSONS || {})) {
           actual = (e.stdout || '') + (e.stderr || '');
         }
         actual = actual.trim();
-        const expected = String(ex.saida).trim();
+        const expected = String(ex.output).trim();
         checked += 1;
 
         if (actual === expected) { console.log(`  ok         ${where}`); return; }

@@ -85,9 +85,9 @@ export function prose(body) {
       return '<ul class="prosa-lista">' + block.map((i) => '<li>' + formatted(i) + '</li>').join('') + '</ul>';
     }
     if (block && typeof block === 'object') {
-      if (block.exemplo) return annotatedExample(block.exemplo);
-      if (block.imagem || block.svg) return figure(block);
-      if (block.texto !== undefined) {
+      if (block.example) return annotatedExample(block.example);
+      if (block.image || block.svg) return figure(block);
+      if (block.text !== undefined) {
         // `esc` and not `formatted`: inside a code block a backtick is a
         // backtick and an asterisk is an asterisk — marking them up would eat
         // the code itself
@@ -96,10 +96,10 @@ export function prose(body) {
            label out would be an odd thing to explain. */
         return '<div class="cod-bloco prosa-cod">' +
           '<div class="cod-barra">' +
-            '<span class="cod-ling">' + esc(block.codigo || '') + '</span>' +
+            '<span class="cod-ling">' + esc(block.code || '') + '</span>' +
             copyButton() +
           '</div>' +
-          '<pre class="cod"><code>' + esc(block.texto) + '</code></pre>' +
+          '<pre class="cod"><code>' + esc(block.text) + '</code></pre>' +
         '</div>';
       }
     }
@@ -127,9 +127,9 @@ export function prose(body) {
 function figure(b) {
   const body = b.svg
     ? '<div class="fig-svg">' + b.svg + '</div>'
-    : '<img src="' + esc(b.imagem) + '" alt="' + esc(b.alt || b.legenda || '') + '" loading="lazy">';
+    : '<img src="' + esc(b.image) + '" alt="' + esc(b.alt || b.caption || '') + '" loading="lazy">';
   return '<figure class="fig">' + body +
-    (b.legenda ? '<figcaption>' + formatted(b.legenda) + '</figcaption>' : '') +
+    (b.caption ? '<figcaption>' + formatted(b.caption) + '</figcaption>' : '') +
   '</figure>';
 }
 
@@ -164,22 +164,22 @@ function figure(b) {
    snippet: reading the explanation and then the code is the order that works
    without the sideways alignment tying the two together. */
 function annotatedExample(ex) {
-  const parts = ex.partes || [];
+  const parts = ex.parts || [];
   return '<div class="exemplo">' +
     '<div class="exemplo-barra">' +
-      '<span class="exemplo-arq mono dim">' + esc(ex.arquivo || ex.linguagem || '') + '</span>' +
+      '<span class="exemplo-arq mono dim">' + esc(ex.file || ex.language || '') + '</span>' +
       (parts.length ? copyButton() : '') +
     '</div>' +
     '<div class="exemplo-grade">' +
       parts.map((p) => (
-        '<p class="exemplo-nota">' + (p.nota ? formatted(p.nota) : '') + '</p>' +
-        '<pre class="exemplo-cod"><code>' + highlight(p.codigo, ex.linguagem) + '</code></pre>'
+        '<p class="exemplo-nota">' + (p.note ? formatted(p.note) : '') + '</p>' +
+        '<pre class="exemplo-cod"><code>' + highlight(p.code, ex.language) + '</code></pre>'
       )).join('') +
-      (ex.saida
+      (ex.output
         ? '<span class="exemplo-vazio" aria-hidden="true"></span>' +
           '<div class="exemplo-saida">' +
             '<span class="exemplo-saida-rot mono dim">' + txt('saída') + '</span>' +
-            '<pre class="cod"><code>' + esc(ex.saida) + '</code></pre>' +
+            '<pre class="cod"><code>' + esc(ex.output) + '</code></pre>' +
           '</div>'
         : '') +
     '</div>' +

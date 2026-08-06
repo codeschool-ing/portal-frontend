@@ -30,7 +30,7 @@ export default async function track() {
     const exam = trackExam(t, activeOption);
     return exam.items.length
       ? examCard({
-        key: exam.key, href: '#/trilha/prova', scope: 'trilha',
+        key: exam.key, href: '#/trilha/prova', scope: 'track',
         count: exam.items.length, progress: trackProgress(t).pct,
       })
       : '';
@@ -91,7 +91,7 @@ export default async function track() {
   addEventListener('resize', redraw);
 
   return {
-    title: t.nome,
+    title: t.name,
     el,
     after: () => {
       drawEdges(el, t);

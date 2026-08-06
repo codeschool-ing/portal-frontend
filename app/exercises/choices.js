@@ -22,10 +22,10 @@ export default {
 
   body(ex, uid) {
     const many = ex.type === 'multiple-choice';
-    const order = shuffleWith(uid, ex.options.map((_, i) => i));
+    const order = shuffleWith(uid, ex.choices.map((_, i) => i));
 
     const options = order.map((ix) => {
-      const a = ex.options[ix];
+      const a = ex.choices[ix];
       return (
         '<label class="alt" data-ix="' + ix + '">' +
           '<input type="' + (many ? 'checkbox' : 'radio') + '" name="alt-' + uid + '" value="' + ix + '" />' +
@@ -51,7 +51,7 @@ export default {
   reveal(root, ex, v) {
     root.querySelectorAll('.alt').forEach((el) => {
       const ix = Number(el.dataset.ix);
-      const a = ex.options[ix];
+      const a = ex.choices[ix];
       const ticked = el.querySelector('input').checked;
       el.classList.toggle('alt-certa', Boolean(a.correct));
       el.classList.toggle('alt-perdida', Boolean(a.correct) && !ticked);

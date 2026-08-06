@@ -31,12 +31,12 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   {
     id: 'wf-01-quiz',
     course: 'web-fundamentos',
-    topic: 'Cliente, servidor e host: quem pede e quem responde',
+    topic: 'Client, server and host: who asks and who answers',
     type: 'quiz',
     difficulty: 'easy',
-    statement: 'Um servidor web precisa consultar um banco de dados para montar a resposta. Nesse instante, o que ele é?',
-    socratic_hint: 'Os papéis descrevem o momento da conversa, não o equipamento. Quem inicia a conversa com o banco?',
-    options: [
+    prompt: 'Um servidor web precisa consultar um banco de dados para montar a resposta. Nesse instante, o que ele é?',
+    socraticHint: 'Os papéis descrevem o momento da conversa, não o equipamento. Quem inicia a conversa com o banco?',
+    choices: [
       {
         text: 'Cliente do banco de dados, porque é ele quem inicia aquele pedido — e continua sendo servidor na conversa com o navegador.',
         correct: true,
@@ -58,28 +58,28 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
         why: 'A distância não muda nada: quem pede é cliente, esteja o outro lado no rack ao lado ou noutro continente.',
       },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
   {
     id: 'wf-01-assoc',
     course: 'web-fundamentos',
-    topic: 'Cliente, servidor e host: quem pede e quem responde',
+    topic: 'Client, server and host: who asks and who answers',
     type: 'matching',
     difficulty: 'medium',
-    statement: 'Associe cada termo ao que ele descreve. Sobram opções na coluna da direita.',
-    socratic_hint: 'Dois destes termos descrevem um papel numa conversa; um descreve a máquina, independentemente do que ela esteja fazendo.',
+    prompt: 'Associe cada termo ao que ele descreve. Sobram opções na coluna da direita.',
+    socraticHint: 'Dois destes termos descrevem um papel numa conversa; um descreve a máquina, independentemente do que ela esteja fazendo.',
     pairs: [
       { left: 'cliente', right: 'Quem inicia a conversa e faz o pedido' },
       { left: 'servidor', right: 'Quem espera ser perguntado e devolve a resposta' },
       { left: 'host', right: 'Qualquer máquina com endereço na rede' },
       { left: 'porta', right: 'O número que diz a qual programa o dado se destina' },
     ],
-    right_distractors: [
+    rightDistractors: [
       'O cabo físico que liga duas máquinas vizinhas',
       'O programa que traduz nomes de domínio em endereços',
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
 
@@ -87,12 +87,12 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   {
     id: 'wf-02-quiz',
     course: 'web-fundamentos',
-    topic: 'Pacote, quadro (frame) e socket',
+    topic: 'Packet, frame and socket',
     type: 'quiz',
     difficulty: 'medium',
-    statement: 'Durante uma transferência, o endereço MAC de destino do quadro muda várias vezes, enquanto o endereço IP de destino do pacote permanece o mesmo. Por quê?',
-    socratic_hint: 'Um dos dois endereços aponta para o fim da viagem; o outro aponta para o próximo trecho dela.',
-    options: [
+    prompt: 'Durante uma transferência, o endereço MAC de destino do quadro muda várias vezes, enquanto o endereço IP de destino do pacote permanece o mesmo. Por quê?',
+    socraticHint: 'Um dos dois endereços aponta para o fim da viagem; o outro aponta para o próximo trecho dela.',
+    choices: [
       {
         text: 'O MAC endereça o próximo salto e é reescrito a cada trecho; o IP endereça o destino final e atravessa a viagem inteira.',
         correct: true,
@@ -114,25 +114,25 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
         why: 'O IP de destino não é reescrito no caminho comum; quem faz algo parecido é o NAT, e só com o endereço de origem.',
       },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
   {
     id: 'wf-02-assoc',
     course: 'web-fundamentos',
-    topic: 'Pacote, quadro (frame) e socket',
+    topic: 'Packet, frame and socket',
     type: 'matching',
     difficulty: 'medium',
-    statement: 'Associe cada porta ao serviço que costuma escutá-la. Sobram opções na coluna da direita.',
-    socratic_hint: 'Duas delas diferem por uma letra no nome do protocolo e por uma camada de cifra.',
+    prompt: 'Associe cada porta ao serviço que costuma escutá-la. Sobram opções na coluna da direita.',
+    socraticHint: 'Duas delas diferem por uma letra no nome do protocolo e por uma camada de cifra.',
     pairs: [
       { left: '`80`', right: 'HTTP' },
       { left: '`443`', right: 'HTTPS' },
       { left: '`22`', right: 'SSH' },
       { left: '`5432`', right: 'PostgreSQL' },
     ],
-    right_distractors: ['DNS', 'SMTP'],
-    check_operation: 'none',
+    rightDistractors: ['DNS', 'SMTP'],
+    checkOperation: 'none',
     _verification: 'structure',
   },
 
@@ -140,12 +140,12 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   {
     id: 'wf-03-quiz',
     course: 'web-fundamentos',
-    topic: 'Largura de banda, latência e vazão (throughput)',
+    topic: 'Bandwidth, latency and throughput',
     type: 'quiz',
     difficulty: 'medium',
-    statement: 'Uma equipe reclama que a chamada de vídeo com um escritório na Europa trava. O provedor oferece dobrar a largura de banda. O que esperar?',
-    socratic_hint: 'Qual das três medidas explica melhor uma chamada que trava? E qual delas um cano mais grosso realmente altera?',
-    options: [
+    prompt: 'Uma equipe reclama que a chamada de vídeo com um escritório na Europa trava. O provedor oferece dobrar a largura de banda. O que esperar?',
+    socraticHint: 'Qual das três medidas explica melhor uma chamada que trava? E qual delas um cano mais grosso realmente altera?',
+    choices: [
       {
         text: 'Pouca ou nenhuma melhora, porque o problema provável é a latência — e ela depende da distância, não da banda contratada.',
         correct: true,
@@ -167,22 +167,22 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
         why: 'Mais capacidade não gera congestionamento; ela apenas não resolve o que não é problema de capacidade.',
       },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
   {
     id: 'wf-03-expr',
     course: 'web-fundamentos',
-    topic: 'Largura de banda, latência e vazão (throughput)',
+    topic: 'Bandwidth, latency and throughput',
     type: 'expression-answer',
     difficulty: 'medium',
-    statement: 'Um arquivo de `T` bits é transferido por um caminho de vazão `v` bits por segundo, e a conexão leva `L` segundos para ser estabelecida antes de o primeiro bit sair. Escreva a expressão do tempo total, em segundos.',
-    socratic_hint: 'São duas parcelas que se somam: uma não depende do tamanho do arquivo e a outra depende. Qual é qual?',
-    answer_expression: 'L + T/v',
+    prompt: 'Um arquivo de `T` bits é transferido por um caminho de vazão `v` bits por segundo, e a conexão leva `L` segundos para ser estabelecida antes de o primeiro bit sair. Escreva a expressão do tempo total, em segundos.',
+    socraticHint: 'São duas parcelas que se somam: uma não depende do tamanho do arquivo e a outra depende. Qual é qual?',
+    referenceExpression: 'L + T/v',
     variables: ['T:positive', 'v:positive', 'L:positive'],
-    check_source: 'L + T/v',
-    check_operation: 'simplify',
-    check_variable: 'T',
+    checkOrigin: 'L + T/v',
+    checkOperation: 'simplify',
+    checkVariable: 'T',
     _verification: 'structure',
   },
 
@@ -190,30 +190,30 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   {
     id: 'wf-04-mult',
     course: 'web-fundamentos',
-    topic: 'Endereço IP, endereço MAC e ARP',
+    topic: 'IP address, MAC address and ARP',
     type: 'multiple-choice',
     difficulty: 'medium',
-    statement: 'Marque todas as afirmações verdadeiras sobre endereços IP e MAC.',
-    socratic_hint: 'Um dos dois descreve onde a máquina está; o outro, qual máquina ela é. Leve o notebook para outra rede e veja qual dos dois muda.',
-    options: [
+    prompt: 'Marque todas as afirmações verdadeiras sobre endereços IP e MAC.',
+    socraticHint: 'Um dos dois descreve onde a máquina está; o outro, qual máquina ela é. Leve o notebook para outra rede e veja qual dos dois muda.',
+    choices: [
       { text: 'O IP muda quando a máquina se conecta a outra rede.', correct: true, why: 'O IP descreve posição, como um endereço postal.' },
       { text: 'O MAC acompanha o equipamento para onde ele for.', correct: true, why: 'O MAC é identidade da placa, gravado nela.' },
       { text: 'Faixas como `192.168.x.x` são reutilizadas dentro de cada rede local e não existem na internet.', correct: true, why: 'São faixas privadas; o roteador traduz para o IP público pelo NAT.' },
       { text: 'O servidor de um site vê o endereço MAC do notebook que o acessou.', correct: false, why: 'MAC só tem significado no enlace local: o servidor vê o MAC do último roteador do caminho dele.' },
       { text: 'O IPv6 existe para dar mais velocidade que o IPv4.', correct: false, why: 'Ele existe porque os 4,3 bilhões de endereços do IPv4 acabaram — é questão de espaço, não de velocidade.' },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
   {
     id: 'wf-04-quiz',
     course: 'web-fundamentos',
-    topic: 'Endereço IP, endereço MAC e ARP',
+    topic: 'IP address, MAC address and ARP',
     type: 'quiz',
     difficulty: 'hard',
-    statement: 'Numa rede pública, uma máquina responde às perguntas do ARP se passando pelo roteador e passa a receber o tráfego dos vizinhos. O que torna esse ataque possível?',
-    socratic_hint: 'O que o protocolo faz quando duas máquinas respondem à mesma pergunta? Ele confere alguma coisa antes de acreditar?',
-    options: [
+    prompt: 'Numa rede pública, uma máquina responde às perguntas do ARP se passando pelo roteador e passa a receber o tráfego dos vizinhos. O que torna esse ataque possível?',
+    socraticHint: 'O que o protocolo faz quando duas máquinas respondem à mesma pergunta? Ele confere alguma coisa antes de acreditar?',
+    choices: [
       {
         text: 'O ARP não autentica as respostas: quem responder é acreditado, e a resposta fica em cache por alguns minutos.',
         correct: true,
@@ -235,7 +235,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
         why: 'O ARP faz exatamente a ponte entre os dois: pergunta por IP e recebe um MAC.',
       },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
 
@@ -243,11 +243,11 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   {
     id: 'wf-05-ord',
     course: 'web-fundamentos',
-    topic: 'Redes em camadas: do cabo até o navegador',
+    topic: 'Layered networks: from the cable to the browser',
     type: 'ordering',
     difficulty: 'medium',
-    statement: 'Ponha as camadas na ordem em que os dados as atravessam ao **sair** do seu navegador rumo à rede, da mais alta para a mais baixa.',
-    socratic_hint: 'Cada camada envelopa a de cima. Qual delas produz o conteúdo que todas as outras vão embrulhar?',
+    prompt: 'Ponha as camadas na ordem em que os dados as atravessam ao **sair** do seu navegador rumo à rede, da mais alta para a mais baixa.',
+    socraticHint: 'Cada camada envelopa a de cima. Qual delas produz o conteúdo que todas as outras vão embrulhar?',
     items: [
       'Aplicação: o navegador monta o pedido HTTP',
       'Transporte: o pedido é cortado em segmentos e recebe as portas',
@@ -255,18 +255,18 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
       'Enlace: cada pacote vira quadro e recebe o MAC do próximo salto',
     ],
     trap: 'O par transporte–rede. Quem memorizou "IP é o principal" tende a pôr a camada de rede antes da de transporte, como se o endereço viesse antes do corte em segmentos. Não vem: é o transporte que decide o tamanho de cada pedaço e a qual programa ele pertence, e só então cada pedaço ganha endereço de destino. Inverter os dois faria o pacote ser endereçado antes de existir.',
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
   {
     id: 'wf-05-quiz',
     course: 'web-fundamentos',
-    topic: 'Redes em camadas: do cabo até o navegador',
+    topic: 'Layered networks: from the cable to the browser',
     type: 'quiz',
     difficulty: 'easy',
-    statement: 'Uma chamada de vídeo ao vivo usa UDP em vez de TCP. Qual é o raciocínio?',
-    socratic_hint: 'Pergunte o que acontece com um quadro de vídeo que chega meio segundo atrasado. Ele ainda serve para alguma coisa?',
-    options: [
+    prompt: 'Uma chamada de vídeo ao vivo usa UDP em vez de TCP. Qual é o raciocínio?',
+    socraticHint: 'Pergunte o que acontece com um quadro de vídeo que chega meio segundo atrasado. Ele ainda serve para alguma coisa?',
+    choices: [
       {
         text: 'Num vídeo ao vivo o dado atrasado já não tem serventia, e esperar pelo reenvio travaria a imagem — é melhor perder o pedaço.',
         correct: true,
@@ -288,7 +288,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
         why: 'O UDP não confirma nada: é a ausência de confirmação que o torna barato.',
       },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
 
@@ -296,12 +296,12 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   {
     id: 'wf-06-quiz',
     course: 'web-fundamentos',
-    topic: 'HTTP e HTTPS: métodos, cabeçalhos e códigos de status',
+    topic: 'HTTP and HTTPS: methods, headers and status codes',
     type: 'quiz',
     difficulty: 'medium',
-    statement: 'Uma aplicação apagava registros por links `GET /apagar?id=7`. Depois de o site ser indexado, vários registros sumiram sem ninguém ter clicado em nada. O que explica?',
-    socratic_hint: 'Quem mais, além de uma pessoa, segue links de uma página? E que promessa o método `GET` faz a quem os segue?',
-    options: [
+    prompt: 'Uma aplicação apagava registros por links `GET /apagar?id=7`. Depois de o site ser indexado, vários registros sumiram sem ninguém ter clicado em nada. O que explica?',
+    socraticHint: 'Quem mais, além de uma pessoa, segue links de uma página? E que promessa o método `GET` faz a quem os segue?',
+    choices: [
       {
         text: '`GET` promete não alterar nada, então rastreadores e pré-carregamentos o repetem à vontade — e cada visita executou a exclusão.',
         correct: true,
@@ -323,17 +323,17 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
         why: 'O `200` não pede repetição; o rastreador repete porque `GET` é declarado seguro, independentemente do status.',
       },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
   {
     id: 'wf-06-assoc',
     course: 'web-fundamentos',
-    topic: 'HTTP e HTTPS: métodos, cabeçalhos e códigos de status',
+    topic: 'HTTP and HTTPS: methods, headers and status codes',
     type: 'matching',
     difficulty: 'medium',
-    statement: 'Associe cada código de status ao que ele comunica. Sobram opções na coluna da direita.',
-    socratic_hint: 'Dois deles falam de identidade e permissão, e a diferença entre os dois é se o servidor já sabe quem você é.',
+    prompt: 'Associe cada código de status ao que ele comunica. Sobram opções na coluna da direita.',
+    socraticHint: 'Dois deles falam de identidade e permissão, e a diferença entre os dois é se o servidor já sabe quem você é.',
     pairs: [
       { left: '`301`', right: 'Mudou de endereço em definitivo' },
       { left: '`401`', right: 'Não sei quem você é' },
@@ -341,29 +341,29 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
       { left: '`502`', right: 'O servidor de trás respondeu mal' },
       { left: '`429`', right: 'Você está pedindo com frequência demais' },
     ],
-    right_distractors: [
+    rightDistractors: [
       'O conteúdo não mudou desde a última vez',
       'O pedido está malformado e não pôde ser interpretado',
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
   {
     id: 'wf-06-mult',
     course: 'web-fundamentos',
-    topic: 'HTTP e HTTPS: métodos, cabeçalhos e códigos de status',
+    topic: 'HTTP and HTTPS: methods, headers and status codes',
     type: 'multiple-choice',
     difficulty: 'hard',
-    statement: 'Marque tudo o que o TLS entrega numa conexão HTTPS.',
-    socratic_hint: 'São três garantias, e uma delas é o que o cadeado da barra realmente representa. Pense também no que a rede continua conseguindo observar.',
-    options: [
+    prompt: 'Marque tudo o que o TLS entrega numa conexão HTTPS.',
+    socraticHint: 'São três garantias, e uma delas é o que o cadeado da barra realmente representa. Pense também no que a rede continua conseguindo observar.',
+    choices: [
       { text: 'Confidencialidade: ninguém no caminho lê o conteúdo.', correct: true, why: 'É a garantia mais lembrada, e apenas uma das três.' },
       { text: 'Integridade: alterar o conteúdo em trânsito se denuncia.', correct: true, why: 'Sem ela, cifrar não bastaria — dava para corromper sem ler.' },
       { text: 'Autenticidade: o certificado prova que aquele servidor é o dono do domínio.', correct: true, why: 'É o que o cadeado representa — "é mesmo o site cujo nome está na barra", não "site confiável".' },
       { text: 'Anonimato: a rede não descobre qual domínio foi acessado.', correct: false, why: 'O nome do domínio e o volume de dados continuam visíveis para a rede.' },
       { text: 'Idoneidade: o site foi verificado como confiável por uma autoridade.', correct: false, why: 'A autoridade certifica posse do domínio, não a honestidade de quem o opera.' },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
 
@@ -371,12 +371,12 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   {
     id: 'wf-07-quiz',
     course: 'web-fundamentos',
-    topic: 'Cookies, sessões e cache do navegador',
+    topic: 'Cookies, sessions and browser cache',
     type: 'quiz',
     difficulty: 'hard',
-    statement: 'Uma aplicação passou a rodar em dois servidores atrás de um balanceador. Os usuários começaram a "cair" da sessão sem padrão aparente. Qual é a causa mais provável?',
-    socratic_hint: 'O cookie carrega só um identificador. Onde estão guardados os dados que ele identifica, e os dois servidores enxergam o mesmo lugar?',
-    options: [
+    prompt: 'Uma aplicação passou a rodar em dois servidores atrás de um balanceador. Os usuários começaram a "cair" da sessão sem padrão aparente. Qual é a causa mais provável?',
+    socraticHint: 'O cookie carrega só um identificador. Onde estão guardados os dados que ele identifica, e os dois servidores enxergam o mesmo lugar?',
+    choices: [
       {
         text: 'A sessão está na memória de cada servidor, então metade dos pedidos chega a quem não a tem.',
         correct: true,
@@ -398,28 +398,28 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
         why: '`HttpOnly` impede o JavaScript da página de ler; o servidor recebe o cookie normalmente.',
       },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
   {
     id: 'wf-07-assoc',
     course: 'web-fundamentos',
-    topic: 'Cookies, sessões e cache do navegador',
+    topic: 'Cookies, sessions and browser cache',
     type: 'matching',
     difficulty: 'medium',
-    statement: 'Associe cada diretiva ou atributo ao efeito dela. Sobram opções na coluna da direita.',
-    socratic_hint: 'Três delas dizem respeito ao cookie e uma ao cache. Duas parecem opostas e não são: uma proíbe guardar, a outra permite guardar mas exige confirmar.',
+    prompt: 'Associe cada diretiva ou atributo ao efeito dela. Sobram opções na coluna da direita.',
+    socraticHint: 'Três delas dizem respeito ao cookie e uma ao cache. Duas parecem opostas e não são: uma proíbe guardar, a outra permite guardar mas exige confirmar.',
     pairs: [
       { left: '`HttpOnly`', right: 'O JavaScript da página não consegue ler o valor' },
       { left: '`Secure`', right: 'O valor não é enviado fora do HTTPS' },
       { left: '`no-cache`', right: 'Pode guardar, mas confirme antes de reutilizar' },
       { left: '`no-store`', right: 'Não guarde em lugar nenhum' },
     ],
-    right_distractors: [
+    rightDistractors: [
       'Reutilize sem perguntar durante o prazo indicado',
       'Cifra o valor do cookie antes de gravá-lo em disco',
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
 
@@ -427,11 +427,11 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   {
     id: 'wf-08-ord',
     course: 'web-fundamentos',
-    topic: 'Domínios: registro, DNS, propagação e subdomínios',
+    topic: 'Domains: registration, DNS, propagation and subdomains',
     type: 'ordering',
     difficulty: 'hard',
-    statement: 'Ponha em ordem os passos de uma migração de servidor sem que os visitantes caiam num endereço morto.',
-    socratic_hint: 'Um dos passos precisa acontecer bem antes dos outros para que os demais façam efeito rápido. Qual deles depende do tempo que os caches já guardaram?',
+    prompt: 'Ponha em ordem os passos de uma migração de servidor sem que os visitantes caiam num endereço morto.',
+    socraticHint: 'Um dos passos precisa acontecer bem antes dos outros para que os demais façam efeito rápido. Qual deles depende do tempo que os caches já guardaram?',
     items: [
       'Baixar o TTL do registro para poucos minutos, um dia antes da troca',
       'Subir a aplicação no servidor novo e conferir que ela responde pelo IP dele',
@@ -440,18 +440,18 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
       'Devolver o TTL para horas',
     ],
     trap: 'O par baixar-o-TTL–alterar-o-registro. É tentador baixar o TTL junto com a mudança, ou depois dela, para "acelerar a propagação". Não funciona: o teto do tempo de espera é o TTL que já estava valendo quando os caches guardaram a resposta antiga. Baixá-lo depois só afeta as consultas seguintes, e a troca continua demorando o TTL velho inteiro.',
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
   {
     id: 'wf-08-quiz',
     course: 'web-fundamentos',
-    topic: 'Domínios: registro, DNS, propagação e subdomínios',
+    topic: 'Domains: registration, DNS, propagation and subdomains',
     type: 'quiz',
     difficulty: 'medium',
-    statement: 'Você precisa apontar `exemplo.com`, sem `www`, para um serviço hospedado que só informa um nome (`app.provedor.net`) e nenhum IP. Por que um `CNAME` não resolve?',
-    socratic_hint: 'O `CNAME` tem uma restrição de posição no domínio. Onde exatamente ele não pode existir, e que registros já ocupam esse lugar?',
-    options: [
+    prompt: 'Você precisa apontar `exemplo.com`, sem `www`, para um serviço hospedado que só informa um nome (`app.provedor.net`) e nenhum IP. Por que um `CNAME` não resolve?',
+    socraticHint: 'O `CNAME` tem uma restrição de posição no domínio. Onde exatamente ele não pode existir, e que registros já ocupam esse lugar?',
+    choices: [
       {
         text: '`CNAME` não pode existir na raiz do domínio, que precisa conviver com outros registros como o `MX`.',
         correct: true,
@@ -473,7 +473,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
         why: 'Continua em pleno uso; o `ALIAS` é que é a extensão não padronizada.',
       },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
 
@@ -481,30 +481,30 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   {
     id: 'wf-09-mult',
     course: 'web-fundamentos',
-    topic: 'Hospedagem: compartilhada, VPS, nuvem e CDN',
+    topic: 'Hosting: shared, VPS, cloud and CDN',
     type: 'multiple-choice',
     difficulty: 'medium',
-    statement: 'Uma loja com tráfego constante o ano inteiro está migrando de hospedagem compartilhada. Marque as afirmações que se sustentam.',
-    socratic_hint: 'Duas das opções vendem elasticidade a quem não tem variação para elastecer. E lembre que o custo de um VPS não é só o da fatura.',
-    options: [
+    prompt: 'Uma loja com tráfego constante o ano inteiro está migrando de hospedagem compartilhada. Marque as afirmações que se sustentam.',
+    socraticHint: 'Duas das opções vendem elasticidade a quem não tem variação para elastecer. E lembre que o custo de um VPS não é só o da fatura.',
+    choices: [
       { text: 'Um VPS transfere para a loja a responsabilidade por atualização, backup e firewall.', correct: true, why: 'É o que muda de verdade na migração — não a potência, e sim de quem é a responsabilidade.' },
       { text: 'A elasticidade da nuvem rende pouco aqui, porque não há variação de demanda para acompanhar.', correct: true, why: 'Elasticidade se paga quando a demanda varia; com tráfego constante ela costuma custar mais que um VPS.' },
       { text: 'Uma CDN ajuda mesmo sem trocar de hospedagem, porque fica na frente dela.', correct: true, why: 'A CDN não substitui a origem: ela a antecede, e cuida do que é estático.' },
       { text: 'A nuvem elimina o vizinho barulhento porque não há mais compartilhamento de recursos.', correct: false, why: 'Instâncias compartilhadas continuam existindo na nuvem; o que muda é o isolamento contratado, não a ausência de vizinhos.' },
       { text: 'Migrar para VPS reduz o custo total, já que a fatura mensal costuma ser parecida.', correct: false, why: 'A fatura é parecida; o custo total sobe em horas de administração, que é onde a conta realmente muda.' },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
   {
     id: 'wf-09-quiz',
     course: 'web-fundamentos',
-    topic: 'Hospedagem: compartilhada, VPS, nuvem e CDN',
+    topic: 'Hosting: shared, VPS, cloud and CDN',
     type: 'quiz',
     difficulty: 'medium',
-    statement: 'Depois de publicar uma correção de CSS, parte dos visitantes continua vendo a versão antiga por horas. O site está atrás de uma CDN. Qual é a solução estrutural?',
-    socratic_hint: 'Existe a saída de sempre — pedir à CDN que esqueça o que guardou. E existe outra, que faz o problema deixar de ocorrer. O que impede duas versões diferentes de disputarem o mesmo nome?',
-    options: [
+    prompt: 'Depois de publicar uma correção de CSS, parte dos visitantes continua vendo a versão antiga por horas. O site está atrás de uma CDN. Qual é a solução estrutural?',
+    socraticHint: 'Existe a saída de sempre — pedir à CDN que esqueça o que guardou. E existe outra, que faz o problema deixar de ocorrer. O que impede duas versões diferentes de disputarem o mesmo nome?',
+    choices: [
       {
         text: 'Dar ao arquivo um nome com impressão digital do conteúdo, para que qualquer alteração mude o nome e o HTML aponte para outro endereço.',
         correct: true,
@@ -526,7 +526,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
         why: 'A diretiva vale para o próprio documento; ela não alcança os arquivos referenciados por ele.',
       },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
 
@@ -534,11 +534,11 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   {
     id: 'wf-10-ord',
     course: 'web-fundamentos',
-    topic: 'Como o navegador monta a página: DOM, CSSOM e renderização',
+    topic: 'How the browser builds the page: DOM, CSSOM and rendering',
     type: 'ordering',
     difficulty: 'medium',
-    statement: 'Ponha em ordem as etapas que levam do HTML recebido aos pixels na tela.',
-    socratic_hint: 'Duas árvores são construídas antes de qualquer posição ser calculada. E posição vem antes de cor.',
+    prompt: 'Ponha em ordem as etapas que levam do HTML recebido aos pixels na tela.',
+    socraticHint: 'Duas árvores são construídas antes de qualquer posição ser calculada. E posição vem antes de cor.',
     items: [
       'O HTML é interpretado e vira a árvore de objetos do DOM',
       'O CSS é interpretado e vira o CSSOM',
@@ -548,18 +548,18 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
       'A composição junta as camadas na tela',
     ],
     trap: 'O par layout–pintura. Quem pensa em "desenhar a página" tende a juntar os dois num passo só, ou a inverter, imaginando que o navegador desenha e depois acomoda. A separação é justamente o que distingue animação suave de animação travada: mudar `width` refaz o layout de tudo em volta, mudar `background-color` só repinta, e mudar `transform` mexe apenas na composição.',
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
   {
     id: 'wf-10-quiz',
     course: 'web-fundamentos',
-    topic: 'Como o navegador monta a página: DOM, CSSOM e renderização',
+    topic: 'How the browser builds the page: DOM, CSSOM and rendering',
     type: 'quiz',
     difficulty: 'medium',
-    statement: 'Uma animação de menu deslizante está travada em celulares. Ela altera `left` a cada quadro. Qual troca tende a resolver?',
-    socratic_hint: 'Cada propriedade dispara uma etapa diferente da renderização. Qual delas não obriga o navegador a recalcular onde tudo está?',
-    options: [
+    prompt: 'Uma animação de menu deslizante está travada em celulares. Ela altera `left` a cada quadro. Qual troca tende a resolver?',
+    socraticHint: 'Cada propriedade dispara uma etapa diferente da renderização. Qual delas não obriga o navegador a recalcular onde tudo está?',
+    choices: [
       {
         text: 'Animar `transform: translateX(...)`, que mexe só na composição e é resolvida pela placa de vídeo.',
         correct: true,
@@ -581,7 +581,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
         why: 'Isso muda quando a página aparece pela primeira vez, e não o custo de cada quadro da animação.',
       },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
 
@@ -589,26 +589,26 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   {
     id: 'wf-11-saida',
     course: 'web-fundamentos',
-    topic: 'Ferramentas do desenvolvedor: rede, console e elementos',
+    topic: 'Developer tools: network, console and elements',
     type: 'expected-output',
     difficulty: 'easy',
     language: 'javascript',
-    statement: 'No console de uma página que contém exatamente três links (`<a>`), você digita as duas linhas abaixo. O que aparece?',
-    socratic_hint: 'A primeira linha devolve uma coleção de elementos, e o que se pede dela é uma contagem. A segunda pergunta o tipo do valor.',
-    given_code: 'const links = document.querySelectorAll("a");\nconsole.log(links.length);\nconsole.log(typeof links.length);\n',
+    prompt: 'No console de uma página que contém exatamente três links (`<a>`), você digita as duas linhas abaixo. O que aparece?',
+    socraticHint: 'A primeira linha devolve uma coleção de elementos, e o que se pede dela é uma contagem. A segunda pergunta o tipo do valor.',
+    givenCode: 'const links = document.querySelectorAll("a");\nconsole.log(links.length);\nconsole.log(typeof links.length);\n',
     answer: '3\nnumber\n',
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
   {
     id: 'wf-11-quiz',
     course: 'web-fundamentos',
-    topic: 'Ferramentas do desenvolvedor: rede, console e elementos',
+    topic: 'Developer tools: network, console and elements',
     type: 'quiz',
     difficulty: 'medium',
-    statement: 'Na aba Rede, um pedido mostra tempo total alto quase inteiro em espera, com transferência rápida e tamanho pequeno. O que isso indica?',
-    socratic_hint: 'O tempo se divide entre esperar a resposta começar e recebê-la. Qual das duas partes fala do servidor e qual fala do caminho?',
-    options: [
+    prompt: 'Na aba Rede, um pedido mostra tempo total alto quase inteiro em espera, com transferência rápida e tamanho pequeno. O que isso indica?',
+    socraticHint: 'O tempo se divide entre esperar a resposta começar e recebê-la. Qual das duas partes fala do servidor e qual fala do caminho?',
+    choices: [
       {
         text: 'O servidor demorou a começar a responder — o gargalo está no processamento do outro lado, não na conexão.',
         correct: true,
@@ -630,7 +630,7 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
         why: 'A descompressão é local e rápida; ela não aparece como espera pelo servidor.',
       },
     ],
-    check_operation: 'none',
+    checkOperation: 'none',
     _verification: 'structure',
   },
 ]);

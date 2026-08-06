@@ -51,8 +51,8 @@ export const TRACK_QUESTIONS = 15;
 export function courseBank(courseId) {
   const out = [];
   courseLessons(courseId).forEach((a, ix) => {
-    lessonExercises(courseId, a.chave).forEach((ex) => {
-      out.push({ ex, ctx: { cursoId: courseId, aulaIx: ix }, aula: a.titulo });
+    lessonExercises(courseId, a.key).forEach((ex) => {
+      out.push({ ex, ctx: { courseId: courseId, lessonIx: ix }, aula: a.title });
     });
   });
   return out;
@@ -73,10 +73,10 @@ export function courseExam(courseId, attempt = 0) {
   const c = courseById(courseId);
   const bank = courseBank(courseId);
   return {
-    key: 'curso:' + courseId,
-    scope: 'curso',
+    key: 'course:' + courseId,
+    scope: 'course',
     about: courseId,
-    title: c ? c.nome : courseId,
+    title: c ? c.name : courseId,
     backTo: '#/curso/' + courseId,
     items: draw(bank, COURSE_QUESTIONS, courseId + ':' + attempt),
     bankSize: bank.length,
@@ -87,14 +87,14 @@ export function trackExam(track, activeOption, attempt = 0) {
   const path = trackPath(track, activeOption);
   const bank = path.flatMap((id) => courseBank(id));
   return {
-    key: 'trilha:' + track.id,
-    scope: 'trilha',
+    key: 'track:' + track.id,
+    scope: 'track',
     about: track.id,
-    title: track.nome,
+    title: track.name,
     backTo: '#/trilha',
     items: draw(bank, TRACK_QUESTIONS, track.id + ':' + attempt),
     bankSize: bank.length,
-    cursos: path.length,
+    courses: path.length,
   };
 }
 
@@ -102,12 +102,12 @@ export function trackExam(track, activeOption, attempt = 0) {
    checked yet, never what was left blank. Leaving it blank is an answer, and it
    is a wrong one; not having been checked is not an answer at all. */
 export function examScore(states) {
-  const judged = states.filter((s) => s.acertou !== null || !s.answered);
-  const right = states.filter((s) => s.acertou === true).length;
+  const judged = states.filter((s) => s.correct !== null || !s.answered);
+  const right = states.filter((s) => s.correct === true).length;
   const pending = states.length - judged.length;
   const pct = judged.length ? Math.round((right / judged.length) * 100) : 0;
   return {
-    certos: right, judged: judged.length, pending, pct,
-    aprovado: judged.length > 0 && pct >= PASS_MARK,
+    lastCorrect: right, judged: judged.length, pending, pct,
+    passed: judged.length > 0 && pct >= PASS_MARK,
   };
 }

@@ -30,7 +30,7 @@ export default {
         '<span class="caso-desc">' + formatted(t.description || '') + '</span>' +
         '<div class="caso-io">' +
           '<div><span class="caso-rot">' + txt('entrada') + '</span><pre class="cod"><code>' + esc(t.input) + '</code></pre></div>' +
-          '<div><span class="caso-rot">' + txt('saída') + '</span><pre class="cod"><code>' + esc(t.expected_output) + '</code></pre></div>' +
+          '<div><span class="caso-rot">' + txt('saída') + '</span><pre class="cod"><code>' + esc(t.expectedOutput) + '</code></pre></div>' +
         '</div>' +
       '</div>'
     )).join('');

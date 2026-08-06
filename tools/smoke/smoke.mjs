@@ -55,7 +55,7 @@ await p.waitForFunction(() => location.hash.length > 1);
 
 console.log('\n== 1. load and redirect ==');
 ok('landed on /entrar with no session', p.url().includes('#/entrar'), p.url());
-ok('catalogue loaded', await p.evaluate(() => typeof CURSOS !== 'undefined' && CURSOS.length === 86));
+ok('catalogue loaded', await p.evaluate(() => typeof COURSES !== 'undefined' && COURSES.length === 86));
 ok('sample exercises loaded', await p.evaluate(() => window.SAMPLE_EXERCISES?.length > 0));
 
 console.log('\n== 2. signing in ==');
@@ -223,13 +223,13 @@ const answer = async (sel, fn, expected) => {
 
 // quiz: ticks the correct choice by its data-ix
 await answer('.ex-quiz', async (ex) => {
-  const ix = await p.evaluate(() => window.SAMPLE_EXERCISES.find((e) => e.type === 'quiz').options.findIndex((a) => a.correct));
+  const ix = await p.evaluate(() => window.SAMPLE_EXERCISES.find((e) => e.type === 'quiz').choices.findIndex((a) => a.correct));
   await ex.locator(`.alt[data-ix="${ix}"]`).click();
 }, 'v-certo');
 
 await answer('.ex-multiple-choice', async (ex) => {
   const ixs = await p.evaluate(() => window.SAMPLE_EXERCISES.find((e) => e.type === 'multiple-choice')
-    .options.map((a, i) => (a.correct ? i : -1)).filter((i) => i >= 0));
+    .choices.map((a, i) => (a.correct ? i : -1)).filter((i) => i >= 0));
   for (const i of ixs) await ex.locator(`.alt[data-ix="${i}"]`).click();
 }, 'v-certo');
 
@@ -301,10 +301,12 @@ ok('the last one is always the assessment', /avalia/i.test(steps[steps.length - 
 ok('prose rendered', (await p.locator('.aula-texto p').count()) >= 2);
 ok('a content section reserves the video frame', await p.locator('.video-fachada').isVisible());
 ok('the rail opens the current lesson sections', (await p.locator('.trilho-secao').count()) === 6);
-/* The regression that matters: sections are matched by the topic IN PORTUGUESE,
-   and the displayed title is translated. In an English-language browser — which
-   is what this Chromium is — matching by title would return zero sections. */
-ok('it matched even though the title is translated', (await p.locator('.aula-titulo').innerText()) !== '');
+/* The regression that matters, restated after the rename: sections are matched
+   by the AUTHORED topic title, which is English now, and the displayed title is
+   whatever the language switch put there. They coincide in an English browser
+   and diverge in every other one — so this asserts the join survived, not that
+   the two strings happen to be equal. */
+ok('the join survived the language switch', (await p.locator('.aula-titulo').innerText()) !== '');
 
 // the last section of a lesson leads to the first of the next lesson
 await p.goto(BASE + PAGE + '#/curso/web-fundamentos/aula/8/avaliacao');
@@ -334,7 +336,7 @@ ok('a pending assessment is not completed by moving on',
   (await p.locator('.passo.passo-aval.feito').count()) === 0);
 
 const denominators = await p.evaluate(() => {
-  const lessons = CURSOS.find((c) => c.id === 'javascript').topicos.length;
+  const lessons = COURSES.find((c) => c.id === 'javascript').topics.length;
   const count = document.querySelector('.trilho-conta').textContent;
   return { lessons, count };
 });
@@ -444,7 +446,7 @@ await p.goto(BASE + PAGE + '#/curso/web-fundamentos/aula/2/avaliacao');
 await p.waitForSelector('.wizard');
 await goToType('quiz');
 const wrongIx = await p.evaluate(() =>
-  window.SAMPLE_EXERCISES.find((e) => e.id === 'wf-03-quiz').options.findIndex((a) => !a.correct));
+  window.SAMPLE_EXERCISES.find((e) => e.id === 'wf-03-quiz').choices.findIndex((a) => !a.correct));
 await p.locator(`.ex-quiz .alt[data-ix="${wrongIx}"]`).click();
 await p.locator('.ex-quiz .ex-responder').click();
 await p.waitForFunction(() => document.querySelector('.ex-quiz .ex-veredito')?.className.includes('v-errado'),
@@ -700,8 +702,8 @@ const answerEverything = async (correctly) => {
     const id = await p.locator('.ex').getAttribute('data-ex');
     const ixs = await p.evaluate((exId) => {
       const ex = window.SAMPLE_EXERCISES.find((e) => e.id === exId);
-      if (!ex?.options) return null;
-      return ex.options.map((a, k) => (a.correct ? k : -1)).filter((k) => k >= 0);
+      if (!ex?.choices) return null;
+      return ex.choices.map((a, k) => (a.correct ? k : -1)).filter((k) => k >= 0);
     }, id);
     if (!ixs) continue;                       // a type this loop cannot answer
     const targets = correctly ? ixs : [ixs.includes(0) ? 1 : 0];
@@ -724,7 +726,7 @@ await p.waitForSelector('.wz-resultado');
 const score = await p.locator('.prova-nota').innerText();
 ok('the exam closes with a score', /%/.test(score), score);
 ok('the result is stored', await p.evaluate(() =>
-  Boolean(JSON.parse(localStorage.getItem('codeschool-portal')).provas['curso:web-fundamentos'])));
+  Boolean(JSON.parse(localStorage.getItem('codeschool-portal')).exams['course:web-fundamentos'])));
 
 /* Walks the questions one by one: the wizard keeps ONE in the document at a
    time, so counting across the whole document would measure only the one on
@@ -1039,12 +1041,12 @@ await p.waitForTimeout(120);
    share URL only shows up on LinkedIn's own site. */
 await p.evaluate(() => {
   const e = JSON.parse(localStorage.getItem('codeschool-portal'));
-  e.provas = { ...(e.provas || {}), 'curso:git': { tentativas: 1, melhor: 90, aprovado: true } };
-  e.progresso = e.progresso || {};
-  e.progresso.git = { aulas: {} };
+  e.exams = { ...(e.exams || {}), 'course:git': { attempts: 1, best: 90, passed: true } };
+  e.progress = e.progress || {};
+  e.progress.git = { lessons: {} };
   // marks every countable section of git as done
-  CURSOS.find((c) => c.id === 'git').topicos.forEach((_, ix) => {
-    e.progresso.git.aulas[ix] = { secoes: { conteudo: true, avaliacao: true }, exercicios: {} };
+  COURSES.find((c) => c.id === 'git').topics.forEach((_, ix) => {
+    e.progress.git.lessons[ix] = { sections: { conteudo: true, avaliacao: true }, exercises: {} };
   });
   localStorage.setItem('codeschool-portal', JSON.stringify(e));
 });
@@ -1085,7 +1087,7 @@ await p.waitForTimeout(300);
 const planAfter = await p.locator('.pl-atual-topo h2').innerText();
 ok('the upgrade switches the plan', planAfter !== planBefore, planBefore + ' → ' + planAfter);
 ok('the plan survives the reload', await p.evaluate(() =>
-  Boolean(JSON.parse(localStorage.getItem('codeschool-portal')).conta?.planoId)));
+  Boolean(JSON.parse(localStorage.getItem('codeschool-portal')).account?.planId)));
 
 await p.goto(BASE + PAGE + '#/conta');
 await p.waitForSelector('#f-email');

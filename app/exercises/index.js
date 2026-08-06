@@ -66,11 +66,11 @@ export function buildExercise(ex, ctx, ix, options = {}) {
       '<span class="ex-tipo">' + txt(ex.type) + '</span>' +
       (ex.difficulty ? '<span class="ex-dif">' + txt(ex.difficulty) + '</span>' : '') +
     '</header>' +
-    '<p class="ex-enunciado">' + formatted(ex.statement) + '</p>' +
+    '<p class="ex-enunciado">' + formatted(ex.prompt) + '</p>' +
     '<div class="ex-corpo">' + mod.body(ex, uid) + '</div>' +
     // the hint is scaffolding for someone learning; in an exam it is a cheat sheet
-    (ex.socratic_hint && !exam
-      ? '<details class="ex-dica"><summary>' + txt('dica') + '</summary><p>' + formatted(ex.socratic_hint) + '</p></details>'
+    (ex.socraticHint && !exam
+      ? '<details class="ex-dica"><summary>' + txt('dica') + '</summary><p>' + formatted(ex.socraticHint) + '</p></details>'
       : '') +
     '<div class="ex-acoes">' +
       (mod.selfCompleting ? '' : '<button type="button" class="btn btn-primary ex-responder">' +
@@ -94,7 +94,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
     out.textContent = txt('conferindo…');
 
     const v = await api.grade(ex, answer);
-    if (ctx) saveAnswer(ctx.cursoId, ctx.aulaIx, uid, v);
+    if (ctx) saveAnswer(ctx.courseId, ctx.lessonIx, uid, v);
 
     if (exam) {
       /* Held back. The element remembers how to reveal itself later — the whole
@@ -117,8 +117,8 @@ export function buildExercise(ex, ctx, ix, options = {}) {
   /* "already solved" is useful memory in an assessment and hands over the
      answer key in an exam: the exam draws from the same bank as the lessons, so
      almost every question has been seen before. */
-  const previous = !exam && ctx && answerFor(ctx.cursoId, ctx.aulaIx, uid);
-  if (previous?.acertou) markAlreadyDone(el, previous);
+  const previous = !exam && ctx && answerFor(ctx.courseId, ctx.lessonIx, uid);
+  if (previous?.correct) markAlreadyDone(el, previous);
 
   const answerButton = el.querySelector('.ex-responder');
   if (answerButton) answerButton.addEventListener('click', () => check(mod.collect(body)));
@@ -138,7 +138,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
 function showVerdict(el, ex, v) {
   const out = el.querySelector('.ex-veredito');
 
-  if (v.acertou === null) {
+  if (v.correct === null) {
     /* Unchecked NEVER becomes passed — it is the pipeline's rule and it holds
        whole here: while there is no execution, the portal says it did not
        check. */
@@ -147,7 +147,7 @@ function showVerdict(el, ex, v) {
     return;
   }
 
-  if (v.acertou) {
+  if (v.correct) {
     out.className = 'ex-veredito v-certo';
     out.innerHTML = '<strong>' + txt('certo') + '</strong>';
     return;
@@ -156,7 +156,7 @@ function showVerdict(el, ex, v) {
   out.className = 'ex-veredito v-errado';
   let extra = '';
   if (v.partial) extra = ' ' + txt('faltou fechar todos os pares.');
-  else if (typeof v.wrong === 'number' && v.wrong > 0) extra = '';
+  else if (typeof v.errors === 'number' && v.errors > 0) extra = '';
   /* The `trap` of an ordering exercise is what the exercise measures:
      which neighbouring pair gets swapped, and why. As feedback it is worth a
      lot; any earlier, it would be the answer. */
@@ -170,8 +170,8 @@ function markAlreadyDone(el, previous) {
   const out = el.querySelector('.ex-veredito');
   out.className = 'ex-veredito v-antigo';
   out.innerHTML = '<strong>' + txt('já resolvido') + '</strong> ' +
-    txt('em') + ' ' + previous.tentativas + ' ' +
-    (previous.tentativas === 1 ? txt('tentativa') : txt('tentativas'));
+    txt('em') + ' ' + previous.attempts + ' ' +
+    (previous.attempts === 1 ? txt('tentativa') : txt('tentativas'));
 }
 
 /* ==========================================================================
@@ -192,7 +192,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
   const exam = Boolean(options.prova);
   const el = document.createElement('div');
   el.className = 'wizard' + (exam ? ' wizard-prova' : '');
-  const states = exercises.map(() => ({ answered: false, acertou: null }));
+  const states = exercises.map(() => ({ answered: false, correct: null }));
   let current = 0;
   let submitted = false;
   let confirming = false;
@@ -223,7 +223,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
       if (s.answered) {
         cls.push(exam && !submitted
           ? 'feito'
-          : (s.acertou === true ? 'certo' : (s.acertou === null ? 'pendente' : 'errado')));
+          : (s.correct === true ? 'certo' : (s.correct === null ? 'pendente' : 'errado')));
       }
       return '<button type="button" class="' + cls.join(' ') + '" data-ir="' + i + '" ' +
         'aria-label="' + txt('questão') + ' ' + (i + 1) + '">' + (i + 1) + '</button>';
@@ -259,8 +259,8 @@ export function buildAssessment(exercises, ctx, options = {}) {
   }
 
   function finish() {
-    const right = states.filter((s) => s.acertou === true).length;
-    const unchecked = states.filter((s) => s.answered && s.acertou === null).length;
+    const right = states.filter((s) => s.correct === true).length;
+    const unchecked = states.filter((s) => s.answered && s.correct === null).length;
     const unanswered = states.filter((s) => !s.answered).length;
 
     /* The exam OPENS here: every answered question reveals the verdict that was
@@ -296,16 +296,16 @@ export function buildAssessment(exercises, ctx, options = {}) {
     paintHeader();
     el.dispatchEvent(new CustomEvent('avaliacao:concluida', {
       bubbles: true,
-      detail: { certos: right, total: exercises.length },
+      detail: { lastCorrect: right, total: exercises.length },
     }));
   }
 
   el.addEventListener('exercise:answered', (e) => {
-    states[current] = { answered: true, acertou: e.detail.v.acertou };
+    states[current] = { answered: true, correct: e.detail.v.correct };
     paintHeader();
   });
   el.addEventListener('exercise:redone', () => {
-    states[current] = { answered: false, acertou: null };
+    states[current] = { answered: false, correct: null };
     screens[current] = stage.firstElementChild;   // "try again" swaps the element
     paintHeader();
   });

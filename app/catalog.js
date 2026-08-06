@@ -22,39 +22,39 @@
    values, not the field name, and they name things the catalogue declares.
    ========================================================================== */
 
-export const courseById = (id) => CURSOS.find((c) => c.id === id);
-export const trackById = (id) => TRILHAS.find((t) => t.id === id);
+export const courseById = (id) => COURSES.find((c) => c.id === id);
+export const trackById = (id) => TRACKS.find((t) => t.id === id);
 
 /* ---------- tracks with a fork ----------
    An item of `cursos` is either a course id (a string) or a choice step (an
    object with `opcoes`). Hence three different readings of the same track: all
    the possible courses, the chosen path, and the hours of that path. */
-export const isChoice = (item) => typeof item === 'object' && Array.isArray(item.opcoes);
+export const isChoice = (item) => typeof item === 'object' && Array.isArray(item.options);
 
 // every course the track can contain, adding up all the options
 export const allCourses = (t) =>
-  t.cursos.flatMap((i) => (isChoice(i) ? i.opcoes.flatMap((o) => o.cursos) : [i]));
+  t.courses.flatMap((i) => (isChoice(i) ? i.options.flatMap((o) => o.courses) : [i]));
 
 // the first option is the one suggested by default, as on the vitrine
 export const DEFAULT_OPTION = () => 0;
 
 // the path this student picked
 export const trackPath = (t, activeOption = DEFAULT_OPTION) =>
-  t.cursos.flatMap((i, idx) => (isChoice(i) ? i.opcoes[activeOption(t.id, idx)].cursos : [i]));
+  t.courses.flatMap((i, idx) => (isChoice(i) ? i.options[activeOption(t.id, idx)].courses : [i]));
 
-export const hoursOf = (ids) => ids.reduce((s, id) => s + (courseById(id)?.horas || 0), 0);
+export const hoursOf = (ids) => ids.reduce((s, id) => s + (courseById(id)?.hours || 0), 0);
 
 // how many tracks a course appears in (the same course can serve several)
-export const tracksWithCourse = (id) => TRILHAS.filter((t) => allCourses(t).includes(id));
+export const tracksWithCourse = (id) => TRACKS.filter((t) => allCourses(t).includes(id));
 // the inverse of `depende`: which courses this one unlocks
-export const unlockedBy = (id) => CURSOS.filter((c) => (c.depende || []).includes(id));
+export const unlockedBy = (id) => COURSES.filter((c) => (c.requires || []).includes(id));
 
 // workload range: the shortest and the longest possible path
 export function hoursRange(t) {
   let min = 0, max = 0;
-  t.cursos.forEach((i) => {
-    if (!isChoice(i)) { const h = courseById(i)?.horas || 0; min += h; max += h; return; }
-    const hs = i.opcoes.map((o) => hoursOf(o.cursos));
+  t.courses.forEach((i) => {
+    if (!isChoice(i)) { const h = courseById(i)?.hours || 0; min += h; max += h; return; }
+    const hs = i.options.map((o) => hoursOf(o.courses));
     min += Math.min(...hs);
     max += Math.max(...hs);
   });
@@ -72,19 +72,19 @@ export function hoursRange(t) {
    The defect shows up without anyone touching anything: the browser only has to
    be set to another language, which is the case for most people outside Brazil.
 
-   The key is the PORTUGUESE text, stored by `savePtBase()` at load time. It is
+   The key is the PORTUGUESE text, stored by `saveBase()` at load time. It is
    the same decision as the vitrine's i18n — the translation key is the
    Portuguese text itself — applied to the join with the content. Hence each
-   lesson carrying both: `titulo` to show, `chave` to match. */
+   lesson carrying both: `title` to show, `key` to match on. */
 export function courseLessons(id) {
   const c = courseById(id);
   if (!c) return [];
-  const inPt = (typeof PT_BASE !== 'undefined' && PT_BASE.cursos?.[id]?.topicos) || c.topicos || [];
-  return (c.topicos || []).map((titulo, ix) => ({
-    cursoId: id,
+  const authored = (typeof BASE !== 'undefined' && BASE.courses?.[id]?.topics) || c.topics || [];
+  return (c.topics || []).map((title, ix) => ({
+    courseId: id,
     ix,
-    titulo,
-    chave: inPt[ix] ?? titulo,
+    title,
+    key: authored[ix] ?? title,
   }));
 }
 
@@ -99,29 +99,29 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
   const ofCourse = {};      // course id -> id of the node containing it
   const forkMembers = {};   // course id (from any option) -> fork node id
 
-  t.cursos.forEach((item, idx) => {
+  t.courses.forEach((item, idx) => {
     if (!isChoice(item)) {
-      nodes.push({ id: item, kind: 'curso', cursos: [item] });
+      nodes.push({ id: item, kind: 'course', courses: [item] });
       ofCourse[item] = item;
       return;
     }
     const nodeId = 'garfo:' + idx;
-    nodes.push({ id: nodeId, kind: 'garfo', step: item, idx: idx, cursos: item.opcoes[activeOption(t.id, idx)].cursos });
-    item.opcoes.forEach((o) => o.cursos.forEach((c) => { forkMembers[c] = nodeId; }));
-    item.opcoes[activeOption(t.id, idx)].cursos.forEach((c) => { ofCourse[c] = nodeId; });
+    nodes.push({ id: nodeId, kind: 'garfo', step: item, idx: idx, courses: item.options[activeOption(t.id, idx)].courses });
+    item.options.forEach((o) => o.courses.forEach((c) => { forkMembers[c] = nodeId; }));
+    item.options[activeOption(t.id, idx)].courses.forEach((c) => { ofCourse[c] = nodeId; });
   });
 
   // edges: prerequisite -> course, resolving inner courses to their block
   const itemId = (v) => (typeof v === 'number' ? nodes[v] && nodes[v].id : ofCourse[v] || forkMembers[v]);
   nodes.forEach((node, i) => {
     const deps = new Set();
-    node.cursos.forEach((id) => {
-      (courseById(id)?.depende || []).forEach((d) => {
+    node.courses.forEach((id) => {
+      (courseById(id)?.requires || []).forEach((d) => {
         const target = ofCourse[d] || forkMembers[d];
         if (target && target !== node.id) deps.add(target);
       });
       // links that only exist in this track (curriculum order, not content order)
-      ((t.ligacoes || {})[id] || []).forEach((v) => {
+      ((t.links || {})[id] || []).forEach((v) => {
         const target = itemId(v);
         if (target && target !== node.id) deps.add(target);
       });
@@ -136,7 +136,7 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
   // the graph does not end in loose courses with no outgoing arrow
   const hasSuccessor = {};
   nodes.forEach((n) => n.deps.forEach((d) => { hasSuccessor[d] = true; }));
-  nodes.push({ id: '@saida', kind: 'saida', cursos: [], deps: nodes.filter((n) => !hasSuccessor[n.id]).map((n) => n.id) });
+  nodes.push({ id: '@saida', kind: 'saida', courses: [], deps: nodes.filter((n) => !hasSuccessor[n.id]).map((n) => n.id) });
 
   const successors = {};
   nodes.forEach((n) => n.deps.forEach((d) => { (successors[d] = successors[d] || []).push(n.id); }));
@@ -166,7 +166,7 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
     queue.push(n.id);
   });
   if (stuck.length && window.console) {
-    console.warn('trilha "' + t.nome + '": dependência circular em ' + stuck.map((n) => n.id).join(', '));
+    console.warn('trilha "' + t.name + '": dependência circular em ' + stuck.map((n) => n.id).join(', '));
   }
 
   // group by level, leaving no gap in the sequence of columns

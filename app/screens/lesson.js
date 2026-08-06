@@ -46,18 +46,18 @@ const ARROW_RIGHT = ARROW('M9 5l7 7-7 7');
    which is pure friction. */
 function neighbours(courseId, ix, pos) {
   const lessons = courseLessons(courseId);
-  const sections = lessonSections(courseId, lessons[ix].chave);
+  const sections = lessonSections(courseId, lessons[ix].key);
   const lastOf = (i) => {
-    const s = lessonSections(courseId, lessons[i].chave);
+    const s = lessonSections(courseId, lessons[i].key);
     return s[s.length - 1].id;
   };
   const previous = pos > 0
-    ? { ix, secId: sections[pos - 1].id }
-    : (ix > 0 ? { ix: ix - 1, secId: lastOf(ix - 1) } : null);
+    ? { ix, sectionId: sections[pos - 1].id }
+    : (ix > 0 ? { ix: ix - 1, sectionId: lastOf(ix - 1) } : null);
   const next = pos + 1 < sections.length
-    ? { ix, secId: sections[pos + 1].id }
+    ? { ix, sectionId: sections[pos + 1].id }
     : (ix + 1 < lessons.length
-      ? { ix: ix + 1, secId: lessonSections(courseId, lessons[ix + 1].chave)[0].id }
+      ? { ix: ix + 1, sectionId: lessonSections(courseId, lessons[ix + 1].key)[0].id }
       : null);
   return { previous, next };
 }
@@ -69,7 +69,7 @@ export default async function lesson({ id, ix, sec }) {
   const a = lessons[n];
   if (!c || !a) return { title: txt('Aula'), el: empty(txt('Aula não encontrada.')) };
 
-  const sections = lessonSections(id, a.chave);
+  const sections = lessonSections(id, a.key);
   const pos = Math.max(0, sections.findIndex((s) => s.id === sec));
   const section = sections[pos];
 
@@ -77,7 +77,7 @@ export default async function lesson({ id, ix, sec }) {
 
   const { previous, next } = neighbours(id, n, pos);
   const note = noteFor(id, n, section.id);
-  const routeTo = (v) => '#/curso/' + esc(id) + '/aula/' + v.ix + '/' + esc(v.secId);
+  const routeTo = (v) => '#/curso/' + esc(id) + '/aula/' + v.ix + '/' + esc(v.sectionId);
 
   const el = document.createElement('div');
   const hasVideoHere = section.tipo === 'conteudo' && section.video !== undefined;
@@ -88,7 +88,7 @@ export default async function lesson({ id, ix, sec }) {
       (s.tipo === 'avaliacao' ? ' passo-aval' : '') + (s.pending ? ' passo-pendente' : '') + '" ' +
       'href="#/curso/' + esc(id) + '/aula/' + n + '/' + esc(s.id) + '">' +
       '<span class="passo-n">' + (s.tipo === 'avaliacao' ? '★' : String(i + 1).padStart(2, '0')) + '</span>' +
-      '<span class="passo-tit">' + esc(s.titulo) + '</span>' +
+      '<span class="passo-tit">' + esc(s.title) + '</span>' +
     '</a>'
   )).join('');
 
@@ -125,17 +125,17 @@ export default async function lesson({ id, ix, sec }) {
     sideArrow(nextTarget, 'dir', ARROW_RIGHT, 'concluir e ir para a próxima seção', true) +
 
     '<nav class="migalhas">' +
-      '<a href="#/curso/' + esc(id) + '">' + esc(c.nome) + '</a>' +
+      '<a href="#/curso/' + esc(id) + '">' + esc(c.name) + '</a>' +
       '<span aria-hidden="true">›</span>' +
       '<span>' + txt('aula') + ' ' + (n + 1) + ' ' + txt('de') + ' ' + lessons.length + '</span>' +
     '</nav>' +
 
     '<header class="aula-cabeca">' +
-      '<h1 class="aula-titulo">' + esc(a.titulo) + '</h1>' +
+      '<h1 class="aula-titulo">' + esc(a.title) + '</h1>' +
       '<nav class="passos" aria-label="' + txt('Seções desta aula') + '">' + steps + '</nav>' +
     '</header>' +
 
-    '<h2 class="secao-titulo">' + esc(section.titulo) + '</h2>' +
+    '<h2 class="secao-titulo">' + esc(section.title) + '</h2>' +
 
     /* THE PLAYER COMES AFTER THE HEADER. It used to come before, so as not to
        push the play button below the fold — and the price was landing in a
@@ -146,7 +146,7 @@ export default async function lesson({ id, ix, sec }) {
           (videoReady
             ? '<button type="button" class="video-play" aria-label="' + txt('Assistir') + '">▶</button>'
             : '<span class="video-breve mono dim">' + txt('vídeo em breve') + '</span>') +
-          (section.duracao ? '<span class="video-duracao mono">' + esc(section.duracao) + '</span>' : '') +
+          (section.duration ? '<span class="video-duracao mono">' + esc(section.duration) + '</span>' : '') +
         '</div>'
       : '') +
 
@@ -159,8 +159,8 @@ export default async function lesson({ id, ix, sec }) {
       /* A video-only section gets no text block at all — not even the "content
          to come" notice, which would be false there: the content is the video.
          The notice still holds for a lesson with nothing written yet. */
-      : (section.corpo
-        ? '<section class="bloco aula-texto">' + prose(section.corpo) + '</section>'
+      : (section.body
+        ? '<section class="bloco aula-texto">' + prose(section.body) + '</section>'
         : (hasVideo
           ? ''
           : '<section class="bloco aula-texto"><p class="mono dim">' +
@@ -188,8 +188,8 @@ export default async function lesson({ id, ix, sec }) {
     '</footer>';
 
   if (section.tipo === 'avaliacao' && !section.pending) {
-    const exercises = await api.lessonExercises(id, a.chave);
-    el.querySelector('.aula-exercicios').appendChild(buildAssessment(exercises, { cursoId: id, aulaIx: n }));
+    const exercises = await api.lessonExercises(id, a.key);
+    el.querySelector('.aula-exercicios').appendChild(buildAssessment(exercises, { courseId: id, lessonIx: n }));
   }
 
   const frame = el.querySelector('.video-fachada');
@@ -198,7 +198,7 @@ export default async function lesson({ id, ix, sec }) {
       const cx = e.currentTarget;
       if (!cx.dataset.video) return;
       cx.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(cx.dataset.video) +
-        '?autoplay=1" title="' + esc(section.titulo) + '" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+        '?autoplay=1" title="' + esc(section.title) + '" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
     });
   }
 
@@ -231,5 +231,5 @@ export default async function lesson({ id, ix, sec }) {
     if (!sectionDone(id, n, section.id)) api.completeSection(id, n, section.id, true);
   });
 
-  return { title: a.titulo + ' · ' + section.titulo, el };
+  return { title: a.title + ' · ' + section.title, el };
 }

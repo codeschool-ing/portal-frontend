@@ -54,12 +54,12 @@ export function lessonSections(courseId, key) {
 
   const sections = written?.length
     ? written.map((s) => ({ ...s, tipo: 'conteudo' }))
-    : [{ id: 'conteudo', titulo: 'Conteúdo', tipo: 'conteudo', corpo: null }];
+    : [{ id: 'conteudo', title: 'Conteúdo', tipo: 'conteudo', body: null }];
 
   const exercises = lessonExercises(courseId, key);
   sections.push({
     id: 'avaliacao',
-    titulo: 'Avaliação',
+    title: 'Avaliação',
     tipo: 'avaliacao',
     count: exercises.length,
     pending: exercises.length === 0,
@@ -79,21 +79,21 @@ export const countableSections = (courseId, key) =>
 export function fullLesson(courseId, ix) {
   const a = courseLessons(courseId)[ix];
   if (!a) return null;
-  return { ...a, secoes: lessonSections(courseId, a.chave) };
+  return { ...a, sections: lessonSections(courseId, a.key) };
 }
 
 export const courseSections = (courseId) =>
-  courseLessons(courseId).map((a) => lessonSections(courseId, a.chave));
+  courseLessons(courseId).map((a) => lessonSections(courseId, a.key));
 
 /* The total number of sections in a course — the denominator of every bit of
    progress in the portal. Counting lessons would measure it wrong: a lesson can
    have one section or six, and the bar would move in jumps that do not match
    the effort. */
 export const sectionCount = (courseId) =>
-  courseLessons(courseId).reduce((s, a) => s + countableSections(courseId, a.chave).length, 0);
+  courseLessons(courseId).reduce((s, a) => s + countableSections(courseId, a.key).length, 0);
 
-export const sectionIndex = (sections, secId) => {
-  const i = sections.findIndex((s) => s.id === secId);
+export const sectionIndex = (sections, sectionId) => {
+  const i = sections.findIndex((s) => s.id === sectionId);
   return i < 0 ? 0 : i;
 };
 
@@ -113,7 +113,7 @@ export const sectionIndex = (sections, secId) => {
 export const materialByKey = (key) => (window.MATERIALS || {})[key] || null;
 
 export const sectionMaterials = (section) =>
-  (section?.materiais || []).map(materialByKey).filter(Boolean);
+  (section?.materials || []).map(materialByKey).filter(Boolean);
 
 /* Every material in a course, without repeats — this is what the course page
    shows, for anyone who wants to download the lot instead of hunting section by
@@ -122,13 +122,13 @@ export function courseMaterials(courseId) {
   const seen = new Set();
   const out = [];
   courseLessons(courseId).forEach((a, ix) => {
-    lessonSections(courseId, a.chave).forEach((s) => {
-      (s.materiais || []).forEach((key) => {
+    lessonSections(courseId, a.key).forEach((s) => {
+      (s.materials || []).forEach((key) => {
         if (seen.has(key)) return;
         const m = materialByKey(key);
         if (!m) return;
         seen.add(key);
-        out.push({ ...m, chave: key, aulaIx: ix, secId: s.id, aula: a.titulo });
+        out.push({ ...m, key: key, lessonIx: ix, sectionId: s.id, aula: a.title });
       });
     });
   });

@@ -7,7 +7,7 @@
 
    THREE STATES, NOT TWO. "Got it wrong" and "nobody checked" cannot become the
    same bar: the types that need a server (`code`, `expected-output`,
-   `expression-answer`) answer `acertou: null` while there is no execution, and
+   `expression-answer`) answer `correct: null` while there is no execution, and
    counting them as mistakes would invent a failure that never happened. It is
    the funnel's rule, from the other side: there, unjudged never becomes passed;
    here, unjudged never becomes failed.
@@ -28,7 +28,7 @@ export function answersWithExercise() {
     .filter((r) => r.ex);
 }
 
-export const wrongOnes = () => answersWithExercise().filter((r) => r.conferido && !r.acertou);
+export const wrongOnes = () => answersWithExercise().filter((r) => r.checked && !r.correct);
 
 export default async function performance() {
   const el = document.createElement('div');
@@ -42,29 +42,29 @@ export default async function performance() {
     };
   }
 
-  const checked = all.filter((r) => r.conferido);
-  const right = checked.filter((r) => r.acertou).length;
+  const checked = all.filter((r) => r.checked);
+  const right = checked.filter((r) => r.correct).length;
   const pending = all.length - checked.length;
   const pct = checked.length ? Math.round((right / checked.length) * 100) : 0;
-  const attempts = all.reduce((s, r) => s + r.tentativas, 0);
+  const attempts = all.reduce((s, r) => s + r.attempts, 0);
 
   const groupBy = (key) => {
     const m = {};
     checked.forEach((r) => {
       const k = key(r);
-      m[k] = m[k] || { total: 0, certos: 0 };
+      m[k] = m[k] || { total: 0, lastCorrect: 0 };
       m[k].total += 1;
-      if (r.acertou) m[k].certos += 1;
+      if (r.correct) m[k].lastCorrect += 1;
     });
     return Object.entries(m).sort((a, b) => b[1].total - a[1].total);
   };
 
   const row = (label, d) => {
-    const p = Math.round((d.certos / d.total) * 100);
+    const p = Math.round((d.lastCorrect / d.total) * 100);
     return '<div class="dsp-linha">' +
       '<span class="dsp-rot">' + esc(label) + '</span>' +
-      bar(p, d.certos + ' de ' + d.total) +
-      '<span class="dsp-num">' + d.certos + '/' + d.total + '</span>' +
+      bar(p, d.lastCorrect + ' de ' + d.total) +
+      '<span class="dsp-num">' + d.lastCorrect + '/' + d.total + '</span>' +
     '</div>';
   };
 
@@ -97,7 +97,7 @@ export default async function performance() {
 
     '<section class="bloco">' +
       '<div class="bloco-topo"><h2>' + txt('Por curso') + '</h2></div>' +
-      groupBy((r) => r.cursoId).map(([k, d]) => row(courseById(k)?.nome || k, d)).join('') +
+      groupBy((r) => r.courseId).map(([k, d]) => row(courseById(k)?.name || k, d)).join('') +
     '</section>' +
 
     (wrong.length
@@ -111,12 +111,12 @@ export default async function performance() {
           '</div>' +
           '<ul class="dsp-errados">' +
             wrong.map((r) => {
-              const a = courseLessons(r.cursoId)[r.aulaIx];
-              const c = courseById(r.cursoId);
-              return '<li><a href="#/curso/' + esc(r.cursoId) + '/aula/' + r.aulaIx + '/avaliacao">' +
+              const a = courseLessons(r.courseId)[r.lessonIx];
+              const c = courseById(r.courseId);
+              return '<li><a href="#/curso/' + esc(r.courseId) + '/aula/' + r.lessonIx + '/avaliacao">' +
                 '<span class="de-tipo">' + txt(r.ex.type) + '</span>' +
-                '<span class="de-enunciado">' + esc(r.ex.statement) + '</span>' +
-                '<span class="de-onde">' + esc(c ? c.nome : r.cursoId) + (a ? ' · ' + esc(a.titulo) : '') + '</span>' +
+                '<span class="de-enunciado">' + esc(r.ex.prompt) + '</span>' +
+                '<span class="de-onde">' + esc(c ? c.name : r.courseId) + (a ? ' · ' + esc(a.title) : '') + '</span>' +
               '</a></li>';
             }).join('') +
           '</ul>' +

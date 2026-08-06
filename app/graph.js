@@ -30,7 +30,7 @@ export function courseState(id) {
   if (courseDone(id)) return 'concluido';
   const p = courseProgress(id);
   if (p.feitas > 0) return 'atual';
-  const deps = courseById(id)?.depende || [];
+  const deps = courseById(id)?.requires || [];
   const ready = deps.every((d) => courseDone(d));
   return ready ? 'disponivel' : 'adiante';
 }
@@ -48,7 +48,7 @@ function courseCard(id, order, deps) {
   const c = courseById(id);
   if (!c) return '';
   const trackCount = tracksWithCourse(id).length;
-  const requires = (deps || []).map((d) => courseById(d)?.nome).filter(Boolean);
+  const requires = (deps || []).map((d) => courseById(d)?.name).filter(Boolean);
   const p = courseProgress(id);
   const st = courseState(id);
 
@@ -56,9 +56,9 @@ function courseCard(id, order, deps) {
     '<button class="curso-no no-' + st + '" type="button" data-curso="' + esc(c.id) + '" data-no="' + esc(c.id) + '">' +
       (order ? '<span class="ordem">' + txt('nível') + ' ' + order + '</span>' : '') +
       '<span class="no-estado" data-estado="' + st + '">' + txt(STATE_LABEL[st]) + '</span>' +
-      '<span class="nome">' + esc(c.nome) + '</span>' +
+      '<span class="nome">' + esc(c.name) + '</span>' +
       (trackCount > 1 ? '<span class="tag-compartilhado">' + txt('em') + ' ' + trackCount + ' ' + txt('trilhas') + '</span>' : '') +
-      '<span class="meta">' + c.horas + 'h · ' + txt(c.nivel) + '</span>' +
+      '<span class="meta">' + c.hours + 'h · ' + txt(c.level) + '</span>' +
       (p.total
         ? '<span class="no-barra" role="img" aria-label="' + p.feitas + ' de ' + p.total + '">' +
             '<span class="no-barra-cheia" style="width:' + p.pct + '%"></span>' +
@@ -92,30 +92,30 @@ export function buildTrack(t) {
           '</span>' +
           '<span class="saida-txt">' +
             '<span class="saida-rotulo">' + txt('chegada') + '</span>' +
-            '<span class="saida-nome">' + esc(t.saida) + '</span>' +
+            '<span class="saida-nome">' + esc(t.outcome) + '</span>' +
           '</span>' +
         '</div>';
       }
-      if (node.kind === 'curso') {
-        const names = (courseById(node.id)?.depende || []).filter((d) => g.nodes.some((x) => x.cursos.includes(d)));
+      if (node.kind === 'course') {
+        const names = (courseById(node.id)?.requires || []).filter((d) => g.nodes.some((x) => x.courses.includes(d)));
         return courseCard(node.id, String(v + 1).padStart(2, '0'), names);
       }
       // a choice step: one single block, with the options as tabs
       const item = node.step;
       const sel = activeOption(t.id, node.idx);
-      const tabs = item.opcoes.map((o, j) =>
+      const tabs = item.options.map((o, j) =>
         '<button class="garfo-aba' + (j === sel ? ' on' : '') + '" type="button" ' +
-        'data-garfo="' + node.idx + '" data-opcao="' + j + '">' + esc(o.nome) +
-        '<span class="garfo-h">' + hoursOf(o.cursos) + 'h</span></button>').join('');
-      const inside = item.opcoes[sel].cursos.map((id) => courseCard(id)).join('');
+        'data-garfo="' + node.idx + '" data-opcao="' + j + '">' + esc(o.name) +
+        '<span class="garfo-h">' + hoursOf(o.courses) + 'h</span></button>').join('');
+      const inside = item.options[sel].courses.map((id) => courseCard(id)).join('');
       return (
         '<div class="garfo" data-no="' + esc(node.id) + '">' +
           '<div class="garfo-topo">' +
             '<span class="garfo-rotulo">' + txt('nível') + ' ' + String(v + 1).padStart(2, '0') +
-              ' · ' + txt('você escolhe') + ' ' + esc(item.escolha) + '</span>' +
+              ' · ' + txt('você escolhe') + ' ' + esc(item.choice) + '</span>' +
             '<div class="garfo-abas" role="tablist">' + tabs + '</div>' +
           '</div>' +
-          (item.nota ? '<p class="garfo-nota">' + esc(item.nota) + '</p>' : '') +
+          (item.note ? '<p class="garfo-nota">' + esc(item.note) + '</p>' : '') +
           '<div class="garfo-cursos">' + inside + '</div>' +
         '</div>'
       );
@@ -130,13 +130,13 @@ export function buildTrack(t) {
   return (
     '<div class="trilha-topo">' +
       '<div>' +
-        '<h2>' + esc(t.nome) + '</h2>' +
-        '<p>' + esc(t.objetivo) + '</p>' +
+        '<h2>' + esc(t.name) + '</h2>' +
+        '<p>' + esc(t.goal) + '</p>' +
       '</div>' +
       '<div class="trilha-resumo">' +
         '<span><b>' + done + '/' + path.length + '</b>' + txt('cursos concluídos') + '</span>' +
         workload +
-        '<span><b>→</b>' + esc(t.saida) + '</span>' +
+        '<span><b>→</b>' + esc(t.outcome) + '</span>' +
       '</div>' +
     '</div>' +
     '<div class="grafo-caixa">' +
@@ -334,9 +334,9 @@ export function drawEdges(root, t) {
 function nodeLabel(id, g) {
   if (id === '@saida') return txt('chegada');
   const c = courseById(id);
-  if (c) return c.nome;
+  if (c) return c.name;
   const node = g.nodes.find((n) => n.id === id);
-  return node && node.step ? 'escolha ' + node.step.escolha : id;
+  return node && node.step ? 'escolha ' + node.step.choice : id;
 }
 
 export function adjustGraphArrows(root) {
@@ -353,4 +353,4 @@ export function adjustGraphArrows(root) {
   scroller.classList.toggle('fade-baixo', spareY > 4 && scroller.scrollTop < spareY - 4);
 }
 
-export const enrolledTrack = () => now().matricula?.trilhaId || null;
+export const enrolledTrack = () => now().enrollment?.trackId || null;
