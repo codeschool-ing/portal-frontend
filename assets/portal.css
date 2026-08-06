@@ -1158,6 +1158,12 @@ html[data-theme="light"] .cert-in{--linkedin:#0a66c2}
 .cert-missing li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;font-size:.9rem}
 
 .account-note{font-size:.84rem;color:var(--paper-dim);line-height:1.5}
+/* The build, at the bottom of the last screen. It is not for the student, so
+   it is the quietest thing on the page and centred rather than in the flow of
+   the sections above. */
+.account-version{margin-top:6px;text-align:center;font-size:.66rem;letter-spacing:.06em}
+.account-version a{color:inherit;transition:color .2s}
+.account-version a:hover{color:var(--phosphor)}
 /* `.block` is a flex column, and a flex column stretches its children: a loose
    button inside it became an edge-to-edge strip. A button has the width of its
    label. */
