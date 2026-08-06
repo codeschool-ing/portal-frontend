@@ -26,6 +26,7 @@
    ========================================================================== */
 
 import { chromium } from 'playwright';
+import { readFile } from 'node:fs/promises';
 
 const BASE = process.env.PORTAL || 'http://127.0.0.1:8899';
 const CHROME = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
@@ -34,7 +35,11 @@ const CHROME = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linu
 const PAGE = process.env.PAGE || '/index.html';
 const errors = [];
 const b = await chromium.launch({ executablePath: CHROME });
-const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+// `acceptDownloads` so the certificate's PNG button can be exercised: without
+// it Playwright cancels the download and the test would pass on a button that
+// never produced a file.
+const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true });
+const p = await ctx.newPage();
 p.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
 p.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
 
@@ -1024,25 +1029,34 @@ ok('and it grows on screen', await p.evaluate(() => {
 ok('the background freezes', await p.evaluate(() =>
   getComputedStyle(document.documentElement).overflow === 'hidden'));
 
-/* The LinkedIn button sits next to the close button in BOTH cases — hiding it
-   would make the feature look non-existent. On an example it comes disabled and
-   with no `href`: visible, and unable to publish a credential nobody earned. */
-ok('the example shows the LinkedIn button', (await p.locator('.modal-actions .cert-in').count()) === 1);
-ok('but it leads nowhere', await p.evaluate(() => {
-  const b = document.querySelector('.modal-actions .cert-in');
-  return b.tagName !== 'A' && b.getAttribute('aria-disabled') === 'true';
-}));
-ok('the button sits left of the close button', await p.evaluate(() => {
-  const b = document.querySelector('.modal-actions .cert-in').getBoundingClientRect();
-  return b.right <= document.querySelector('.modal-close').getBoundingClientRect().left + 1;
-}));
+/* Both buttons sit next to the close button in BOTH cases — hiding one would
+   make the feature look non-existent. On an example they come disabled and
+   without a target: visible, and unable to publish or save a credential nobody
+   earned. `:not(.cert-png)` is how the LinkedIn one is named apart, now that
+   two controls share the shape. */
+const LI = '.modal-actions .cert-in:not(.cert-png)';
+ok('the example shows both certificate buttons',
+  (await p.locator('.modal-actions .cert-in').count()) === 2);
+ok('and neither leads anywhere', await p.evaluate((li) => {
+  const a = document.querySelector(li);
+  const png = document.querySelector('.modal-actions .cert-png');
+  return a.tagName !== 'A' && a.getAttribute('aria-disabled') === 'true'
+    && png.tagName !== 'BUTTON' && png.getAttribute('aria-disabled') === 'true';
+}, LI));
+ok('the buttons sit left of the close button', await p.evaluate((li) => {
+  const close = document.querySelector('.modal-close').getBoundingClientRect().left + 1;
+  return [li, '.modal-actions .cert-png']
+    .every((sel) => document.querySelector(sel).getBoundingClientRect().right <= close);
+}, LI));
 /* Icon only: the label left the screen and moved into the `aria-label`, which is
    what a screen reader announces. An icon button with no accessible name is a
    mute button. */
-ok('the button is icon only, with an accessible name', await p.evaluate(() => {
-  const b = document.querySelector('.modal-actions .cert-in');
-  return b.textContent.trim() === '' && (b.getAttribute('aria-label') || '').length > 5;
-}));
+ok('the buttons are icon only, with accessible names', await p.evaluate((li) => {
+  return [li, '.modal-actions .cert-png'].every((sel) => {
+    const b = document.querySelector(sel);
+    return b.textContent.trim() === '' && (b.getAttribute('aria-label') || '').length > 5;
+  });
+}, LI));
 await p.keyboard.press('Escape');
 await p.waitForTimeout(200);
 ok('Esc closes the certificate', (await p.locator('.modal-cert').count()) === 0);
@@ -1100,7 +1114,7 @@ ok('a certificate is issued with the course done and the exam passed', true);
 
 await p.locator('.cert:not(.cert-sample)').first().click();
 await p.waitForSelector('.modal-cert');
-const profileUrl = await p.locator('.modal-actions .cert-in').first().getAttribute('href');
+const profileUrl = await p.locator(LI).first().getAttribute('href');
 ok('there is an add-to-LinkedIn-profile button',
   profileUrl.startsWith('https://www.linkedin.com/profile/add?'));
 /* The fields LinkedIn needs to fill the form on its own. Missing one of them
@@ -1110,9 +1124,32 @@ ok('the URL carries every certificate field', fields.every((c) => profileUrl.inc
   fields.filter((c) => !profileUrl.includes(c)).join(', ') || 'all of them');
 ok('the code in the URL is the one printed on the document', await p.evaluate(() => {
   const code = document.querySelector('.modal-cert .cert-code').textContent.trim();
-  const href = document.querySelector('.modal-actions .cert-in').href;
+  const href = document.querySelector('.modal-actions .cert-in:not(.cert-png)').href;
   return href.includes(encodeURIComponent(code));
 }));
+
+/* The PNG. Checked by DOWNLOADING it and reading the bytes: a button that
+   fires and produces nothing looks identical from the outside, and the file is
+   the whole point of it. The signature is PNG's, and the size is the one the
+   module declares — a canvas that failed to draw still saves, at 0 bytes. */
+const certCode = (await p.locator('.modal-cert .cert-code').innerText()).trim();
+const [png] = await Promise.all([
+  p.waitForEvent('download', { timeout: 15000 }),
+  p.locator('.modal-actions .cert-png').click(),
+]);
+ok('the certificate downloads as a PNG named after its code',
+  png.suggestedFilename() === 'codeschool-ing-' + certCode.replace(/[^\w-]+/g, '') + '.png',
+  png.suggestedFilename());
+const pngPath = await png.path();
+const bytes = pngPath ? await readFile(pngPath) : Buffer.alloc(0);
+ok('and the file is a real PNG, not an empty one',
+  bytes.length > 4000 && bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])),
+  bytes.length + ' bytes');
+/* The dimensions live in one place, and a silent change of them would ship a
+   certificate at the wrong size to whoever downloads it. */
+const dims = bytes.length > 24 ? [bytes.readUInt32BE(16), bytes.readUInt32BE(20)] : [0, 0];
+ok('at the declared size', dims[0] === 2000 && dims[1] === 1160, dims.join('x'));
+
 await p.keyboard.press('Escape');
 await p.waitForTimeout(150);
 
