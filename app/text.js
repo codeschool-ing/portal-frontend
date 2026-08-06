@@ -49,7 +49,7 @@ const ICON_COPIED = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" 
 
 export const copyButton = () =>
   '<button type="button" class="cod-copiar" data-copiar ' +
-    'title="' + txt('Copiar o código') + '" aria-label="' + txt('Copiar o código') + '">' +
+    'title="' + txt('Copy the code') + '" aria-label="' + txt('Copy the code') + '">' +
     ICON_COPY + '</button>';
 
 export const COPY_ICONS = { copy: ICON_COPY, copied: ICON_COPIED };
@@ -178,7 +178,7 @@ function annotatedExample(ex) {
       (ex.output
         ? '<span class="exemplo-vazio" aria-hidden="true"></span>' +
           '<div class="exemplo-saida">' +
-            '<span class="exemplo-saida-rot mono dim">' + txt('saída') + '</span>' +
+            '<span class="exemplo-saida-rot mono dim">' + txt('output') + '</span>' +
             '<pre class="cod"><code>' + esc(ex.output) + '</code></pre>' +
           '</div>'
         : '') +

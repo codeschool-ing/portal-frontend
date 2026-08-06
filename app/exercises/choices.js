@@ -37,7 +37,7 @@ export default {
     }).join('');
 
     return (
-      (many ? '<p class="ex-instrucao">' + txt('Marque todas as que se aplicam.') + '</p>' : '') +
+      (many ? '<p class="ex-instrucao">' + txt('Select all that apply.') + '</p>' : '') +
       '<div class="alts">' + options + '</div>'
     );
   },

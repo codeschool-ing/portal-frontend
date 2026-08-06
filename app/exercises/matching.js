@@ -48,14 +48,14 @@ export default {
 
     return (
       '<p class="ex-instrucao">' +
-        txt('Toque num item da esquerda e depois no par dele à direita.') +
-        (spare > 0 ? ' <strong>' + spare + ' ' + txt('opções ficam de fora.') + '</strong>' : '') +
+        txt('Tap an item on the left, then its pair on the right.') +
+        (spare > 0 ? ' <strong>' + spare + ' ' + txt('options are left out.') + '</strong>' : '') +
       '</p>' +
       '<div class="assoc-colunas">' +
         '<div class="assoc-col assoc-col-esq">' + left.map((t) => tile(t, 'esq')).join('') + '</div>' +
         '<div class="assoc-col assoc-col-dir">' + right.map((t) => tile(t, 'dir')).join('') + '</div>' +
       '</div>' +
-      '<p class="assoc-conta"><span class="assoc-feitos">0</span>/' + ex.pairs.length + ' ' + txt('pares') + '</p>'
+      '<p class="assoc-conta"><span class="assoc-feitos">0</span>/' + ex.pairs.length + ' ' + txt('pairs') + '</p>'
     );
   },
 
@@ -131,8 +131,8 @@ export default {
       const p = document.createElement('p');
       p.className = 'assoc-erros';
       p.textContent = v.errors === 1
-        ? txt('1 par foi tentado errado antes de fechar.')
-        : v.errors + ' ' + txt('pares foram tentados errado antes de fechar.');
+        ? txt('1 pair was tried wrong before it closed.')
+        : v.errors + ' ' + txt('pairs were tried wrong before closing.');
       root.appendChild(p);
     }
   },

@@ -37,8 +37,8 @@ export default async function performance() {
 
   if (!all.length) {
     return {
-      title: txt('Desempenho'),
-      el: empty(txt('Você ainda não respondeu nenhum exercício. Faça uma avaliação e volte aqui.')),
+      title: txt('Performance'),
+      el: empty(txt('You have not answered any exercises yet. Take an assessment and come back.')),
     };
   }
 
@@ -72,42 +72,42 @@ export default async function performance() {
 
   el.innerHTML =
     '<header class="tela-head">' +
-      '<h1>' + txt('Como você está indo') + '</h1>' +
+      '<h1>' + txt('How you are doing') + '</h1>' +
     '</header>' +
 
     '<section class="bloco">' +
       '<div class="trilha-numeros">' +
-        '<span><b>' + pct + '%</b>' + txt('de acerto') + '</span>' +
-        '<span><b>' + right + '/' + checked.length + '</b>' + txt('exercícios conferidos') + '</span>' +
-        '<span><b>' + attempts + '</b>' + txt('tentativas') + '</span>' +
-        (pending ? '<span><b>' + pending + '</b>' + txt('aguardando o servidor') + '</span>' : '') +
+        '<span><b>' + pct + '%</b>' + txt('correct') + '</span>' +
+        '<span><b>' + right + '/' + checked.length + '</b>' + txt('exercises checked') + '</span>' +
+        '<span><b>' + attempts + '</b>' + txt('attempts') + '</span>' +
+        (pending ? '<span><b>' + pending + '</b>' + txt('waiting for the server') + '</span>' : '') +
       '</div>' +
       bar(pct, pct + '%') +
       (pending
         ? '<p class="conta-nota mono dim">' +
-            txt('Os tipos que precisam de execução ainda não são conferidos, e por isso não entram na taxa.') +
+            txt('The types that need execution are not checked yet, so they stay out of the rate.') +
           '</p>'
         : '') +
     '</section>' +
 
     '<section class="bloco">' +
-      '<div class="bloco-topo"><h2>' + txt('Por tipo de exercício') + '</h2></div>' +
+      '<div class="bloco-topo"><h2>' + txt('By exercise type') + '</h2></div>' +
       groupBy((r) => r.ex.type).map(([k, d]) => row(txt(k), d)).join('') +
     '</section>' +
 
     '<section class="bloco">' +
-      '<div class="bloco-topo"><h2>' + txt('Por curso') + '</h2></div>' +
+      '<div class="bloco-topo"><h2>' + txt('By course') + '</h2></div>' +
       groupBy((r) => r.courseId).map(([k, d]) => row(courseById(k)?.name || k, d)).join('') +
     '</section>' +
 
     (wrong.length
       ? '<section class="bloco">' +
           '<div class="bloco-topo">' +
-            '<h2>' + txt('O que você errou') + '</h2>' +
+            '<h2>' + txt('What you got wrong') + '</h2>' +
             '<a class="btn btn-primary" href="#/refazer">' +
               (wrong.length === 1
-                ? txt('Refazer o que você errou')
-                : txt('Refazer os') + ' ' + wrong.length + ' ' + txt('errados')) + ' →</a>' +
+                ? txt('Redo what you got wrong')
+                : txt('Redo the') + ' ' + wrong.length + ' ' + txt('wrong ones')) + ' →</a>' +
           '</div>' +
           '<ul class="dsp-errados">' +
             wrong.map((r) => {
@@ -121,7 +121,7 @@ export default async function performance() {
             }).join('') +
           '</ul>' +
         '</section>'
-      : '<section class="bloco"><p class="vazio">' + txt('Nenhum erro pendente. Bom trabalho.') + '</p></section>');
+      : '<section class="bloco"><p class="vazio">' + txt('No mistakes pending. Good work.') + '</p></section>');
 
-  return { title: txt('Desempenho'), el };
+  return { title: txt('Performance'), el };
 }

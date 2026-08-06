@@ -67,20 +67,20 @@ function card({ label, name, meta, who, when, key, sample, grade }) {
      to it would be a worse target for the same intention. */
   return '<article class="cert' + (sample ? ' cert-exemplo' : '') + '" ' +
       'tabindex="0" role="button" data-cert="' + esc(key) + '" ' +
-      'aria-label="' + txt('Ver o certificado em tamanho grande') + '">' +
+      'aria-label="' + txt('View the certificate at full size') + '">' +
     '<div class="cert-folha">' +
       '<header class="cert-topo">' +
         '<span class="cert-marca"><span class="cert-led" aria-hidden="true"></span>codeschool<b>.ing</b></span>' +
         (sample
-          ? '<span class="cert-selo">' + txt('exemplo') + '</span>'
+          ? '<span class="cert-selo">' + txt('sample') + '</span>'
           : '<span class="cert-tipo">' + txt(label) + '</span>') +
       '</header>' +
 
       '<div class="cert-miolo">' +
-        '<span class="cert-frase">' + txt('certifica que') + '</span>' +
+        '<span class="cert-frase">' + txt('certifies that') + '</span>' +
         '<p class="cert-aluno">' + esc(who) + '</p>' +
         '<span class="cert-frase">' +
-          txt(label === 'trilha concluída' ? 'concluiu a trilha' : 'concluiu o curso') + '</span>' +
+          txt(label === 'track completed' ? 'completed the track' : 'completed the course') + '</span>' +
         '<h2 class="cert-curso">' + esc(name) + '</h2>' +
         '<p class="cert-meta">' + esc(meta) + (grade ? ' · ' + esc(grade) : '') + '</p>' +
       '</div>' +
@@ -88,7 +88,7 @@ function card({ label, name, meta, who, when, key, sample, grade }) {
       '<footer class="cert-pe">' +
         '<span>' + esc(when) + '</span>' +
         '<span class="cert-codigo">' +
-          (sample ? txt('exemplo — nenhum código foi emitido') : code(key + who)) +
+          (sample ? txt('sample — no code has been issued') : code(key + who)) +
         '</span>' +
       '</footer>' +
     '</div>' +
@@ -136,10 +136,10 @@ function linkedInButtons({ name, code: certCode, when }) {
      did not disappear — it lives in the `aria-label` and the `title`, which is
      what a screen reader announces and what the cursor shows. */
   return '<a class="cert-in" href="' + esc(profile) + '" target="_blank" rel="noopener" ' +
-      'title="' + txt('Adicionar ao perfil do LinkedIn') + '" ' +
-      'aria-label="' + txt('Adicionar ao perfil do LinkedIn') + '">' + ICON_LINKEDIN + '</a>' +
+      'title="' + txt('Add to LinkedIn profile') + '" ' +
+      'aria-label="' + txt('Add to LinkedIn profile') + '">' + ICON_LINKEDIN + '</a>' +
     '<a class="btn btn-ghost cert-share" href="' + esc(post) + '" target="_blank" rel="noopener">' +
-      txt('Compartilhar') + '</a>';
+      txt('Share') + '</a>';
 }
 
 const ICON_LINKEDIN = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
@@ -167,24 +167,24 @@ export default async function certificates() {
   const issued =
     (trackReady
       ? card({
-        label: 'trilha concluída',
+        label: 'track completed',
         name: t.name,
-        meta: onPath.length + ' ' + txt('cursos') + ' · ' +
+        meta: onPath.length + ' ' + txt('courses') + ' · ' +
           onPath.reduce((s, id) => s + (courseById(id)?.hours || 0), 0) + 'h',
         who: who,
         when: today,
         key: 'trilha.' + t.id,
-        grade: txt('prova da trilha:') + ' ' + examResult('track:' + t.id).best + '%',
+        grade: txt('track exam:') + ' ' + examResult('track:' + t.id).best + '%',
       })
       : '') +
     done.map((c) => card({
-      label: 'curso concluído',
+      label: 'course completed',
       name: c.name,
       meta: c.hours + 'h · ' + txt(c.level) + (onPath.includes(c.id) && t ? ' · ' + t.name : ''),
       who: who,
       when: today,
       key: c.id,
-      grade: txt('prova final:') + ' ' + examResult('course:' + c.id).best + '%',
+      grade: txt('final exam:') + ' ' + examResult('course:' + c.id).best + '%',
     })).join('');
 
   /* The examples: one of each kind the student does not have yet. Someone who
@@ -198,43 +198,43 @@ export default async function certificates() {
   const model = courseById(onPath[0]) || COURSES[0];
   const examples =
     (done.length ? '' : card({
-      label: 'curso concluído',
+      label: 'course completed',
       name: model.name,
       meta: model.hours + 'h · ' + txt(model.level) + (t ? ' · ' + t.name : ''),
       who: who,
       when: today,
       key: 'exemplo.curso',
       sample: true,
-      grade: txt('prova final:') + ' 90%',
+      grade: txt('final exam:') + ' 90%',
     })) +
     (trackReady ? '' : card({
-      label: 'trilha concluída',
+      label: 'track completed',
       name: t ? t.name : TRACKS[0].name,
-      meta: (onPath.length || 10) + ' ' + txt('cursos') + ' · ' +
+      meta: (onPath.length || 10) + ' ' + txt('courses') + ' · ' +
         (onPath.reduce((s, id) => s + (courseById(id)?.hours || 0), 0) || 380) + 'h',
       who: who,
       when: today,
       key: 'exemplo.trilha',
       sample: true,
-      grade: txt('prova da trilha:') + ' 84%',
+      grade: txt('track exam:') + ' 84%',
     }));
 
   el.innerHTML =
     '<header class="tela-head">' +
-      '<h1>' + txt('Seus certificados') + '</h1>' +
-      '<p>' + txt('Um por curso concluído com prova aprovada, e um por trilha inteira.') + '</p>' +
+      '<h1>' + txt('Your certificates') + '</h1>' +
+      '<p>' + txt('One per course completed with a passed exam, and one per whole track.') + '</p>' +
     '</header>' +
 
     (issued ? '<div class="certs">' + issued + '</div>' : '') +
 
     (almostDone.length
       ? '<section class="bloco">' +
-          '<div class="bloco-topo"><h2>' + txt('Falta só a prova') + '</h2></div>' +
+          '<div class="bloco-topo"><h2>' + txt('Only the exam is left') + '</h2></div>' +
           '<ul class="cert-falta">' +
             almostDone.map((c) => '<li>' +
-              '<span>' + esc(c.name) + ' — ' + txt('conteúdo concluído') + '</span>' +
+              '<span>' + esc(c.name) + ' — ' + txt('content completed') + '</span>' +
               '<a class="btn btn-primary" href="#/curso/' + esc(c.id) + '/prova">' +
-                txt('Fazer a prova') + ' →</a>' +
+                txt('Take the exam') + ' →</a>' +
             '</li>').join('') +
           '</ul>' +
         '</section>'
@@ -243,8 +243,8 @@ export default async function certificates() {
     (examples
       ? '<section class="cert-previa">' +
           '<div class="bloco-topo">' +
-            '<h2>' + txt('Como será o seu') + '</h2>' +
-            '<span class="mono dim">' + txt('exemplos — não valem como certificado') + '</span>' +
+            '<h2>' + txt('What yours will look like') + '</h2>' +
+            '<span class="mono dim">' + txt('samples — they do not count as a certificate') + '</span>' +
           '</div>' +
           '<div class="certs">' + examples + '</div>' +
         '</section>'
@@ -263,11 +263,11 @@ export default async function certificates() {
        the only one of the three that does not lie. */
     openModal(art.outerHTML, {
       className: 'modal-cert',
-      label: txt('Certificado') + ' — ' + certName,
+      label: txt('Certificate') + ' — ' + certName,
       actions: isExample
         ? '<span class="cert-in cert-in-off" aria-disabled="true" ' +
-            'title="' + txt('exemplo — não há certificado para adicionar') + '" ' +
-            'aria-label="' + txt('exemplo — não há certificado para adicionar') + '">' +
+            'title="' + txt('sample — there is no certificate to add') + '" ' +
+            'aria-label="' + txt('sample — there is no certificate to add') + '">' +
             ICON_LINKEDIN + '</span>'
         : linkedInButtons({ name: certName, code: code(key + who), when: new Date().toISOString() }),
     });
@@ -285,5 +285,5 @@ export default async function certificates() {
     open(art);
   });
 
-  return { title: txt('Certificados'), el };
+  return { title: txt('Certificates'), el };
 }

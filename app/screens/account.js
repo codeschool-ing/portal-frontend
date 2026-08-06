@@ -53,27 +53,27 @@ export default async function account() {
 
   el.innerHTML =
     '<header class="tela-head">' +
-      '<h1>' + esc(session?.name || txt('aluno')) + '</h1>' +
+      '<h1>' + esc(session?.name || txt('student')) + '</h1>' +
     '</header>' +
 
     '<section class="bloco">' +
-      '<div class="bloco-topo"><h2>' + txt('Sua trilha') + '</h2></div>' +
-      '<div class="campo"><label for="c-trilha">' + txt('trilha atual') + '</label>' +
+      '<div class="bloco-topo"><h2>' + txt('Your track') + '</h2></div>' +
+      '<div class="campo"><label for="c-trilha">' + txt('current track') + '</label>' +
         '<select id="c-trilha">' + options + '</select></div>' +
-      (p ? '<p class="conta-nota">' + p.feitas + '/' + p.total + ' ' + txt('aulas') + ' · ' + p.pct + '%</p>' : '') +
+      (p ? '<p class="conta-nota">' + p.feitas + '/' + p.total + ' ' + txt('lessons') + ' · ' + p.pct + '%</p>' : '') +
       '<p class="conta-nota mono dim">' +
-        txt('Trocar de trilha não apaga nada: o progresso é por curso, e curso compartilhado continua contando.') +
+        txt('Switching track erases nothing: progress is per course, and a shared course keeps counting.') +
       '</p>' +
     '</section>' +
 
     '<section class="bloco">' +
       '<div class="bloco-topo">' +
-        '<h2>' + txt('Plano') + '</h2>' +
-        '<a class="bloco-link" href="#/plano">' + txt('ver detalhes do plano') + ' →</a>' +
+        '<h2>' + txt('Plan') + '</h2>' +
+        '<a class="bloco-link" href="#/plano">' + txt('see plan details') + ' →</a>' +
       '</div>' +
       '<p class="conta-nota">' +
         '<strong>' + esc(plan ? plan.name : '—') + '</strong> · ' +
-        (plan && plan.price === 0 ? txt('grátis') : 'R$ ' + (plan?.price ?? 0) + ' ' + txt(plan?.cycle || '')) +
+        (plan && plan.price === 0 ? txt('free') : 'R$ ' + (plan?.price ?? 0) + ' ' + txt(plan?.cycle || '')) +
       '</p>' +
     '</section>' +
 
@@ -86,60 +86,60 @@ export default async function account() {
       '<div class="bloco-topo"><h2>' + txt('E-mail') + '</h2></div>' +
       '<form id="f-email" novalidate>' +
         '<div class="campo">' +
-          '<label for="c-email">' + txt('e-mail de acesso') + '</label>' +
+          '<label for="c-email">' + txt('sign-in e-mail') + '</label>' +
           '<input type="email" id="c-email" autocomplete="email" value="' + esc(acc.email) + '" ' +
             'placeholder="voce@exemplo.com">' +
         '</div>' +
         '<div class="conta-acao">' +
-          '<button type="submit" class="btn btn-primary">' + txt('Trocar e-mail') + '</button>' +
+          '<button type="submit" class="btn btn-primary">' + txt('Change e-mail') + '</button>' +
           '<span class="conta-aviso mono" id="a-email" aria-live="polite"></span>' +
         '</div>' +
       '</form>' +
       '<p class="conta-nota mono dim">' +
-        txt('Na Etapa 2 a troca só vale depois de confirmada no endereço novo — senão trocar o e-mail seria a forma mais fácil de tomar uma conta.') +
+        txt('In Stage 2 the change only takes effect once confirmed at the new address — otherwise changing the e-mail would be the easiest way to take over an account.') +
       '</p>' +
     '</section>' +
 
     '<section class="bloco">' +
-      '<div class="bloco-topo"><h2>' + txt('Senha') + '</h2></div>' +
+      '<div class="bloco-topo"><h2>' + txt('Password') + '</h2></div>' +
       '<form id="f-senha" novalidate>' +
         '<div class="campo">' +
-          '<label for="c-senha-atual">' + txt('senha atual') + '</label>' +
+          '<label for="c-senha-atual">' + txt('current password') + '</label>' +
           '<input type="password" id="c-senha-atual" autocomplete="current-password">' +
         '</div>' +
         '<div class="campo">' +
-          '<label for="c-senha-nova">' + txt('senha nova') + '</label>' +
+          '<label for="c-senha-nova">' + txt('new password') + '</label>' +
           '<input type="password" id="c-senha-nova" autocomplete="new-password">' +
           '<span class="senha-medida"><span class="barra"><span class="barra-cheia" style="width:0"></span></span>' +
             '<span class="senha-rotulo mono dim"></span></span>' +
         '</div>' +
         '<div class="campo">' +
-          '<label for="c-senha-rep">' + txt('repita a senha nova') + '</label>' +
+          '<label for="c-senha-rep">' + txt('repeat the new password') + '</label>' +
           '<input type="password" id="c-senha-rep" autocomplete="new-password">' +
         '</div>' +
         '<div class="conta-acao">' +
-          '<button type="submit" class="btn btn-primary">' + txt('Trocar senha') + '</button>' +
+          '<button type="submit" class="btn btn-primary">' + txt('Change password') + '</button>' +
           '<span class="conta-aviso mono" id="a-senha" aria-live="polite"></span>' +
         '</div>' +
       '</form>' +
       '<p class="conta-nota mono dim">' +
-        txt('Nenhuma senha é guardada aqui: não há autenticação no portal ainda, e gravá-la no navegador daria a impressão contrária.') +
+        txt('No password is stored here: there is no authentication in the portal yet, and writing one to the browser would give the opposite impression.') +
       '</p>' +
     '</section>' +
 
     '<section class="bloco bloco-risco">' +
-      '<div class="bloco-topo"><h2>' + txt('Apagar meu progresso') + '</h2></div>' +
-      '<p class="conta-nota">' + txt('Remove aulas concluídas, respostas e a matrícula. Não há desfazer.') + '</p>' +
-      '<button type="button" class="btn btn-ghost btn-risco" id="c-zerar">' + txt('Apagar tudo') + '</button>' +
+      '<div class="bloco-topo"><h2>' + txt('Erase my progress') + '</h2></div>' +
+      '<p class="conta-nota">' + txt('Removes completed lessons, answers and the enrolment. There is no undo.') + '</p>' +
+      '<button type="button" class="btn btn-ghost btn-risco" id="c-zerar">' + txt('Erase everything') + '</button>' +
       '<p class="conta-confirma" id="c-confirma" hidden>' +
-        '<span>' + txt('Tem certeza?') + '</span>' +
-        '<button type="button" class="btn btn-risco" id="c-sim">' + txt('Sim, apagar') + '</button>' +
-        '<button type="button" class="btn btn-ghost" id="c-nao">' + txt('Cancelar') + '</button>' +
+        '<span>' + txt('Are you sure?') + '</span>' +
+        '<button type="button" class="btn btn-risco" id="c-sim">' + txt('Yes, erase') + '</button>' +
+        '<button type="button" class="btn btn-ghost" id="c-nao">' + txt('Cancel') + '</button>' +
       '</p>' +
     '</section>' +
 
     '<section class="bloco">' +
-      '<button type="button" class="btn btn-ghost" id="c-sair">' + txt('Sair') + '</button>' +
+      '<button type="button" class="btn btn-ghost" id="c-sair">' + txt('Sign out') + '</button>' +
     '</section>';
 
   el.querySelector('#c-trilha').addEventListener('change', async (e) => {
@@ -154,12 +154,12 @@ export default async function account() {
     const value = el.querySelector('#c-email').value.trim();
     if (!plausibleEmail(value)) {
       emailNotice.className = 'conta-aviso mono ruim';
-      emailNotice.textContent = txt('esse endereço não parece um e-mail');
+      emailNotice.textContent = txt('that address does not look like an e-mail');
       return;
     }
     await api.changeEmail(value);
     emailNotice.className = 'conta-aviso mono bom';
-    emailNotice.textContent = txt('e-mail atualizado');
+    emailNotice.textContent = txt('e-mail updated');
   });
 
   /* ---------- password ---------- */
@@ -201,5 +201,5 @@ export default async function account() {
   el.querySelector('#c-sim').addEventListener('click', () => { reset(); goTo('/entrar'); });
   el.querySelector('#c-sair').addEventListener('click', async () => { await api.signOut(); goTo('/entrar'); });
 
-  return { title: txt('Conta'), el };
+  return { title: txt('Account'), el };
 }

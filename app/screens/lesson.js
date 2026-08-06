@@ -67,7 +67,7 @@ export default async function lesson({ id, ix, sec }) {
   const lessons = courseLessons(id);
   const n = Number(ix);
   const a = lessons[n];
-  if (!c || !a) return { title: txt('Aula'), el: empty(txt('Aula não encontrada.')) };
+  if (!c || !a) return { title: txt('Lesson'), el: empty(txt('Lesson not found.')) };
 
   const sections = lessonSections(id, a.key);
   const pos = Math.max(0, sections.findIndex((s) => s.id === sec));
@@ -127,12 +127,12 @@ export default async function lesson({ id, ix, sec }) {
     '<nav class="migalhas">' +
       '<a href="#/curso/' + esc(id) + '">' + esc(c.name) + '</a>' +
       '<span aria-hidden="true">›</span>' +
-      '<span>' + txt('aula') + ' ' + (n + 1) + ' ' + txt('de') + ' ' + lessons.length + '</span>' +
+      '<span>' + txt('lesson') + ' ' + (n + 1) + ' ' + txt('of') + ' ' + lessons.length + '</span>' +
     '</nav>' +
 
     '<header class="aula-cabeca">' +
       '<h1 class="aula-titulo">' + esc(a.title) + '</h1>' +
-      '<nav class="passos" aria-label="' + txt('Seções desta aula') + '">' + steps + '</nav>' +
+      '<nav class="passos" aria-label="' + txt('Sections of this lesson') + '">' + steps + '</nav>' +
     '</header>' +
 
     '<h2 class="secao-titulo">' + esc(section.title) + '</h2>' +
@@ -144,8 +144,8 @@ export default async function lesson({ id, ix, sec }) {
     (hasVideo
       ? '<div class="video-fachada" data-video="' + esc(videoReady || '') + '">' +
           (videoReady
-            ? '<button type="button" class="video-play" aria-label="' + txt('Assistir') + '">▶</button>'
-            : '<span class="video-breve mono dim">' + txt('vídeo em breve') + '</span>') +
+            ? '<button type="button" class="video-play" aria-label="' + txt('Watch') + '">▶</button>'
+            : '<span class="video-breve mono dim">' + txt('video coming soon') + '</span>') +
           (section.duration ? '<span class="video-duracao mono">' + esc(section.duration) + '</span>' : '') +
         '</div>'
       : '') +
@@ -153,7 +153,7 @@ export default async function lesson({ id, ix, sec }) {
     (section.tipo === 'avaliacao'
       ? '<section class="bloco aula-exercicios' + (section.pending ? ' aval-pendente' : '') + '">' +
           (section.pending
-            ? '<p class="mono dim">' + txt('[avaliação em preparação — os exercícios deste tópico ainda não foram produzidos]') + '</p>'
+            ? '<p class="mono dim">' + txt('[assessment in preparation — this topic\'s exercises have not been produced yet]') + '</p>'
             : '') +
         '</section>'
       /* A video-only section gets no text block at all — not even the "content
@@ -164,7 +164,7 @@ export default async function lesson({ id, ix, sec }) {
         : (hasVideo
           ? ''
           : '<section class="bloco aula-texto"><p class="mono dim">' +
-            txt('[conteúdo da aula — entra com o material real na Etapa 2]') + '</p></section>'))) +
+            txt('[lesson content — the real material lands in Stage 2]') + '</p></section>'))) +
 
     /* Material comes AFTER the text and BEFORE the note: downloading the PDF is
        what you do having read, and taking a note is the section's last gesture. */
@@ -174,17 +174,17 @@ export default async function lesson({ id, ix, sec }) {
        noting is what you do after reading, not during. Collapsed when empty, so
        it does not ask for attention from someone who will not use it. */
     '<details class="nota" ' + (note ? 'open' : '') + '>' +
-      '<summary>' + (note ? '✎ ' + txt('sua anotação') : '＋ ' + txt('anotar esta seção')) + '</summary>' +
+      '<summary>' + (note ? '✎ ' + txt('your note') : '＋ ' + txt('make a note on this section')) + '</summary>' +
       '<textarea class="nota-campo" rows="4" placeholder="' +
-        txt('o que você quer lembrar desta seção…') + '">' + esc(note) + '</textarea>' +
+        txt('what you want to remember from this section…') + '">' + esc(note) + '</textarea>' +
       '<span class="nota-estado mono dim" aria-live="polite"></span>' +
     '</details>' +
 
     /* The footer only exists where there are no side arrows — below 1400px.
        There is no complete button: moving on is completing. */
     '<footer class="aula-pe">' +
-      (previous ? '<a class="btn btn-ghost" href="' + routeTo(previous) + '">← ' + txt('anterior') + '</a>' : '<span></span>') +
-      '<a class="btn btn-primary avancar" href="' + nextTarget + '">' + txt('próxima') + ' →</a>' +
+      (previous ? '<a class="btn btn-ghost" href="' + routeTo(previous) + '">← ' + txt('previous') + '</a>' : '<span></span>') +
+      '<a class="btn btn-primary avancar" href="' + nextTarget + '">' + txt('next') + ' →</a>' +
     '</footer>';
 
   if (section.tipo === 'avaliacao' && !section.pending) {
@@ -209,10 +209,10 @@ export default async function lesson({ id, ix, sec }) {
   let saveT = null;
   noteField.addEventListener('input', () => {
     clearTimeout(saveT);
-    notice.textContent = txt('escrevendo…');
+    notice.textContent = txt('typing…');
     saveT = setTimeout(() => {
       saveNote(id, n, section.id, noteField.value);
-      notice.textContent = txt('anotação salva');
+      notice.textContent = txt('note saved');
       setTimeout(() => { notice.textContent = ''; }, 1600);
     }, 600);
   });

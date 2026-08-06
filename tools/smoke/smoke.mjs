@@ -461,7 +461,7 @@ ok('it lists the wrong ones', wrongCount > 0, wrongCount + ' wrong');
 /* Getting it wrong and not-being-checked are different states: the types that
    need a server answer `null` and cannot count as a failure. */
 ok('it separates "not checked" from "wrong"',
-  (await p.locator('.trilha-numeros').innerText()).includes('aguardando'));
+  (await p.locator('.trilha-numeros').innerText()).includes('waiting for the server'));
 
 ok('there is a link to redo', (await p.locator('a[href="#/refazer"]').count()) === 1);
 await p.goto(BASE + PAGE + '#/refazer');
@@ -974,7 +974,7 @@ ok('the certificate opens in a modal', await p.locator('.modal-cert .cert-folha'
    passing `label` while openModal still destructured `rotulo`, so the attribute
    silently stopped being set. Every screen looked right — the only symptom was
    on a screen reader. */
-ok('and the dialog is named', /Certificado/.test(await p.locator('.modal-cert').getAttribute('aria-label') || ''),
+ok('and the dialog is named', /Certificate/.test(await p.locator('.modal-cert').getAttribute('aria-label') || ''),
   await p.locator('.modal-cert').getAttribute('aria-label'));
 ok('and it grows on screen', await p.evaluate(() => {
   const inside = document.querySelector('.modal-cert .cert-aluno').getBoundingClientRect().height;

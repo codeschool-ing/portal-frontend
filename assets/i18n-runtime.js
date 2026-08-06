@@ -15,34 +15,38 @@
    from abroad still wants Portuguese, and it asks the user for no permission.
    ========================================================================== */
 
+/* English first: it is the source language, and the fallback everything lands
+   on. Portuguese is one entry among the others now — it used to be the base and
+   needed no dictionary; it has one. The labels are each language's own name for
+   itself, which is the only form a speaker recognises in a picker. */
 const LANGUAGES = [
-  { cod: 'pt', html: 'pt-BR', rotulo: 'Português', curto: 'PT' },
-  { cod: 'en', html: 'en',    rotulo: 'English',   curto: 'EN' },
-  { cod: 'es', html: 'es',    rotulo: 'Español',   curto: 'ES' },
-  { cod: 'fr', html: 'fr',    rotulo: 'Français',  curto: 'FR' },
-  { cod: 'it', html: 'it',    rotulo: 'Italiano',  curto: 'IT' },
+  { code: 'en', html: 'en',    label: 'English',    short: 'EN' },
+  { code: 'pt', html: 'pt-BR', label: 'Português',  short: 'PT' },
+  { code: 'es', html: 'es',    label: 'Español',    short: 'ES' },
+  { code: 'fr', html: 'fr',    label: 'Français',   short: 'FR' },
+  { code: 'it', html: 'it',    label: 'Italiano',   short: 'IT' },
 ];
 const LANG_KEY = 'codeschool-idioma';
 
 function browserLanguage() {
   const list = (navigator.languages && navigator.languages.length)
-    ? navigator.languages : [navigator.language || 'pt-BR'];
+    ? navigator.languages : [navigator.language || 'en'];
   for (const l of list) {
     const base = String(l).toLowerCase().split('-')[0];
-    if (LANGUAGES.some((i) => i.cod === base)) return base;
+    if (LANGUAGES.some((i) => i.code === base)) return base;
   }
-  return 'pt';
+  return 'en';
 }
 
 let LANG = (() => {
   try {
     const saved = localStorage.getItem(LANG_KEY);
-    if (saved && LANGUAGES.some((i) => i.cod === saved)) return saved;
+    if (saved && LANGUAGES.some((i) => i.code === saved)) return saved;
   } catch (e) { /* private mode: fall back to detection */ }
   return browserLanguage();
 })();
 
-/* translation of one interface string; with no entry, it returns the Portuguese */
+/* translation of one interface string; with no entry, it returns the key, which is already English */
 function txt(s) {
   const d = window.I18N && window.I18N[LANG] && window.I18N[LANG].ui;
   return (d && d[s]) || s;
@@ -177,14 +181,14 @@ function buildLanguagePicker() {
   LANGUAGES.forEach((i) => {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'idioma-op' + (i.cod === LANG ? ' on' : '');
+    b.className = 'idioma-op' + (i.code === LANG ? ' on' : '');
     b.lang = i.html;
-    b.textContent = i.rotulo;
-    b.addEventListener('click', () => { switchLanguage(i.cod); closeLanguageMenu(); });
+    b.textContent = i.label;
+    b.addEventListener('click', () => { switchLanguage(i.code); closeLanguageMenu(); });
     box.appendChild(b);
   });
-  const active = LANGUAGES.find((i) => i.cod === LANG);
-  document.querySelector('#idioma-curto').textContent = active.curto;
+  const active = LANGUAGES.find((i) => i.code === LANG);
+  document.querySelector('#idioma-curto').textContent = active.short;
   document.documentElement.lang = active.html;
 }
 function closeLanguageMenu() {

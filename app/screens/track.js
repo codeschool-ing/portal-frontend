@@ -17,7 +17,7 @@ let redrawT = null;
 
 export default async function track() {
   const t = studentTrack();
-  if (!t) return { title: txt('Trilha'), el: empty(txt('Você ainda não escolheu uma trilha.')) };
+  if (!t) return { title: txt('Track'), el: empty(txt('You have not chosen a track yet.')) };
 
   const el = document.createElement('div');
   el.className = 'tela tela-trilha';

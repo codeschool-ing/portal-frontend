@@ -29,10 +29,10 @@ export default {
         '</div>' +
         '<pre class="cod"><code>' + esc(ex.givenCode) + '</code></pre>' +
       '</div>' +
-      '<label class="ex-rotulo" for="saida-' + uid + '">' + txt('o que aparece na tela') + '</label>' +
+      '<label class="ex-rotulo" for="saida-' + uid + '">' + txt('what appears on screen') + '</label>' +
       '<textarea id="saida-' + uid + '" class="ex-campo mono" rows="4" spellcheck="false" ' +
-        'autocapitalize="off" autocorrect="off" placeholder="' + txt('digite a saída exata') + '"></textarea>' +
-      '<p class="ex-nota">' + txt('A comparação é exata: espaços e quebras de linha contam.') + '</p>'
+        'autocapitalize="off" autocorrect="off" placeholder="' + txt('type the exact output') + '"></textarea>' +
+      '<p class="ex-nota">' + txt('The comparison is exact: spaces and line breaks count.') + '</p>'
     );
   },
 

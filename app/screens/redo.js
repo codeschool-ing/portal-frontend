@@ -20,17 +20,17 @@ import { empty } from './common.js';
 export default async function redo() {
   const list = wrongOnes();
   if (!list.length) {
-    return { title: txt('Refazer'), el: empty(txt('Não há nada errado para refazer.')) };
+    return { title: txt('Redo'), el: empty(txt('There is nothing wrong to redo.')) };
   }
 
   const el = document.createElement('div');
   el.className = 'tela tela-refazer';
   el.innerHTML =
     '<header class="tela-head">' +
-      '<h1>' + txt('Os que você errou') + '</h1>' +
+      '<h1>' + txt('The ones you got wrong') + '</h1>' +
       '<p>' + list.length + ' ' + (list.length === 1
-        ? txt('exercício, do curso em que você respondeu.')
-        : txt('exercícios, de todos os cursos em que você respondeu.')) + '</p>' +
+        ? txt('exercise, from the course you answered it in.')
+        : txt('exercises, from every course you answered in.')) + '</p>' +
     '</header>' +
     '<section class="bloco"></section>';
 
@@ -41,5 +41,5 @@ export default async function redo() {
     buildAssessment(list.map((r) => r.ex), contextByIndex),
   );
 
-  return { title: txt('Refazer'), el };
+  return { title: txt('Redo'), el };
 }

@@ -107,7 +107,7 @@ async function toClipboard(text) {
    describe the past instead of what it does. */
 function flash(button, ok) {
   clearTimeout(button.dataset.timer);
-  const label = ok ? txt('código copiado') : txt('não foi possível copiar');
+  const label = ok ? txt('code copied') : txt('could not copy');
   button.innerHTML = ok ? COPY_ICONS.copied : COPY_ICONS.copy;
   button.classList.toggle('copiado', ok);
   button.classList.toggle('falhou', !ok);
@@ -117,8 +117,8 @@ function flash(button, ok) {
   button.dataset.timer = setTimeout(() => {
     button.innerHTML = COPY_ICONS.copy;
     button.classList.remove('copiado', 'falhou');
-    button.setAttribute('aria-label', txt('Copiar o código'));
-    button.setAttribute('title', txt('Copiar o código'));
+    button.setAttribute('aria-label', txt('Copy the code'));
+    button.setAttribute('title', txt('Copy the code'));
   }, HELD);
 }
 

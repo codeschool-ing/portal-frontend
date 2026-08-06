@@ -20,8 +20,8 @@ export default async function notes() {
   const list = allNotes();
   if (!list.length) {
     return {
-      title: txt('Notas'),
-      el: empty(txt('Você ainda não escreveu nenhuma nota. Elas ficam no fim de cada seção.')),
+      title: txt('Notes'),
+      el: empty(txt('You have not written any notes yet. They live at the end of each section.')),
     };
   }
 
@@ -34,8 +34,8 @@ export default async function notes() {
   el.className = 'tela tela-notas';
   el.innerHTML =
     '<header class="tela-head">' +
-      '<h1>' + txt('Suas anotações') + '</h1>' +
-      '<p>' + list.length + ' ' + (list.length === 1 ? txt('nota') : txt('notas')) + '</p>' +
+      '<h1>' + txt('Your notes') + '</h1>' +
+      '<p>' + list.length + ' ' + (list.length === 1 ? txt('score') : txt('notes')) + '</p>' +
     '</header>' +
     Object.entries(byCourse).map(([courseId, ofCourse]) => {
       const c = courseById(courseId);
@@ -43,7 +43,7 @@ export default async function notes() {
       return '<section class="bloco">' +
         '<div class="bloco-topo">' +
           '<h2>' + esc(c ? c.name : courseId) + '</h2>' +
-          '<a class="bloco-link" href="#/curso/' + esc(courseId) + '">' + txt('abrir o curso') + ' →</a>' +
+          '<a class="bloco-link" href="#/curso/' + esc(courseId) + '">' + txt('open the course') + ' →</a>' +
         '</div>' +
         ofCourse.map((n) => {
           const a = lessons[n.lessonIx];
@@ -58,5 +58,5 @@ export default async function notes() {
       '</section>';
     }).join('');
 
-  return { title: txt('Notas'), el };
+  return { title: txt('Notes'), el };
 }

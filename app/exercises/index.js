@@ -57,7 +57,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
   el.dataset.ex = uid;
 
   if (!mod) {
-    el.innerHTML = '<p class="ex-erro">' + txt('tipo de exercício desconhecido') + ': ' + esc(ex.type) + '</p>';
+    el.innerHTML = '<p class="ex-erro">' + txt('unknown exercise type') + ': ' + esc(ex.type) + '</p>';
     return el;
   }
 
@@ -70,12 +70,12 @@ export function buildExercise(ex, ctx, ix, options = {}) {
     '<div class="ex-corpo">' + mod.body(ex, uid) + '</div>' +
     // the hint is scaffolding for someone learning; in an exam it is a cheat sheet
     (ex.socraticHint && !exam
-      ? '<details class="ex-dica"><summary>' + txt('dica') + '</summary><p>' + formatted(ex.socraticHint) + '</p></details>'
+      ? '<details class="ex-dica"><summary>' + txt('hint') + '</summary><p>' + formatted(ex.socraticHint) + '</p></details>'
       : '') +
     '<div class="ex-acoes">' +
       (mod.selfCompleting ? '' : '<button type="button" class="btn btn-primary ex-responder">' +
         txt(exam ? 'Registrar resposta' : 'Responder') + '</button>') +
-      (exam ? '' : '<button type="button" class="btn btn-ghost ex-refazer" hidden>' + txt('Tentar de novo') + '</button>') +
+      (exam ? '' : '<button type="button" class="btn btn-ghost ex-refazer" hidden>' + txt('Try again') + '</button>') +
     '</div>' +
     '<div class="ex-veredito" aria-live="polite"></div>';
 
@@ -85,13 +85,13 @@ export function buildExercise(ex, ctx, ix, options = {}) {
     const out = el.querySelector('.ex-veredito');
     if (answer === null) {
       out.className = 'ex-veredito v-vazio';
-      out.textContent = txt('Responda antes de conferir.');
+      out.textContent = txt('Answer before checking.');
       return;
     }
     const button = el.querySelector('.ex-responder');
     if (button) button.disabled = true;
     out.className = 'ex-veredito v-esperando';
-    out.textContent = txt('conferindo…');
+    out.textContent = txt('checking…');
 
     const v = await api.grade(ex, answer);
     if (ctx) saveAnswer(ctx.courseId, ctx.lessonIx, uid, v);
@@ -101,8 +101,8 @@ export function buildExercise(ex, ctx, ix, options = {}) {
          exam opens at once when it closes, and the student reviews what they
          answered. */
       out.className = 'ex-veredito v-registrado';
-      out.innerHTML = '<strong>' + txt('resposta registrada') + '</strong> ' +
-        txt('o resultado sai no fim da prova.');
+      out.innerHTML = '<strong>' + txt('answer recorded') + '</strong> ' +
+        txt('the result comes at the end of the exam.');
       el.revealExam = () => { mod.reveal(body, ex, v); showVerdict(el, ex, v); };
     } else {
       mod.reveal(body, ex, v);
@@ -143,19 +143,19 @@ function showVerdict(el, ex, v) {
        whole here: while there is no execution, the portal says it did not
        check. */
     out.className = 'ex-veredito v-pendente';
-    out.innerHTML = '<strong>' + txt('não conferido') + '</strong> ' + esc(v.detail || '');
+    out.innerHTML = '<strong>' + txt('not checked') + '</strong> ' + esc(v.detail || '');
     return;
   }
 
   if (v.correct) {
     out.className = 'ex-veredito v-certo';
-    out.innerHTML = '<strong>' + txt('certo') + '</strong>';
+    out.innerHTML = '<strong>' + txt('correct') + '</strong>';
     return;
   }
 
   out.className = 'ex-veredito v-errado';
   let extra = '';
-  if (v.partial) extra = ' ' + txt('faltou fechar todos os pares.');
+  if (v.partial) extra = ' ' + txt('not every pair was closed.');
   else if (typeof v.errors === 'number' && v.errors > 0) extra = '';
   /* The `trap` of an ordering exercise is what the exercise measures:
      which neighbouring pair gets swapped, and why. As feedback it is worth a
@@ -163,15 +163,15 @@ function showVerdict(el, ex, v) {
   if (ex.type === 'ordering' && ex.trap) {
     extra += '<span class="v-armadilha">' + formatted(ex.trap) + '</span>';
   }
-  out.innerHTML = '<strong>' + txt('ainda não') + '</strong>' + extra;
+  out.innerHTML = '<strong>' + txt('not yet') + '</strong>' + extra;
 }
 
 function markAlreadyDone(el, previous) {
   const out = el.querySelector('.ex-veredito');
   out.className = 'ex-veredito v-antigo';
-  out.innerHTML = '<strong>' + txt('já resolvido') + '</strong> ' +
-    txt('em') + ' ' + previous.attempts + ' ' +
-    (previous.attempts === 1 ? txt('tentativa') : txt('tentativas'));
+  out.innerHTML = '<strong>' + txt('already solved') + '</strong> ' +
+    txt('in') + ' ' + previous.attempts + ' ' +
+    (previous.attempts === 1 ? txt('attempt') : txt('attempts'));
 }
 
 /* ==========================================================================
@@ -204,8 +204,8 @@ export function buildAssessment(exercises, ctx, options = {}) {
     '</header>' +
     '<div class="wz-palco"></div>' +
     '<footer class="wz-pe">' +
-      '<button type="button" class="btn btn-ghost wz-antes">← ' + txt('anterior') + '</button>' +
-      '<button type="button" class="btn btn-primary wz-depois">' + txt('próxima') + ' →</button>' +
+      '<button type="button" class="btn btn-ghost wz-antes">← ' + txt('previous') + '</button>' +
+      '<button type="button" class="btn btn-primary wz-depois">' + txt('next') + ' →</button>' +
     '</footer>';
 
   const stage = el.querySelector('.wz-palco');
@@ -213,7 +213,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
 
   function paintHeader() {
     el.querySelector('.wz-conta').textContent =
-      txt('questão') + ' ' + (current + 1) + ' ' + txt('de') + ' ' + exercises.length;
+      txt('question') + ' ' + (current + 1) + ' ' + txt('of') + ' ' + exercises.length;
     dots.innerHTML = states.map((s, i) => {
       const cls = ['wz-ponto'];
       if (i === current) cls.push('on');
@@ -226,17 +226,17 @@ export function buildAssessment(exercises, ctx, options = {}) {
           : (s.correct === true ? 'certo' : (s.correct === null ? 'pendente' : 'errado')));
       }
       return '<button type="button" class="' + cls.join(' ') + '" data-ir="' + i + '" ' +
-        'aria-label="' + txt('questão') + ' ' + (i + 1) + '">' + (i + 1) + '</button>';
+        'aria-label="' + txt('question') + ' ' + (i + 1) + '">' + (i + 1) + '</button>';
     }).join('');
     el.querySelector('.wz-antes').disabled = current === 0;
     const last = current === exercises.length - 1;
     const blank = states.filter((s) => !s.answered).length;
     const next = el.querySelector('.wz-depois');
-    if (submitted) next.textContent = txt('prova entregue');
-    else if (!last) next.textContent = txt('próxima') + ' →';
-    else if (!exam) next.textContent = txt('ver resultado');
-    else if (confirming) next.textContent = txt('Entregar com') + ' ' + blank + ' ' + txt('em branco');
-    else next.textContent = txt('Entregar a prova');
+    if (submitted) next.textContent = txt('exam submitted');
+    else if (!last) next.textContent = txt('next') + ' →';
+    else if (!exam) next.textContent = txt('see the result');
+    else if (confirming) next.textContent = txt('Submit with') + ' ' + blank + ' ' + txt('blank');
+    else next.textContent = txt('Submit the exam');
     next.classList.toggle('wz-cuidado', confirming && !submitted);
   }
 
@@ -284,12 +284,12 @@ export function buildAssessment(exercises, ctx, options = {}) {
       : null;
     r.innerHTML =
       (grade ? grade.html : '') +
-      (grade ? '' : '<span class="wz-res-rot">' + txt('resultado') + '</span>' +
-        '<p class="wz-res-nota"><strong>' + right + '</strong>/' + exercises.length + ' ' + txt('corretas') + '</p>') +
-      (unchecked ? '<p class="wz-res-obs">' + unchecked + ' ' + txt('aguardam conferência no servidor.') + '</p>' : '') +
-      (unanswered ? '<p class="wz-res-obs">' + unanswered + ' ' + txt('sem resposta.') + '</p>' : '') +
+      (grade ? '' : '<span class="wz-res-rot">' + txt('result') + '</span>' +
+        '<p class="wz-res-nota"><strong>' + right + '</strong>/' + exercises.length + ' ' + txt('correct') + '</p>') +
+      (unchecked ? '<p class="wz-res-obs">' + unchecked + ' ' + txt('are waiting to be checked on the server.') + '</p>' : '') +
+      (unanswered ? '<p class="wz-res-obs">' + unanswered + ' ' + txt('unanswered.') + '</p>' : '') +
       '<button type="button" class="btn btn-ghost wz-voltar">' +
-        txt(exam ? 'Rever a prova questão a questão' : 'Rever as questões') + '</button>';
+        txt(exam ? 'Review the exam question by question' : 'Review the questions') + '</button>';
     stage.appendChild(r);
     r.querySelector('.wz-voltar').addEventListener('click', () => show(0));
     el.querySelector('.wz-depois').disabled = true;

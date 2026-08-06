@@ -21,7 +21,7 @@ import { dispatch } from '../routes.js';
 import { esc } from '../text.js';
 
 const price = (p) => (p.price === 0
-  ? txt('grátis')
+  ? txt('free')
   : 'R$ ' + p.price + '<span class="pl-ciclo">' + txt(p.cycle) + '</span>');
 
 const CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" ' +
@@ -38,8 +38,8 @@ export default async function plan() {
   const features = window.FEATURES || {};
 
   if (!current) {
-    el.innerHTML = '<p class="vazio">' + txt('Nenhum plano configurado.') + '</p>';
-    return { title: txt('Meu plano'), el };
+    el.innerHTML = '<p class="vazio">' + txt('No plan configured.') + '</p>';
+    return { title: txt('My plan'), el };
   }
 
   const since = account.since
@@ -54,34 +54,34 @@ export default async function plan() {
 
   el.innerHTML =
     '<header class="tela-head">' +
-      '<h1>' + txt('Meu plano') + '</h1>' +
-      '<p>' + txt('O que você assinou, o que ele inclui e o que muda se você trocar.') + '</p>' +
+      '<h1>' + txt('My plan') + '</h1>' +
+      '<p>' + txt('What you subscribed to, what it includes and what changes if you switch.') + '</p>' +
     '</header>' +
 
     '<section class="bloco pl-atual">' +
       '<div class="pl-atual-topo">' +
         '<div>' +
-          '<span class="pl-rot mono">' + txt('plano atual') + '</span>' +
+          '<span class="pl-rot mono">' + txt('current plan') + '</span>' +
           '<h2>' + esc(current.name) + '</h2>' +
           '<p class="pl-resumo">' + esc(current.summary) + '</p>' +
         '</div>' +
         '<span class="pl-preco">' + price(current) + '</span>' +
       '</div>' +
       '<div class="pl-fatos mono dim">' +
-        (since ? '<span>' + txt('desde') + ' ' + esc(since) + '</span>' : '') +
-        '<span>' + current.includes.length + ' ' + txt('de') + ' ' + keys.length + ' ' + txt('recursos') + '</span>' +
+        (since ? '<span>' + txt('since') + ' ' + esc(since) + '</span>' : '') +
+        '<span>' + current.includes.length + ' ' + txt('of') + ' ' + keys.length + ' ' + txt('features') + '</span>' +
         (account.email ? '<span>' + esc(account.email) + '</span>' : '') +
       '</div>' +
     '</section>' +
 
     '<section class="bloco">' +
-      '<div class="bloco-topo"><h2>' + txt('O que cada plano inclui') + '</h2></div>' +
+      '<div class="bloco-topo"><h2>' + txt('What each plan includes') + '</h2></div>' +
       '<div class="pl-tabela-rolo">' +
         '<table class="pl-tabela">' +
-          '<thead><tr><th scope="col">' + txt('recurso') + '</th>' +
+          '<thead><tr><th scope="col">' + txt('feature') + '</th>' +
             plans.map((p) => '<th scope="col"' + (p.id === current.id ? ' class="on"' : '') + '>' +
               esc(p.name) +
-              (p.id === current.id ? '<span class="pl-seu mono">' + txt('seu') + '</span>' : '') +
+              (p.id === current.id ? '<span class="pl-seu mono">' + txt('yours') + '</span>' : '') +
             '</th>').join('') +
           '</tr></thead>' +
           '<tbody>' +
@@ -90,14 +90,14 @@ export default async function plan() {
                 const has = p.includes.includes(k);
                 return '<td class="' + (has ? 'sim' : 'nao') + (p.id === current.id ? ' on' : '') + '">' +
                   (has ? CHECK : DASH) +
-                  '<span class="pl-oculto">' + txt(has ? 'incluído' : 'não incluído') + '</span>' +
+                  '<span class="pl-oculto">' + txt(has ? 'included' : 'not included') + '</span>' +
                 '</td>';
               }).join('') +
             '</tr>').join('') +
             '<tr class="pl-linha-acao"><th scope="row"></th>' +
               plans.map((p) => '<td' + (p.id === current.id ? ' class="on"' : '') + '>' +
                 (p.id === current.id
-                  ? '<span class="pl-ja mono">' + txt('seu plano') + '</span>'
+                  ? '<span class="pl-ja mono">' + txt('your plan') + '</span>'
                   : '<button type="button" class="btn ' + (p.price > current.price ? 'btn-primary' : 'btn-ghost') +
                     ' pl-trocar" data-plano="' + esc(p.id) + '">' +
                     txt(p.price > current.price ? 'Fazer upgrade' : 'Mudar para este') + '</button>') +
@@ -107,7 +107,7 @@ export default async function plan() {
         '</table>' +
       '</div>' +
       '<p class="conta-nota mono dim">' +
-        txt('Nenhum conteúdo do portal é bloqueado por plano hoje — travar exige servidor, e com o estado no navegador qualquer trava seria teatro.') +
+        txt('No portal content is locked by plan today — locking requires a server, and with the state in the browser any lock would be theatre.') +
       '</p>' +
     '</section>';
 
@@ -119,5 +119,5 @@ export default async function plan() {
     dispatch();
   });
 
-  return { title: txt('Meu plano'), el };
+  return { title: txt('My plan'), el };
 }

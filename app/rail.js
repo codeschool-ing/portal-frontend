@@ -130,9 +130,9 @@ function courseRail(params, path) {
     const head =
       '<div class="trilho-aula' + (done ? ' feita' : '') + (isCurrent ? ' on' : '') + (open ? ' aberta' : '') + '">' +
         '<button type="button" class="ta-abrir" data-aula="' + a.ix + '" ' +
-          'aria-expanded="' + open + '" aria-label="' + txt('Mostrar seções') + '">' + ICON_CHEVRON + '</button>' +
+          'aria-expanded="' + open + '" aria-label="' + txt('Show sections') + '">' + ICON_CHEVRON + '</button>' +
         '<a class="ta-titulo" href="#/curso/' + esc(id) + '/aula/' + a.ix + '/' + esc(sections[0].id) + '">' +
-          '<span class="ta-num">' + txt('aula') + ' ' + String(a.ix + 1).padStart(2, '0') + '</span>' +
+          '<span class="ta-num">' + txt('lesson') + ' ' + String(a.ix + 1).padStart(2, '0') + '</span>' +
           '<span class="ta-tit">' + esc(a.title) + '</span>' +
         '</a>' +
         '<span class="ta-conta">' + pa.feitas + '/' + pa.total + '</span>' +
@@ -174,16 +174,16 @@ function courseRail(params, path) {
     ? '<a class="trilho-prova' + (passed ? ' feita' : '') + (onExam ? ' on' : '') + '" ' +
       'href="#/curso/' + esc(id) + '/prova">' +
       '<span class="ts-marca" aria-hidden="true">' + (passed ? ICON_CHECK : ICON_TROPHY) + '</span>' +
-      '<span class="ts-tit">' + txt('Prova final') + '</span>' +
+      '<span class="ts-tit">' + txt('Final exam') + '</span>' +
     '</a>'
     : '';
 
   return (
-    '<a class="trilho-voltar" href="#/trilha">← ' + txt('minha trilha') + '</a>' +
+    '<a class="trilho-voltar" href="#/trilha">← ' + txt('my track') + '</a>' +
     '<div class="trilho-sec">' +
       '<span class="trilho-tit">' + esc(c.name) + '</span>' +
       bar(p.pct, p.feitas + ' de ' + p.total) +
-      '<span class="trilho-conta">' + p.feitas + '/' + p.total + ' ' + txt('seções') + '</span>' +
+      '<span class="trilho-conta">' + p.feitas + '/' + p.total + ' ' + txt('sections') + '</span>' +
       '<div class="trilho-aulas">' + rows + '</div>' +
       examRow +
     '</div>'

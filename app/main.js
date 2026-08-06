@@ -81,8 +81,8 @@ whenChanged(async (path, found) => {
   if (leaving) { leaving(); leaving = null; }
 
   if (!found) {
-    content.innerHTML = '<div class="tela"><p class="vazio">' + txt('página não encontrada') + '</p></div>';
-    content.setAttribute('aria-label', txt('página não encontrada'));
+    content.innerHTML = '<div class="tela"><p class="vazio">' + txt('page not found') + '</p></div>';
+    content.setAttribute('aria-label', txt('page not found'));
     return;
   }
 
@@ -138,7 +138,7 @@ function paintContext() {
         '<span class="ctx-seta" aria-hidden="true">▾</span>' +
       '</button>' +
       '<div class="ctx-menu" role="menu">' +
-        '<a class="ctx-op ctx-mapa" href="#/trilha">' + txt('ver o mapa da trilha') + ' →</a>' +
+        '<a class="ctx-op ctx-mapa" href="#/trilha">' + txt('see the track map') + ' →</a>' +
         TRACKS_BY_FAMILY().map(([family, list]) =>
           '<span class="ctx-grupo">' + txt('trilhas por ' + family) + '</span>' +
           list.map((x) => '<button type="button" class="ctx-op' + (x.id === t.id ? ' on' : '') + '" ' +
@@ -166,11 +166,11 @@ function paintAccount() {
   const s = now().session;
   $('#conta-avatar').textContent = (s?.name || '·').trim().charAt(0).toUpperCase() || '·';
   $('#conta-menu').innerHTML = s
-    ? '<a class="conta-op" href="#/conta">' + txt('Minha conta') + '</a>' +
-      '<a class="conta-op" href="#/plano">' + txt('Meu plano') + '</a>' +
-      '<a class="conta-op" href="#/certificados">' + txt('Certificados') + '</a>' +
-      '<a class="conta-op" href="https://codeschool.ing">' + txt('Ir para o site') + ' ↗</a>'
-    : '<a class="conta-op" href="#/entrar">' + txt('Entrar') + '</a>';
+    ? '<a class="conta-op" href="#/conta">' + txt('My account') + '</a>' +
+      '<a class="conta-op" href="#/plano">' + txt('My plan') + '</a>' +
+      '<a class="conta-op" href="#/certificados">' + txt('Certificates') + '</a>' +
+      '<a class="conta-op" href="https://codeschool.ing">' + txt('Go to the site') + ' ↗</a>'
+    : '<a class="conta-op" href="#/entrar">' + txt('Sign in') + '</a>';
 }
 
 $('#conta').addEventListener('click', (e) => {
@@ -203,7 +203,7 @@ const THEME_KEY = 'codeschool-tema';
 function applyTheme(theme) {
   document.documentElement.dataset.tema = theme === 'claro' ? 'claro' : '';
   try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* private mode */ }
-  $('#tema-btn').setAttribute('aria-label', theme === 'claro' ? 'Mudar para tema escuro' : 'Mudar para tema claro');
+  $('#tema-btn').setAttribute('aria-label', theme === 'claro' ? txt('Switch to the dark theme') : txt('Switch to the light theme'));
 }
 $('#tema-btn').addEventListener('click', () => {
   applyTheme(document.documentElement.dataset.tema === 'claro' ? 'escuro' : 'claro');

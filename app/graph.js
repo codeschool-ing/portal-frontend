@@ -36,10 +36,10 @@ export function courseState(id) {
 }
 
 const STATE_LABEL = {
-  concluido: 'concluído',
-  atual: 'em andamento',
-  disponivel: 'disponível',
-  adiante: 'mais adiante',
+  concluido: 'completed',
+  atual: 'in progress',
+  disponivel: 'available',
+  adiante: 'further ahead',
 };
 
 /* ---------- the cards ---------- */
@@ -54,19 +54,19 @@ function courseCard(id, order, deps) {
 
   return (
     '<button class="curso-no no-' + st + '" type="button" data-curso="' + esc(c.id) + '" data-no="' + esc(c.id) + '">' +
-      (order ? '<span class="ordem">' + txt('nível') + ' ' + order + '</span>' : '') +
+      (order ? '<span class="ordem">' + txt('level') + ' ' + order + '</span>' : '') +
       '<span class="no-estado" data-estado="' + st + '">' + txt(STATE_LABEL[st]) + '</span>' +
       '<span class="nome">' + esc(c.name) + '</span>' +
-      (trackCount > 1 ? '<span class="tag-compartilhado">' + txt('em') + ' ' + trackCount + ' ' + txt('trilhas') + '</span>' : '') +
+      (trackCount > 1 ? '<span class="tag-compartilhado">' + txt('in') + ' ' + trackCount + ' ' + txt('tracks') + '</span>' : '') +
       '<span class="meta">' + c.hours + 'h · ' + txt(c.level) + '</span>' +
       (p.total
         ? '<span class="no-barra" role="img" aria-label="' + p.feitas + ' de ' + p.total + '">' +
             '<span class="no-barra-cheia" style="width:' + p.pct + '%"></span>' +
           '</span>' +
-          '<span class="no-conta">' + p.feitas + '/' + p.total + ' ' + txt('seções') + '</span>'
+          '<span class="no-conta">' + p.feitas + '/' + p.total + ' ' + txt('sections') + '</span>'
         : '') +
       (requires.length && st === 'adiante'
-        ? '<span class="requer">' + txt('recomendado depois de') + ' ' + esc(requires.join(' + ')) + '</span>'
+        ? '<span class="requer">' + txt('recommended after') + ' ' + esc(requires.join(' + ')) + '</span>'
         : '') +
     '</button>'
   );
@@ -91,7 +91,7 @@ export function buildTrack(t) {
             '<path d="M5 22V4M5 4h11l-2 4 2 4H5"/></svg>' +
           '</span>' +
           '<span class="saida-txt">' +
-            '<span class="saida-rotulo">' + txt('chegada') + '</span>' +
+            '<span class="saida-rotulo">' + txt('finish') + '</span>' +
             '<span class="saida-nome">' + esc(t.outcome) + '</span>' +
           '</span>' +
         '</div>';
@@ -111,8 +111,8 @@ export function buildTrack(t) {
       return (
         '<div class="garfo" data-no="' + esc(node.id) + '">' +
           '<div class="garfo-topo">' +
-            '<span class="garfo-rotulo">' + txt('nível') + ' ' + String(v + 1).padStart(2, '0') +
-              ' · ' + txt('você escolhe') + ' ' + esc(item.choice) + '</span>' +
+            '<span class="garfo-rotulo">' + txt('level') + ' ' + String(v + 1).padStart(2, '0') +
+              ' · ' + txt('you choose') + ' ' + esc(item.choice) + '</span>' +
             '<div class="garfo-abas" role="tablist">' + tabs + '</div>' +
           '</div>' +
           (item.note ? '<p class="garfo-nota">' + esc(item.note) + '</p>' : '') +
@@ -124,8 +124,8 @@ export function buildTrack(t) {
   }).join('');
 
   const workload = min === max
-    ? '<span><b>' + hours + 'h</b>' + txt('de carga') + '</span>'
-    : '<span><b>' + hours + 'h</b>' + txt('neste caminho') + ' <i>(' + min + 'h ' + txt('a') + ' ' + max + 'h)</i></span>';
+    ? '<span><b>' + hours + 'h</b>' + txt('total') + '</span>'
+    : '<span><b>' + hours + 'h</b>' + txt('on this path') + ' <i>(' + min + 'h ' + txt('to') + ' ' + max + 'h)</i></span>';
 
   return (
     '<div class="trilha-topo">' +
@@ -134,7 +134,7 @@ export function buildTrack(t) {
         '<p>' + esc(t.goal) + '</p>' +
       '</div>' +
       '<div class="trilha-resumo">' +
-        '<span><b>' + done + '/' + path.length + '</b>' + txt('cursos concluídos') + '</span>' +
+        '<span><b>' + done + '/' + path.length + '</b>' + txt('courses completed') + '</span>' +
         workload +
         '<span><b>→</b>' + esc(t.outcome) + '</span>' +
       '</div>' +
@@ -332,7 +332,7 @@ export function drawEdges(root, t) {
 }
 
 function nodeLabel(id, g) {
-  if (id === '@saida') return txt('chegada');
+  if (id === '@saida') return txt('finish');
   const c = courseById(id);
   if (c) return c.name;
   const node = g.nodes.find((n) => n.id === id);

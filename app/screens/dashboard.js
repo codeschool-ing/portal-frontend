@@ -36,15 +36,15 @@ export default async function dashboard() {
     const p = courseProgress(c.id);
     return (
       '<a class="retomar" href="#/curso/' + esc(c.id) + '/aula/' + a.ix + '/' + esc(s.id) + '">' +
-        '<span class="retomar-rot">' + txt('continuar de onde parou') + '</span>' +
+        '<span class="retomar-rot">' + txt('pick up where you left off') + '</span>' +
         '<span class="retomar-aula">' + esc(s.title) + '</span>' +
         '<span class="retomar-curso">' + esc(c.name) + ' · ' + esc(a.title) + '</span>' +
         '<span class="retomar-onde mono dim">' +
-          txt('aula') + ' ' + (a.ix + 1) + '/' + lessons.length + ' · ' +
-          txt('seção') + ' ' + (sections.indexOf(s) + 1) + '/' + sections.length +
+          txt('lesson') + ' ' + (a.ix + 1) + '/' + lessons.length + ' · ' +
+          txt('section') + ' ' + (sections.indexOf(s) + 1) + '/' + sections.length +
         '</span>' +
         bar(p.pct, p.feitas + ' de ' + p.total) +
-        '<span class="retomar-btn btn btn-primary">' + txt('Continuar') + ' →</span>' +
+        '<span class="retomar-btn btn btn-primary">' + txt('Continue') + ' →</span>' +
       '</a>'
     );
   })();
@@ -61,7 +61,7 @@ export default async function dashboard() {
 
   el.innerHTML =
     '<header class="tela-head">' +
-      '<h1>' + txt('Olá') + ', ' + esc(session?.name || txt('aluno')) + '</h1>' +
+      '<h1>' + txt('Hello') + ', ' + esc(session?.name || txt('student')) + '</h1>' +
     '</header>' +
 
     resume +
@@ -70,37 +70,37 @@ export default async function dashboard() {
       ? '<section class="bloco">' +
           '<div class="bloco-topo">' +
             '<h2>' + esc(t.name) + '</h2>' +
-            '<a class="bloco-link" href="#/trilha">' + txt('ver o mapa') + ' →</a>' +
+            '<a class="bloco-link" href="#/trilha">' + txt('see the map') + ' →</a>' +
           '</div>' +
           '<div class="trilha-numeros">' +
-            '<span><b>' + pt.pct + '%</b>' + txt('da trilha') + '</span>' +
-            '<span><b>' + pt.feitas + '/' + pt.total + '</b>' + txt('seções') + '</span>' +
-            '<span><b>' + pt.courses + '</b>' + txt('cursos no caminho') + '</span>' +
+            '<span><b>' + pt.pct + '%</b>' + txt(' of the track') + '</span>' +
+            '<span><b>' + pt.feitas + '/' + pt.total + '</b>' + txt('sections') + '</span>' +
+            '<span><b>' + pt.courses + '</b>' + txt('courses on the path') + '</span>' +
             '<span><b>→</b>' + esc(t.outcome) + '</span>' +
           '</div>' +
           bar(pt.pct, pt.pct + '%') +
         '</section>'
-      : '<section class="bloco"><p class="vazio">' + txt('Você ainda não escolheu uma trilha.') + '</p></section>') +
+      : '<section class="bloco"><p class="vazio">' + txt('You have not chosen a track yet.') + '</p></section>') +
 
     (upcoming.length
       ? '<section class="bloco">' +
-          '<div class="bloco-topo"><h2>' + txt('Próximos passos') + '</h2></div>' +
+          '<div class="bloco-topo"><h2>' + txt('Next steps') + '</h2></div>' +
           '<div class="cartoes">' +
             upcoming.map(({ id, st }) => {
               const c = courseById(id);
               const p = courseProgress(id);
               return '<a class="cartao no-' + st + '" href="#/curso/' + esc(id) + '">' +
                 '<span class="no-estado" data-estado="' + st + '">' +
-                  txt(st === 'atual' ? 'em andamento' : 'disponível') + '</span>' +
+                  txt(st === 'atual' ? 'in progress' : 'available') + '</span>' +
                 '<span class="cartao-nome">' + esc(c.name) + '</span>' +
                 '<span class="cartao-meta">' + c.hours + 'h · ' + txt(c.level) + '</span>' +
                 bar(p.pct, p.feitas + ' de ' + p.total) +
-                '<span class="cartao-conta">' + p.feitas + '/' + p.total + ' ' + txt('seções') + '</span>' +
+                '<span class="cartao-conta">' + p.feitas + '/' + p.total + ' ' + txt('sections') + '</span>' +
               '</a>';
             }).join('') +
           '</div>' +
         '</section>'
       : '');
 
-  return { title: txt('Painel'), el };
+  return { title: txt('Dashboard'), el };
 }

@@ -27,17 +27,17 @@ export default async function signIn() {
         '<span class="modal-arquivo">sessao.nova</span>' +
       '</div>' +
       '<div class="entrar-corpo">' +
-        '<h1>' + txt('Área do aluno') + '</h1>' +
-        '<p class="entrar-sub">' + txt('Entre para retomar de onde parou.') + '</p>' +
+        '<h1>' + txt('Student area') + '</h1>' +
+        '<p class="entrar-sub">' + txt('Sign in to pick up where you left off.') + '</p>' +
         '<form id="form-entrar" novalidate>' +
-          '<div class="campo"><label for="e-nome">' + txt('nome') + '</label>' +
-            '<input id="e-nome" type="text" required autocomplete="name" placeholder="' + txt('seu nome') + '" /></div>' +
-          '<div class="campo"><label for="e-trilha">' + txt('sua trilha') + '</label>' +
+          '<div class="campo"><label for="e-nome">' + txt('name') + '</label>' +
+            '<input id="e-nome" type="text" required autocomplete="name" placeholder="' + txt('your name') + '" /></div>' +
+          '<div class="campo"><label for="e-trilha">' + txt('your track') + '</label>' +
             '<select id="e-trilha">' + options + '</select></div>' +
-          '<button type="submit" class="btn btn-primary">' + txt('Entrar') + '</button>' +
+          '<button type="submit" class="btn btn-primary">' + txt('Sign in') + '</button>' +
         '</form>' +
         '<p class="entrar-aviso mono dim">' +
-          txt('[esqueleto — não há autenticação: qualquer nome entra]') +
+          txt('[skeleton — there is no authentication: any name gets in]') +
         '</p>' +
       '</div>' +
     '</div>';
@@ -51,5 +51,5 @@ export default async function signIn() {
     goTo('/painel');
   });
 
-  return { title: txt('Entrar'), el, after: () => el.querySelector('#e-nome').focus() };
+  return { title: txt('Sign in'), el, after: () => el.querySelector('#e-nome').focus() };
 }

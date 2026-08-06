@@ -46,7 +46,7 @@ export function openModal(content, { className = '', actions = '', label = '' } 
     '<div class="modal-pilha">' +
       '<div class="modal-acoes">' +
         actions +
-        '<button type="button" class="modal-fechar" aria-label="' + txt('Fechar') + '">✕</button>' +
+        '<button type="button" class="modal-fechar" aria-label="' + txt('Close') + '">✕</button>' +
       '</div>' +
       '<div class="modal-caixa">' + content + '</div>' +
     '</div>';

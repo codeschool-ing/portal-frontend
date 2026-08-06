@@ -88,6 +88,12 @@ export function migrate(raw) {
   legacy.forEach((k) => { out[LEGACY_TOP[k]] = out[k]; delete out[k]; });
 
   const moved = renameKeys(out);
+  /* Plan ids are stored, so their VALUES move too — a renamed id would silently
+     drop the student onto the first plan in the list. */
+  const PLANS_MOVED = { estudante: 'student', equipe: 'team' };
+  if (moved.account?.planId && PLANS_MOVED[moved.account.planId]) {
+    moved.account.planId = PLANS_MOVED[moved.account.planId];
+  }
   if (moved.exams) {
     moved.exams = Object.fromEntries(Object.entries(moved.exams).map(([k, v]) =>
       [k.replace(/^curso:/, 'course:').replace(/^trilha:/, 'track:'), v]));
@@ -318,7 +324,7 @@ export function answersGiven() {
    life, and every one of them becomes an `if` nobody will ever exercise. */
 export function studentAccount() {
   const c = state.account;
-  const planId = c?.planId || (window.PLANS?.[0]?.id ?? 'estudante');
+  const planId = c?.planId || (window.PLANS?.[0]?.id ?? 'student');
   return { planId: planId, since: c?.since || null, email: state.session?.email || '' };
 }
 

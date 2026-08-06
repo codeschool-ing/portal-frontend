@@ -33,22 +33,22 @@ export default {
     return (
       (ex.checkOrigin
         ? '<div class="expr-origem">' +
-            '<span class="expr-rot">' + txt(OP_NAME[ex.checkOperation] || 'expressão') + ' ' + txt('de') + '</span>' +
+            '<span class="expr-rot">' + txt(OP_NAME[ex.checkOperation] || 'expression') + ' ' + txt('of') + '</span>' +
             '<code class="expr-cod">' + esc(ex.checkOrigin) + '</code>' +
           '</div>'
         : '') +
-      '<label class="ex-rotulo" for="expr-' + uid + '">' + txt('sua resposta') + '</label>' +
+      '<label class="ex-rotulo" for="expr-' + uid + '">' + txt('your answer') + '</label>' +
       '<input id="expr-' + uid + '" class="ex-campo mono" type="text" spellcheck="false" ' +
         'autocapitalize="off" autocorrect="off" placeholder="x**3/3" />' +
-      '<p class="ex-nota">' + txt('Vale qualquer forma equivalente.') +
-        (vars.length ? ' ' + txt('variáveis') + ': <code>' + esc(vars.join(', ')) + '</code>' : '') +
+      '<p class="ex-nota">' + txt('Any equivalent form counts.') +
+        (vars.length ? ' ' + txt('variables') + ': <code>' + esc(vars.join(', ')) + '</code>' : '') +
       '</p>' +
       (assumptions.length
-        ? '<p class="ex-nota ex-nota-dom">' + txt('Suposições de domínio') + ': <code>' +
+        ? '<p class="ex-nota ex-nota-dom">' + txt('Domain assumptions') + ': <code>' +
             esc(assumptions.join(', ')) + '</code></p>'
         : '') +
       (ex.checkOperation === 'none'
-        ? '<p class="ex-nota ex-nota-aviso">' + formatted(txt('Este exercício não declara recálculo — o gabarito não foi conferido por ninguém.')) + '</p>'
+        ? '<p class="ex-nota ex-nota-aviso">' + formatted(txt('This exercise declares no recomputation — nobody checked the answer key.')) + '</p>'
         : '')
     );
   },

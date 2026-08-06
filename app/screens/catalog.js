@@ -20,12 +20,12 @@ export default async function catalogue() {
 
   el.innerHTML =
     '<header class="tela-head">' +
-      '<h1>' + txt('Todos os cursos') + '</h1>' +
+      '<h1>' + txt('All courses') + '</h1>' +
     '</header>' +
     '<div class="filtros">' +
       '<div class="busca">' +
         '<span class="busca-ico" aria-hidden="true">⌕</span>' +
-        '<input type="search" id="cat-busca" placeholder="' + txt('buscar curso...') + '" aria-label="' + txt('Buscar curso') + '" />' +
+        '<input type="search" id="cat-busca" placeholder="' + txt('search courses...') + '" aria-label="' + txt('Search courses') + '" />' +
       '</div>' +
       /* THE CATEGORY ROW SCROLLS, AND WITH ARROWS. There are nine categories,
          and not even with the rail closed do they fit on one line: the last ones
@@ -37,18 +37,18 @@ export default async function catalogue() {
          everything. */
       '<div class="chips-caixa">' +
         '<button type="button" class="abas-seta" data-rolar="-1" aria-label="' +
-          txt('Categorias anteriores') + '">←</button>' +
+          txt('Previous categories') + '">←</button>' +
         '<div class="chips" id="cat-chips" role="group">' +
           categories.map((k, i) =>
             '<button class="chip' + (i === 0 ? ' on' : '') + '" type="button" data-cat="' + esc(k) + '">' +
               txt(k) + '</button>').join('') +
         '</div>' +
         '<button type="button" class="abas-seta" data-rolar="1" aria-label="' +
-          txt('Próximas categorias') + '">→</button>' +
+          txt('Next categories') + '">→</button>' +
       '</div>' +
     '</div>' +
     '<div class="cartoes" id="cat-grade"></div>' +
-    '<p class="vazio" id="cat-vazio" hidden>' + txt('nenhum curso encontrado — tente outro termo.') + '</p>';
+    '<p class="vazio" id="cat-vazio" hidden>' + txt('no course found — try another term.') + '</p>';
 
   const grid = el.querySelector('#cat-grade');
   const field = el.querySelector('#cat-busca');
@@ -72,7 +72,7 @@ export default async function catalogue() {
         '<span class="cartao-cat">' + esc(c.category) + '</span>' +
         '<span class="cartao-nome">' + esc(c.name) + '</span>' +
         '<span class="cartao-resumo">' + esc(c.summary) + '</span>' +
-        '<span class="cartao-meta">' + c.hours + 'h · ' + txt(c.level) + ' · ' + lessons + ' ' + txt('aulas') + '</span>' +
+        '<span class="cartao-meta">' + c.hours + 'h · ' + txt(c.level) + ' · ' + lessons + ' ' + txt('lessons') + '</span>' +
         (p.feitas ? bar(p.pct, p.feitas + ' de ' + p.total) : '') +
       '</a>';
     }).join('');
@@ -117,7 +117,7 @@ export default async function catalogue() {
 
   paint();
   return {
-    title: txt('Catálogo'),
+    title: txt('Catalog'),
     el,
     // the measurements only exist once the element is in the document
     after: adjustArrows,

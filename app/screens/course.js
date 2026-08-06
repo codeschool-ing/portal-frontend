@@ -19,7 +19,7 @@ import { esc, formatted } from '../text.js';
 
 export default async function course({ id }) {
   const c = courseById(id);
-  if (!c) return { title: txt('Curso'), el: empty(txt('Curso não encontrado.')) };
+  if (!c) return { title: txt('Course'), el: empty(txt('Course not found.')) };
 
   const lessons = courseLessons(id);
   const p = courseProgress(id);
@@ -34,18 +34,18 @@ export default async function course({ id }) {
   el.innerHTML =
     '<header class="curso-head">' +
       '<span class="no-estado" data-estado="' + st + '">' + txt({
-        concluido: 'concluído', atual: 'em andamento', disponivel: 'disponível', adiante: 'mais adiante',
+        concluido: 'completed', atual: 'in progress', disponivel: 'available', adiante: 'further ahead',
       }[st]) + '</span>' +
       '<h1>' + esc(c.name) + '</h1>' +
       '<p class="curso-resumo">' + esc(c.summary) + '</p>' +
       '<div class="curso-meta">' +
         '<span>' + c.hours + 'h</span>' +
         '<span>' + txt(c.level) + '</span>' +
-        '<span>' + lessons.length + ' ' + txt('aulas') + '</span>' +
-        '<span>' + txt('em') + ' ' + tracksWithCourse(id).length + ' ' + txt('trilhas') + '</span>' +
+        '<span>' + lessons.length + ' ' + txt('lessons') + '</span>' +
+        '<span>' + txt('in') + ' ' + tracksWithCourse(id).length + ' ' + txt('tracks') + '</span>' +
       '</div>' +
       bar(p.pct, p.feitas + ' de ' + p.total) +
-      '<p class="curso-conta">' + p.feitas + '/' + p.total + ' ' + txt('seções concluídas') + '</p>' +
+      '<p class="curso-conta">' + p.feitas + '/' + p.total + ' ' + txt('sections completed') + '</p>' +
     '</header>' +
 
     '<div class="curso-colunas">' +
@@ -54,7 +54,7 @@ export default async function course({ id }) {
          sidebar down to the next row. */
       '<div class="curso-principal">' +
       '<section class="bloco">' +
-        '<div class="bloco-topo"><h2>' + txt('Aulas') + '</h2></div>' +
+        '<div class="bloco-topo"><h2>' + txt('Lessons') + '</h2></div>' +
         '<ol class="aulas">' +
           lessons.map((a) => {
             const done = lessonDone(id, a.ix);
@@ -67,8 +67,8 @@ export default async function course({ id }) {
               '<span class="aula-num">' + String(a.ix + 1).padStart(2, '0') + '</span>' +
               '<span class="aula-tit">' + esc(a.title) + '</span>' +
               '<span class="aula-secoes">' +
-                (sections.length > 1 ? sections.length + ' ' + txt('seções') : txt('1 seção')) +
-                (hasAssessment ? ' · ' + txt('com avaliação') : '') +
+                (sections.length > 1 ? sections.length + ' ' + txt('sections') : txt('1 section')) +
+                (hasAssessment ? ' · ' + txt('with an assessment') : '') +
               '</span>' +
               '<span class="aula-prog">' + pa.feitas + '/' + pa.total + '</span>' +
             '</a></li>';
@@ -91,19 +91,19 @@ export default async function course({ id }) {
           ? '<section class="bloco">' + materialList(materials, { title: 'Material do curso' }) + '</section>'
           : '') +
         (c.syllabus?.length
-          ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('Ementa') + '</h2></div>' +
+          ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('Syllabus') + '</h2></div>' +
             '<ul class="ementa">' + c.syllabus.map((l) => '<li>' + esc(l) + '</li>').join('') + '</ul></section>'
           : '') +
         (c.prerequisites
-          ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('Pré-requisitos') + '</h2></div>' +
+          ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('Prerequisites') + '</h2></div>' +
             '<p class="requisitos">' + formatted(c.prerequisites) + '</p></section>'
           : '') +
         ((c.requires || []).length
-          ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('Depois de') + '</h2></div>' +
+          ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('After') + '</h2></div>' +
             '<div class="ligados">' + c.requires.map((d) => link(d, 'antes')).join('') + '</div></section>'
           : '') +
         (opens.length
-          ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('Abre caminho para') + '</h2></div>' +
+          ? '<section class="bloco"><div class="bloco-topo"><h2>' + txt('Opens the way to') + '</h2></div>' +
             '<div class="ligados">' + opens.map((x) => link(x.id, 'depois')).join('') + '</div></section>'
           : '') +
       '</aside>' +

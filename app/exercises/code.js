@@ -29,22 +29,22 @@ export default {
       '<div class="caso">' +
         '<span class="caso-desc">' + formatted(t.description || '') + '</span>' +
         '<div class="caso-io">' +
-          '<div><span class="caso-rot">' + txt('entrada') + '</span><pre class="cod"><code>' + esc(t.input) + '</code></pre></div>' +
-          '<div><span class="caso-rot">' + txt('saída') + '</span><pre class="cod"><code>' + esc(t.expectedOutput) + '</code></pre></div>' +
+          '<div><span class="caso-rot">' + txt('input') + '</span><pre class="cod"><code>' + esc(t.input) + '</code></pre></div>' +
+          '<div><span class="caso-rot">' + txt('output') + '</span><pre class="cod"><code>' + esc(t.expectedOutput) + '</code></pre></div>' +
         '</div>' +
       '</div>'
     )).join('');
 
     return (
-      '<label class="ex-rotulo" for="cod-' + uid + '">' + txt('sua solução') + '</label>' +
+      '<label class="ex-rotulo" for="cod-' + uid + '">' + txt('your solution') + '</label>' +
       '<div class="cod-bloco cod-editor">' +
         '<div class="cod-barra"><span class="cod-ling">' + esc(ex.language || '') + '</span></div>' +
         '<textarea id="cod-' + uid + '" class="ex-campo mono cod-area" rows="10" spellcheck="false" ' +
           'autocapitalize="off" autocorrect="off">' + esc(ex.skeleton || '') + '</textarea>' +
       '</div>' +
       (cases
-        ? '<div class="casos"><span class="casos-tit">' + txt('exemplos') + '</span>' + cases +
-          (hidden ? '<p class="ex-nota">' + hidden + ' ' + txt('casos de teste ficam ocultos.') + '</p>' : '') +
+        ? '<div class="casos"><span class="casos-tit">' + txt('examples') + '</span>' + cases +
+          (hidden ? '<p class="ex-nota">' + hidden + ' ' + txt('test cases stay hidden.') + '</p>' : '') +
           '</div>'
         : '')
     );

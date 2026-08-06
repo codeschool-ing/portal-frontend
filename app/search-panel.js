@@ -29,18 +29,18 @@ function create() {
   panel.id = 'busca-painel';
   panel.hidden = true;
   panel.innerHTML =
-    '<div class="busca-caixa" role="dialog" aria-modal="true" aria-label="' + txt('Buscar') + '">' +
+    '<div class="busca-caixa" role="dialog" aria-modal="true" aria-label="' + txt('Search') + '">' +
       '<div class="busca-topo">' +
         '<span class="busca-lupa" aria-hidden="true">' + MAGNIFIER + '</span>' +
         '<input type="search" class="busca-campo" autocomplete="off" spellcheck="false" ' +
-          'placeholder="' + txt('buscar em cursos, aulas, seções e exercícios…') + '" ' +
-          'aria-label="' + txt('Buscar') + '" />' +
+          'placeholder="' + txt('search courses, lessons, sections and exercises…') + '" ' +
+          'aria-label="' + txt('Search') + '" />' +
       '</div>' +
       '<div class="busca-res" role="listbox"></div>' +
       '<div class="busca-pe">' +
-        '<span><kbd>↑</kbd><kbd>↓</kbd> ' + txt('navegar') + '</span>' +
-        '<span><kbd>↵</kbd> ' + txt('abrir') + '</span>' +
-        '<span><kbd>esc</kbd> ' + txt('fechar') + '</span>' +
+        '<span><kbd>↑</kbd><kbd>↓</kbd> ' + txt('navigate') + '</span>' +
+        '<span><kbd>↵</kbd> ' + txt('open') + '</span>' +
+        '<span><kbd>esc</kbd> ' + txt('close') + '</span>' +
       '</div>' +
     '</div>';
   document.body.appendChild(panel);
@@ -72,11 +72,11 @@ function paint() {
   selected = 0;
 
   if (term.trim().length < 2) {
-    list.innerHTML = '<p class="busca-dica">' + txt('Digite ao menos duas letras.') + '</p>';
+    list.innerHTML = '<p class="busca-dica">' + txt('Type at least two letters.') + '</p>';
     return;
   }
   if (!hits.length) {
-    list.innerHTML = '<p class="busca-dica">' + txt('Nada encontrado para') + ' “' + esc(term) + '”.</p>';
+    list.innerHTML = '<p class="busca-dica">' + txt('Nothing found for') + ' “' + esc(term) + '”.</p>';
     return;
   }
 
