@@ -54,12 +54,12 @@ export function lessonSections(courseId, key) {
 
   const sections = written?.length
     ? written.map((s) => ({ ...s, type: 'content' }))
-    : [{ id: 'content', title: 'Content', type: 'content', body: null }];
+    : [{ id: 'content', title: txt('Content'), type: 'content', body: null }];
 
   const exercises = lessonExercises(courseId, key);
   sections.push({
     id: 'assessment',
-    title: 'Assessment',
+    title: txt('Assessment'),
     type: 'assessment',
     count: exercises.length,
     pending: exercises.length === 0,

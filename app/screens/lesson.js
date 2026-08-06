@@ -98,7 +98,7 @@ export default async function lesson({ id, ix, sec }) {
   const nextTarget = next ? routeTo(next) : '#/course/' + esc(id);
   const sideArrow = (target, side, arrow, label, advances) => (target
     ? '<a class="side-arrow side-' + side + (advances ? ' advances' : '') + '" href="' + target +
-      '" aria-label="' + txt(label) + '">' + arrow + '</a>'
+      '" aria-label="' + label + '">' + arrow + '</a>'
     : '');
 
   /* THE VIDEO FRAME ONLY EXISTS WHERE THE SECTION SAYS IT HAS VIDEO.
@@ -121,8 +121,8 @@ export default async function lesson({ id, ix, sec }) {
   const videoReady = hasVideo && typeof section.video === 'string' && section.video;
 
   el.innerHTML =
-    sideArrow(previous && routeTo(previous), 'left', ARROW_LEFT, 'previous section') +
-    sideArrow(nextTarget, 'right', ARROW_RIGHT, 'complete and go to the next section', true) +
+    sideArrow(previous && routeTo(previous), 'left', ARROW_LEFT, txt('previous section')) +
+    sideArrow(nextTarget, 'right', ARROW_RIGHT, txt('complete and go to the next section'), true) +
 
     '<nav class="crumbs">' +
       '<a href="#/course/' + esc(id) + '">' + esc(c.name) + '</a>' +

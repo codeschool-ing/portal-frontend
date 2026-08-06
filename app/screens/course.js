@@ -88,7 +88,7 @@ export default async function course({ id }) {
 
       '<aside class="course-side">' +
         (materials.length
-          ? '<section class="block">' + materialList(materials, { title: 'Course material' }) + '</section>'
+          ? '<section class="block">' + materialList(materials, { title: txt('Course material') }) + '</section>'
           : '') +
         (c.syllabus?.length
           ? '<section class="block"><div class="block-top"><h2>' + txt('Syllabus') + '</h2></div>' +

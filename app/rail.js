@@ -71,6 +71,12 @@ export const toggleLesson = (courseId, ix) => {
 
 export function buildRail(el, path, params) {
   const insideCourse = path.startsWith('/course/');
+  /* The rail is listed in window.I18N_DYNAMIC, so the runtime's DOM walk skips
+     it — including the aria-label on the element ITSELF, which is static and
+     was therefore never translated in any language. Setting it here puts it
+     back on a path that runs on every route change and on every language
+     switch. */
+  el.setAttribute('aria-label', txt('Navigation'));
   el.innerHTML = insideCourse ? courseRail(params, path) : globalRail(path);
   const open = el.querySelector('.rail-lesson.on');
   if (open) open.scrollIntoView({ block: 'nearest' });

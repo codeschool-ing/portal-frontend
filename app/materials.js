@@ -39,7 +39,7 @@ export function materialList(materials, { title } = {}) {
   if (!materials.length) return '';
   return '<section class="materials">' +
     '<div class="materials-top">' +
-      '<h3>' + txt(title || 'Supporting material') + '</h3>' +
+      '<h3>' + (title || txt('Supporting material')) + '</h3>' +
       '<span class="mono dim">' + materials.length + ' ' +
         txt(materials.length === 1 ? 'file' : 'files') + '</span>' +
     '</div>' +

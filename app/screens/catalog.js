@@ -69,7 +69,7 @@ export default async function catalogue() {
       const p = courseProgress(c.id);
       const st = courseState(c.id);
       return '<a class="card node-' + st + '" href="#/course/' + esc(c.id) + '">' +
-        '<span class="card-cat">' + esc(c.category) + '</span>' +
+        '<span class="card-cat">' + txt(c.category) + '</span>' +
         '<span class="card-name">' + esc(c.name) + '</span>' +
         '<span class="card-summary">' + esc(c.summary) + '</span>' +
         '<span class="card-meta">' + c.hours + 'h · ' + txt(c.level) + ' · ' + lessons + ' ' + txt('lessons') + '</span>' +
