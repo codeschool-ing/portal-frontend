@@ -22,7 +22,7 @@ import { esc } from '../text.js';
    stable key — that is what it exists for. */
 export function answersWithExercise() {
   const byId = {};
-  (window.EXERCICIOS_EXEMPLO || []).forEach((e) => { byId[e.id] = e; });
+  (window.SAMPLE_EXERCISES || []).forEach((e) => { byId[e.id] = e; });
   return answersGiven()
     .map((r) => ({ ...r, ex: byId[r.exId] }))
     .filter((r) => r.ex);

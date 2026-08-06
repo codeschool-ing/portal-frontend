@@ -10,7 +10,7 @@
                       is finished (the matching type, which checks pair by
                       pair). The wrapper hides "Responder" and waits.
      body(ex, uid)                       → HTML of the middle
-     setup(root, {exercicio, concluir})  → optional: event listeners
+     setup(root, {exercise, done})  → optional: event listeners
      collect(root)                       → the answer, or null if unanswered
      reveal(root, ex, verdict)           → marks what was right, AFTERWARDS
 
@@ -103,7 +103,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
       out.className = 'ex-veredito v-registrado';
       out.innerHTML = '<strong>' + txt('resposta registrada') + '</strong> ' +
         txt('o resultado sai no fim da prova.');
-      el.revelarProva = () => { mod.reveal(body, ex, v); showVerdict(el, ex, v); };
+      el.revealExam = () => { mod.reveal(body, ex, v); showVerdict(el, ex, v); };
     } else {
       mod.reveal(body, ex, v);
       showVerdict(el, ex, v);
@@ -112,7 +112,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
     el.dispatchEvent(new CustomEvent('exercise:answered', { bubbles: true, detail: { ex, v } }));
   }
 
-  if (mod.setup) mod.setup(body, { exercicio: ex, concluir: check });
+  if (mod.setup) mod.setup(body, { exercise: ex, done: check });
 
   /* "already solved" is useful memory in an assessment and hands over the
      answer key in an exam: the exam draws from the same bank as the lessons, so
@@ -128,7 +128,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
     retry.addEventListener('click', () => {
       const fresh = buildExercise(ex, ctx, ix, options);
       el.replaceWith(fresh);
-      fresh.dispatchEvent(new CustomEvent('exercicio:refeito', { bubbles: true }));
+      fresh.dispatchEvent(new CustomEvent('exercise:redone', { bubbles: true }));
     });
   }
 
@@ -143,7 +143,7 @@ function showVerdict(el, ex, v) {
        whole here: while there is no execution, the portal says it did not
        check. */
     out.className = 'ex-veredito v-pendente';
-    out.innerHTML = '<strong>' + txt('não conferido') + '</strong> ' + esc(v.detalhe || '');
+    out.innerHTML = '<strong>' + txt('não conferido') + '</strong> ' + esc(v.detail || '');
     return;
   }
 
@@ -271,7 +271,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
       submitted = true;
       screens.forEach((t) => {
         if (!t) return;
-        if (t.revelarProva) t.revelarProva();
+        if (t.revealExam) t.revealExam();
         t.querySelectorAll('.ex-responder, input, textarea, select, button').forEach((b) => { b.disabled = true; });
       });
     }
@@ -304,7 +304,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
     states[current] = { answered: true, acertou: e.detail.v.acertou };
     paintHeader();
   });
-  el.addEventListener('exercicio:refeito', () => {
+  el.addEventListener('exercise:redone', () => {
     states[current] = { answered: false, acertou: null };
     screens[current] = stage.firstElementChild;   // "try again" swaps the element
     paintHeader();

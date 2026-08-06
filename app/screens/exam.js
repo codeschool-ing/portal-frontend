@@ -23,8 +23,8 @@ import { studentTrack, trackProgress, bar, empty } from './common.js';
 import { esc } from '../text.js';
 
 function build(exam, progress) {
-  const previous = examResult(exam.chave);
-  const attempt = examAttempts(exam.chave);
+  const previous = examResult(exam.key);
+  const attempt = examAttempts(exam.key);
   const ready = progress.pct >= 100;
 
   const el = document.createElement('div');
@@ -33,7 +33,7 @@ function build(exam, progress) {
   if (!exam.items.length) {
     el.innerHTML =
       '<header class="tela-head">' +
-        '<h1>' + txt('Prova') + ' · ' + esc(exam.titulo) + '</h1>' +
+        '<h1>' + txt('Prova') + ' · ' + esc(exam.title) + '</h1>' +
       '</header>' +
       '<section class="bloco aval-pendente"><p class="mono dim">' +
         txt('[prova em preparação — este curso ainda não tem exercícios produzidos]') +
@@ -43,14 +43,14 @@ function build(exam, progress) {
 
   el.innerHTML =
     '<nav class="migalhas">' +
-      '<a href="' + exam.backTo + '">' + esc(exam.titulo) + '</a>' +
+      '<a href="' + exam.backTo + '">' + esc(exam.title) + '</a>' +
       '<span aria-hidden="true">›</span>' +
       '<span>' + txt(exam.scope === 'trilha' ? 'prova da trilha' : 'prova final') + '</span>' +
     '</nav>' +
 
     '<header class="tela-head">' +
       '<h1>' + txt(exam.scope === 'trilha' ? 'Prova da trilha' : 'Prova final do curso') + '</h1>' +
-      '<p>' + esc(exam.titulo) + '</p>' +
+      '<p>' + esc(exam.title) + '</p>' +
     '</header>' +
 
     '<section class="bloco prova-regras">' +
@@ -85,7 +85,7 @@ function build(exam, progress) {
      "passed" means something, and this is where it gets stored. */
   const onSubmit = ({ states }) => {
     const n = examScore(states);
-    saveExam(exam.chave, {
+    saveExam(exam.key, {
       pct: n.pct, aprovado: n.aprovado, certos: n.certos, total: n.judged,
     });
     return {
@@ -130,8 +130,8 @@ export async function trackExamScreen() {
 /* The card that announces the exam, at the end of the course page and of the
    track page. It is the same piece in both places because it is the same
    promise. */
-export function examCard({ chave, href, scope, count, progress }) {
-  const r = examResult(chave);
+export function examCard({ key, href, scope, count, progress }) {
+  const r = examResult(key);
   const state = r?.aprovado ? 'passou' : (r ? 'tentou' : 'novo');
   return '<section class="bloco prova-cartao ' + state + '">' +
     '<div class="prova-cartao-texto">' +

@@ -82,7 +82,7 @@ function paint() {
 
   let i = -1;
   list.innerHTML = hits.map((g) =>
-    '<div class="busca-grupo">' + txt(GROUP_LABEL[g.grupo]) + '</div>' +
+    '<div class="busca-grupo">' + txt(GROUP_LABEL[g.group]) + '</div>' +
     g.items.map((it) => {
       i += 1;
       const ctx = excerpt(it, term);

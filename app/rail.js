@@ -169,7 +169,7 @@ function courseRail(params, path) {
      as the pending assessment: announcing what does not exist is noise. */
   const exam = courseExam(id);
   const onExam = path === '/curso/' + id + '/prova';
-  const passed = examPassed(exam.chave);
+  const passed = examPassed(exam.key);
   const examRow = exam.items.length
     ? '<a class="trilho-prova' + (passed ? ' feita' : '') + (onExam ? ' on' : '') + '" ' +
       'href="#/curso/' + esc(id) + '/prova">' +

@@ -192,7 +192,7 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
 
   const edges = [];
   nodes.forEach((n) => n.deps.forEach((d) => {
-    if (level[d] < level[n.id]) edges.push({ de: d, para: n.id, vao: level[n.id] - level[d] });
+    if (level[d] < level[n.id]) edges.push({ from: d, to: n.id, span: level[n.id] - level[d] });
   }));
 
   /* A cost with THREE criteria compared lexicographically, not summed — that way
@@ -208,7 +208,7 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
   const cost = () => {
     for (let g = 0; g < columns.length - 1; g += 1) gaps[g] = [];
     edges.forEach((e) => {
-      if (e.vao === 1) gaps[level[e.de]].push({ a: position[e.de], b: position[e.para] });
+      if (e.span === 1) gaps[level[e.from]].push({ a: position[e.from], b: position[e.to] });
     });
     let crossings = 0;
     gaps.forEach((list) => {
@@ -220,9 +220,9 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
     });
     let bias = 0;
     edges.forEach((e) => {
-      if (e.vao === 1) return;
-      const pu = position[e.de], pv = position[e.para];
-      const out = gaps[level[e.de]], into = gaps[level[e.para] - 1];
+      if (e.span === 1) return;
+      const pu = position[e.from], pv = position[e.to];
+      const out = gaps[level[e.from]], into = gaps[level[e.to] - 1];
       let up = 0, down = 0;
       out.forEach((s) => { if (s.a < pu) up += 1; else if (s.a > pu) down += 1; });
       into.forEach((s) => { if (s.b < pv) up += 1; else if (s.b > pv) down += 1; });

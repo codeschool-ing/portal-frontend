@@ -28,7 +28,7 @@ export function gradeLocally(ex, answer) {
     case 'quiz': {
       // exactly one, and it has to be the one flagged as correct
       const right = ex.options.findIndex((a) => a.correct);
-      return verdict(answer === right, { certa: right });
+      return verdict(answer === right, { right });
     }
 
     case 'multiple-choice': {
@@ -36,12 +36,12 @@ export function gradeLocally(ex, answer) {
          record that five choices are five chances to get it wrong rather than
          one. Marking almost all of the right ones is not half a point. */
       const right = ex.options.map((a, i) => (a.correct ? i : -1)).filter((i) => i >= 0);
-      return verdict(sameSet(answer || [], right), { certas: right });
+      return verdict(sameSet(answer || [], right), { right });
     }
 
     case 'ordering': {
       // `items` in the JSON is already in the right order — it is the key
-      return verdict(sameSequence(answer || [], ex.items), { certa: ex.items });
+      return verdict(sameSequence(answer || [], ex.items), { right: ex.items });
     }
 
     case 'matching': {

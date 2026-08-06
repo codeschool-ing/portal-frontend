@@ -59,12 +59,12 @@ export default {
     );
   },
 
-  setup(root, { exercicio, concluir }) {
+  setup(root, { exercise, done }) {
     const key = {};
-    exercicio.pairs.forEach((p) => { key[p.left] = p.right; });
+    exercise.pairs.forEach((p) => { key[p.left] = p.right; });
 
     const state = { left: null, wrong: 0, done: 0, map: {}, locked: false };
-    const total = exercicio.pairs.length;
+    const total = exercise.pairs.length;
 
     const clear = () => {
       root.querySelectorAll('.ficha.sel').forEach((f) => f.classList.remove('sel'));
@@ -100,7 +100,7 @@ export default {
         root.querySelector('.assoc-feitos').textContent = state.done;
         if (state.done === total) {
           state.locked = true;
-          concluir({ map: state.map, wrong: state.wrong });
+          done({ map: state.map, wrong: state.wrong });
         }
         return;
       }

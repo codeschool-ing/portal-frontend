@@ -76,7 +76,7 @@ function buildIndex() {
     // matching. Without both, the excerpt would come out lowercase and unaccented.
     const head = stripMarkup(title);
     const raw = [head, ...texts.map(stripMarkup)].filter(Boolean).join(' ');
-    items.push({ grupo: group, titulo: title, sub, href, bruto: raw, alvo: fold(raw), daqui: head.length + 1 });
+    items.push({ group, title, sub, href, raw, target: fold(raw), bodyAt: head.length + 1 });
   };
 
   CURSOS.forEach((c) => {
@@ -134,29 +134,29 @@ export const GROUP_LABEL = {
 
 const PER_GROUP = 5;
 
-export function search(term, { porGrupo = PER_GROUP } = {}) {
+export function search(term, { perGroup = PER_GROUP } = {}) {
   const q = fold(term).trim();
   if (q.length < 2) return [];
   if (!index) index = buildIndex();
 
   const hits = [];
   index.forEach((it) => {
-    const at = it.alvo.indexOf(q);
+    const at = it.target.indexOf(q);
     if (at < 0) return;
     /* Simple, explainable scoring: matching at the start of the title is worth
        more than matching in the middle of the body. No statistical relevance —
        at this volume it would cost more in surprise than it earns in order. */
-    const inTitle = fold(it.titulo).indexOf(q);
+    const inTitle = fold(it.title).indexOf(q);
     const weight = (inTitle === 0 ? 0 : (inTitle > 0 ? 1 : 2)) * 1000 + at;
-    hits.push({ ...it, peso: weight, onde: at });
+    hits.push({ ...it, weight, at });
   });
 
-  hits.sort((a, b) => a.peso - b.peso);
+  hits.sort((a, b) => a.weight - b.weight);
 
   const out = [];
   GROUPS.forEach((g) => {
-    const ofGroup = hits.filter((a) => a.grupo === g).slice(0, porGrupo);
-    if (ofGroup.length) out.push({ grupo: g, items: ofGroup });
+    const ofGroup = hits.filter((a) => a.group === g).slice(0, perGroup);
+    if (ofGroup.length) out.push({ group: g, items: ofGroup });
   });
   return out;
 }
@@ -166,18 +166,18 @@ export function search(term, { porGrupo = PER_GROUP } = {}) {
    indistinguishable rows. */
 export function excerpt(item, term, width = 90) {
   const q = fold(term).trim();
-  const bodyFrom = item.daqui || 0;
-  if (bodyFrom >= item.bruto.length) return '';   // no body: the title is already on screen
+  const bodyFrom = item.bodyAt || 0;
+  if (bodyFrom >= item.raw.length) return '';   // no body: the title is already on screen
 
   /* Search from the body onwards. If the term only appears in the title, show
      the start of the body — repeating the title underneath it says nothing. */
-  const inBody = item.alvo.indexOf(q, bodyFrom);
+  const inBody = item.target.indexOf(q, bodyFrom);
   const from = inBody < 0
     ? bodyFrom
     : Math.max(bodyFrom, inBody - Math.floor(width / 3));
 
   // both strings have the same length (folding does not change it), so the index
   // found in the folded one holds in the raw one
-  const piece = item.bruto.slice(from, from + width);
-  return (from > bodyFrom ? '…' : '') + piece + (from + width < item.bruto.length ? '…' : '');
+  const piece = item.raw.slice(from, from + width);
+  return (from > bodyFrom ? '…' : '') + piece + (from + width < item.raw.length ? '…' : '');
 }

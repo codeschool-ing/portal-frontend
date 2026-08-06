@@ -325,7 +325,7 @@ progress does not see it reset.
 ### The three written courses
 
 There is one file per course, as the pipeline does — `lessons-<course>.js` and
-`exercicios-<course>.js` — and each one **merges** into the global object instead
+`exercises-<course>.js` — and each one **merges** into the global object instead
 of assigning it: none of them may depend on being the first to load.
 
 | course | lessons written | sections | assessments | what it exercises |
@@ -453,7 +453,7 @@ before closing an exercise.
 
 ## What is skeleton and what is settled
 
-**Disposable:** the content of `assets/exercicios-exemplo.js`, the sign-in screen
+**Disposable:** the content of `assets/exercises-sample.js`, the sign-in screen
 (any name gets in), the lessons' text, the certificate with no validation code.
 
 **Settled:** the exercise format — the fields are exactly the ones the pipeline
@@ -478,7 +478,7 @@ assets/base.css                the vitrine's CSS, unchanged
 assets/portal.css              only what the vitrine did not have
 assets/dados.js                catalogue (becomes an API in Stage 2)
 assets/lessons-*.js            each topic's sections and their text
-assets/exercicios-*.js         one file per course, as the pipeline does
+assets/exercises-*.js         one file per course, as the pipeline does
 app/catalog.js                 reading the catalogue and the graph — no DOM
 app/lessons.js                 what a lesson is made of: sections + assessment
 app/graph.js                   the graph as a progress map
@@ -1004,6 +1004,17 @@ inertia:
 The lesson content itself is content, not code, and stays in Portuguese too —
 including the comments inside the code an `exemplo` or a `{ codigo }` block
 teaches, which the student reads.
+
+**Nothing internal is left in Portuguese.** The last sweep renamed the shapes
+that only travel between two modules — the search index's records, the exam DTO,
+the certificate card's fields, the matching exercise's state, the type modules'
+`setup(root, {exercise, done})` contract — and the graph's edge records now use
+the vitrine's own `from`/`to`/`span`, since that algorithm is a verbatim port and
+has to stay comparable with it. `assets/exercicios-*.js` became
+`assets/exercises-*.js` and `window.EXERCICIOS_EXEMPLO` became
+`window.SAMPLE_EXERCISES`, following the pipeline, which now emits
+`exercises-<course>.json`. The plan and material records, which nothing outside
+this repository produces or reads, are in English too.
 
 **The persisted shape reaches further than the store.** `ultima` is stored as
 `{ cursoId, aulaIx, secId }`, so that coordinate pair keeps those names

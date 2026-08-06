@@ -26,7 +26,7 @@
 
 /* Concatenates instead of assigning: there is one file per course, as in the
    pipeline, and none of them may depend on being the first to load. */
-window.EXERCICIOS_EXEMPLO = (window.EXERCICIOS_EXEMPLO || []).concat([
+window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
 
   /* ================= demonstration lesson: the seven types ================ */
   /* javascript · topic 1 · "Tipos, coerção, igualdade estrita e valores falsos" */

@@ -44,14 +44,14 @@ export function materialList(materials, { titulo } = {}) {
         txt(materials.length === 1 ? 'arquivo' : 'arquivos') + '</span>' +
     '</div>' +
     materials.map((m) => {
-      const kind = m.tipo || 'link';
+      const kind = m.kind || 'link';
       const external = kind === 'link';
-      return '<a class="mat" href="' + esc(m.dados || m.url || '#') + '"' +
+      return '<a class="mat" href="' + esc(m.data || m.url || '#') + '"' +
         // an external link opens away; a file downloads, under the record's name
-        (external ? ' target="_blank" rel="noopener"' : ' download="' + esc(m.arquivo || '') + '"') + '>' +
+        (external ? ' target="_blank" rel="noopener"' : ' download="' + esc(m.file || '') + '"') + '>' +
         '<span class="mat-icone" aria-hidden="true">' + svg(ICON[kind] || ICON.link) + '</span>' +
         '<span class="mat-meio">' +
-          '<span class="mat-tit">' + esc(m.titulo) + '</span>' +
+          '<span class="mat-tit">' + esc(m.title) + '</span>' +
           '<span class="mat-meta mono dim">' + esc(kind.toUpperCase()) +
             (m.bytes ? ' · ' + fileSize(m.bytes) : '') +
             (m.aula ? ' · ' + esc(m.aula) : '') +

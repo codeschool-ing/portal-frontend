@@ -134,7 +134,7 @@ async function gradeOnServer(ex, answer) {
   return {
     acertou: null,                                 // null = it was not checked
     simulado: true,
-    detalhe: ex.type === 'expression-answer'
+    detail: ex.type === 'expression-answer'
       ? 'Equivalência simbólica exige o CAS no servidor.'
       : 'A execução dos casos de teste exige o contêiner no servidor.',
     resposta: answer,

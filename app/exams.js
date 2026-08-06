@@ -73,13 +73,13 @@ export function courseExam(courseId, attempt = 0) {
   const c = courseById(courseId);
   const bank = courseBank(courseId);
   return {
-    chave: 'curso:' + courseId,
+    key: 'curso:' + courseId,
     scope: 'curso',
-    alvo: courseId,
-    titulo: c ? c.nome : courseId,
+    about: courseId,
+    title: c ? c.nome : courseId,
     backTo: '#/curso/' + courseId,
     items: draw(bank, COURSE_QUESTIONS, courseId + ':' + attempt),
-    banco: bank.length,
+    bankSize: bank.length,
   };
 }
 
@@ -87,13 +87,13 @@ export function trackExam(track, activeOption, attempt = 0) {
   const path = trackPath(track, activeOption);
   const bank = path.flatMap((id) => courseBank(id));
   return {
-    chave: 'trilha:' + track.id,
+    key: 'trilha:' + track.id,
     scope: 'trilha',
-    alvo: track.id,
-    titulo: track.nome,
+    about: track.id,
+    title: track.nome,
     backTo: '#/trilha',
     items: draw(bank, TRACK_QUESTIONS, track.id + ':' + attempt),
-    banco: bank.length,
+    bankSize: bank.length,
     cursos: path.length,
   };
 }

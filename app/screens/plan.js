@@ -20,9 +20,9 @@ import { currentPlan, studentAccount, changePlan } from '../state.js';
 import { dispatch } from '../routes.js';
 import { esc } from '../text.js';
 
-const price = (p) => (p.preco === 0
+const price = (p) => (p.price === 0
   ? txt('grátis')
-  : 'R$ ' + p.preco + '<span class="pl-ciclo">' + txt(p.ciclo) + '</span>');
+  : 'R$ ' + p.price + '<span class="pl-ciclo">' + txt(p.cycle) + '</span>');
 
 const CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" ' +
   'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.5 3.5L13 5"/></svg>';
@@ -50,7 +50,7 @@ export default async function plan() {
   /* Every feature ANY plan offers becomes a row, in the order they appear in
      FEATURES. Listing only the current plan's would hide precisely what the
      person came to see. */
-  const keys = Object.keys(features).filter((k) => plans.some((p) => p.inclui.includes(k)));
+  const keys = Object.keys(features).filter((k) => plans.some((p) => p.includes.includes(k)));
 
   el.innerHTML =
     '<header class="tela-head">' +
@@ -62,14 +62,14 @@ export default async function plan() {
       '<div class="pl-atual-topo">' +
         '<div>' +
           '<span class="pl-rot mono">' + txt('plano atual') + '</span>' +
-          '<h2>' + esc(current.nome) + '</h2>' +
-          '<p class="pl-resumo">' + esc(current.resumo) + '</p>' +
+          '<h2>' + esc(current.name) + '</h2>' +
+          '<p class="pl-resumo">' + esc(current.summary) + '</p>' +
         '</div>' +
         '<span class="pl-preco">' + price(current) + '</span>' +
       '</div>' +
       '<div class="pl-fatos mono dim">' +
         (since ? '<span>' + txt('desde') + ' ' + esc(since) + '</span>' : '') +
-        '<span>' + current.inclui.length + ' ' + txt('de') + ' ' + keys.length + ' ' + txt('recursos') + '</span>' +
+        '<span>' + current.includes.length + ' ' + txt('de') + ' ' + keys.length + ' ' + txt('recursos') + '</span>' +
         (account.email ? '<span>' + esc(account.email) + '</span>' : '') +
       '</div>' +
     '</section>' +
@@ -80,14 +80,14 @@ export default async function plan() {
         '<table class="pl-tabela">' +
           '<thead><tr><th scope="col">' + txt('recurso') + '</th>' +
             plans.map((p) => '<th scope="col"' + (p.id === current.id ? ' class="on"' : '') + '>' +
-              esc(p.nome) +
+              esc(p.name) +
               (p.id === current.id ? '<span class="pl-seu mono">' + txt('seu') + '</span>' : '') +
             '</th>').join('') +
           '</tr></thead>' +
           '<tbody>' +
             keys.map((k) => '<tr><th scope="row">' + txt(features[k]) + '</th>' +
               plans.map((p) => {
-                const has = p.inclui.includes(k);
+                const has = p.includes.includes(k);
                 return '<td class="' + (has ? 'sim' : 'nao') + (p.id === current.id ? ' on' : '') + '">' +
                   (has ? CHECK : DASH) +
                   '<span class="pl-oculto">' + txt(has ? 'incluído' : 'não incluído') + '</span>' +
@@ -98,9 +98,9 @@ export default async function plan() {
               plans.map((p) => '<td' + (p.id === current.id ? ' class="on"' : '') + '>' +
                 (p.id === current.id
                   ? '<span class="pl-ja mono">' + txt('seu plano') + '</span>'
-                  : '<button type="button" class="btn ' + (p.preco > current.preco ? 'btn-primary' : 'btn-ghost') +
+                  : '<button type="button" class="btn ' + (p.price > current.price ? 'btn-primary' : 'btn-ghost') +
                     ' pl-trocar" data-plano="' + esc(p.id) + '">' +
-                    txt(p.preco > current.preco ? 'Fazer upgrade' : 'Mudar para este') + '</button>') +
+                    txt(p.price > current.price ? 'Fazer upgrade' : 'Mudar para este') + '</button>') +
               '</td>').join('') +
             '</tr>' +
           '</tbody>' +

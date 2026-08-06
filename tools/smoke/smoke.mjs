@@ -49,7 +49,7 @@ await p.goto(BASE + PAGE, { waitUntil: 'networkidle' });
 console.log('\n== 1. load and redirect ==');
 ok('landed on /entrar with no session', p.url().includes('#/entrar'), p.url());
 ok('catalogue loaded', await p.evaluate(() => typeof CURSOS !== 'undefined' && CURSOS.length === 86));
-ok('sample exercises loaded', await p.evaluate(() => window.EXERCICIOS_EXEMPLO?.length > 0));
+ok('sample exercises loaded', await p.evaluate(() => window.SAMPLE_EXERCISES?.length > 0));
 
 console.log('\n== 2. signing in ==');
 await p.fill('#e-nome', 'Alexandre');
@@ -216,19 +216,19 @@ const answer = async (sel, fn, expected) => {
 
 // quiz: ticks the correct choice by its data-ix
 await answer('.ex-quiz', async (ex) => {
-  const ix = await p.evaluate(() => window.EXERCICIOS_EXEMPLO.find((e) => e.type === 'quiz').options.findIndex((a) => a.correct));
+  const ix = await p.evaluate(() => window.SAMPLE_EXERCISES.find((e) => e.type === 'quiz').options.findIndex((a) => a.correct));
   await ex.locator(`.alt[data-ix="${ix}"]`).click();
 }, 'v-certo');
 
 await answer('.ex-multiple-choice', async (ex) => {
-  const ixs = await p.evaluate(() => window.EXERCICIOS_EXEMPLO.find((e) => e.type === 'multiple-choice')
+  const ixs = await p.evaluate(() => window.SAMPLE_EXERCISES.find((e) => e.type === 'multiple-choice')
     .options.map((a, i) => (a.correct ? i : -1)).filter((i) => i >= 0));
   for (const i of ixs) await ex.locator(`.alt[data-ix="${i}"]`).click();
 }, 'v-certo');
 
 // ordering: reorders through the DOM into the right order using the arrows
 await answer('.ex-ordering', async (ex) => {
-  const right = await p.evaluate(() => window.EXERCICIOS_EXEMPLO.find((e) => e.type === 'ordering').items);
+  const right = await p.evaluate(() => window.SAMPLE_EXERCISES.find((e) => e.type === 'ordering').items);
   for (let target = 0; target < right.length; target += 1) {
     for (let step = 0; step < 8; step += 1) {
       const current = await ex.locator('.ord-item').allTextContents();
@@ -244,7 +244,7 @@ await answer('.ex-ordering', async (ex) => {
    verdict now measures the MISTAKES along the way, and passing means closing
    with none. */
 await answer('.ex-matching', async (ex) => {
-  const pairs = await p.evaluate(() => window.EXERCICIOS_EXEMPLO.find((e) => e.type === 'matching').pairs);
+  const pairs = await p.evaluate(() => window.SAMPLE_EXERCISES.find((e) => e.type === 'matching').pairs);
   for (const pair of pairs) {
     await ex.locator('.ficha-esq').filter({ hasText: pair.left.replace(/`/g, '') }).first().click();
     await ex.locator('.ficha-dir').filter({ hasText: pair.right.replace(/`/g, '') }).first().click();
@@ -437,7 +437,7 @@ await p.goto(BASE + PAGE + '#/curso/web-fundamentos/aula/2/avaliacao');
 await p.waitForSelector('.wizard');
 await goToType('quiz');
 const wrongIx = await p.evaluate(() =>
-  window.EXERCICIOS_EXEMPLO.find((e) => e.id === 'wf-03-quiz').options.findIndex((a) => !a.correct));
+  window.SAMPLE_EXERCISES.find((e) => e.id === 'wf-03-quiz').options.findIndex((a) => !a.correct));
 await p.locator(`.ex-quiz .alt[data-ix="${wrongIx}"]`).click();
 await p.locator('.ex-quiz .ex-responder').click();
 await p.waitForFunction(() => document.querySelector('.ex-quiz .ex-veredito')?.className.includes('v-errado'),
@@ -630,7 +630,7 @@ const answerEverything = async (correctly) => {
     // the id comes from the DOM, not from the text: the prompt is rendered with markup
     const id = await p.locator('.ex').getAttribute('data-ex');
     const ixs = await p.evaluate((exId) => {
-      const ex = window.EXERCICIOS_EXEMPLO.find((e) => e.id === exId);
+      const ex = window.SAMPLE_EXERCISES.find((e) => e.id === exId);
       if (!ex?.options) return null;
       return ex.options.map((a, k) => (a.correct ? k : -1)).filter((k) => k >= 0);
     }, id);
