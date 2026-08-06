@@ -55,10 +55,10 @@ export default {
       const b = e.target.closest('.ord-arrow');
       if (!b) return;
       const li = b.closest('.ord-item');
-      const dir = Number(b.dataset.direction);
-      const neighbour = dir < 0 ? li.previousElementSibling : li.nextElementSibling;
+      const direction = Number(b.dataset.direction);
+      const neighbour = direction < 0 ? li.previousElementSibling : li.nextElementSibling;
       if (!neighbour) return;
-      if (dir < 0) list.insertBefore(li, neighbour);
+      if (direction < 0) list.insertBefore(li, neighbour);
       else list.insertBefore(neighbour, li);
       b.focus();   // focus follows the item, or the keyboard loses its place
     });

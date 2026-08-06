@@ -7,8 +7,9 @@
    Portuguese by itself, without breaking the screen.
 
    The dictionaries live in assets/i18n.js, under window.I18N. Their keys — and
-   the shape of the catalogue objects they carry (`cursos`, `trilhas`, `nome`,
-   `ementa`…) — are the data contract, so they stay in Portuguese.
+   the shape of the catalogue objects they carry (`courses`, `tracks`, `name`,
+   `syllabus`…) — are the data contract, and they are English like everything
+   else. Portuguese is a translation file now, not the base.
 
    Detection: it uses `navigator.languages`, which is the LANGUAGE configured in
    the browser — not geolocation. That is the right signal: a Brazilian browsing

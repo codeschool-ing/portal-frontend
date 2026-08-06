@@ -128,7 +128,7 @@ export function courseMaterials(courseId) {
         const m = materialByKey(key);
         if (!m) return;
         seen.add(key);
-        out.push({ ...m, key: key, lessonIx: ix, sectionId: s.id, aula: a.title });
+        out.push({ ...m, key: key, lessonIx: ix, sectionId: s.id, lesson: a.title });
       });
     });
   });

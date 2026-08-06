@@ -12,10 +12,11 @@
    in four-hour jumps, which is nearly the same as not moving. `lessonDone`
    became derived: a lesson is done when all of its sections are.
 
-   THE STORED SHAPE KEEPS ITS PORTUGUESE KEYS (`sessao`, `progresso`,
-   `secoes`…). They are the persisted format — renaming them would orphan every
-   browser that already has state, for no gain that a reader of this file can
-   see.
+   THE STORED SHAPE IS ENGLISH, AND GETTING THERE NEEDED A MIGRATION. It used
+   to be Portuguese (`sessao`, `progresso`, `secoes`…), and a browser holding
+   that document would be read against a shape asking for `progress`, find
+   nothing and report a student who never started — silently. `migrate()` below
+   rewrites it on read, once. Do not rename a stored key without extending it.
    ========================================================================== */
 
 import {
