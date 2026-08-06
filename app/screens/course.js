@@ -142,7 +142,7 @@ export default async function course({ id }) {
    time then fills the frames in without rearranging anybody's screen. */
 function videoBlock(c) {
   if (!c.video) {
-    return '<div class="modal-video empty" aria-hidden="true">' +
+    return '<div class="modal-video is-empty" aria-hidden="true">' +
       '<span class="video-play"></span>' +
       '<span class="video-notice">' + txt('video coming soon') + '</span></div>';
   }

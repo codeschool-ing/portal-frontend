@@ -23,6 +23,26 @@ const plausibleEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || '').
 /* Password strength by BANDS, not by prohibitive rules. A long passphrase is
    worth more than "P@ss1!" and no "must contain a symbol" rule captures that;
    the bar measures and informs, and the minimum is only the length. */
+/* ---------- the released version ----------
+
+   THE PERSON ASKING IS NOT THE STUDENT. It answers "which build am I looking
+   at", which is what nobody can say when a student writes in about something
+   broken. So it goes at the very bottom of the account screen — the last line
+   of the last screen anyone opens on purpose — and not anywhere a student
+   passes through on the way to a lesson.
+
+   THE PORTAL NEVER INVENTS IT. The single source is the `version` meta tag,
+   and the release workflow refuses a tag that disagrees with it. Anything but
+   a semantic version — `dev`, which is every build that is not a release —
+   renders nothing, rather than link to a GitHub tag nobody created. */
+function versionLine() {
+  const version = document.querySelector('meta[name="version"]')?.content?.trim() || '';
+  if (!/^\d+\.\d+\.\d+(?:[-+][\w.]+)?$/.test(version)) return '';
+  const url = 'https://github.com/codeschool-ing/portal-frontend/releases/tag/v' + version;
+  return '<p class="account-version mono dim">' +
+    '<a href="' + esc(url) + '" target="_blank" rel="noopener">v' + esc(version) + '</a></p>';
+}
+
 function passwordStrength(s) {
   const v = String(s || '');
   if (v.length < 8) return { pct: Math.min(30, v.length * 4), label: 'too short', ok: false };
@@ -140,7 +160,9 @@ export default async function account() {
 
     '<section class="block">' +
       '<button type="button" class="btn btn-ghost" id="c-signout">' + txt('Sign out') + '</button>' +
-    '</section>';
+    '</section>' +
+
+    versionLine();
 
   el.querySelector('#c-track').addEventListener('change', async (e) => {
     await api.enrol(e.target.value);

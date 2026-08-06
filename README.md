@@ -29,6 +29,22 @@ node tools/examples/check.mjs   # the code examples really do run
 node tools/i18n/check.mjs       # nothing on screen is stuck in English
 ```
 
+## Cutting a release
+
+The version lives in `index.html`, in `<meta name="version">`, and nowhere else — not in a
+build flag, because `bundle.py` produces one artefact and the portal is also served from
+source, and a version that existed only in the bundle would give two answers to one question.
+
+```sh
+node tools/version/version.js 1.2.0    # never edit the meta tag by hand
+git commit -am 'Release 1.2.0' && git tag v1.2.0 && git push --follow-tags
+```
+
+`.github/workflows/release.yml` fails the release when the tag and the file disagree. `dev` is
+every build that is not a release, and the account screen then shows nothing rather than link
+to a tag nobody created — a wrong version is worse than none, because it answers with
+confidence.
+
 ## A single file, to open off disk
 
 ```sh
@@ -523,6 +539,7 @@ app/screens/*.js               one per screen
 app/exercises/*.js             one per type, plus the wrapper and the grading
 tools/smoke/                   the smoke suite
 tools/i18n/                    every string on screen has all four translations
+tools/version/                 reads or sets the released version
 tools/bundle/                  generates the single HTML file
 ```
 
