@@ -88,7 +88,7 @@ export default async function account() {
         '<div class="field">' +
           '<label for="c-email">' + txt('sign-in e-mail') + '</label>' +
           '<input type="email" id="c-email" autocomplete="email" value="' + esc(acc.email) + '" ' +
-            'placeholder="voce@example.com">' +
+            'placeholder="you@example.com">' +
         '</div>' +
         '<div class="account-action">' +
           '<button type="submit" class="btn btn-primary">' + txt('Change e-mail') + '</button>' +

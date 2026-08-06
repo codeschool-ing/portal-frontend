@@ -63,7 +63,7 @@ export default async function performance() {
     const p = Math.round((d.lastCorrect / d.total) * 100);
     return '<div class="perf-row">' +
       '<span class="perf-label">' + esc(label) + '</span>' +
-      bar(p, d.lastCorrect + ' de ' + d.total) +
+      bar(p, d.lastCorrect + ' ' + txt('of') + ' ' + d.total) +
       '<span class="perf-num">' + d.lastCorrect + '/' + d.total + '</span>' +
     '</div>';
   };

@@ -73,7 +73,7 @@ export default async function catalogue() {
         '<span class="card-name">' + esc(c.name) + '</span>' +
         '<span class="card-summary">' + esc(c.summary) + '</span>' +
         '<span class="card-meta">' + c.hours + 'h · ' + txt(c.level) + ' · ' + lessons + ' ' + txt('lessons') + '</span>' +
-        (p.done ? bar(p.pct, p.done + ' de ' + p.total) : '') +
+        (p.done ? bar(p.pct, p.done + ' ' + txt('of') + ' ' + p.total) : '') +
       '</a>';
     }).join('');
     el.querySelector('#cat-empty').hidden = list.length > 0;

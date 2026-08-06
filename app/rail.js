@@ -91,7 +91,7 @@ function globalRail(path) {
     const st = courseState(id);
     return '<a class="rail-course no-' + st + '" href="#/course/' + esc(id) + '">' +
       '<span class="tc-mark" data-state="' + st + '" aria-hidden="true"></span>' +
-      '<span class="tc-nome">' + esc(c.name) + '</span>' +
+      '<span class="tc-name">' + esc(c.name) + '</span>' +
       '<span class="tc-count">' + p.done + '/' + p.total + '</span>' +
     '</a>';
   }).join('');
@@ -182,7 +182,7 @@ function courseRail(params, path) {
     '<a class="rail-back" href="#/track">← ' + txt('my track') + '</a>' +
     '<div class="rail-sec">' +
       '<span class="rail-tit">' + esc(c.name) + '</span>' +
-      bar(p.pct, p.done + ' de ' + p.total) +
+      bar(p.pct, p.done + ' ' + txt('of') + ' ' + p.total) +
       '<span class="rail-count">' + p.done + '/' + p.total + ' ' + txt('sections') + '</span>' +
       '<div class="rail-lessons">' + rows + '</div>' +
       examRow +

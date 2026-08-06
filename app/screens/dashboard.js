@@ -43,7 +43,7 @@ export default async function dashboard() {
           txt('lesson') + ' ' + (a.ix + 1) + '/' + lessons.length + ' · ' +
           txt('section') + ' ' + (sections.indexOf(s) + 1) + '/' + sections.length +
         '</span>' +
-        bar(p.pct, p.done + ' de ' + p.total) +
+        bar(p.pct, p.done + ' ' + txt('of') + ' ' + p.total) +
         '<span class="resume-btn btn btn-primary">' + txt('Continue') + ' →</span>' +
       '</a>'
     );
@@ -94,7 +94,7 @@ export default async function dashboard() {
                   txt(st === 'current' ? 'in progress' : 'available') + '</span>' +
                 '<span class="card-name">' + esc(c.name) + '</span>' +
                 '<span class="card-meta">' + c.hours + 'h · ' + txt(c.level) + '</span>' +
-                bar(p.pct, p.done + ' de ' + p.total) +
+                bar(p.pct, p.done + ' ' + txt('of') + ' ' + p.total) +
                 '<span class="card-count">' + p.done + '/' + p.total + ' ' + txt('sections') + '</span>' +
               '</a>';
             }).join('') +

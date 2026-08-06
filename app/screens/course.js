@@ -44,7 +44,7 @@ export default async function course({ id }) {
         '<span>' + lessons.length + ' ' + txt('lessons') + '</span>' +
         '<span>' + txt('in') + ' ' + tracksWithCourse(id).length + ' ' + txt('tracks') + '</span>' +
       '</div>' +
-      bar(p.pct, p.done + ' de ' + p.total) +
+      bar(p.pct, p.done + ' ' + txt('of') + ' ' + p.total) +
       '<p class="course-count">' + p.done + '/' + p.total + ' ' + txt('sections completed') + '</p>' +
     '</header>' +
 
