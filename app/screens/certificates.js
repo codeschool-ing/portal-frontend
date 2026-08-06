@@ -28,9 +28,10 @@ import { trackPath, courseById } from '../catalog.js';
 import { courseDone, activeOption, examPassed, examResult, now } from '../state.js';
 import { studentTrack } from './common.js';
 import { openModal } from '../modal.js';
+import { downloadCertificatePNG } from '../certificate-png.js';
 import { esc } from '../text.js';
 
-const DATE = (d) => new Intl.DateTimeFormat(document.documentElement.lang || 'pt-BR', {
+const DATE = (d) => new Intl.DateTimeFormat(document.documentElement.lang || 'en', {
   day: '2-digit', month: 'long', year: 'numeric',
 }).format(d);
 
@@ -114,6 +115,13 @@ function card({ label, name, meta, who, when, key, sample, grade }) {
 const LINKEDIN = 'https://www.linkedin.com';
 const validationUrl = (c) => 'https://codeschool.ing/certificate/' + encodeURIComponent(c);
 
+/* Icon only, like the LinkedIn one beside it: the arrow says "save this", and
+   a caption would say it again in the width of the whole bar. */
+const pngButton = () =>
+  '<button type="button" class="cert-in cert-png" ' +
+    'title="' + txt('Download as PNG') + '" ' +
+    'aria-label="' + txt('Download as PNG') + '">' + ICON_PNG + '</button>';
+
 function linkedInButtons({ name, code: certCode, when }) {
   const d = new Date(when);
   const q = (o) => Object.entries(o)
@@ -141,6 +149,12 @@ function linkedInButtons({ name, code: certCode, when }) {
     '<a class="btn btn-ghost cert-share" href="' + esc(post) + '" target="_blank" rel="noopener">' +
       txt('Share') + '</a>';
 }
+
+/* An arrow into a tray: the same drawing the material list uses for a
+   download, so the two mean the same thing in two places. */
+const ICON_PNG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
+  'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+  '<path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>';
 
 const ICON_LINKEDIN = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
   '<path d="M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-.95 1.83-1.95 3.77-1.95 4.03 0 4.78 2.5 4.78 5.76V21h-4v-5.6c0-1.34-.03-3.07-1.9-3.07-1.9 0-2.2 1.46-2.2 2.97V21H9z"/></svg>';
@@ -264,12 +278,38 @@ export default async function certificates() {
     openModal(art.outerHTML, {
       className: 'modal-cert',
       label: txt('Certificate') + ' — ' + certName,
+      /* The PNG button follows the LinkedIn button's rule, for the LinkedIn
+         button's reason: on an example it is disabled rather than hidden or
+         working. A sample downloaded as a file stops being marked as a sample
+         the moment it leaves the screen — it is a picture of a certificate
+         nobody earned, and it would be the one form of it that travels. */
       actions: isExample
-        ? '<span class="cert-in cert-in-off" aria-disabled="true" ' +
+        ? '<span class="cert-in cert-png cert-in-off" aria-disabled="true" ' +
+            'title="' + txt('sample — there is nothing to download') + '" ' +
+            'aria-label="' + txt('sample — there is nothing to download') + '">' +
+            ICON_PNG + '</span>' +
+          '<span class="cert-in cert-in-off" aria-disabled="true" ' +
             'title="' + txt('sample — there is no certificate to add') + '" ' +
             'aria-label="' + txt('sample — there is no certificate to add') + '">' +
             ICON_LINKEDIN + '</span>'
-        : linkedInButtons({ name: certName, code: code(key + who), when: new Date().toISOString() }),
+        : pngButton() +
+          linkedInButtons({ name: certName, code: code(key + who), when: new Date().toISOString() }),
+    });
+
+    if (isExample) return;
+    const modal = document.querySelector('.modal-cert');
+    modal?.querySelector('.cert-png')?.addEventListener('click', async (ev) => {
+      const btn = ev.currentTarget;
+      btn.disabled = true;
+      // The card inside the modal, not the one in the grid: it is the same
+      // markup, and reading the visible one keeps the file and the preview
+      // from ever disagreeing.
+      const ok = await downloadCertificatePNG(modal.querySelector('.cert'));
+      btn.disabled = false;
+      if (!ok) {
+        btn.title = txt('this browser cannot generate the image');
+        btn.setAttribute('aria-label', txt('this browser cannot generate the image'));
+      }
     });
   };
 
