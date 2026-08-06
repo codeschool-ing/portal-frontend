@@ -7,10 +7,10 @@
 
    WHAT IS NOT DISPOSABLE IS THE FORMAT. The fields below are exactly the ones
    the pipeline emits — `topic`, `type`, `difficulty`, `prompt`,
-   `socraticHint`, `options[].{text,correct,why}`, `items`, `trap`,
+   `socraticHint`, `choices[].{text,correct,why}`, `items`, `trap`,
    `pairs[].{left,right}`, `rightDistractors`, `givenCode`, `skeleton`,
-   `tests[].{description,input,expected_output}`, `referenceExpression`,
-   `variables`, `check_*`. Ignoring the tool for now costs nothing; inventing a
+   `tests[].{description,input,expectedOutput}`, `referenceExpression`,
+   `variables`, `check*`. Ignoring the tool for now costs nothing; inventing a
    parallel format would cost a migration.
 
    Two fields were added that the pipeline does not emit, because they belong to
@@ -18,10 +18,14 @@
    student's answer) and `course` (the pipeline already knows which course a file
    belongs to; here everything lives together).
 
+   The Portuguese of every prompt, hint, option and justification is in
+   assets/exercises-pt.js. What decides an answer — `correct`, `answer`,
+   `expectedOutput`, `referenceExpression` — is not translated.
+
    ONE DELIBERATE IMPURITY: `expression-answer` in a JavaScript lesson makes no
    pedagogical sense — the type exists for mathematics. It is here so that the
    demonstration lesson exercises all seven renderers on a single screen. The
-   same type turns up again in `estatistica`, where it is legitimate.
+   same type turns up again in `statistics`, where it is legitimate.
    ========================================================================== */
 
 /* Concatenates instead of assigning: there is one file per course, as in the
@@ -29,36 +33,36 @@
 window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
 
   /* ================= demonstration lesson: the seven types ================ */
-  /* javascript · topic 1 · "Tipos, coerção, igualdade estrita e valores falsos" */
+  /* javascript · topic 1 · "Types, coercion, strict equality and falsy values" */
 
   {
-    id: 'js-coercao-quiz-1',
+    id: 'js-coercion-quiz-1',
     course: 'javascript',
     topic: 'Types, coercion, strict equality and falsy values',
     type: 'quiz',
     difficulty: 'easy',
-    prompt: 'Em `0 == "0"` o resultado é `true`, mas em `0 === "0"` é `false`. O que explica a diferença?',
-    socraticHint: 'Um dos dois operadores tem uma etapa a mais antes de comparar. Qual etapa seria essa, e o que ela faz com a string?',
+    prompt: 'In `0 == "0"` the result is `true`, but in `0 === "0"` it is `false`. What explains the difference?',
+    socraticHint: 'One of the two operators has an extra step before comparing. What step would that be, and what does it do to the string?',
     choices: [
       {
-        text: '`==` converte os operandos para um tipo comum antes de comparar; `===` compara tipo e valor sem converter nada.',
+        text: '`==` converts the operands to a common type before comparing; `===` compares type and value without converting anything.',
         correct: true,
-        why: 'É a diferença entre igualdade abstrata e estrita: a primeira aplica coerção, a segunda falha de imediato quando os tipos diferem.',
+        why: 'It is the difference between abstract and strict equality: the first applies coercion, the second fails immediately when the types differ.',
       },
       {
-        text: '`==` compara apenas o conteúdo textual dos valores, ignorando se são número ou string.',
+        text: '`==` compares only the textual content of the values, ignoring whether they are a number or a string.',
         correct: false,
-        why: 'Não há comparação textual: `0 == "0"` é verdadeiro porque a string vira o número 0, e não porque `0` e `"0"` se pareçam escritos.',
+        why: 'There is no textual comparison: `0 == "0"` is true because the string becomes the number 0, not because `0` and `"0"` look alike written down.',
       },
       {
-        text: '`===` só funciona entre valores primitivos, então com uma string ele devolve `false` por não conseguir comparar.',
+        text: '`===` only works between primitive values, so with a string it returns `false` because it cannot compare them.',
         correct: false,
-        why: '`===` funciona com qualquer valor, inclusive strings; ele devolve `false` aqui porque os tipos são diferentes.',
+        why: '`===` works with any value, strings included; it returns `false` here because the types are different.',
       },
       {
-        text: '`==` arredonda números antes de comparar, e o arredondamento faz `0` coincidir com a string.',
+        text: '`==` rounds numbers before comparing, and the rounding makes `0` coincide with the string.',
         correct: false,
-        why: 'Não há arredondamento envolvido: a conversão é de string para número, e `"0"` já é exatamente 0.',
+        why: 'No rounding is involved: the conversion is from string to number, and `"0"` is already exactly 0.',
       },
     ],
     checkOperation: 'none',
@@ -66,51 +70,51 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
 
   {
-    id: 'js-coercao-multipla-1',
+    id: 'js-coercion-multiple-1',
     course: 'javascript',
     topic: 'Types, coercion, strict equality and falsy values',
     type: 'multiple-choice',
     difficulty: 'medium',
-    prompt: 'Marque todos os valores que são **falsy** em JavaScript — isto é, que se comportam como `false` dentro de um `if`.',
-    socraticHint: 'A lista de valores falsy é fechada e curta. Um objeto vazio continua sendo um objeto; uma string vazia não é a mesma coisa que uma string com um caractere dentro.',
+    prompt: 'Tick every value that is **falsy** in JavaScript — that is, that behaves like `false` inside an `if`.',
+    socraticHint: 'The list of falsy values is closed and short. An empty object is still an object; an empty string is not the same thing as a string with one character in it.',
     choices: [
-      { text: '`0`', correct: true, why: 'O zero é um dos valores falsy da lista fechada.' },
-      { text: '`""` (string vazia)', correct: true, why: 'String vazia é falsy; qualquer string com pelo menos um caractere é truthy.' },
-      { text: '`NaN`', correct: true, why: '`NaN` é falsy, apesar de `typeof NaN` ser `"number"`.' },
-      { text: '`[]` (array vazio)', correct: false, why: 'Todo objeto é truthy, e array é objeto — mesmo vazio. É a pegadinha clássica: `[] == false` é `true`, mas `if ([])` entra.' },
-      { text: '`"0"` (string com zero)', correct: false, why: 'É uma string de um caractere, portanto truthy. Só a string vazia é falsy.' },
+      { text: '`0`', correct: true, why: 'Zero is one of the values on the closed falsy list.' },
+      { text: '`""` (the empty string)', correct: true, why: 'An empty string is falsy; any string with at least one character is truthy.' },
+      { text: '`NaN`', correct: true, why: '`NaN` is falsy, even though `typeof NaN` is `"number"`.' },
+      { text: '`[]` (an empty array)', correct: false, why: 'Every object is truthy, and an array is an object — even an empty one. It is the classic trap: `[] == false` is `true`, but `if ([])` runs.' },
+      { text: '`"0"` (a string with a zero)', correct: false, why: 'It is a one-character string, therefore truthy. Only the empty string is falsy.' },
     ],
     checkOperation: 'none',
     _verification: 'structure',
   },
 
   {
-    id: 'js-coercao-ordenacao-1',
+    id: 'js-coercion-ordering-1',
     course: 'javascript',
     topic: 'Types, coercion, strict equality and falsy values',
     type: 'ordering',
     difficulty: 'medium',
-    prompt: 'Ponha na ordem os passos que o interpretador executa ao avaliar `"10" > 9`.',
-    socraticHint: 'Antes de decidir como comparar, algo precisa ser constatado sobre os operandos. Comparar é a última coisa que acontece, não a primeira.',
+    prompt: 'Put the steps the interpreter takes when evaluating `"10" > 9` in order.',
+    socraticHint: 'Before deciding how to compare, something has to be established about the operands. Comparing is the last thing that happens, not the first.',
     items: [
-      'Constata que os operandos têm tipos diferentes: string e número',
-      'Converte a string `"10"` para o número 10, com ToNumber',
-      'Compara 10 com 9 numericamente',
-      'Devolve `true`',
+      'Establishes that the operands have different types: a string and a number',
+      'Converts the string `"10"` to the number 10, with ToNumber',
+      'Compares 10 with 9 numerically',
+      'Returns `true`',
     ],
-    trap: 'O par constatar–converter. Quem aprendeu que "o operador `>` converte a string" tende a pôr a conversão primeiro, como se ela fosse incondicional. Não é: com duas strings (`"10" > "9"`) não há conversão nenhuma e a comparação é lexicográfica, devolvendo `false`. É a constatação de tipos que decide qual das duas comparações vai acontecer, e por isso ela vem antes.',
+    trap: 'The establish–convert pair. Anyone who learned that "the `>` operator converts the string" tends to put the conversion first, as if it were unconditional. It is not: with two strings (`"10" > "9"`) there is no conversion at all and the comparison is lexicographic, returning `false`. It is establishing the types that decides which of the two comparisons will happen, which is why it comes first.',
     checkOperation: 'none',
     _verification: 'structure',
   },
 
   {
-    id: 'js-coercao-associacao-1',
+    id: 'js-coercion-matching-1',
     course: 'javascript',
     topic: 'Types, coercion, strict equality and falsy values',
     type: 'matching',
     difficulty: 'medium',
-    prompt: 'Associe cada expressão ao que ela devolve. Sobram opções na coluna da direita.',
-    socraticHint: 'Um destes resultados é um defeito histórico da linguagem, preservado por compatibilidade. Outro surpreende quem espera que o nome do valor descreva o tipo dele.',
+    prompt: 'Match each expression to what it returns. There are options left over in the right-hand column.',
+    socraticHint: 'One of these results is a historical defect in the language, preserved for compatibility. Another surprises anyone expecting the value\'s name to describe its type.',
     pairs: [
       { left: '`typeof null`', right: '`"object"`' },
       { left: '`typeof NaN`', right: '`"number"`' },
@@ -124,14 +128,14 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
 
   {
-    id: 'js-coercao-saida-1',
+    id: 'js-coercion-output-1',
     course: 'javascript',
     topic: 'Types, coercion, strict equality and falsy values',
     type: 'expected-output',
     difficulty: 'hard',
     language: 'javascript',
-    prompt: 'O que este trecho imprime, linha a linha?',
-    socraticHint: 'Duas das três linhas contrariam a intuição. Uma envolve como frações binárias representam décimos; a outra envolve o que acontece com um array antes de ele ser comparado com um booleano.',
+    prompt: 'What does this snippet print, line by line?',
+    socraticHint: 'Two of the three lines defy intuition. One involves how binary fractions represent tenths; the other involves what happens to an array before it is compared with a boolean.',
     givenCode: 'console.log(0.1 + 0.2 === 0.3);\nconsole.log([] == false);\nconsole.log(typeof NaN);\n',
     answer: 'false\ntrue\nnumber\n',
     checkOperation: 'none',
@@ -139,20 +143,20 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
 
   {
-    id: 'js-coercao-codigo-1',
+    id: 'js-coercion-code-1',
     course: 'javascript',
     topic: 'Types, coercion, strict equality and falsy values',
     type: 'code',
     difficulty: 'medium',
     language: 'javascript',
-    prompt: 'Cada linha da entrada traz um valor em JSON. Para cada uma, imprima `true` se o valor for falsy e `false` caso contrário.',
-    socraticHint: 'Você não precisa listar os valores falsy um a um: a própria linguagem já sabe classificá-los. O que o operador `!` faz com um valor qualquer?',
-    skeleton: 'const linhas = require("fs").readFileSync(0, "utf8").split("\\n").filter(Boolean);\nfor (const linha of linhas) {\n  const valor = JSON.parse(linha);\n  // complete: imprima true se `valor` for falsy\n}\n',
+    prompt: 'Each line of the input carries one value in JSON. For each of them, print `true` if the value is falsy and `false` otherwise.',
+    socraticHint: 'You do not need to list the falsy values one by one: the language already knows how to classify them. What does the `!` operator do to any value?',
+    skeleton: 'const lines = require("fs").readFileSync(0, "utf8").split("\\n").filter(Boolean);\nfor (const line of lines) {\n  const value = JSON.parse(line);\n  // complete: print true if `value` is falsy\n}\n',
     tests: [
-      { description: 'zero e string com zero', input: '0\n"0"\n', expectedOutput: 'true\nfalse\n' },
-      { description: 'string vazia e array vazio', input: '""\n[]\n', expectedOutput: 'true\nfalse\n' },
-      { description: 'nulo e objeto vazio', input: 'null\n{}\n', expectedOutput: 'true\nfalse\n' },
-      { description: 'borda: zero negativo', input: '-0\n', expectedOutput: 'true\n' },
+      { description: 'zero and a string with a zero', input: '0\n"0"\n', expectedOutput: 'true\nfalse\n' },
+      { description: 'the empty string and an empty array', input: '""\n[]\n', expectedOutput: 'true\nfalse\n' },
+      { description: 'null and an empty object', input: 'null\n{}\n', expectedOutput: 'true\nfalse\n' },
+      { description: 'edge case: negative zero', input: '-0\n', expectedOutput: 'true\n' },
     ],
     checkOperation: 'none',
     _verification: 'structure',
@@ -160,13 +164,13 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
 
   {
     /* out of context on purpose — see this file's header */
-    id: 'js-demo-expressao-1',
+    id: 'js-demo-expression-1',
     course: 'javascript',
     topic: 'Types, coercion, strict equality and falsy values',
     type: 'expression-answer',
     difficulty: 'easy',
-    prompt: 'Escreva a derivada de `x**3` em relação a `x`.',
-    socraticHint: 'A regra da potência baixa o expoente para multiplicar e subtrai um dele.',
+    prompt: 'Write the derivative of `x**3` with respect to `x`.',
+    socraticHint: 'The power rule brings the exponent down to multiply and subtracts one from it.',
     referenceExpression: '3*x**2',
     variables: ['x'],
     checkOrigin: 'x**3',
@@ -178,33 +182,33 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   /* ============ other lessons, so the course is not hollow =============== */
 
   {
-    id: 'js-sintaxe-quiz-1',
+    id: 'js-syntax-quiz-1',
     course: 'javascript',
     topic: 'ES6+ syntax: let/const, arrow functions and template strings',
     type: 'quiz',
     difficulty: 'easy',
-    prompt: 'Uma variável declarada com `const` recebe um array. O que é impedido a partir daí?',
-    socraticHint: 'A restrição do `const` recai sobre a ligação entre o nome e o valor. O conteúdo apontado por esse valor está sujeito à mesma regra?',
+    prompt: 'A variable declared with `const` is given an array. What is prevented from then on?',
+    socraticHint: 'The restriction `const` imposes falls on the binding between the name and the value. Is the content that value points at subject to the same rule?',
     choices: [
       {
-        text: 'Reatribuir a variável a outro valor — mas o conteúdo do array continua podendo ser alterado.',
+        text: 'Reassigning the variable to another value — but the array\'s contents can still be changed.',
         correct: true,
-        why: '`const` congela a ligação nome↔valor, não o objeto apontado. `push` continua funcionando; `=` não.',
+        why: '`const` freezes the name↔value binding, not the object pointed at. `push` still works; `=` does not.',
       },
       {
-        text: 'Qualquer alteração no array, incluindo `push` e `pop`, porque `const` torna o valor imutável.',
+        text: 'Any change to the array, `push` and `pop` included, because `const` makes the value immutable.',
         correct: false,
-        why: 'Imutabilidade de conteúdo exigiria `Object.freeze`; `const` não faz isso.',
+        why: 'Immutable contents would require `Object.freeze`; `const` does not do that.',
       },
       {
-        text: 'Usar a variável antes da linha em que ela foi declarada, o que com `var` seria permitido.',
+        text: 'Using the variable before the line it was declared on, which with `var` would be allowed.',
         correct: false,
-        why: 'Isso é verdade sobre a zona morta temporal, e vale igualmente para `let` — não é o que distingue `const`.',
+        why: 'That is true of the temporal dead zone, and it applies equally to `let` — it is not what distinguishes `const`.',
       },
       {
-        text: 'Passar a variável como argumento de uma função que altere o array recebido.',
+        text: 'Passing the variable as an argument to a function that changes the array it receives.',
         correct: false,
-        why: 'Nada impede a passagem, e a função pode alterar o conteúdo normalmente.',
+        why: 'Nothing stops it being passed, and the function can change the contents as normal.',
       },
     ],
     checkOperation: 'none',
@@ -212,22 +216,22 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
   },
 
   {
-    id: 'js-objetos-associacao-1',
+    id: 'js-objects-matching-1',
     course: 'javascript',
     topic: 'Objects, arrays, spread and destructuring',
     type: 'matching',
     difficulty: 'medium',
-    prompt: 'Associe cada sintaxe ao efeito que ela produz. Sobram opções na coluna da direita.',
-    socraticHint: 'Três reticências fazem coisas opostas conforme o lado em que aparecem: recebendo ou entregando.',
+    prompt: 'Match each piece of syntax to the effect it produces. There are options left over in the right-hand column.',
+    socraticHint: 'Three dots do opposite things depending on which side they appear: receiving or handing over.',
     pairs: [
-      { left: '`const { a } = obj`', right: 'Cria uma variável com o valor de uma propriedade' },
-      { left: '`const [x, y] = lista`', right: 'Cria variáveis a partir das posições de um array' },
-      { left: '`{ ...obj, a: 1 }`', right: 'Copia as propriedades e sobrescreve uma delas' },
-      { left: '`f(...lista)`', right: 'Passa cada item do array como um argumento separado' },
+      { left: '`const { a } = obj`', right: 'Creates a variable holding the value of a property' },
+      { left: '`const [x, y] = list`', right: 'Creates variables from the positions of an array' },
+      { left: '`{ ...obj, a: 1 }`', right: 'Copies the properties and overwrites one of them' },
+      { left: '`f(...list)`', right: 'Passes each item of the array as a separate argument' },
     ],
     rightDistractors: [
-      'Congela o objeto, impedindo alterações posteriores',
-      'Percorre o array executando uma função para cada item',
+      'Freezes the object, preventing later changes',
+      'Walks the array running a function for each item',
     ],
     checkOperation: 'none',
     _verification: 'structure',
@@ -235,13 +239,13 @@ window.SAMPLE_EXERCISES = (window.SAMPLE_EXERCISES || []).concat([
 
   {
     /* here `expression-answer` is in the right place: a statistics course */
-    id: 'est-derivada-1',
-    course: 'estatistica',
+    id: 'stats-derivative-1',
+    course: 'statistics',
     topic: 'Measures of central tendency: mean, median and mode',
     type: 'expression-answer',
     difficulty: 'medium',
-    prompt: 'Escreva a expressão da variância de uma amostra `x` de `n` observações, em torno da média `m`, usando o denominador `n - 1`.',
-    socraticHint: 'O numerador soma os quadrados dos desvios. O denominador não é `n` — pergunte-se por que a correção existe.',
+    prompt: 'Write the expression for the variance of a sample `x` of `n` observations, about the mean `m`, using the denominator `n - 1`.',
+    socraticHint: 'The numerator sums the squared deviations. The denominator is not `n` — ask yourself why the correction exists.',
     referenceExpression: 'Sum((x - m)**2, (i, 1, n))/(n - 1)',
     variables: ['x', 'm', 'n:positive', 'i'],
     checkOrigin: 'Sum((x - m)**2, (i, 1, n))/(n - 1)',

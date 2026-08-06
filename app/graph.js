@@ -9,13 +9,14 @@
    IT SHOWS, BUT IT DOES NOT LOCK. The vitrine's FAQ promises, in writing: "No.
    The track is a recommended order — if you only need one course from it, watch
    just that one." A padlock here would contradict a promise that is already
-   published, which is why the most restrictive state is called `adiante` and
+   published, which is why the most restrictive state is called `ahead` and
    stays clickable: it tells you the recommended order, it does not forbid
    access.
 
-   The class names, the `data-*` attributes and the course states (`concluido`,
-   `atual`, `disponivel`, `adiante`) stay in Portuguese: they are the DOM
-   contract that base.css — a verbatim copy of the vitrine's stylesheet — styles.
+   The class names, the `data-*` attributes and the course states (`done`,
+   `current`, `available`, `ahead`) are the DOM contract that base.css styles.
+   base.css is the vitrine's stylesheet with its selectors renamed to English;
+   the shapes and the cascade are untouched.
    ========================================================================== */
 
 import {
@@ -27,19 +28,19 @@ import { esc } from './text.js';
 /* ---------- the state of each course ---------- */
 
 export function courseState(id) {
-  if (courseDone(id)) return 'concluido';
+  if (courseDone(id)) return 'done';
   const p = courseProgress(id);
-  if (p.feitas > 0) return 'atual';
+  if (p.done > 0) return 'current';
   const deps = courseById(id)?.requires || [];
   const ready = deps.every((d) => courseDone(d));
-  return ready ? 'disponivel' : 'adiante';
+  return ready ? 'available' : 'ahead';
 }
 
 const STATE_LABEL = {
-  concluido: 'concluído',
-  atual: 'em andamento',
-  disponivel: 'disponível',
-  adiante: 'mais adiante',
+  done: 'completed',
+  current: 'in progress',
+  available: 'available',
+  ahead: 'further ahead',
 };
 
 /* ---------- the cards ---------- */
@@ -53,20 +54,20 @@ function courseCard(id, order, deps) {
   const st = courseState(id);
 
   return (
-    '<button class="curso-no no-' + st + '" type="button" data-curso="' + esc(c.id) + '" data-no="' + esc(c.id) + '">' +
-      (order ? '<span class="ordem">' + txt('nível') + ' ' + order + '</span>' : '') +
-      '<span class="no-estado" data-estado="' + st + '">' + txt(STATE_LABEL[st]) + '</span>' +
-      '<span class="nome">' + esc(c.name) + '</span>' +
-      (trackCount > 1 ? '<span class="tag-compartilhado">' + txt('em') + ' ' + trackCount + ' ' + txt('trilhas') + '</span>' : '') +
+    '<button class="course-node node-' + st + '" type="button" data-course="' + esc(c.id) + '" data-node="' + esc(c.id) + '">' +
+      (order ? '<span class="order">' + txt('level') + ' ' + order + '</span>' : '') +
+      '<span class="node-state" data-state="' + st + '">' + txt(STATE_LABEL[st]) + '</span>' +
+      '<span class="name">' + esc(c.name) + '</span>' +
+      (trackCount > 1 ? '<span class="tag-shared">' + txt('in') + ' ' + trackCount + ' ' + txt('tracks') + '</span>' : '') +
       '<span class="meta">' + c.hours + 'h · ' + txt(c.level) + '</span>' +
       (p.total
-        ? '<span class="no-barra" role="img" aria-label="' + p.feitas + ' de ' + p.total + '">' +
-            '<span class="no-barra-cheia" style="width:' + p.pct + '%"></span>' +
+        ? '<span class="node-bar" role="img" aria-label="' + p.done + ' de ' + p.total + '">' +
+            '<span class="node-bar-fill" style="width:' + p.pct + '%"></span>' +
           '</span>' +
-          '<span class="no-conta">' + p.feitas + '/' + p.total + ' ' + txt('seções') + '</span>'
+          '<span class="node-count">' + p.done + '/' + p.total + ' ' + txt('sections') + '</span>'
         : '') +
-      (requires.length && st === 'adiante'
-        ? '<span class="requer">' + txt('recomendado depois de') + ' ' + esc(requires.join(' + ')) + '</span>'
+      (requires.length && st === 'ahead'
+        ? '<span class="requires">' + txt('recommended after') + ' ' + esc(requires.join(' + ')) + '</span>'
         : '') +
     '</button>'
   );
@@ -84,15 +85,15 @@ export function buildTrack(t) {
 
   const columns = g.columns.map((nodes, v) => {
     const cards = nodes.map((node) => {
-      if (node.kind === 'saida') {
-        return '<div class="no-saida" data-no="@saida">' +
-          '<span class="saida-selo" aria-hidden="true">' +
+      if (node.kind === 'outcome') {
+        return '<div class="node-outcome" data-node="@outcome">' +
+          '<span class="outcome-seal" aria-hidden="true">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
             '<path d="M5 22V4M5 4h11l-2 4 2 4H5"/></svg>' +
           '</span>' +
-          '<span class="saida-txt">' +
-            '<span class="saida-rotulo">' + txt('chegada') + '</span>' +
-            '<span class="saida-nome">' + esc(t.outcome) + '</span>' +
+          '<span class="outcome-text">' +
+            '<span class="outcome-label">' + txt('finish') + '</span>' +
+            '<span class="outcome-name">' + esc(t.outcome) + '</span>' +
           '</span>' +
         '</div>';
       }
@@ -104,50 +105,50 @@ export function buildTrack(t) {
       const item = node.step;
       const sel = activeOption(t.id, node.idx);
       const tabs = item.options.map((o, j) =>
-        '<button class="garfo-aba' + (j === sel ? ' on' : '') + '" type="button" ' +
-        'data-garfo="' + node.idx + '" data-opcao="' + j + '">' + esc(o.name) +
-        '<span class="garfo-h">' + hoursOf(o.courses) + 'h</span></button>').join('');
+        '<button class="fork-tab' + (j === sel ? ' on' : '') + '" type="button" ' +
+        'data-fork="' + node.idx + '" data-option="' + j + '">' + esc(o.name) +
+        '<span class="fork-h">' + hoursOf(o.courses) + 'h</span></button>').join('');
       const inside = item.options[sel].courses.map((id) => courseCard(id)).join('');
       return (
-        '<div class="garfo" data-no="' + esc(node.id) + '">' +
-          '<div class="garfo-topo">' +
-            '<span class="garfo-rotulo">' + txt('nível') + ' ' + String(v + 1).padStart(2, '0') +
-              ' · ' + txt('você escolhe') + ' ' + esc(item.choice) + '</span>' +
-            '<div class="garfo-abas" role="tablist">' + tabs + '</div>' +
+        '<div class="fork" data-node="' + esc(node.id) + '">' +
+          '<div class="fork-top">' +
+            '<span class="fork-label">' + txt('level') + ' ' + String(v + 1).padStart(2, '0') +
+              ' · ' + txt('you choose') + ' ' + esc(item.choice) + '</span>' +
+            '<div class="fork-tabs" role="tablist">' + tabs + '</div>' +
           '</div>' +
-          (item.note ? '<p class="garfo-nota">' + esc(item.note) + '</p>' : '') +
-          '<div class="garfo-cursos">' + inside + '</div>' +
+          (item.note ? '<p class="fork-note">' + esc(item.note) + '</p>' : '') +
+          '<div class="fork-courses">' + inside + '</div>' +
         '</div>'
       );
     }).join('');
-    return '<div class="nivel" data-nivel="' + v + '"><div class="subcol">' + cards + '</div></div>';
+    return '<div class="level" data-level="' + v + '"><div class="subcol">' + cards + '</div></div>';
   }).join('');
 
   const workload = min === max
-    ? '<span><b>' + hours + 'h</b>' + txt('de carga') + '</span>'
-    : '<span><b>' + hours + 'h</b>' + txt('neste caminho') + ' <i>(' + min + 'h ' + txt('a') + ' ' + max + 'h)</i></span>';
+    ? '<span><b>' + hours + 'h</b>' + txt('total') + '</span>'
+    : '<span><b>' + hours + 'h</b>' + txt('on this path') + ' <i>(' + min + 'h ' + txt('to') + ' ' + max + 'h)</i></span>';
 
   return (
-    '<div class="trilha-topo">' +
+    '<div class="track-top">' +
       '<div>' +
         '<h2>' + esc(t.name) + '</h2>' +
         '<p>' + esc(t.goal) + '</p>' +
       '</div>' +
-      '<div class="trilha-resumo">' +
-        '<span><b>' + done + '/' + path.length + '</b>' + txt('cursos concluídos') + '</span>' +
+      '<div class="track-summary">' +
+        '<span><b>' + done + '/' + path.length + '</b>' + txt('courses completed') + '</span>' +
         workload +
         '<span><b>→</b>' + esc(t.outcome) + '</span>' +
       '</div>' +
     '</div>' +
-    '<div class="grafo-caixa">' +
-      '<button class="grafo-seta esq" type="button" data-rolar="-1" aria-label="Ver níveis anteriores">←</button>' +
-      '<div class="trilha-grafo"><svg class="grafo-arestas" aria-hidden="true"></svg>' +
-        '<div class="grafo-niveis">' + columns + '</div></div>' +
-      '<button class="grafo-seta dir" type="button" data-rolar="1" aria-label="Ver próximos níveis">→</button>' +
+    '<div class="graph-box">' +
+      '<button class="graph-arrow left" type="button" data-scroll="-1" aria-label="' + txt('See previous levels') + '">←</button>' +
+      '<div class="track-graph"><svg class="graph-edges" aria-hidden="true"></svg>' +
+        '<div class="graph-levels">' + columns + '</div></div>' +
+      '<button class="graph-arrow right" type="button" data-scroll="1" aria-label="' + txt('See next levels') + '">→</button>' +
     '</div>' +
-    '<div class="grafo-legenda">' +
+    '<div class="graph-legend">' +
       Object.entries(STATE_LABEL).map(([k, r]) =>
-        '<span class="leg"><i class="leg-cor no-' + k + '"></i>' + txt(r) + '</span>').join('') +
+        '<span class="leg"><i class="leg-color node-' + k + '"></i>' + txt(r) + '</span>').join('') +
     '</div>'
   );
 }
@@ -159,17 +160,17 @@ export function buildTrack(t) {
    Neither `flex-wrap` nor CSS multi-column expands the container's width — the
    cards that overflowed ended up on top of the neighbouring level. */
 export function splitLevels(root) {
-  const scroller = root.querySelector('.trilha-grafo');
-  const strip = root.querySelector('.grafo-niveis');
+  const scroller = root.querySelector('.track-graph');
+  const strip = root.querySelector('.graph-levels');
   if (!scroller || !strip) return;
-  const box = root.querySelector('.grafo-caixa');
+  const box = root.querySelector('.graph-box');
   if (box) box.style.flex = '1 1 auto';
   const asList = getComputedStyle(strip).flexDirection !== 'row';
   const gap = 10;
   const cs = getComputedStyle(strip);
   const available = scroller.clientHeight - (parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom)) - 4;
 
-  root.querySelectorAll('.nivel').forEach((lv) => {
+  root.querySelectorAll('.level').forEach((lv) => {
     const items = [];
     lv.querySelectorAll(':scope > .subcol').forEach((sc) => {
       Array.from(sc.children).forEach((el) => items.push(el));
@@ -206,9 +207,9 @@ export function splitLevels(root) {
 
   if (!asList) {
     let tallest = 0;
-    root.querySelectorAll('.nivel > .subcol').forEach((sc) => { tallest = Math.max(tallest, sc.offsetHeight); });
+    root.querySelectorAll('.level > .subcol').forEach((sc) => { tallest = Math.max(tallest, sc.offsetHeight); });
     const full = scroller.clientHeight;
-    const cx = root.querySelector('.grafo-caixa');
+    const cx = root.querySelector('.graph-box');
     if (tallest && cx) {
       const pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
       cx.style.flex = '0 0 ' + Math.min(full, tallest + pad) + 'px';
@@ -226,14 +227,14 @@ export function splitLevels(root) {
    1.8px. */
 export function drawEdges(root, t) {
   splitLevels(root);
-  const cont = root.querySelector('.trilha-grafo');
-  const svg = cont && cont.querySelector('.grafo-arestas');
+  const cont = root.querySelector('.track-graph');
+  const svg = cont && cont.querySelector('.graph-edges');
   if (!svg) return;
   const g = trackGraph(t, activeOption);
   const base = cont.getBoundingClientRect();
   const L = cont.scrollLeft, T = cont.scrollTop;
   const boxOf = (id) => {
-    const el = cont.querySelector('[data-no="' + CSS.escape(id) + '"]');
+    const el = cont.querySelector('[data-node="' + CSS.escape(id) + '"]');
     if (!el) return null;
     const r = el.getBoundingClientRect();
     return { x: r.left - base.left + L, y: r.top - base.top + T, w: r.width, h: r.height };
@@ -316,13 +317,13 @@ export function drawEdges(root, t) {
 
       // the edge takes on the state of the PREREQUISITE: green when what it
       // unlocks has been finished, dimmed when it has not
-      const met = courseById(d) && courseState(d) === 'concluido';
+      const met = courseById(d) && courseState(d) === 'done';
       lines.push(
-        '<g class="aresta' + (met ? ' aresta-feita' : '') + '" data-de="' + esc(d) + '" data-para="' + esc(node.id) + '">' +
+        '<g class="edge' + (met ? ' edge-done' : '') + '" data-from="' + esc(d) + '" data-to="' + esc(node.id) + '">' +
           '<title>' + esc(nodeLabel(d, g)) + ' → ' + esc(nodeLabel(node.id, g)) + '</title>' +
           '<path class="hit" d="' + dd + '"/>' +
-          '<path class="linha" d="' + dd + '"/>' +
-          '<circle class="ponta" cx="' + x2 + '" cy="' + y2 + '" r="3"/>' +
+          '<path class="row" d="' + dd + '"/>' +
+          '<circle class="tip" cx="' + x2 + '" cy="' + y2 + '" r="3"/>' +
         '</g>',
       );
     });
@@ -332,25 +333,25 @@ export function drawEdges(root, t) {
 }
 
 function nodeLabel(id, g) {
-  if (id === '@saida') return txt('chegada');
+  if (id === '@outcome') return txt('finish');
   const c = courseById(id);
   if (c) return c.name;
   const node = g.nodes.find((n) => n.id === id);
-  return node && node.step ? 'escolha ' + node.step.choice : id;
+  return node && node.step ? 'choice ' + node.step.choice : id;
 }
 
 export function adjustGraphArrows(root) {
-  const cx = root.querySelector('.grafo-caixa');
-  const scroller = cx && cx.querySelector('.trilha-grafo');
+  const cx = root.querySelector('.graph-box');
+  const scroller = cx && cx.querySelector('.track-graph');
   if (!scroller) return;
   const spare = scroller.scrollWidth - scroller.clientWidth;
-  cx.querySelector('.grafo-seta.esq').disabled = !(spare > 4 && scroller.scrollLeft > 4);
-  cx.querySelector('.grafo-seta.dir').disabled = !(spare > 4 && scroller.scrollLeft < spare - 4);
-  cx.classList.toggle('sem-setas', spare <= 4);
-  scroller.classList.toggle('fade-dir', spare > 4 && scroller.scrollLeft < spare - 4);
-  scroller.classList.toggle('fade-esq', spare > 4 && scroller.scrollLeft > 4);
+  cx.querySelector('.graph-arrow.left').disabled = !(spare > 4 && scroller.scrollLeft > 4);
+  cx.querySelector('.graph-arrow.right').disabled = !(spare > 4 && scroller.scrollLeft < spare - 4);
+  cx.classList.toggle('no-arrows', spare <= 4);
+  scroller.classList.toggle('fade-right', spare > 4 && scroller.scrollLeft < spare - 4);
+  scroller.classList.toggle('fade-left', spare > 4 && scroller.scrollLeft > 4);
   const spareY = scroller.scrollHeight - scroller.clientHeight;
-  scroller.classList.toggle('fade-baixo', spareY > 4 && scroller.scrollTop < spareY - 4);
+  scroller.classList.toggle('fade-down', spareY > 4 && scroller.scrollTop < spareY - 4);
 }
 
 export const enrolledTrack = () => now().enrollment?.trackId || null;

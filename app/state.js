@@ -12,10 +12,11 @@
    in four-hour jumps, which is nearly the same as not moving. `lessonDone`
    became derived: a lesson is done when all of its sections are.
 
-   THE STORED SHAPE KEEPS ITS PORTUGUESE KEYS (`sessao`, `progresso`,
-   `secoes`…). They are the persisted format — renaming them would orphan every
-   browser that already has state, for no gain that a reader of this file can
-   see.
+   THE STORED SHAPE IS ENGLISH, AND GETTING THERE NEEDED A MIGRATION. It used
+   to be Portuguese (`sessao`, `progresso`, `secoes`…), and a browser holding
+   that document would be read against a shape asking for `progress`, find
+   nothing and report a student who never started — silently. `migrate()` below
+   rewrites it on read, once. Do not rename a stored key without extending it.
    ========================================================================== */
 
 import {
@@ -70,7 +71,7 @@ const LEGACY_FIELDS = {
 };
 
 /* Renames keys everywhere in the tree. It cannot rename VALUES, and it must not
-   try: a note's text is a value, and a note that happens to read "aulas" is the
+   try: a note's text is a value, and a note that happens to read "lessons" is the
    student's sentence, not a key of ours. */
 function renameKeys(node) {
   if (Array.isArray(node)) return node.map(renameKeys);
@@ -80,19 +81,167 @@ function renameKeys(node) {
   return out;
 }
 
+/* Course and track ids moved too, and they are stored as KEYS, not only as
+   values: progress and notes are keyed by course id, the exam scope keys carry
+   both, and the enrolment carries a track id plus fork choices keyed by it.
+   Renaming the catalogue without moving these unjoins every student from their
+   own progress — same silence as above, one level down. */
+const MOVED_IDS = {
+  'web-fundamentos': 'web-fundamentals', 'ia-dev': 'ai-dev',
+  'front-qualidade': 'front-quality', 'front-entrega': 'front-delivery',
+  'front-multiplataforma': 'front-multiplatform', 'java-funcional': 'java-functional',
+  'go-concorrencia': 'go-concurrency', 'go-producao': 'go-production',
+  'bancos-sql': 'sql-databases', 'servidores-cache': 'servers-cache',
+  'testes-cicd': 'testing-cicd', 'arquitetura': 'architecture', 'escala': 'scale',
+  'redes': 'networks', 'nuvem': 'cloud', 'observabilidade': 'observability',
+  'dados-fundamentos': 'data-fundamentals', 'modelagem-dw': 'warehouse-modeling',
+  'dados-governanca': 'data-governance', 'redes-enderecamento': 'networks-addressing',
+  'redes-disponibilidade': 'networks-availability', 'redes-seguranca': 'networks-security',
+  'redes-automacao': 'networks-automation', 'prompt-confiabilidade': 'prompt-reliability',
+  'ia-seguranca': 'ai-security', 'ia-modelos': 'ai-models',
+  'embeddings-vetores': 'embeddings-vectors', 'agentes-mcp': 'agents-mcp',
+  'llm-observabilidade': 'llm-observability', 'arquitetura-papel': 'architecture-role',
+  'padroes-projeto': 'design-patterns', 'modelagem-arquitetura': 'architecture-modeling',
+  'software-corporativo': 'enterprise-software', 'gestao-processos': 'process-management',
+  'arquiteto-comunicacao': 'architect-communication',
+  'informatica-essencial': 'computing-essentials',
+  'sistemas-operacionais': 'operating-systems', 'virtualizacao': 'virtualization',
+  'suporte-tecnico': 'tech-support', 'seguranca-fundamentos': 'security-fundamentals',
+  'criptografia': 'cryptography', 'ataques-ameacas': 'attacks-threats',
+  'defesa-hardening': 'defense-hardening', 'soc-resposta': 'soc-response',
+  'nuvem-seguranca': 'cloud-security', 'codigo-seguro': 'secure-code',
+  'modelagem-ameacas': 'threat-modeling', 'pipeline-seguro': 'secure-pipeline',
+  'bi-negocio': 'bi-business', 'excel-analitico': 'excel-analytics',
+  'estatistica': 'statistics', 'dados-limpeza': 'data-cleaning',
+  'visualizacao': 'visualization', 'bi-tecnicas': 'bi-techniques',
+  'dados-storytelling': 'data-storytelling', 'qa-fundamentos': 'qa-fundamentals',
+  'testes-manuais': 'manual-testing', 'automacao-web': 'web-automation',
+  'automacao-api-mobile': 'api-mobile-automation',
+  'testes-nao-funcionais': 'non-functional-testing', 'dados': 'data',
+  'redes-infra': 'networks-infra', 'ia': 'ai', 'arquitetura-software': 'software-architecture',
+  'ti-suporte': 'it-support', 'seguranca': 'security', 'python-tec': 'python-tech',
+  'go-tec': 'go-tech', 'sql-tec': 'sql-tech',
+};
+
+/* Section ids and exercise ids moved with the content, and they are stored keys
+   too — one level below the course. A section id is unique only inside its
+   course, so the map is scoped by course; an exercise id is globally unique, so
+   it is not. Miss these and a student keeps the course but loses every section
+   they ticked and every answer they gave in it. */
+const MOVED_SECTIONS = {
+  'web-fundamentals': {
+    'apresentacao': 'intro', 'papeis': 'roles', 'ida-e-volta': 'round-trip',
+    'pacote': 'packet', 'quadro': 'frame', 'banda': 'bandwidth', 'latencia': 'latency',
+    'vazao': 'throughput', 'porque-camadas': 'why-layers', 'as-camadas': 'the-layers',
+    'metodos': 'methods', 'cabecalhos': 'headers', 'sessoes': 'sessions',
+    'registro': 'registration', 'propagacao': 'propagation', 'subdominios': 'subdomains',
+    'compartilhada': 'shared', 'nuvem': 'cloud', 'escolher': 'choosing',
+    'renderizacao': 'rendering', 'elementos': 'elements', 'rede': 'network',
+  },
+  'html-css': {
+    'esqueleto': 'skeleton', 'metadados': 'metadata', 'onde-entra': 'where-they-go',
+    'por-que': 'why-not-div', 'regioes': 'regions', 'rotulos': 'labels',
+    'tipos': 'field-types', 'validacao': 'validation', 'tabelas': 'tables',
+    'imagens': 'images', 'midia': 'media', 'seletores': 'selectors',
+    'especificidade': 'specificity', 'cascata': 'cascade', 'caixa': 'box', 'unidades': 'units',
+    'fluxo': 'flow', 'eixos': 'axes', 'alinhamento': 'alignment', 'crescer': 'grow-shrink',
+    'linhas-colunas': 'rows-columns', 'implicito': 'implicit', 'variaveis': 'variables',
+    'tema': 'theme', 'organizar': 'organising', 'transicao': 'transition',
+    'utilitarios': 'utilities', 'configurar': 'configuration', 'quando': 'when-not',
+  },
+  javascript: {
+    'apresentacao': 'intro', 'coercao': 'coercion', 'igualdade': 'equality', 'falsos': 'falsy',
+    'desestruturar': 'destructuring', 'espalhar': 'spread',
+  },
+};
+
+const MOVED_EXERCISES = {
+  'js-coercao-quiz-1': 'js-coercion-quiz-1', 'js-coercao-multipla-1': 'js-coercion-multiple-1',
+  'js-coercao-ordenacao-1': 'js-coercion-ordering-1',
+  'js-coercao-associacao-1': 'js-coercion-matching-1',
+  'js-coercao-saida-1': 'js-coercion-output-1', 'js-coercao-codigo-1': 'js-coercion-code-1',
+  'js-demo-expressao-1': 'js-demo-expression-1', 'js-sintaxe-quiz-1': 'js-syntax-quiz-1',
+  'js-objetos-associacao-1': 'js-objects-matching-1', 'est-derivada-1': 'stats-derivative-1',
+  'wf-11-saida': 'wf-11-output',
+};
+
+const movedId = (id) => MOVED_IDS[id] || id;
+
+/* `course` is the id AFTER the move — this runs once the course keys are already
+   renamed, and the section maps are written against the new names. */
+function moveSections(course, lessons) {
+  const map = MOVED_SECTIONS[course];
+  if (!map || !lessons) return lessons;
+  const rename = (o, m) => (o ? Object.fromEntries(Object.entries(o).map(([k, v]) => [m[k] || k, v])) : o);
+  return Object.fromEntries(Object.entries(lessons).map(([ix, lesson]) => [ix, {
+    ...lesson,
+    sections: rename(lesson.sections, map),
+    exercises: rename(lesson.exercises, MOVED_EXERCISES),
+  }]));
+}
+
+function moveIds(doc) {
+  const keyed = (o) => (o ? Object.fromEntries(Object.entries(o).map(([k, v]) => [movedId(k), v])) : o);
+  const out = { ...doc };
+  if (out.progress) {
+    out.progress = Object.fromEntries(Object.entries(keyed(out.progress)).map(([course, rec]) =>
+      [course, { ...rec, lessons: moveSections(course, rec.lessons) }]));
+  }
+  /* A note is filed under course → lesson index → SECTION id. */
+  if (out.notes) {
+    out.notes = Object.fromEntries(Object.entries(keyed(out.notes)).map(([course, byLesson]) => {
+      const map = MOVED_SECTIONS[course];
+      if (!map) return [course, byLesson];
+      return [course, Object.fromEntries(Object.entries(byLesson || {}).map(([ix, bySection]) =>
+        [ix, Object.fromEntries(Object.entries(bySection || {}).map(([sec, text]) => [map[sec] || sec, text]))]))];
+    }));
+  }
+  if (out.exams) {
+    out.exams = Object.fromEntries(Object.entries(out.exams).map(([k, v]) => {
+      const [scope, id] = [k.slice(0, k.indexOf(':') + 1), k.slice(k.indexOf(':') + 1)];
+      return [scope + movedId(id), v];
+    }));
+  }
+  if (out.last?.courseId) {
+    const courseId = movedId(out.last.courseId);
+    const map = MOVED_SECTIONS[courseId] || {};
+    out.last = { ...out.last, courseId, sectionId: map[out.last.sectionId] || out.last.sectionId };
+  }
+  if (out.enrollment) {
+    const e = { ...out.enrollment };
+    if (e.trackId) e.trackId = movedId(e.trackId);
+    if (e.choices) {
+      e.choices = Object.fromEntries(Object.entries(e.choices).map(([k, v]) => {
+        const cut = k.lastIndexOf(':');
+        return [movedId(k.slice(0, cut)) + k.slice(cut), v];
+      }));
+    }
+    out.enrollment = e;
+  }
+  return out;
+}
+
 export function migrate(raw) {
   const legacy = Object.keys(LEGACY_TOP).filter((k) => k in raw);
-  if (!legacy.length) return raw;
+  /* The two stages are independent: a browser migrated by the shape rename
+     before the ids moved still needs the second one. */
+  if (!legacy.length) return moveIds(raw);
 
   const out = { ...raw };
   legacy.forEach((k) => { out[LEGACY_TOP[k]] = out[k]; delete out[k]; });
 
   const moved = renameKeys(out);
+  /* Plan ids are stored, so their VALUES move too — a renamed id would silently
+     drop the student onto the first plan in the list. */
+  const PLANS_MOVED = { estudante: 'student', equipe: 'team' };
+  if (moved.account?.planId && PLANS_MOVED[moved.account.planId]) {
+    moved.account.planId = PLANS_MOVED[moved.account.planId];
+  }
   if (moved.exams) {
     moved.exams = Object.fromEntries(Object.entries(moved.exams).map(([k, v]) =>
       [k.replace(/^curso:/, 'course:').replace(/^trilha:/, 'track:'), v]));
   }
-  return moved;
+  return moveIds(moved);
 }
 
 function read() {
@@ -145,17 +294,17 @@ export function sectionDone(courseId, ix, sectionId) {
 
 export function lessonProgress(courseId, ix) {
   const a = courseLessons(courseId)[ix];
-  if (!a) return { feitas: 0, total: 0, pct: 0 };
+  if (!a) return { done: 0, total: 0, pct: 0 };
   // only the countable ones: an assessment with no exercises yet shows on
   // screen but stays out of the denominator, or the course would never close
   const sections = countableSections(courseId, a.key);
   const done = sections.filter((s) => sectionDone(courseId, ix, s.id)).length;
-  return { feitas: done, total: sections.length, pct: sections.length ? Math.round((done / sections.length) * 100) : 0 };
+  return { done: done, total: sections.length, pct: sections.length ? Math.round((done / sections.length) * 100) : 0 };
 }
 
 export const lessonDone = (courseId, ix) => {
   const p = lessonProgress(courseId, ix);
-  return p.total > 0 && p.feitas === p.total;
+  return p.total > 0 && p.done === p.total;
 };
 
 export function courseProgress(courseId) {
@@ -166,12 +315,12 @@ export function courseProgress(courseId) {
       if (sectionDone(courseId, ix, s.id)) done += 1;
     });
   });
-  return { feitas: done, total, pct: total ? Math.round((done / total) * 100) : 0 };
+  return { done: done, total, pct: total ? Math.round((done / total) * 100) : 0 };
 }
 
 export const courseDone = (courseId) => {
   const p = courseProgress(courseId);
-  return p.total > 0 && p.feitas === p.total;
+  return p.total > 0 && p.done === p.total;
 };
 
 /* ---------- exams ----------
@@ -246,7 +395,7 @@ export function saveAnswer(courseId, ix, exId, verdict) {
       attempts: before.attempts + 1,
       // once right, still right: redoing it to practise does not take the credit
       correct: before.correct || verdict.correct === true,
-      /* `conferido` separates "got it wrong" from "nobody checked". Without it,
+      /* `checked` separates "got it wrong" from "nobody checked". Without it,
          a code exercise that was answered and never executed was
          indistinguishable from a mistake, and the performance screen would
          count as a failure something that was never judged — the same confusion
@@ -318,7 +467,7 @@ export function answersGiven() {
    life, and every one of them becomes an `if` nobody will ever exercise. */
 export function studentAccount() {
   const c = state.account;
-  const planId = c?.planId || (window.PLANS?.[0]?.id ?? 'estudante');
+  const planId = c?.planId || (window.PLANS?.[0]?.id ?? 'student');
   return { planId: planId, since: c?.since || null, email: state.session?.email || '' };
 }
 

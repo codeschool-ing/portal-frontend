@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>codeschool.ing</title>
-<meta name="description" content="Área do aluno da codeschool.ing: sua trilha, seus cursos e seus exercícios." />
+<meta name="description" content="codeschool.ing student area: your track, your courses and your exercises." />
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 <script>/* applies the saved theme before paint, avoiding the "flash" — same as the vitrine */
-try{if(localStorage.getItem('codeschool-tema')==='claro')document.documentElement.dataset.tema='claro'}catch(e){}</script>
+try{if(localStorage.getItem('codeschool-theme')==='light')document.documentElement.dataset.theme='light'}catch(e){}</script>
 
 <!-- Containers the i18n must NOT map on load: they rebuild themselves from the
      data, calling txt() at render time. In the vitrine this list is the
      exception; here it is nearly the whole page, and that is why it moved out
      of i18n-runtime.js and became configuration — the file stays identical to
      the one over there. -->
-<script>window.I18N_DINAMICOS = ['#conteudo', '#trilho', '#nav-contexto', '#conta-menu', '.drop-atual'];</script>
+<script>window.I18N_DYNAMIC = ['#content', '#rail', '#nav-context', '#account-menu', '.drop-current'];</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,40 +26,40 @@ try{if(localStorage.getItem('codeschool-tema')==='claro')document.documentElemen
 
 <!-- THE SAME bar as the vitrine: a fixed 64px, brand with LED, theme and
      language. What changed is the middle — the sales links gave way to the
-     student's context, and "Área do aluno" stopped being a placeholder: it is
+     student's context, and "Student area" stopped being a placeholder: it is
      this page. -->
 <nav>
-  <a href="#/painel" class="brand">
+  <a href="#/dashboard" class="brand">
     <span class="led"></span><span class="brand-nome">codeschool<span class="brand-sep">.</span>ing</span>
   </a>
 
-  <button class="trilho-btn" id="trilho-btn" aria-label="Abrir navegação" aria-expanded="false">≡</button>
+  <button class="rail-btn" id="rail-btn" aria-label="Open navigation" aria-expanded="false">≡</button>
 
-  <div class="nav-contexto" id="nav-contexto"></div>
+  <div class="nav-context" id="nav-context"></div>
 
-  <div class="nav-acoes">
-    <button id="busca-btn" class="nav-icone" aria-label="Buscar curso">
+  <div class="nav-actions">
+    <button id="search-btn" class="nav-icon" aria-label="Search courses">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
     </button>
 
-    <button id="tema-btn" class="tema" aria-label="Mudar para tema claro">
-      <svg class="ico-lua" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
-      <svg class="ico-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>
+    <button id="theme-btn" class="theme" aria-label="Switch to the light theme">
+      <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+      <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>
     </button>
 
-    <div class="idioma" id="idioma">
-      <button class="idioma-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Escolher idioma">
+    <div class="lang" id="lang">
+      <button class="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Choose a language">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
-        <span id="idioma-curto">PT</span>
+        <span id="lang-short">EN</span>
       </button>
-      <div class="idioma-menu" id="idioma-menu" role="menu"></div>
+      <div class="lang-menu" id="lang-menu" role="menu"></div>
     </div>
 
-    <div class="conta" id="conta">
-      <button class="conta-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Sua conta">
-        <span class="conta-avatar" id="conta-avatar">·</span>
+    <div class="account" id="account">
+      <button class="account-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Your account">
+        <span class="account-avatar" id="account-avatar">·</span>
       </button>
-      <div class="conta-menu" id="conta-menu" role="menu"></div>
+      <div class="account-menu" id="account-menu" role="menu"></div>
     </div>
   </div>
 </nav>
@@ -68,27 +68,30 @@ try{if(localStorage.getItem('codeschool-tema')==='claro')document.documentElemen
   <!-- Rail: answers "where am I" and "how much is left" without a click. It
        becomes a drawer below 1180px, the same cut at which the vitrine's bar
        no longer fitted on one line. -->
-  <aside class="trilho" id="trilho" aria-label="Navegação"></aside>
-  <div class="trilho-veu" id="trilho-veu" hidden></div>
+  <aside class="rail" id="rail" aria-label="Navigation"></aside>
+  <div class="rail-veil" id="rail-veil" hidden></div>
 
-  <main class="conteudo" id="conteudo" tabindex="-1"></main>
+  <main class="content" id="content" tabindex="-1"></main>
 </div>
 
 <!-- catalogue and dictionaries: exactly the vitrine's files, unchanged -->
 <script src="assets/catalog.js"></script>
 <script src="assets/i18n.js"></script>
+<script src="assets/i18n-pt.js"></script>
 <script src="assets/i18n-courses-pt.js"></script>
+<script src="assets/lessons-pt.js"></script>
+<script src="assets/exercises-pt.js"></script>
 <script src="assets/i18n-courses-es.js"></script>
 <script src="assets/i18n-courses-fr.js"></script>
 <script src="assets/i18n-courses-it.js"></script>
 <script src="assets/i18n-runtime.js"></script>
 <script src="assets/plans.js"></script>
 <script src="assets/materials.js"></script>
-<script src="assets/lessons-web-fundamentos.js"></script>
+<script src="assets/lessons-web-fundamentals.js"></script>
 <script src="assets/lessons-html-css.js"></script>
 <script src="assets/lessons-javascript.js"></script>
 <script src="assets/exercises-sample.js"></script>
-<script src="assets/exercises-web-fundamentos.js"></script>
+<script src="assets/exercises-web-fundamentals.js"></script>
 <script src="assets/exercises-html-css.js"></script>
 
 <script type="module" src="app/main.js"></script>

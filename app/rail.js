@@ -35,12 +35,12 @@ import { studentTrack, bar } from './screens/common.js';
 import { esc } from './text.js';
 
 const LINKS = [
-  { href: '#/painel', rotulo: 'Painel' },
-  { href: '#/trilha', rotulo: 'Minha trilha' },
-  { href: '#/catalogo', rotulo: 'Catálogo' },
-  { href: '#/desempenho', rotulo: 'Desempenho' },
-  { href: '#/notas', rotulo: 'Notas' },
-  { href: '#/certificados', rotulo: 'Certificados' },
+  { href: '#/dashboard', label: 'Dashboard' },
+  { href: '#/track', label: 'My track' },
+  { href: '#/catalog', label: 'Catalog' },
+  { href: '#/performance', label: 'Performance' },
+  { href: '#/notes', label: 'Notes' },
+  { href: '#/certificates', label: 'Certificates' },
 ];
 
 const ICON_PLAY = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4.5l5 3.5-5 3.5z" fill="currentColor"/></svg>';
@@ -70,37 +70,37 @@ export const toggleLesson = (courseId, ix) => {
 };
 
 export function buildRail(el, path, params) {
-  const insideCourse = path.startsWith('/curso/');
+  const insideCourse = path.startsWith('/course/');
   el.innerHTML = insideCourse ? courseRail(params, path) : globalRail(path);
-  const open = el.querySelector('.trilho-aula.on');
+  const open = el.querySelector('.rail-lesson.on');
   if (open) open.scrollIntoView({ block: 'nearest' });
 }
 
 function globalRail(path) {
   const t = studentTrack();
   const links = LINKS.map((l) =>
-    '<a class="trilho-link' + (path === l.href.slice(1) ? ' on' : '') + '" href="' + l.href + '">' +
-      txt(l.rotulo) + '</a>').join('');
+    '<a class="rail-link' + (path === l.href.slice(1) ? ' on' : '') + '" href="' + l.href + '">' +
+      txt(l.label) + '</a>').join('');
 
-  if (!t) return '<nav class="trilho-nav">' + links + '</nav>';
+  if (!t) return '<nav class="rail-nav">' + links + '</nav>';
 
   const courses = trackPath(t, activeOption).map((id) => {
     const c = courseById(id);
     if (!c) return '';
     const p = courseProgress(id);
     const st = courseState(id);
-    return '<a class="trilho-curso no-' + st + '" href="#/curso/' + esc(id) + '">' +
-      '<span class="tc-marca" data-estado="' + st + '" aria-hidden="true"></span>' +
+    return '<a class="rail-course no-' + st + '" href="#/course/' + esc(id) + '">' +
+      '<span class="tc-mark" data-state="' + st + '" aria-hidden="true"></span>' +
       '<span class="tc-nome">' + esc(c.name) + '</span>' +
-      '<span class="tc-conta">' + p.feitas + '/' + p.total + '</span>' +
+      '<span class="tc-count">' + p.done + '/' + p.total + '</span>' +
     '</a>';
   }).join('');
 
   return (
-    '<nav class="trilho-nav">' + links + '</nav>' +
-    '<div class="trilho-sec">' +
-      '<span class="trilho-tit">' + esc(t.name) + '</span>' +
-      '<div class="trilho-cursos">' + courses + '</div>' +
+    '<nav class="rail-nav">' + links + '</nav>' +
+    '<div class="rail-sec">' +
+      '<span class="rail-tit">' + esc(t.name) + '</span>' +
+      '<div class="rail-courses">' + courses + '</div>' +
     '</div>'
   );
 }
@@ -112,7 +112,7 @@ function courseRail(params, path) {
 
   const lessons = courseLessons(id);
   const p = courseProgress(id);
-  const here = path.match(/\/aula\/(\d+)(?:\/([^/]+))?$/);
+  const here = path.match(/\/lesson\/(\d+)(?:\/([^/]+))?$/);
   const currentIx = here ? Number(here[1]) : -1;
   const currentSec = here && here[2] ? decodeURIComponent(here[2]) : null;
 
@@ -128,14 +128,14 @@ function courseRail(params, path) {
     const open = isCurrent ? !marked : marked;
 
     const head =
-      '<div class="trilho-aula' + (done ? ' feita' : '') + (isCurrent ? ' on' : '') + (open ? ' aberta' : '') + '">' +
-        '<button type="button" class="ta-abrir" data-aula="' + a.ix + '" ' +
-          'aria-expanded="' + open + '" aria-label="' + txt('Mostrar seções') + '">' + ICON_CHEVRON + '</button>' +
-        '<a class="ta-titulo" href="#/curso/' + esc(id) + '/aula/' + a.ix + '/' + esc(sections[0].id) + '">' +
-          '<span class="ta-num">' + txt('aula') + ' ' + String(a.ix + 1).padStart(2, '0') + '</span>' +
+      '<div class="rail-lesson' + (done ? ' done' : '') + (isCurrent ? ' on' : '') + (open ? ' is-open' : '') + '">' +
+        '<button type="button" class="ta-open" data-lesson="' + a.ix + '" ' +
+          'aria-expanded="' + open + '" aria-label="' + txt('Show sections') + '">' + ICON_CHEVRON + '</button>' +
+        '<a class="ta-title" href="#/course/' + esc(id) + '/lesson/' + a.ix + '/' + esc(sections[0].id) + '">' +
+          '<span class="ta-num">' + txt('lesson') + ' ' + String(a.ix + 1).padStart(2, '0') + '</span>' +
           '<span class="ta-tit">' + esc(a.title) + '</span>' +
         '</a>' +
-        '<span class="ta-conta">' + pa.feitas + '/' + pa.total + '</span>' +
+        '<span class="ta-count">' + pa.done + '/' + pa.total + '</span>' +
       '</div>';
 
     if (!open) return head;
@@ -146,21 +146,21 @@ function courseRail(params, path) {
          video, a page for what is reading, a star for the assessment. Before,
          every section was a play, which promised video in all of them. */
       const mark = ok ? ICON_CHECK
-        : (s.tipo === 'avaliacao' ? ICON_STAR
+        : (s.type === 'assessment' ? ICON_STAR
           : (s.video !== undefined ? ICON_PLAY : ICON_TEXT));
-      return '<a class="trilho-secao' + (ok ? ' feita' : '') +
+      return '<a class="rail-section' + (ok ? ' done' : '') +
         (s.id === currentSec && isCurrent ? ' on' : '') +
-        (s.tipo === 'avaliacao' ? ' aval' : '') + (s.pending ? ' pendente' : '') + '" ' +
-        'href="#/curso/' + esc(id) + '/aula/' + a.ix + '/' + esc(s.id) + '">' +
-        '<span class="ts-marca" aria-hidden="true">' + mark + '</span>' +
-        '<span class="ts-meio">' +
-          '<span class="ts-tit">' + esc(s.title) + '</span>' +
+        (s.type === 'assessment' ? ' assessment' : '') + (s.pending ? ' pending' : '') + '" ' +
+        'href="#/course/' + esc(id) + '/lesson/' + a.ix + '/' + esc(s.id) + '">' +
+        '<span class="ts-mark" aria-hidden="true">' + mark + '</span>' +
+        '<span class="ts-middle">' +
+          '<span class="ts-title">' + esc(s.title) + '</span>' +
           (s.duration ? '<span class="ts-dur mono">' + esc(s.duration) + '</span>' : '') +
         '</span>' +
       '</a>';
     }).join('');
 
-    return head + '<div class="trilho-secoes">' + inside + '</div>';
+    return head + '<div class="rail-sections">' + inside + '</div>';
   }).join('');
 
   /* The exam comes in as a row at the end of the list, shaped like a section —
@@ -168,23 +168,23 @@ function courseRail(params, path) {
      course. It only shows up where there is a question bank, for the same reason
      as the pending assessment: announcing what does not exist is noise. */
   const exam = courseExam(id);
-  const onExam = path === '/curso/' + id + '/prova';
+  const onExam = path === '/course/' + id + '/exam';
   const passed = examPassed(exam.key);
   const examRow = exam.items.length
-    ? '<a class="trilho-prova' + (passed ? ' feita' : '') + (onExam ? ' on' : '') + '" ' +
-      'href="#/curso/' + esc(id) + '/prova">' +
-      '<span class="ts-marca" aria-hidden="true">' + (passed ? ICON_CHECK : ICON_TROPHY) + '</span>' +
-      '<span class="ts-tit">' + txt('Prova final') + '</span>' +
+    ? '<a class="rail-exam' + (passed ? ' done' : '') + (onExam ? ' on' : '') + '" ' +
+      'href="#/course/' + esc(id) + '/exam">' +
+      '<span class="ts-mark" aria-hidden="true">' + (passed ? ICON_CHECK : ICON_TROPHY) + '</span>' +
+      '<span class="ts-title">' + txt('Final exam') + '</span>' +
     '</a>'
     : '';
 
   return (
-    '<a class="trilho-voltar" href="#/trilha">← ' + txt('minha trilha') + '</a>' +
-    '<div class="trilho-sec">' +
-      '<span class="trilho-tit">' + esc(c.name) + '</span>' +
-      bar(p.pct, p.feitas + ' de ' + p.total) +
-      '<span class="trilho-conta">' + p.feitas + '/' + p.total + ' ' + txt('seções') + '</span>' +
-      '<div class="trilho-aulas">' + rows + '</div>' +
+    '<a class="rail-back" href="#/track">← ' + txt('my track') + '</a>' +
+    '<div class="rail-sec">' +
+      '<span class="rail-tit">' + esc(c.name) + '</span>' +
+      bar(p.pct, p.done + ' de ' + p.total) +
+      '<span class="rail-count">' + p.done + '/' + p.total + ' ' + txt('sections') + '</span>' +
+      '<div class="rail-lessons">' + rows + '</div>' +
       examRow +
     '</div>'
   );

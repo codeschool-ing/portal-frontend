@@ -7,7 +7,7 @@
    curriculum — it is the mistake.
 
    EACH EXERCISE'S CONTEXT IS PRESERVED. The wizard stores the answer under
-   `progresso[curso].aulas[ix]`, so each one has to come back with the course and
+   `progress[course].lessons[ix]`, so each one has to come back with the course and
    the lesson it came from; passing a single context would record the correct
    answer against the wrong lesson, and the performance screen would start lying
    about where the person improved.
@@ -20,26 +20,26 @@ import { empty } from './common.js';
 export default async function redo() {
   const list = wrongOnes();
   if (!list.length) {
-    return { title: txt('Refazer'), el: empty(txt('Não há nada errado para refazer.')) };
+    return { title: txt('Redo'), el: empty(txt('There is nothing wrong to redo.')) };
   }
 
   const el = document.createElement('div');
-  el.className = 'tela tela-refazer';
+  el.className = 'view screen-redo';
   el.innerHTML =
-    '<header class="tela-head">' +
-      '<h1>' + txt('Os que você errou') + '</h1>' +
+    '<header class="view-head">' +
+      '<h1>' + txt('The ones you got wrong') + '</h1>' +
       '<p>' + list.length + ' ' + (list.length === 1
-        ? txt('exercício, do curso em que você respondeu.')
-        : txt('exercícios, de todos os cursos em que você respondeu.')) + '</p>' +
+        ? txt('exercise, from the course you answered it in.')
+        : txt('exercises, from every course you answered in.')) + '</p>' +
     '</header>' +
-    '<section class="bloco"></section>';
+    '<section class="block"></section>';
 
   /* One context per exercise, and not a single one for the whole wizard: each
      answer has to be stored against the lesson it came from. */
   const contextByIndex = list.map((r) => ({ courseId: r.courseId, lessonIx: r.lessonIx }));
-  el.querySelector('.bloco').appendChild(
+  el.querySelector('.block').appendChild(
     buildAssessment(list.map((r) => r.ex), contextByIndex),
   );
 
-  return { title: txt('Refazer'), el };
+  return { title: txt('Redo'), el };
 }

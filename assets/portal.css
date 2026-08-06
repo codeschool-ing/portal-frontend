@@ -33,7 +33,7 @@
    with that the browser draws what is its own in the right tone — including
    before the CSS loads, which also kills the white flash. */
 :root{color-scheme:dark}
-html[data-tema="claro"]{color-scheme:light}
+html[data-theme="light"]{color-scheme:light}
 
 /* `hidden` has to beat the component classes. The browser rule for `[hidden]`
    has zero specificity, so `.btn{display:inline-flex}` runs it over — and the
@@ -72,21 +72,21 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 
 /* THE LESSON HAS ONE WIDTH, and that width has two values.
 
-     --trilho    the menu column
-     --leitura   820px: the narrow column, where the lesson lives while the
+     --rail    the menu column
+     --reading   820px: the narrow column, where the lesson lives while the
                  annotated code block still fits stacked. Prose above ~68
                  characters per line tires the eye, and this is the number that
                  gives 68.
-     --amplo     the wide column, where the lesson lives when the code block
+     --wide     the wide column, where the lesson lives when the code block
                  opens in two columns — it has one column that does not wrap for
                  comfort, and that column is what dictates the size.
-     --tela      which of the two is in force right now. EVERYTHING in the lesson
+     --screen      which of the two is in force right now. EVERYTHING in the lesson
                  uses this one: the title, the breadcrumbs, the steps, the prose,
                  the player, the example, the material, the footer.
 
    This was the third attempt, and the first two got it wrong the same way. The
    first let the player bleed edge to edge while the text stayed at 820. The
-   second released the example (and later the player) to `--amplo` and left the
+   second released the example (and later the player) to `--wide` and left the
    rest at 820. Both produced the SAME thing: different left margins inside one
    lesson, the eye hunting for where the line starts on every scroll.
 
@@ -95,15 +95,15 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
    asking "who went past the ceiling?" and started asking "do they all start in
    the same column?", which is the real rule.
 
-   The price is declared: at `--amplo` the prose line reaches 121ch (measured),
+   The price is declared: at `--wide` the prose line reaches 121ch (measured),
    against the comfortable 68. That is what a single width costs, and it only
    happens on a large screen, where the alternative was the misalignment.
 
    The navigation arrows live in the gap that is left over, and they derive from
-   `--tela` too: when the lesson widens, the gap shrinks and they follow. */
+   `--screen` too: when the lesson widens, the gap shrinks and they follow. */
 .portal{
-  --trilho:380px;
-  --leitura:820px;
+  --rail:380px;
+  --reading:820px;
   /* The annotated code block has two columns, and the right one does NOT wrap
      for comfort: either the program fits, or a scrollbar appears. So its width
      comes from a MEASUREMENT of the content, not from a guess.
@@ -112,52 +112,52 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
        browser); the longest line in the examples has 74 characters → 562px
        plus the block's 36px of padding                             → 598px
 
-     `--cod` is 604: a little more than that, and the slack is the six pixels
-     that keep the bar from appearing over a single character. `--nota` is the
-     comfort of the text column; `--nota-min`, the minimum below which it stops
+     `--code` is 604: a little more than that, and the slack is the six pixels
+     that keep the bar from appearing over a single character. `--note` is the
+     comfort of the text column; `--note-min`, the minimum below which it stops
      being readable and the two columns stop being worth it. */
-  --cod:604px;
-  --nota:440px;
-  --nota-min:300px;
+  --code:604px;
+  --note:440px;
+  --note-min:300px;
   /* THE CEILING OF THE WIDE COLUMN COMES FROM THE ARROW, not from a chosen
      number. The arrows sit in the middle of the gap and are 44px wide; to leave
      16px between the arrow and the content, the gap on each side needs
      4 × 38 = 152px in total:
 
-       --amplo <= 100vw - trilho - 152
+       --wide <= 100vw - rail - 152
 
-     Until that is the tighter bound, the one in charge is `.conteudo`'s
-     padding. And the floor is the block's content: `--cod + --nota + 30`, above
+     Until that is the tighter bound, the one in charge is `.content`'s
+     padding. And the floor is the block's content: `--code + --note + 30`, above
      which widening would only stretch the text column. */
-  --amplo:min(
-    calc(var(--cod) + var(--nota) + 30px),
-    calc(100vw - var(--trilho) - 2 * var(--pad-x))
+  --wide:min(
+    calc(var(--code) + var(--note) + 30px),
+    calc(100vw - var(--rail) - 2 * var(--pad-x))
   );
-  --tela:var(--leitura);
+  --screen:var(--reading);
   display:grid;
   /* 380 and not 272: at 272 nearly every lesson name wrapped onto two or three
      lines, and a list of thirteen wrapped items becomes a wall. The 50px that
      came later buy the difference between "Front-end with React and TypeScript"
      on one line or on two. */
-  grid-template-columns:var(--trilho) minmax(0,1fr);
+  grid-template-columns:var(--rail) minmax(0,1fr);
   min-height:100vh;
   padding-top:64px;               /* the bar is fixed and has a fixed height */
 }
-body.sem-trilho .portal{grid-template-columns:minmax(0,1fr)}
-body.sem-trilho .trilho{display:none}
+body.no-rail .portal{grid-template-columns:minmax(0,1fr)}
+body.no-rail .rail{display:none}
 
 /* The padding becomes a VARIABLE because it is not only padding: the edge-to-
    edge video cancels it with a negative margin, and a number repeated in two
    places diverges the day one of them changes. Which is what happened — the
    narrow padding became 16px here and stayed 18px there, and 2px of horizontal
    scrolling were left over on the phone. */
-.conteudo{
+.content{
   --pad-x:clamp(18px,3.2vw,44px);
   --pad-y:26px;
   min-width:0;
   padding:var(--pad-y) var(--pad-x) 60px;
 }
-.conteudo:focus{outline:none}
+.content:focus{outline:none}
 
 /* ---------- side rail ---------- */
 /* SPACING IS LEGIBILITY. The first version was dense — 2px of breathing room
@@ -165,121 +165,121 @@ body.sem-trilho .trilho{display:none}
    open became a wall that is read line by line instead of being swept with the
    eye. The air between the items is what lets the menu be CONSULTED rather than
    read. */
-.trilho{
+.rail{
   position:sticky;top:64px;align-self:start;
   height:calc(100vh - 64px);overflow-y:auto;
   border-right:1px solid var(--wire);
   padding:26px 18px 48px;
   /* `scrollbar-width` alone is not enough: without the COLOUR, Chromium uses
      the system one. The vitrine always declares the two together (see
-     `.cursos-rol` in base.css), and the rail had been left with only the first
+     `.courses-scroll` in base.css), and the rail had been left with only the first
      half. The `::-webkit-` rule is the same patch from there, for the versions
      that still ignore `scrollbar-color`. */
   scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
 }
-.trilho::-webkit-scrollbar{width:7px}
-.trilho::-webkit-scrollbar-track{background:transparent}
-.trilho::-webkit-scrollbar-thumb{background:var(--wire);border-radius:4px}
-.trilho:hover::-webkit-scrollbar-thumb{background:var(--phosphor-dim)}
-.trilho-nav{display:flex;flex-direction:column;gap:6px;margin-bottom:30px}
-.trilho-link{
+.rail::-webkit-scrollbar{width:7px}
+.rail::-webkit-scrollbar-track{background:transparent}
+.rail::-webkit-scrollbar-thumb{background:var(--wire);border-radius:4px}
+.rail:hover::-webkit-scrollbar-thumb{background:var(--phosphor-dim)}
+.rail-nav{display:flex;flex-direction:column;gap:6px;margin-bottom:30px}
+.rail-link{
   padding:11px 14px;border-radius:4px;font-size:.94rem;color:var(--paper-dim);
   border-left:2px solid transparent;transition:color .15s,background .15s;
 }
-.trilho-link:hover{color:var(--paper);background:var(--panel)}
-.trilho-link.on{color:var(--phosphor);border-left-color:var(--phosphor);background:var(--panel)}
+.rail-link:hover{color:var(--paper);background:var(--panel)}
+.rail-link.on{color:var(--phosphor);border-left-color:var(--phosphor);background:var(--panel)}
 
-.trilho-sec{display:flex;flex-direction:column;gap:12px}
-.trilho-tit{
+.rail-sec{display:flex;flex-direction:column;gap:12px}
+.rail-tit{
   font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.12em;
   text-transform:uppercase;color:var(--phosphor-dim);padding:0 11px;
 }
-.trilho-conta{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--paper-dim);padding:0 11px}
-.trilho-voltar{
+.rail-count{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--paper-dim);padding:0 11px}
+.rail-back{
   display:inline-block;margin-bottom:16px;padding:0 11px;
   font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--phosphor);
 }
 
-.trilho-cursos{display:flex;flex-direction:column;gap:4px}
-.trilho-curso{
+.rail-courses{display:flex;flex-direction:column;gap:4px}
+.rail-course{
   display:grid;grid-template-columns:8px 1fr auto;align-items:center;gap:10px;
   padding:11px 14px;border-radius:4px;font-size:.88rem;color:var(--paper-dim);line-height:1.35;
 }
-.trilho-curso:hover{background:var(--panel);color:var(--paper)}
-.tc-conta{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--phosphor-dim)}
-.tc-marca{width:8px;height:8px;border-radius:50%;border:1px solid var(--wire)}
-.tc-marca[data-estado="concluido"]{background:var(--phosphor);border-color:var(--phosphor)}
-.tc-marca[data-estado="atual"]{background:var(--amber);border-color:var(--amber)}
-.tc-marca[data-estado="disponivel"]{border-color:var(--phosphor)}
+.rail-course:hover{background:var(--panel);color:var(--paper)}
+.tc-count{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--phosphor-dim)}
+.tc-mark{width:8px;height:8px;border-radius:50%;border:1px solid var(--wire)}
+.tc-mark[data-state="done"]{background:var(--phosphor);border-color:var(--phosphor)}
+.tc-mark[data-state="current"]{background:var(--amber);border-color:var(--amber)}
+.tc-mark[data-state="available"]{border-color:var(--phosphor)}
 
 /* A LESSON IS A HEADING, A SECTION IS A LINE. Before, both were similar lines
    with different indents, and there was no telling which was which without
    reading. The lesson gets monospaced uppercase and a counter; the section
    stays in normal text with an icon. Two different natures, two different
    shapes. */
-.trilho-aulas{display:flex;flex-direction:column;gap:6px}
-.trilho-aula{
+.rail-lessons{display:flex;flex-direction:column;gap:6px}
+.rail-lesson{
   display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:8px;
   border-radius:4px;padding:3px 8px 3px 2px;
 }
-.trilho-aula:hover{background:var(--panel)}
-.trilho-aula.on{background:var(--panel);box-shadow:inset 2px 0 0 var(--phosphor)}
-.ta-abrir{
+.rail-lesson:hover{background:var(--panel)}
+.rail-lesson.on{background:var(--panel);box-shadow:inset 2px 0 0 var(--phosphor)}
+.ta-open{
   display:grid;place-items:center;width:20px;height:26px;
   background:none;border:0;color:var(--phosphor-dim);cursor:pointer;
 }
-.ta-abrir svg{width:13px;height:13px;transition:transform .18s}
-.trilho-aula.aberta .ta-abrir svg{transform:rotate(-180deg)}
-.ta-titulo{display:flex;flex-direction:column;gap:3px;padding:10px 0;min-width:0}
+.ta-open svg{width:13px;height:13px;transition:transform .18s}
+.rail-lesson.is-open .ta-open svg{transform:rotate(-180deg)}
+.ta-title{display:flex;flex-direction:column;gap:3px;padding:10px 0;min-width:0}
 .ta-num{
   font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.12em;
   text-transform:uppercase;color:var(--phosphor-dim);
 }
-.trilho-aula.on .ta-num{color:var(--phosphor)}
+.rail-lesson.on .ta-num{color:var(--phosphor)}
 .ta-tit{
   font-family:'Space Grotesk',sans-serif;font-weight:400;font-size:.88rem;
   line-height:1.35;color:var(--paper);
 }
-.trilho-aula.feita .ta-tit{color:var(--paper-dim)}
-.ta-conta{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--phosphor-dim)}
+.rail-lesson.done .ta-tit{color:var(--paper-dim)}
+.ta-count{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--phosphor-dim)}
 
-.trilho-secoes{display:flex;flex-direction:column;gap:3px;margin:4px 0 10px}
-.trilho-secao,.trilho-prova{
+.rail-sections{display:flex;flex-direction:column;gap:3px;margin:4px 0 10px}
+.rail-section,.rail-exam{
   display:grid;grid-template-columns:16px 1fr;align-items:center;gap:11px;
   padding:9px 12px 9px 30px;border-radius:4px;
   font-size:.85rem;line-height:1.45;color:var(--paper-dim);
 }
-.ts-meio{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ts-middle{display:flex;flex-direction:column;gap:2px;min-width:0}
 .ts-dur{font-size:.62rem;color:var(--phosphor-dim);letter-spacing:.06em}
-.trilho-secao:hover,.trilho-prova:hover{background:var(--panel);color:var(--paper)}
-.trilho-secao.on,.trilho-prova.on{color:var(--phosphor);background:var(--panel)}
+.rail-section:hover,.rail-exam:hover{background:var(--panel);color:var(--paper)}
+.rail-section.on,.rail-exam.on{color:var(--phosphor);background:var(--panel)}
 /* play for what is left, check for what is done: the icon states the status
    without leaning on colour alone, and it also says that this is something to
    go through */
-.ts-marca{display:grid;place-items:center;color:var(--phosphor-dim)}
-.ts-marca svg{width:14px;height:14px}
-.trilho-secao.feita .ts-marca,.trilho-prova.feita .ts-marca{color:var(--phosphor)}
-.trilho-secao.on .ts-marca,.trilho-prova.on .ts-marca{color:var(--phosphor)}
-.trilho-secao.feita .ts-tit,.trilho-prova.feita .ts-tit{color:var(--paper-dim)}
-.trilho-secao.aval .ts-tit{font-style:italic}
+.ts-mark{display:grid;place-items:center;color:var(--phosphor-dim)}
+.ts-mark svg{width:14px;height:14px}
+.rail-section.done .ts-mark,.rail-exam.done .ts-mark{color:var(--phosphor)}
+.rail-section.on .ts-mark,.rail-exam.on .ts-mark{color:var(--phosphor)}
+.rail-section.done .ts-title,.rail-exam.done .ts-title{color:var(--paper-dim)}
+.rail-section.assessment .ts-title{font-style:italic}
 
 /* ---------- top bar: only what the vitrine did not have ---------- */
-.nav-contexto{margin-left:26px;min-width:0;flex:1 1 auto}
-.ctx-caixa{position:relative}
+.nav-context{margin-left:26px;min-width:0;flex:1 1 auto}
+.ctx-box{position:relative}
 .ctx{
   display:flex;align-items:center;gap:10px;max-width:460px;
   background:none;border:1px solid transparent;border-radius:4px;
   padding:5px 9px;color:var(--paper-dim);cursor:pointer;font:inherit;
 }
 .ctx:hover{color:var(--paper);border-color:var(--wire)}
-.ctx-seta{font-size:.7rem;color:var(--phosphor-dim)}
+.ctx-arrow{font-size:.7rem;color:var(--phosphor-dim)}
 .ctx-menu{
   display:none;position:absolute;top:calc(100% + 8px);left:0;min-width:280px;max-height:70vh;overflow-y:auto;
   scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
   background:var(--panel);border:1px solid var(--wire);border-radius:5px;padding:5px;z-index:120;
 }
-.ctx-caixa.aberto .ctx-menu{display:block}
-.ctx-grupo{
+.ctx-box.is-open .ctx-menu{display:block}
+.ctx-group{
   display:block;padding:9px 11px 4px;font-family:'IBM Plex Mono',monospace;
   font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--phosphor-dim);
 }
@@ -289,94 +289,94 @@ body.sem-trilho .trilho{display:none}
 }
 .ctx-op:hover{background:var(--ink);color:var(--paper)}
 .ctx-op.on{color:var(--phosphor)}
-.ctx-mapa{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--phosphor);border-bottom:1px solid var(--wire);border-radius:0;margin-bottom:4px}
-.ctx-nome{font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ctx-barra{flex:0 0 84px;height:4px;border-radius:2px;background:var(--wire);overflow:hidden}
-.ctx-barra span{display:block;height:100%;background:var(--phosphor)}
+.ctx-map{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--phosphor);border-bottom:1px solid var(--wire);border-radius:0;margin-bottom:4px}
+.ctx-name{font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctx-bar{flex:0 0 84px;height:4px;border-radius:2px;background:var(--wire);overflow:hidden}
+.ctx-bar span{display:block;height:100%;background:var(--phosphor)}
 .ctx-pct{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--phosphor)}
 
 /* `base.css` does NOT reset the `button` element: every vitrine component
-   declares its own background (`.tema`, `.burger`, `.nav-cta`…). Every new
+   declares its own background (`.theme`, `.burger`, `.nav-cta`…). Every new
    button has to declare its own, otherwise it inherits the browser's light grey
    — which is what left the magnifier, the avatar and the ordering arrows white
    on the dark theme. */
-.nav-icone{
+.nav-icon{
   display:flex;align-items:center;justify-content:center;width:32px;height:32px;
   background:none;border:0;color:var(--paper-dim);border-radius:4px;cursor:pointer;
 }
-.nav-icone:hover{color:var(--phosphor);background:var(--panel)}
-.nav-icone svg{width:17px;height:17px}
+.nav-icon:hover{color:var(--phosphor);background:var(--panel)}
+.nav-icon svg{width:17px;height:17px}
 
-.conta{position:relative}
-.conta-btn{display:flex;align-items:center;background:none;border:0;padding:0;cursor:pointer}
-.conta-avatar{
+.account{position:relative}
+.account-btn{display:flex;align-items:center;background:none;border:0;padding:0;cursor:pointer}
+.account-avatar{
   display:grid;place-items:center;width:30px;height:30px;border-radius:50%;
   background:var(--panel);border:1px solid var(--wire);color:var(--phosphor);
   font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.82rem;
 }
-.conta-btn:hover .conta-avatar{border-color:var(--phosphor)}
-.conta-menu{
+.account-btn:hover .account-avatar{border-color:var(--phosphor)}
+.account-menu{
   display:none;position:absolute;top:calc(100% + 8px);right:0;min-width:186px;
   background:var(--panel);border:1px solid var(--wire);border-radius:5px;
   padding:5px;flex-direction:column;z-index:120;
 }
-.conta.aberto .conta-menu{display:flex}
-.conta-op{padding:8px 11px;border-radius:4px;font-size:.86rem;color:var(--paper-dim)}
-.conta-op:hover{background:var(--ink);color:var(--paper)}
+.account.is-open .account-menu{display:flex}
+.account-op{padding:8px 11px;border-radius:4px;font-size:.86rem;color:var(--paper-dim)}
+.account-op:hover{background:var(--ink);color:var(--paper)}
 
-.trilho-btn{display:none;background:none;border:0;font-size:1.3rem;color:var(--paper-dim);padding:0 10px;cursor:pointer}
-.trilho-veu{display:none}
+.rail-btn{display:none;background:none;border:0;font-size:1.3rem;color:var(--paper-dim);padding:0 10px;cursor:pointer}
+.rail-veil{display:none}
 
 /* ==========================================================
    2 · SCREENS — generic blocks
    ========================================================== */
 
-.tela{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
-.tela-head{display:flex;flex-direction:column;gap:6px}
-.tela-head h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.4rem,3vw,2rem);line-height:1.15}
-.tela-head p{color:var(--paper-dim);font-size:.92rem}
+.view{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.view-head{display:flex;flex-direction:column;gap:6px}
+.view-head h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.4rem,3vw,2rem);line-height:1.15}
+.view-head p{color:var(--paper-dim);font-size:.92rem}
 
-.bloco{
+.block{
   background:var(--panel);border:1px solid var(--wire);border-radius:6px;
   padding:18px 20px;display:flex;flex-direction:column;gap:14px;
 }
-.bloco-topo{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-.bloco-topo h2{font-family:'Space Grotesk',sans-serif;font-size:1.02rem}
-.bloco-link{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--phosphor)}
-.bloco-risco{border-color:rgba(255,77,94,.3)}
-.btn-risco{border-color:var(--amber);color:var(--amber)}
-.btn-risco:hover{background:rgba(255,77,94,.1)}
+.block-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.block-top h2{font-family:'Space Grotesk',sans-serif;font-size:1.02rem}
+.block-link{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--phosphor)}
+.block-risk{border-color:rgba(255,77,94,.3)}
+.btn-risk{border-color:var(--amber);color:var(--amber)}
+.btn-risk:hover{background:rgba(255,77,94,.1)}
 
-.barra{display:block;height:5px;border-radius:3px;background:var(--wire);overflow:hidden}
-.barra-cheia{display:block;height:100%;background:var(--phosphor);transition:width .3s ease}
+.bar{display:block;height:5px;border-radius:3px;background:var(--wire);overflow:hidden}
+.bar-fill{display:block;height:100%;background:var(--phosphor);transition:width .3s ease}
 
-.cartoes{display:grid;grid-template-columns:repeat(auto-fill,minmax(226px,1fr));gap:12px}
-.cartao{
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(226px,1fr));gap:12px}
+.card{
   display:flex;flex-direction:column;gap:6px;padding:14px;
   background:var(--ink);border:1px solid var(--wire);border-radius:5px;
   transition:border-color .2s,transform .2s;
 }
-.cartao:hover{border-color:var(--phosphor);transform:translateY(-2px)}
-.cartao-nome{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.94rem;line-height:1.2}
-.cartao-resumo{font-size:.82rem;color:var(--paper-dim);line-height:1.45}
-.cartao-cat,.cartao-meta,.cartao-conta{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--paper-dim)}
-.cartao-cat{color:var(--phosphor-dim);letter-spacing:.08em;text-transform:uppercase}
+.card:hover{border-color:var(--phosphor);transform:translateY(-2px)}
+.card-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.94rem;line-height:1.2}
+.card-summary{font-size:.82rem;color:var(--paper-dim);line-height:1.45}
+.card-cat,.card-meta,.card-count{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--paper-dim)}
+.card-cat{color:var(--phosphor-dim);letter-spacing:.08em;text-transform:uppercase}
 
 /* ---------- pick up where you left off ---------- */
-.retomar{
+.resume{
   display:flex;flex-direction:column;gap:8px;padding:20px 22px;
   background:var(--panel);border:1px solid var(--phosphor-dim);border-radius:6px;
   transition:border-color .2s;
 }
-.retomar:hover{border-color:var(--phosphor)}
-.retomar-rot{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--phosphor)}
-.retomar-aula{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:clamp(1.05rem,2.2vw,1.35rem);line-height:1.2}
-.retomar-curso{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
-.retomar-btn{align-self:flex-start;margin-top:6px}
+.resume:hover{border-color:var(--phosphor)}
+.resume-label{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--phosphor)}
+.resume-lesson{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:clamp(1.05rem,2.2vw,1.35rem);line-height:1.2}
+.resume-course{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
+.resume-btn{align-self:flex-start;margin-top:6px}
 
-.trilha-numeros{display:flex;flex-wrap:wrap;gap:20px}
-.trilha-numeros span{display:flex;flex-direction:column;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
-.trilha-numeros b{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;color:var(--paper)}
+.track-numbers{display:flex;flex-wrap:wrap;gap:20px}
+.track-numbers span{display:flex;flex-direction:column;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
+.track-numbers b{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;color:var(--paper)}
 
 /* ==========================================================
    3 · THE GRAPH AS A PROGRESS MAP
@@ -397,124 +397,124 @@ body.sem-trilho .trilho{display:none}
 
    Here and not in `base.css`, which is a copy of the vitrine and has to stay
    syncable. */
-.portal .grafo-niveis{gap:88px}
-.portal .nivel{gap:26px}
+.portal .graph-levels{gap:88px}
+.portal .level{gap:26px}
 .portal .subcol{gap:20px}
 
-/* `.grafo-niveis` and `.nivel` have height:100%, so the box needs a definite
+/* `.graph-levels` and `.level` have height:100%, so the box needs a definite
    height — in the vitrine it came from the fullpage section, which does not
    exist here. */
-.tela-trilha .grafo-caixa{height:clamp(360px,58vh,640px)}
-.tela-trilha .trilha-topo{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-start}
-.tela-trilha .trilha-topo p{max-width:58ch;color:var(--paper-dim);font-size:.9rem}
-.tela-trilha .trilha-resumo{display:flex;gap:18px;flex-wrap:wrap}
-.tela-trilha .trilha-resumo span{display:flex;flex-direction:column;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--paper-dim)}
-.tela-trilha .trilha-resumo b{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;color:var(--paper)}
-.tela-trilha .trilha-resumo i{font-style:normal;font-size:.64rem}
+.view-track .graph-box{height:clamp(360px,58vh,640px)}
+.view-track .track-top{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-start}
+.view-track .track-top p{max-width:58ch;color:var(--paper-dim);font-size:.9rem}
+.view-track .track-summary{display:flex;gap:18px;flex-wrap:wrap}
+.view-track .track-summary span{display:flex;flex-direction:column;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--paper-dim)}
+.view-track .track-summary b{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;color:var(--paper)}
+.view-track .track-summary i{font-style:normal;font-size:.64rem}
 
-/* The four states. `adiante` is the most restrictive and is clickable ANYWAY:
+/* The four states. `ahead` is the most restrictive and is clickable ANYWAY:
    the vitrine's FAQ promises that the track is a recommended order, not a
    lock. */
-.curso-no.no-concluido{border-color:var(--phosphor-dim);background:rgba(91,140,255,.06)}
-.curso-no.no-atual{border-color:var(--amber)}
-.curso-no.no-adiante{opacity:.62}
-.curso-no.no-adiante:hover{opacity:1}
+.course-node.node-done{border-color:var(--phosphor-dim);background:rgba(91,140,255,.06)}
+.course-node.node-current{border-color:var(--amber)}
+.course-node.node-ahead{opacity:.62}
+.course-node.node-ahead:hover{opacity:1}
 
-.no-estado{
+.node-state{
   font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;
   text-transform:uppercase;color:var(--paper-dim);
 }
-.no-estado[data-estado="concluido"]{color:var(--phosphor)}
-.no-estado[data-estado="atual"]{color:var(--amber)}
-.no-estado[data-estado="disponivel"]{color:var(--phosphor-dim)}
+.node-state[data-state="done"]{color:var(--phosphor)}
+.node-state[data-state="current"]{color:var(--amber)}
+.node-state[data-state="available"]{color:var(--phosphor-dim)}
 
-.no-barra{display:block;height:3px;border-radius:2px;background:var(--wire);overflow:hidden;margin-top:5px}
-.no-barra-cheia{display:block;height:100%;background:var(--phosphor)}
-.no-conta{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--paper-dim)}
+.node-bar{display:block;height:3px;border-radius:2px;background:var(--wire);overflow:hidden;margin-top:5px}
+.node-bar-fill{display:block;height:100%;background:var(--phosphor)}
+.node-count{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--paper-dim)}
 
 /* an edge whose prerequisite is already met lights up; the rest stays quiet */
-.aresta-feita .linha{stroke:var(--phosphor);opacity:.55}
+.edge-done .row{stroke:var(--phosphor);opacity:.55}
 
-.grafo-legenda{display:flex;flex-wrap:wrap;gap:16px}
+.graph-legend{display:flex;flex-wrap:wrap;gap:16px}
 .leg{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--paper-dim)}
-.leg-cor{width:11px;height:11px;border-radius:2px;border:1px solid var(--wire);background:var(--ink)}
-.leg-cor.no-concluido{border-color:var(--phosphor-dim);background:rgba(91,140,255,.25)}
-.leg-cor.no-atual{border-color:var(--amber)}
-.leg-cor.no-adiante{opacity:.5}
+.leg-color{width:11px;height:11px;border-radius:2px;border:1px solid var(--wire);background:var(--ink)}
+.leg-color.node-done{border-color:var(--phosphor-dim);background:rgba(91,140,255,.25)}
+.leg-color.node-current{border-color:var(--amber)}
+.leg-color.node-ahead{opacity:.5}
 
 /* ==========================================================
    4 · COURSE AND LESSON
    ========================================================== */
 
-.curso-head{display:flex;flex-direction:column;gap:8px}
-.curso-head h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.4rem,3vw,2rem);line-height:1.15}
-.curso-resumo{color:var(--paper-dim);max-width:70ch}
-.curso-meta{display:flex;flex-wrap:wrap;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--phosphor-dim)}
-.curso-conta{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
+.course-head{display:flex;flex-direction:column;gap:8px}
+.course-head h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.4rem,3vw,2rem);line-height:1.15}
+.course-summary{color:var(--paper-dim);max-width:70ch}
+.course-meta{display:flex;flex-wrap:wrap;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--phosphor-dim)}
+.course-count{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
 
-.curso-colunas{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
-.curso-principal,.curso-lado{display:flex;flex-direction:column;gap:18px}
-.curso-principal{min-width:0}
-.ementa{display:flex;flex-direction:column;gap:7px;font-size:.88rem;color:var(--paper-dim);padding-left:16px}
-.ementa li{list-style:'› ';padding-left:4px}
-.requisitos{font-size:.88rem;color:var(--paper-dim)}
-.ligados{display:flex;flex-wrap:wrap;gap:7px}
-.elo{
+.course-cols{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.course-main,.course-side{display:flex;flex-direction:column;gap:18px}
+.course-main{min-width:0}
+.syllabus{display:flex;flex-direction:column;gap:7px;font-size:.88rem;color:var(--paper-dim);padding-left:16px}
+.syllabus li{list-style:'› ';padding-left:4px}
+.prerequisites{font-size:.88rem;color:var(--paper-dim)}
+.related{display:flex;flex-wrap:wrap;gap:7px}
+.link-chip{
   font-family:'IBM Plex Mono',monospace;font-size:.72rem;padding:5px 9px;border-radius:4px;
   border:1px solid var(--wire);color:var(--paper-dim);
 }
-.elo-antes{border-color:rgba(255,77,94,.35);color:var(--amber)}
-.elo-depois{border-color:var(--phosphor-dim);color:var(--phosphor)}
-.elo:hover{background:var(--ink)}
+.link-before{border-color:rgba(255,77,94,.35);color:var(--amber)}
+.link-after{border-color:var(--phosphor-dim);color:var(--phosphor)}
+.link-chip:hover{background:var(--ink)}
 
-/* `list-style:none` because the numbering belongs to `.aula-num`, monospaced
+/* `list-style:none` because the numbering belongs to `.lesson-num`, monospaced
    and zero-padded: letting the <ol> marker show up as well numbered the same
-   line twice ("1. 01 Cliente, servidor e host"). */
-.aulas{display:flex;flex-direction:column;gap:1px;list-style:none;padding:0}
-.aula-linha{
+   line twice ("1. 01 Client, server and host"). */
+.lessons{display:flex;flex-direction:column;gap:1px;list-style:none;padding:0}
+.lesson-row{
   display:grid;grid-template-columns:18px 26px 1fr auto;align-items:center;gap:4px 10px;
   padding:10px 12px;border-radius:4px;color:var(--paper);font-size:.9rem;
 }
-.aula-secoes{
+.lesson-sections{
   grid-column:3;font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--phosphor-dim);
 }
-.aula-prog{
+.lesson-prog{
   grid-column:4;grid-row:1/3;font-family:'IBM Plex Mono',monospace;
   font-size:.7rem;color:var(--paper-dim);
 }
-.aula-linha:hover{background:var(--ink)}
-.aula-marca{color:var(--phosphor);font-size:.8rem}
-.aula-num{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--phosphor-dim)}
-.aula-linha.feita .aula-tit{color:var(--paper-dim)}
+.lesson-row:hover{background:var(--ink)}
+.lesson-mark{color:var(--phosphor);font-size:.8rem}
+.lesson-num{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--phosphor-dim)}
+.lesson-row.done .lesson-tit{color:var(--paper-dim)}
 
 /* ---------- the lesson, now in sections ---------- */
 /* one width for the whole screen, and every child inherits it by being a child
    — none of them declares a width of its own */
-.tela-aula{max-width:var(--tela)}
-.aula-cabeca{display:flex;flex-direction:column;gap:12px}
+.view-lesson{max-width:var(--screen)}
+.lesson-head{display:flex;flex-direction:column;gap:12px}
 
 /* The steps are the lesson's spine: where I am among the sections and how much
    is left. They WRAP onto several lines instead of scrolling horizontally —
    unlike the vitrine's rows, which scroll because there height is the scarce
    resource and there are arrows to navigate with. Here there are no arrows, and
    a scrollable row with no affordance hides the last section without warning:
-   which is what happened to "Como escolher", the fifth in the hosting topic,
+   which is what happened to "How to choose", the fifth in the hosting topic,
    that simply did not show up. */
-.passos{display:flex;flex-wrap:wrap;gap:6px}
-.passo{
+.steps{display:flex;flex-wrap:wrap;gap:6px}
+.step{
   flex:0 0 auto;display:flex;align-items:center;gap:7px;max-width:230px;
   padding:7px 11px;border:1px solid var(--wire);border-radius:4px;
   color:var(--paper-dim);font-size:.8rem;transition:border-color .15s,color .15s;
 }
-.passo:hover{border-color:var(--phosphor-dim);color:var(--paper)}
-.passo.on{border-color:var(--phosphor);color:var(--phosphor);background:var(--panel)}
-.passo.feito .passo-n{color:var(--phosphor)}
-.passo.feito:not(.on) .passo-tit{color:var(--paper-dim)}
-.passo-n{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--phosphor-dim)}
-.passo-tit{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.passo-aval{border-style:dashed}
+.step:hover{border-color:var(--phosphor-dim);color:var(--paper)}
+.step.on{border-color:var(--phosphor);color:var(--phosphor);background:var(--panel)}
+.step.done .step-n{color:var(--phosphor)}
+.step.done:not(.on) .step-title{color:var(--paper-dim)}
+.step-n{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--phosphor-dim)}
+.step-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.step-assessment{border-style:dashed}
 
-.secao-titulo{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.1rem,2.2vw,1.4rem);line-height:1.2}
+.section-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.1rem,2.2vw,1.4rem);line-height:1.2}
 
 /* PROSE IS NOT A CARD.
 
@@ -531,11 +531,11 @@ body.sem-trilho .trilho{display:none}
    something other than prose" — which it could not say while it lived inside
    another frame.
 
-   PROSE NO LONGER HAS A CEILING OF ITS OWN — it goes to `--tela`, like
+   PROSE NO LONGER HAS A CEILING OF ITS OWN — it goes to `--screen`, like
    everything else.
 
    It used to have `max-width:68ch`, the classic line limit for long reading.
-   The effect was that, at `--amplo`, the paragraph stopped at 605px while the
+   The effect was that, at `--wide`, the paragraph stopped at 605px while the
    player and the example beside it went to 1074 — the same left margin and
    three right margins, which is the misalignment from the other end.
 
@@ -543,13 +543,13 @@ body.sem-trilho .trilho{display:none}
    comfortable 68. It was a choice between two defects, and alignment won; if
    the long line turns out to hurt reading, the ceiling comes back in `ch` and
    what is lost is the alignment on the right, not the one on the left. */
-.aula-texto{
+.lesson-text{
   gap:0;background:none;border:0;border-radius:0;padding:0;
 }
-.aula-texto p{line-height:1.72;margin-bottom:14px}
-.aula-texto p:last-child{margin-bottom:0}
-.aula-texto strong{color:var(--paper)}
-.aula-texto code{
+.lesson-text p{line-height:1.72;margin-bottom:14px}
+.lesson-text p:last-child{margin-bottom:0}
+.lesson-text strong{color:var(--paper)}
+.lesson-text code{
   font-family:'IBM Plex Mono',monospace;font-size:.86em;
   background:var(--ink);padding:1px 5px;border-radius:3px;color:var(--phosphor);
 }
@@ -562,33 +562,33 @@ body.sem-trilho .trilho{display:none}
    background drawing that was tried and discarded — the rectangle ate half of
    it. The drawing went away, the fix stays: a box behind a line of code was a
    mistake either way. */
-.aula-texto pre code{
+.lesson-text pre code{
   background:none;padding:0;border-radius:0;color:inherit;font-size:inherit;
 }
 /* The prose's code block is the same component the exercises use: a long line
    scrolls inside the box instead of being folded — code does not wrap for
    reading comfort. */
-.prosa-cod{margin:0 0 16px;max-width:100%}
-.prosa-cod .cod{font-size:.8rem}
-.prosa-lista{display:flex;flex-direction:column;gap:8px;margin:0 0 14px;padding-left:18px}
-.prosa-lista li{list-style:'› ';padding-left:5px;line-height:1.6;color:var(--paper-dim)}
-.prosa-lista li strong{color:var(--paper)}
+.prose-code{margin:0 0 16px;max-width:100%}
+.prose-code .code{font-size:.8rem}
+.prose-list{display:flex;flex-direction:column;gap:8px;margin:0 0 14px;padding-left:18px}
+.prose-list li{list-style:'› ';padding-left:5px;line-height:1.6;color:var(--paper-dim)}
+.prose-list li strong{color:var(--paper)}
 
-.aval-intro{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--paper-dim)}
+.assessment-intro{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--paper-dim)}
 /* The assessment exists in every lesson, but not every one has exercises yet.
    The dashed border says "this is reserved" without pretending there is already
    something to do. */
-.passo-aval{border-style:dashed}
-.passo-pendente{opacity:.55}
-.passo-pendente:hover{opacity:1}
-.aval-pendente{border-style:dashed}
-.pe-nota{font-size:.72rem}
-.trilho-secao.pendente{opacity:.6}
-.trilho-secao.pendente:hover{opacity:1}
-.retomar-onde{font-size:.68rem}
-.migalhas{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
-.migalhas a{color:var(--phosphor)}
-.aula-titulo{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.3rem,2.8vw,1.8rem);line-height:1.18}
+.step-assessment{border-style:dashed}
+.step-pending{opacity:.55}
+.step-pending:hover{opacity:1}
+.assessment-pending{border-style:dashed}
+.foot-note{font-size:.72rem}
+.rail-section.pending{opacity:.6}
+.rail-section.pending:hover{opacity:1}
+.resume-where{font-size:.68rem}
+.crumbs{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
+.crumbs a{color:var(--phosphor)}
+.lesson-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.3rem,2.8vw,1.8rem);line-height:1.18}
 
 /* TWO SHAPES OF SECTION, AND THE LAYOUT FOLLOWS THE SHAPE.
 
@@ -604,12 +604,12 @@ body.sem-trilho .trilho{display:none}
    flattens it, and the video inside stretches. By limiting the width, the 16/9
    ratio derives the height, and in a short window the player ends up smaller
    than the rest of the lesson instead of deformed. */
-.aula-com-video .video-fachada{
+.lesson-with-video .video-facade{
   --video-alt:min(64vh, calc(100vh - 300px));
   width:min(100%, calc(var(--video-alt) * 16 / 9));
 }
 
-.video-fachada{
+.video-facade{
   position:relative;aspect-ratio:16/9;
   border-radius:6px;overflow:hidden;cursor:pointer;
   background:var(--panel);border:1px solid var(--wire);
@@ -618,44 +618,44 @@ body.sem-trilho .trilho{display:none}
 /* The duration in the corner of the player, as everywhere else that has video:
    it answers "is there time right now?", which is the question one asks before
    hitting play. */
-.video-duracao{
+.video-duration{
   position:absolute;right:12px;bottom:12px;
   font-size:.68rem;letter-spacing:.06em;
   background:rgba(0,0,0,.62);color:#fff;border-radius:3px;padding:3px 7px;
 }
-.video-fachada iframe{width:100%;height:100%;border:0}
+.video-facade iframe{width:100%;height:100%;border:0}
 .video-play{
   width:60px;height:60px;border-radius:50%;background:var(--phosphor);color:var(--ink);
   font-size:1.3rem;display:grid;place-items:center;
 }
-.video-breve{font-size:.8rem}
+.video-soon{font-size:.8rem}
 
-.aula-texto{min-height:0}
+.lesson-text{min-height:0}
 /* Without the box, the text needs breathing room of its own on top — that space
    used to be the card's `padding`. */
-.aula-texto>*:first-child{margin-top:6px}
-.conta-ex{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--phosphor)}
-.lista-ex{display:flex;flex-direction:column;gap:16px}
+.lesson-text>*:first-child{margin-top:6px}
+.account-ex{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--phosphor)}
+.ex-list{display:flex;flex-direction:column;gap:16px}
 
-.aula-pe{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--wire)}
+.lesson-foot{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--wire)}
 /* THE NAVIGATION ARROWS MOVE TO THE SIDES on a wide screen. The lesson is
    pinned to one column, so there is space to spare on the sides and space
    missing vertically — and every pixel spent below is text pushed past the
    fold. */
-.lado-seta{display:none}
+.side-arrow{display:none}
 
 /* THE ARROWS LIVE IN THE SCREEN'S LEFTOVER, not glued to the text.
 
-   The lesson is at most `--tela` wide and is centred in the area the rail
+   The lesson is at most `--screen` wide and is centred in the area the rail
    leaves. What remains on both sides — the "gap" — is space no content uses,
    and it is exactly where a navigation control belongs: close enough to be
    reached, far enough not to fight for the line with the word being read.
 
-     gap on each side = (100vw - trilho - tela) / 2
+     gap on each side = (100vw - rail - view) / 2
      left arrow   → centred in the gap between the rail and the column
      right arrow  → centred in the gap between the column and the screen edge
 
-   It is `--tela`, and not `--leitura`: when the lesson widens the gap shrinks,
+   It is `--screen`, and not `--reading`: when the lesson widens the gap shrinks,
    and an arrow positioned by the narrow column would sit on top of the wide
    one's content.
 
@@ -664,62 +664,62 @@ body.sem-trilho .trilho{display:none}
    100px — enough for a 44px arrow with slack on both sides. Below that there is
    no gap, and the footer is the right place again. It never stopped existing. */
 @media(min-width:1400px){
-  .lado-seta{
+  .side-arrow{
     display:grid;place-items:center;position:fixed;top:50%;
     width:44px;height:44px;border-radius:50%;z-index:60;
     background:var(--panel);border:1px solid var(--wire);color:var(--paper-dim);
     transition:color .15s,border-color .15s,background .15s;
   }
-  .lado-seta:hover{color:var(--phosphor);border-color:var(--phosphor);background:var(--ink)}
-  .lado-seta svg{width:20px;height:20px}
-  .lado-esq{
-    left:calc(var(--trilho) + (100vw - var(--trilho) - var(--tela)) / 4);
+  .side-arrow:hover{color:var(--phosphor);border-color:var(--phosphor);background:var(--ink)}
+  .side-arrow svg{width:20px;height:20px}
+  .side-left{
+    left:calc(var(--rail) + (100vw - var(--rail) - var(--screen)) / 4);
     transform:translate(-50%,-50%);
   }
-  .lado-dir{
-    right:calc((100vw - var(--trilho) - var(--tela)) / 4);
+  .side-right{
+    right:calc((100vw - var(--rail) - var(--screen)) / 4);
     transform:translate(50%,-50%);
   }
   /* with the arrows at the sides the whole footer goes away: it only repeated
      the same two routes, and repeating costs the height the arrows went there
      to save */
-  .aula-pe{display:none}
+  .lesson-foot{display:none}
 
 }
 
 /* ---------- the assessment wizard ---------- */
 .wizard{display:flex;flex-direction:column;gap:14px}
-.wz-topo{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
-.wz-conta{
+.wz-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.wz-count{
   font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.1em;
   text-transform:uppercase;color:var(--phosphor-dim);
 }
-.wz-pontos{display:flex;flex-wrap:wrap;gap:5px}
-.wz-ponto{
+.wz-dots{display:flex;flex-wrap:wrap;gap:5px}
+.wz-dot{
   width:26px;height:26px;border-radius:50%;cursor:pointer;
   background:none;border:1px solid var(--wire);color:var(--paper-dim);
   font-family:'IBM Plex Mono',monospace;font-size:.68rem;
   transition:border-color .15s,color .15s;
 }
-.wz-ponto:hover{border-color:var(--phosphor-dim);color:var(--paper)}
-.wz-ponto.on{border-color:var(--phosphor);color:var(--phosphor)}
-.wz-ponto.certo{background:rgba(91,140,255,.16);border-color:var(--phosphor-dim);color:var(--phosphor)}
-.wz-ponto.errado{background:rgba(255,77,94,.14);border-color:rgba(255,77,94,.5);color:var(--amber)}
-.wz-ponto.pendente{border-style:dashed}
-.wz-pe{display:flex;gap:8px;justify-content:space-between}
-.wz-pe .btn:disabled{opacity:.4;cursor:default}
+.wz-dot:hover{border-color:var(--phosphor-dim);color:var(--paper)}
+.wz-dot.on{border-color:var(--phosphor);color:var(--phosphor)}
+.wz-dot.right{background:rgba(91,140,255,.16);border-color:var(--phosphor-dim);color:var(--phosphor)}
+.wz-dot.wrong{background:rgba(255,77,94,.14);border-color:rgba(255,77,94,.5);color:var(--amber)}
+.wz-dot.pending{border-style:dashed}
+.wz-foot{display:flex;gap:8px;justify-content:space-between}
+.wz-foot .btn:disabled{opacity:.4;cursor:default}
 
-.wz-resultado{
+.wz-result{
   display:flex;flex-direction:column;gap:10px;align-items:flex-start;
   padding:22px;border:1px solid var(--wire);border-radius:6px;background:var(--ink);
 }
-.wz-res-rot{
+.wz-res-label{
   font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.12em;
   text-transform:uppercase;color:var(--phosphor);
 }
-.wz-res-nota{font-family:'Space Grotesk',sans-serif;font-size:1.6rem}
-.wz-res-nota strong{color:var(--phosphor)}
-.wz-res-obs{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--paper-dim)}
+.wz-res-score{font-family:'Space Grotesk',sans-serif;font-size:1.6rem}
+.wz-res-score strong{color:var(--phosphor)}
+.wz-res-note{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--paper-dim)}
 
 /* ==========================================================
    5 · EXERCISES — the seven types
@@ -729,121 +729,121 @@ body.sem-trilho .trilho{display:none}
   background:var(--ink);border:1px solid var(--wire);border-radius:6px;
   padding:16px 18px;display:flex;flex-direction:column;gap:12px;
 }
-.ex-topo{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-.ex-tipo,.ex-dif{
+.ex-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.ex-type,.ex-difficulty{
   font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.08em;
   text-transform:uppercase;padding:3px 7px;border-radius:3px;border:1px solid var(--wire);
 }
-.ex-tipo{color:var(--phosphor);border-color:var(--phosphor-dim)}
-.ex-dif{color:var(--paper-dim)}
+.ex-type{color:var(--phosphor);border-color:var(--phosphor-dim)}
+.ex-difficulty{color:var(--paper-dim)}
 
-.ex-enunciado{font-size:.95rem;line-height:1.6}
-.ex-instrucao{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
-.ex-rotulo{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
-.ex-nota{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--paper-dim)}
-.ex-nota-dom{color:var(--phosphor-dim)}
-.ex-nota-aviso{color:var(--amber)}
-.ex-erro{color:var(--amber);font-family:'IBM Plex Mono',monospace;font-size:.8rem}
+.ex-prompt{font-size:.95rem;line-height:1.6}
+.ex-instruction{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
+.ex-label{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
+.ex-note{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--paper-dim)}
+.ex-note-domain{color:var(--phosphor-dim)}
+.ex-note-warn{color:var(--amber)}
+.ex-error{color:var(--amber);font-family:'IBM Plex Mono',monospace;font-size:.8rem}
 .ex code{font-family:'IBM Plex Mono',monospace;font-size:.86em;background:var(--panel);padding:1px 5px;border-radius:3px}
 
-.ex-corpo{display:flex;flex-direction:column;gap:10px}
-.ex-campo{
+.ex-body{display:flex;flex-direction:column;gap:10px}
+.ex-field{
   width:100%;background:var(--panel);border:1px solid var(--wire);border-radius:4px;
   padding:10px 12px;color:var(--paper);font:inherit;resize:vertical;
 }
-.ex-campo.mono{font-family:'IBM Plex Mono',monospace;font-size:.84rem;line-height:1.5}
-.ex-campo:focus{outline:none;border-color:var(--phosphor)}
-.ex-campo.campo-certo{border-color:var(--phosphor)}
-.ex-campo.campo-errado{border-color:var(--amber)}
+.ex-field.mono{font-family:'IBM Plex Mono',monospace;font-size:.84rem;line-height:1.5}
+.ex-field:focus{outline:none;border-color:var(--phosphor)}
+.ex-field.field-right{border-color:var(--phosphor)}
+.ex-field.field-wrong{border-color:var(--amber)}
 
-.ex-dica{border-top:1px dashed var(--wire);padding-top:10px}
-.ex-dica summary{cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--phosphor)}
-.ex-dica p{margin-top:8px;font-size:.88rem;color:var(--paper-dim);line-height:1.55}
+.ex-hint{border-top:1px dashed var(--wire);padding-top:10px}
+.ex-hint summary{cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--phosphor)}
+.ex-hint p{margin-top:8px;font-size:.88rem;color:var(--paper-dim);line-height:1.55}
 
-.ex-acoes{display:flex;gap:8px;flex-wrap:wrap}
-.ex-veredito:empty{display:none}
-.ex-veredito{font-family:'IBM Plex Mono',monospace;font-size:.78rem;padding:9px 11px;border-radius:4px;border:1px solid var(--wire)}
-.v-certo{color:var(--phosphor);border-color:var(--phosphor-dim);background:rgba(91,140,255,.07)}
-.v-errado{color:var(--amber);border-color:rgba(255,77,94,.35)}
-.v-pendente,.v-vazio,.v-esperando,.v-antigo{color:var(--paper-dim)}
-.v-armadilha{display:block;margin-top:8px;color:var(--paper-dim);font-family:'IBM Plex Sans',sans-serif;font-size:.85rem;line-height:1.5}
+.ex-actions{display:flex;gap:8px;flex-wrap:wrap}
+.ex-verdict:empty{display:none}
+.ex-verdict{font-family:'IBM Plex Mono',monospace;font-size:.78rem;padding:9px 11px;border-radius:4px;border:1px solid var(--wire)}
+.v-right{color:var(--phosphor);border-color:var(--phosphor-dim);background:rgba(91,140,255,.07)}
+.v-wrong{color:var(--amber);border-color:rgba(255,77,94,.35)}
+.v-pending,.v-empty,.v-waiting,.v-old{color:var(--paper-dim)}
+.v-trap{display:block;margin-top:8px;color:var(--paper-dim);font-family:'IBM Plex Sans',sans-serif;font-size:.85rem;line-height:1.5}
 
 /* ---------- choices (quiz and multiple choice) ---------- */
-.alts{display:flex;flex-direction:column;gap:7px}
-.alt{
+.choices{display:flex;flex-direction:column;gap:7px}
+.choice{
   display:grid;grid-template-columns:16px 1fr;align-items:start;gap:10px;
   padding:11px 13px;border:1px solid var(--wire);border-radius:5px;cursor:pointer;
   transition:border-color .15s,background .15s;
 }
-.alt:hover{border-color:var(--phosphor-dim)}
-.alt input{grid-row:1;appearance:none;width:0;height:0;position:absolute;opacity:0}
-.alt-marca{grid-row:1;width:15px;height:15px;margin-top:3px;border:1px solid var(--wire);border-radius:50%;position:relative}
-.ex-multiple-choice .alt-marca{border-radius:3px}
-.alt input:checked ~ .alt-marca{border-color:var(--phosphor)}
-.alt input:checked ~ .alt-marca::after{
+.choice:hover{border-color:var(--phosphor-dim)}
+.choice input{grid-row:1;appearance:none;width:0;height:0;position:absolute;opacity:0}
+.choice-mark{grid-row:1;width:15px;height:15px;margin-top:3px;border:1px solid var(--wire);border-radius:50%;position:relative}
+.ex-multiple-choice .choice-mark{border-radius:3px}
+.choice input:checked ~ .choice-mark{border-color:var(--phosphor)}
+.choice input:checked ~ .choice-mark::after{
   content:'';position:absolute;inset:3px;border-radius:inherit;background:var(--phosphor);
 }
-.alt-txt{grid-column:2;font-size:.9rem;line-height:1.5}
-.alt-porque{
+.choice-text{grid-column:2;font-size:.9rem;line-height:1.5}
+.choice-why{
   grid-column:2;font-size:.82rem;color:var(--paper-dim);line-height:1.5;
   padding-top:7px;margin-top:5px;border-top:1px dashed var(--wire);
 }
-.alt-certa{border-color:var(--phosphor);background:rgba(91,140,255,.07)}
-.alt-errada{border-color:var(--amber);background:rgba(255,77,94,.06)}
-.alt-perdida{border-style:dashed}
+.choice-right{border-color:var(--phosphor);background:rgba(91,140,255,.07)}
+.choice-wrong{border-color:var(--amber);background:rgba(255,77,94,.06)}
+.choice-missed{border-style:dashed}
 
 /* ---------- ordering ---------- */
-.ord{display:flex;flex-direction:column;gap:6px;counter-reset:passo;list-style:none}
+.ord{display:flex;flex-direction:column;gap:6px;counter-reset:step;list-style:none}
 .ord-item{
   display:grid;grid-template-columns:16px 1fr auto;align-items:center;gap:10px;
   padding:10px 12px;border:1px solid var(--wire);border-radius:5px;background:var(--panel);
   cursor:grab;
 }
-.ord-item.arrastando{opacity:.45;border-style:dashed}
-.ord-item::before{counter-increment:passo}
-.ord-pega{color:var(--phosphor-dim);font-size:.9rem}
-.ord-txt{font-size:.88rem;line-height:1.45}
-.ord-setas{display:flex;flex-direction:column;gap:2px}
-.ord-seta{
+.ord-item.dragging{opacity:.45;border-style:dashed}
+.ord-item::before{counter-increment:step}
+.ord-grip{color:var(--phosphor-dim);font-size:.9rem}
+.ord-text{font-size:.88rem;line-height:1.45}
+.ord-arrows{display:flex;flex-direction:column;gap:2px}
+.ord-arrow{
   width:24px;height:18px;display:grid;place-items:center;border-radius:3px;
   background:none;border:1px solid var(--wire);color:var(--paper-dim);cursor:pointer;
 }
-.ord-seta svg{width:13px;height:13px}
-.ord-pega svg{width:14px;height:14px;display:block}
-.ord-seta:hover:not(:disabled){border-color:var(--phosphor);color:var(--phosphor)}
-.ord-seta:disabled{opacity:.35}
-.ord-certo{border-color:var(--phosphor)}
-.ord-errado{border-color:var(--amber)}
+.ord-arrow svg{width:13px;height:13px}
+.ord-grip svg{width:14px;height:14px;display:block}
+.ord-arrow:hover:not(:disabled){border-color:var(--phosphor);color:var(--phosphor)}
+.ord-arrow:disabled{opacity:.35}
+.ord-right{border-color:var(--phosphor)}
+.ord-wrong{border-color:var(--amber)}
 
 /* ---------- matching: tiles, in place of the selects ---------- */
-.assoc-colunas{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
-.assoc-col{display:flex;flex-direction:column;gap:7px}
-.ficha{
+.matching-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.matching-col{display:flex;flex-direction:column;gap:7px}
+.tile{
   text-align:left;padding:10px 12px;border-radius:5px;cursor:pointer;
   background:var(--panel);border:1px solid var(--wire);color:var(--paper);
   font:inherit;font-size:.86rem;line-height:1.35;
   transition:border-color .15s,background .15s,transform .12s;
 }
-.ficha:hover:not(:disabled){border-color:var(--phosphor-dim)}
-.ficha.sel{border-color:var(--phosphor);background:rgba(91,140,255,.1)}
-.ficha-certa{border-color:var(--phosphor);background:rgba(91,140,255,.08);opacity:.65;cursor:default}
-.ficha-errada{border-color:var(--amber);background:rgba(255,77,94,.1)}
-.ficha.tremendo{animation:shake .3s}
+.tile:hover:not(:disabled){border-color:var(--phosphor-dim)}
+.tile.sel{border-color:var(--phosphor);background:rgba(91,140,255,.1)}
+.tile-right{border-color:var(--phosphor);background:rgba(91,140,255,.08);opacity:.65;cursor:default}
+.tile-wrong{border-color:var(--amber);background:rgba(255,77,94,.1)}
+.tile.shaking{animation:shake .3s}
 @keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
-.assoc-conta{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
-.assoc-erros{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--amber);margin-top:8px}
+.matching-count{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
+.matching-errors{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--amber);margin-top:8px}
 
 /* ---------- code and expected output ---------- */
-.cod-bloco{border:1px solid var(--wire);border-radius:5px;overflow:hidden;background:var(--panel)}
+.code-block{border:1px solid var(--wire);border-radius:5px;overflow:hidden;background:var(--panel)}
 /* The bar became a row: the language on the left, the copy button on the right.
    It is `min-height` and not a fixed height because the language may be absent —
    the bar still has to hold the button at the same size either way. */
-.cod-barra{
+.code-bar{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding:3px 5px 3px 11px;min-height:28px;
   border-bottom:1px solid var(--wire);background:var(--ink);
 }
-.cod-ling{font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
+.code-lang{font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
 
 /* THE COPY BUTTON IS QUIET UNTIL IT IS WANTED. It sits at ~55% opacity and
    comes up to full on hover or focus anywhere in the block — present enough to
@@ -851,49 +851,49 @@ body.sem-trilho .trilho{display:none}
    what the eye goes to. It never hides completely: a control that appears only
    on hover does not exist on a touch screen, and the phone is where copying a
    snippet is most annoying to do by hand. */
-.cod-copiar{
+.code-copy{
   flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;
   background:none;border:0;border-radius:4px;padding:0;cursor:pointer;
   color:var(--paper-dim);opacity:.55;
   transition:opacity .15s,color .15s,background .15s;
 }
-.cod-copiar svg{width:15px;height:15px}
-.cod-bloco:hover .cod-copiar,.exemplo:hover .cod-copiar,.cod-copiar:focus-visible{opacity:1}
-.cod-copiar:hover{color:var(--phosphor);background:var(--panel)}
-.cod-copiar:focus-visible{outline:2px solid var(--phosphor);outline-offset:1px}
+.code-copy svg{width:15px;height:15px}
+.code-block:hover .code-copy,.example:hover .code-copy,.code-copy:focus-visible{opacity:1}
+.code-copy:hover{color:var(--phosphor);background:var(--panel)}
+.code-copy:focus-visible{outline:2px solid var(--phosphor);outline-offset:1px}
 /* Copied is the brand's green; failed is the amber the portal already uses for
    "this did not go well". Both hold for a moment and then let go — see copy.js */
-.cod-copiar.copiado{opacity:1;color:var(--phosphor)}
-.cod-copiar.falhou{opacity:1;color:var(--amber)}
-.cod{
+.code-copy.copied{opacity:1;color:var(--phosphor)}
+.code-copy.failed{opacity:1;color:var(--amber)}
+.code{
   padding:12px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;font-size:.82rem;line-height:1.55;
   scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
 }
-.cod-editor .ex-campo{border:0;border-radius:0;background:var(--panel)}
-.cod-area{
+.code-editor .ex-field{border:0;border-radius:0;background:var(--panel)}
+.code-area{
   min-height:180px;white-space:pre;overflow-wrap:normal;overflow-x:auto;
   scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
 }
 
-.casos{display:flex;flex-direction:column;gap:10px;padding-top:4px}
-.casos-tit{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
-.caso{border:1px solid var(--wire);border-radius:5px;padding:10px 12px;display:flex;flex-direction:column;gap:7px}
-.caso-desc{font-size:.82rem;color:var(--paper-dim)}
-.caso-io{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
-.caso-rot{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
-.caso .cod{padding:8px;background:var(--panel);border-radius:4px;margin-top:4px}
+.cases{display:flex;flex-direction:column;gap:10px;padding-top:4px}
+.cases-title{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
+.case{border:1px solid var(--wire);border-radius:5px;padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.case-desc{font-size:.82rem;color:var(--paper-dim)}
+.case-io{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.case-label{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
+.case .code{padding:8px;background:var(--panel);border-radius:4px;margin-top:4px}
 
 /* ---------- expression answer ---------- */
-.expr-origem{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.expr-rot{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
-.expr-cod{font-family:'IBM Plex Mono',monospace;font-size:.95rem;color:var(--phosphor);background:var(--panel);padding:5px 10px;border-radius:4px}
+.expr-origin{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.expr-label{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--phosphor-dim)}
+.expr-code{font-family:'IBM Plex Mono',monospace;font-size:.95rem;color:var(--phosphor);background:var(--panel);padding:5px 10px;border-radius:4px}
 
 /* ==========================================================
    6 · SEARCH, PERFORMANCE AND NOTES
    ========================================================== */
 
 /* ---------- the ⌘K panel ---------- */
-.busca-veu{
+.search-veil{
   position:fixed;inset:0;z-index:200;
   background:rgba(10,14,20,.72);backdrop-filter:blur(3px);
   display:flex;justify-content:center;align-items:flex-start;
@@ -901,21 +901,21 @@ body.sem-trilho .trilho{display:none}
      shortcut */
   padding:12vh 20px 20px;
 }
-body.com-busca{overflow:hidden}
-.busca-caixa{
+body.with-search{overflow:hidden}
+.search-box{
   width:min(680px,100%);max-height:76vh;display:flex;flex-direction:column;
   background:var(--panel);border:1px solid var(--wire);border-radius:8px;overflow:hidden;
   box-shadow:0 24px 60px -20px rgba(0,0,0,.6);
 }
-.busca-topo{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--wire)}
-.busca-lupa{display:grid;place-items:center;color:var(--phosphor-dim)}
-.busca-lupa svg{width:18px;height:18px}
-.busca-campo{
+.search-top{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--wire)}
+.search-glass{display:grid;place-items:center;color:var(--phosphor-dim)}
+.search-glass svg{width:18px;height:18px}
+.search-field{
   flex:1 1 auto;min-width:0;background:none;border:0;color:var(--paper);
   font:inherit;font-size:1rem;outline:none;
 }
-.busca-campo::-webkit-search-cancel-button{display:none}
-.busca-res{
+.search-field::-webkit-search-cancel-button{display:none}
+.search-res{
   overflow-y:auto;padding:6px;
   scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
 }
@@ -923,15 +923,15 @@ body.com-busca{overflow:hidden}
    only thing in the list that is not a result — it is the divider between them.
    In blue it blended with each item's context, which is also blue and also
    monospaced, and the list became a single column. */
-.busca-grupo{
+.search-group{
   padding:12px 12px 5px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;
   letter-spacing:.14em;text-transform:uppercase;color:var(--amber);
 }
-.busca-item{
+.search-item{
   display:flex;flex-direction:column;gap:3px;width:100%;text-align:left;
   padding:9px 12px;border-radius:5px;background:none;border:0;cursor:pointer;font:inherit;
 }
-.busca-item.on{background:var(--ink);box-shadow:inset 2px 0 0 var(--phosphor)}
+.search-item.on{background:var(--ink);box-shadow:inset 2px 0 0 var(--phosphor)}
 .bi-tit{
   color:var(--paper);font-size:.9rem;line-height:1.3;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
@@ -941,12 +941,12 @@ body.com-busca{overflow:hidden}
   font-size:.78rem;color:var(--paper-dim);line-height:1.4;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-.busca-dica{padding:26px 14px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--paper-dim)}
-.busca-pe{
+.search-hint{padding:26px 14px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--paper-dim)}
+.search-foot{
   display:flex;gap:16px;padding:9px 16px;border-top:1px solid var(--wire);
   font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--paper-dim);
 }
-.busca-pe kbd{
+.search-foot kbd{
   display:inline-block;padding:1px 5px;margin-right:3px;border-radius:3px;
   border:1px solid var(--wire);background:var(--ink);font-family:inherit;font-size:.9em;
 }
@@ -956,50 +956,50 @@ body.com-busca{overflow:hidden}
    used to be the other way round, and the result was a name adrift on the left
    and a short dash half a metre away from it, on the other side of the
    screen. */
-.dsp-linha{display:grid;grid-template-columns:minmax(0,210px) minmax(0,1fr) auto;align-items:center;gap:14px}
-.dsp-rot{font-size:.86rem;color:var(--paper);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dsp-num{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
-.dsp-errados{display:flex;flex-direction:column;gap:1px;list-style:none;padding:0}
-.dsp-errados a{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:4px}
-.dsp-errados a:hover{background:var(--ink)}
-.de-tipo{
+.perf-row{display:grid;grid-template-columns:minmax(0,210px) minmax(0,1fr) auto;align-items:center;gap:14px}
+.perf-label{font-size:.86rem;color:var(--paper);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.perf-num{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
+.perf-wrong{display:flex;flex-direction:column;gap:1px;list-style:none;padding:0}
+.perf-wrong a{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:4px}
+.perf-wrong a:hover{background:var(--ink)}
+.de-type{
   font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;
   text-transform:uppercase;color:var(--amber);
 }
-.de-enunciado{font-size:.88rem;line-height:1.4;color:var(--paper)}
-.de-onde{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--phosphor-dim)}
+.de-prompt{font-size:.88rem;line-height:1.4;color:var(--paper)}
+.de-where{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--phosphor-dim)}
 
 /* ---------- notes ---------- */
-.nota{border-top:1px dashed var(--wire);padding-top:12px;margin-top:2px}
-.nota summary{
+.note{border-top:1px dashed var(--wire);padding-top:12px;margin-top:2px}
+.note summary{
   cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--phosphor);
   list-style:none;
 }
-.nota summary::-webkit-details-marker{display:none}
-.nota-campo{
+.note summary::-webkit-details-marker{display:none}
+.note-field{
   width:100%;margin-top:10px;padding:11px 13px;border-radius:5px;resize:vertical;
   background:var(--panel);border:1px solid var(--wire);color:var(--paper);
   font:inherit;font-size:.9rem;line-height:1.6;
 }
-.nota-campo:focus{outline:none;border-color:var(--phosphor)}
-.nota-estado{display:block;margin-top:6px;font-size:.68rem;min-height:1em}
+.note-field:focus{outline:none;border-color:var(--phosphor)}
+.note-status{display:block;margin-top:6px;font-size:.68rem;min-height:1em}
 
-.nota-item{display:flex;flex-direction:column;gap:5px;padding:12px 0;border-top:1px solid var(--wire)}
-.nota-item:first-of-type{border-top:0}
-.nota-onde{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--phosphor)}
-.nota-texto{font-size:.9rem;line-height:1.6;color:var(--paper-dim);white-space:pre-wrap}
+.note-item{display:flex;flex-direction:column;gap:5px;padding:12px 0;border-top:1px solid var(--wire)}
+.note-item:first-of-type{border-top:0}
+.note-where{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--phosphor)}
+.note-text{font-size:.9rem;line-height:1.6;color:var(--paper-dim);white-space:pre-wrap}
 
 /* ==========================================================
    7 · SIGN IN, CERTIFICATES, ACCOUNT
    ========================================================== */
 
-.tela-entrar{min-height:calc(100vh - 130px);display:grid;place-items:center;max-width:none}
-.entrar-caixa{width:min(420px,100%);border:1px solid var(--wire);border-radius:6px;background:var(--panel);overflow:hidden}
-.entrar-corpo{padding:22px 24px 26px;display:flex;flex-direction:column;gap:14px}
-.entrar-corpo h1{font-family:'Space Grotesk',sans-serif;font-size:1.3rem}
-.entrar-sub{font-size:.88rem;color:var(--paper-dim)}
-.entrar-corpo form{display:flex;flex-direction:column;gap:14px}
-.entrar-aviso{font-size:.68rem}
+.view-signin{min-height:calc(100vh - 130px);display:grid;place-items:center;max-width:none}
+.signin-box{width:min(420px,100%);border:1px solid var(--wire);border-radius:6px;background:var(--panel);overflow:hidden}
+.signin-body{padding:22px 24px 26px;display:flex;flex-direction:column;gap:14px}
+.signin-body h1{font-family:'Space Grotesk',sans-serif;font-size:1.3rem}
+.signin-sub{font-size:.88rem;color:var(--paper-dim)}
+.signin-body form{display:flex;flex-direction:column;gap:14px}
+.signin-notice{font-size:.68rem}
 
 /* ---------- the certificate ----------
 
@@ -1016,7 +1016,7 @@ body.com-busca{overflow:hidden}
   padding:9px;transition:border-color .2s;
 }
 .cert:hover{border-color:var(--phosphor-dim)}
-.cert-folha{
+.cert-sheet{
   border:1px solid var(--wire);border-radius:2px;
   padding:26px 30px 16px;
   display:flex;flex-direction:column;gap:22px;min-height:250px;
@@ -1025,54 +1025,54 @@ body.com-busca{overflow:hidden}
     radial-gradient(120% 90% at 100% 0%, rgba(126,231,135,.05), transparent 55%),
     radial-gradient(90% 80% at 0% 100%, rgba(126,231,135,.035), transparent 60%);
 }
-.cert-topo{display:flex;align-items:center;justify-content:space-between;gap:14px}
-.cert-marca{
+.cert-top{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.cert-brand{
   display:flex;align-items:center;gap:8px;
   font-family:'Space Grotesk',sans-serif;font-size:.82rem;letter-spacing:.06em;
   text-transform:uppercase;color:var(--paper);
 }
 /* the negative indent eats the `letter-spacing` left over after the "l" and
    glues the ".ing" to the brand — without it one reads "CODESCHOOL .ING" */
-.cert-marca b{font-weight:400;color:var(--phosphor);margin-left:-.06em}
+.cert-brand b{font-weight:400;color:var(--phosphor);margin-left:-.06em}
 .cert-led{
   width:7px;height:7px;border-radius:50%;background:var(--phosphor);
   box-shadow:0 0 8px var(--phosphor);
 }
-.cert-tipo,.cert-selo{
+.cert-type,.cert-seal{
   font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.16em;
   text-transform:uppercase;color:var(--paper-dim);
   border:1px solid var(--wire);border-radius:3px;padding:3px 8px;
 }
 
-.cert-miolo{display:flex;flex-direction:column;gap:6px;flex:1;justify-content:center}
-.cert-frase{
+.cert-body{display:flex;flex-direction:column;gap:6px;flex:1;justify-content:center}
+.cert-line{
   font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.1em;
   color:var(--paper-dim);
 }
 /* The name of whoever receives it is the largest element of the document. It is
    what that person looks for first on opening it, and what the other person
    reads on receiving it. */
-.cert-aluno{
+.cert-student{
   font-family:'Space Grotesk',sans-serif;font-size:clamp(1.4rem,2.6vw,1.85rem);
   line-height:1.15;color:var(--paper);margin:2px 0 12px;
 }
-.cert-curso{font-family:'Space Grotesk',sans-serif;font-size:1.06rem;line-height:1.3;color:var(--paper)}
+.cert-course{font-family:'Space Grotesk',sans-serif;font-size:1.06rem;line-height:1.3;color:var(--paper)}
 .cert-meta{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--phosphor-dim);margin-top:4px}
 
-.cert-pe{
+.cert-foot{
   display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px;
   padding-top:12px;border-top:1px solid var(--wire);
   font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--paper-dim);
 }
-.cert-codigo{letter-spacing:.1em;color:var(--phosphor-dim)}
+.cert-code{letter-spacing:.1em;color:var(--phosphor-dim)}
 
 /* The sample has to be recognisable as a sample WITHOUT being read: dashed
    frame, muted colour and a seal in place of the type. A fake certificate that
    looks like a real one is a problem — not a preview. */
-.cert-exemplo{opacity:.66}
-.cert-exemplo .cert-folha{border-style:dashed;background:none}
-.cert-exemplo .cert-led{box-shadow:none;background:var(--wire)}
-.cert-exemplo .cert-marca b{color:var(--paper-dim)}
+.cert-sample{opacity:.66}
+.cert-sample .cert-sheet{border-style:dashed;background:none}
+.cert-sample .cert-led{box-shadow:none;background:var(--wire)}
+.cert-sample .cert-brand b{color:var(--paper-dim)}
 
 /* ---------- the enlarged certificate ----------
    It is the only artefact of the portal a person wants to LOOK AT rather than
@@ -1094,37 +1094,37 @@ body.com-busca{overflow:hidden}
    "the cell". The vitrine never saw this because its content is text, which
    shrinks; the certificate has a minimum width of its own. */
 .modal{grid-template-columns:minmax(0,1fr);align-items:start;overflow-y:auto}
-.modal-pilha{
+.modal-stack{
   display:flex;flex-direction:column;gap:14px;
   width:min(1040px,100%);margin:auto 0;
 }
-.modal-acoes{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px}
-.modal-cert .modal-caixa{width:100%;background:none;border:0;box-shadow:none;overflow:visible}
+.modal-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px}
+.modal-cert .modal-box{width:100%;background:none;border:0;box-shadow:none;overflow:visible}
 /* inside the modal the certificate is the whole content: no zoom cursor, no
    hover, and with a larger body — that is what it was enlarged for */
 .modal-cert .cert{cursor:default;padding:14px}
-.modal-cert .cert-folha{min-height:min(62vh,480px);padding:46px 56px 30px;gap:30px}
-.modal-cert .cert-marca{font-size:1rem}
+.modal-cert .cert-sheet{min-height:min(62vh,480px);padding:46px 56px 30px;gap:30px}
+.modal-cert .cert-brand{font-size:1rem}
 /* `5vw` on the font + `min-height` in `vh` make the document grow along with
    the screen; on the phone the two pushed the certificate out of it. Here the
    whole enlargement goes back to the size of the list card — enlarging on a
    device where it already takes the full width has nothing to enlarge. */
-.modal-cert .cert-aluno{font-size:clamp(2.1rem,5vw,3.4rem)}
-.modal-cert .cert-curso{font-size:1.6rem}
-.modal-cert .cert-frase{font-size:.78rem}
-.modal-cert .cert-meta,.modal-cert .cert-pe{font-size:.8rem}
+.modal-cert .cert-student{font-size:clamp(2.1rem,5vw,3.4rem)}
+.modal-cert .cert-course{font-size:1.6rem}
+.modal-cert .cert-line{font-size:.78rem}
+.modal-cert .cert-meta,.modal-cert .cert-foot{font-size:.8rem}
 
 @media(max-width:640px){
   .modal{padding:12px}
   .modal-cert .cert{padding:8px}
-  .modal-cert .cert-folha{min-height:0;padding:20px 18px 14px;gap:16px}
-  .modal-cert .cert-marca{font-size:.78rem}
-  .modal-cert .cert-aluno{font-size:1.5rem}
-  .modal-cert .cert-curso{font-size:1rem}
-  .modal-cert .cert-frase{font-size:.66rem}
-  .modal-cert .cert-meta,.modal-cert .cert-pe{font-size:.66rem}
+  .modal-cert .cert-sheet{min-height:0;padding:20px 18px 14px;gap:16px}
+  .modal-cert .cert-brand{font-size:.78rem}
+  .modal-cert .cert-student{font-size:1.5rem}
+  .modal-cert .cert-course{font-size:1rem}
+  .modal-cert .cert-line{font-size:.66rem}
+  .modal-cert .cert-meta,.modal-cert .cert-foot{font-size:.66rem}
   /* the footer line stacks instead of squeezing date and code onto one line */
-  .cert-pe{flex-direction:column;gap:4px}
+  .cert-foot{flex-direction:column;gap:4px}
 }
 .cert-share{gap:8px}
 .cert-share svg{width:15px;height:15px}
@@ -1142,84 +1142,84 @@ body.com-busca{overflow:hidden}
   color:var(--linkedin);border:1px solid transparent;
   transition:background .15s,border-color .15s;
 }
-html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
+html[data-theme="light"] .cert-in{--linkedin:#0a66c2}
 .cert-in svg{width:21px;height:21px}
 .cert-in:hover{background:var(--panel);border-color:var(--linkedin)}
 /* disabled, and looking it: the button exists to say what will be there */
 .cert-in-off{opacity:.35;cursor:not-allowed}
 .cert-in-off:hover{background:none;border-color:transparent}
 
-.cert-previa{margin-top:26px;display:flex;flex-direction:column;gap:12px}
+.cert-preview{margin-top:26px;display:flex;flex-direction:column;gap:12px}
 /* the label travels next to the title, and not at the other end of the screen:
    it explains the title, and an explanation a metre away explains nothing */
-.cert-previa .bloco-topo{align-items:baseline;justify-content:flex-start;gap:14px}
+.cert-preview .block-top{align-items:baseline;justify-content:flex-start;gap:14px}
 
-.cert-falta{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
-.cert-falta li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;font-size:.9rem}
+.cert-missing{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+.cert-missing li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;font-size:.9rem}
 
-.conta-nota{font-size:.84rem;color:var(--paper-dim);line-height:1.5}
-/* `.bloco` is a flex column, and a flex column stretches its children: a loose
+.account-note{font-size:.84rem;color:var(--paper-dim);line-height:1.5}
+/* `.block` is a flex column, and a flex column stretches its children: a loose
    button inside it became an edge-to-edge strip. A button has the width of its
    label. */
-.tela-conta .bloco>.btn{align-self:flex-start}
-.conta-acao{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
-.conta-aviso{font-size:.72rem}
-.conta-aviso.bom{color:var(--phosphor)}
-.conta-aviso.ruim{color:var(--amber)}
-.tela-conta form{display:flex;flex-direction:column;gap:14px}
+.view-account .block>.btn{align-self:flex-start}
+.account-action{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.account-notice{font-size:.72rem}
+.account-notice.good{color:var(--phosphor)}
+.account-notice.bad{color:var(--amber)}
+.view-account form{display:flex;flex-direction:column;gap:14px}
 /* The password meter sits FLUSH with the field, not at the foot of the form: it
    comments on that field, and a comment far from what it comments on becomes
    decoration. */
-.senha-medida{display:flex;align-items:center;gap:10px;margin-top:7px}
-.senha-medida .barra{flex:1;max-width:220px}
-.senha-rotulo{font-size:.66rem;min-width:8ch}
+.password-meter{display:flex;align-items:center;gap:10px;margin-top:7px}
+.password-meter .bar{flex:1;max-width:220px}
+.password-label{font-size:.66rem;min-width:8ch}
 
 /* ---------- My plan ---------- */
-.pl-atual-topo{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:18px}
-.pl-rot{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--phosphor)}
-.pl-atual-topo h2{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;margin-top:4px}
-.pl-resumo{font-size:.9rem;color:var(--paper-dim);margin-top:5px;max-width:52ch}
-.pl-preco{
+.pl-current-top{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:18px}
+.pl-label{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--phosphor)}
+.pl-current-top h2{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;margin-top:4px}
+.pl-summary{font-size:.9rem;color:var(--paper-dim);margin-top:5px;max-width:52ch}
+.pl-price{
   font-family:'Space Grotesk',sans-serif;font-size:1.7rem;color:var(--phosphor);
   display:flex;flex-direction:column;align-items:flex-end;line-height:1.1;
 }
-.pl-ciclo{font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--paper-dim);margin-top:4px}
-.pl-fatos{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:.7rem}
+.pl-cycle{font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--paper-dim);margin-top:4px}
+.pl-facts{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:.7rem}
 
 /* The table scrolls inside its own box on narrow screens — the page never
    scrolls horizontally, which is the rule for the whole portal. */
-.pl-tabela-rolo{
+.pl-table-scroll{
   overflow-x:auto;margin:0 -4px;padding:0 4px;
   scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
 }
-.pl-tabela{width:100%;border-collapse:collapse;min-width:520px}
-.pl-tabela th,.pl-tabela td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--wire)}
-.pl-tabela thead th{
+.pl-table{width:100%;border-collapse:collapse;min-width:520px}
+.pl-table th,.pl-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--wire)}
+.pl-table thead th{
   font-family:'Space Grotesk',sans-serif;font-size:.92rem;font-weight:400;color:var(--paper);
   text-align:center;white-space:nowrap;
 }
-.pl-tabela thead th:first-child{text-align:left}
-.pl-tabela tbody th{font-weight:400;font-size:.86rem;color:var(--paper-dim);line-height:1.4}
-.pl-tabela td{text-align:center;width:152px}
-.pl-tabela td svg{width:16px;height:16px}
-.pl-tabela td.sim{color:var(--phosphor)}
-.pl-tabela td.nao{color:var(--wire)}
+.pl-table thead th:first-child{text-align:left}
+.pl-table tbody th{font-weight:400;font-size:.86rem;color:var(--paper-dim);line-height:1.4}
+.pl-table td{text-align:center;width:152px}
+.pl-table td svg{width:16px;height:16px}
+.pl-table td.yes{color:var(--phosphor)}
+.pl-table td.no{color:var(--wire)}
 /* the subscribed plan's column gets a continuous background: it is what lets
    the "what do I have" reading be vertical, without hunting for the header on
    every row */
-.pl-tabela th.on,.pl-tabela td.on{background:var(--ink)}
-.pl-seu{
+.pl-table th.on,.pl-table td.on{background:var(--ink)}
+.pl-yours{
   display:block;font-size:.54rem;letter-spacing:.16em;text-transform:uppercase;
   color:var(--phosphor);margin-top:3px;
 }
-.pl-linha-acao td{padding-top:16px;border-bottom:0}
-.pl-linha-acao .btn{width:100%;justify-content:center;font-size:.78rem;padding:8px 10px}
-.pl-ja{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-dim)}
+.pl-action-row td{padding-top:16px;border-bottom:0}
+.pl-action-row .btn{width:100%;justify-content:center;font-size:.78rem;padding:8px 10px}
+.pl-already{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-dim)}
 /* the text only the screen reader uses: the icon alone does not say
    "included" */
-.pl-oculto{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.conta-confirma{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:.85rem}
-.tela-conta .campo{max-width:420px}
+.pl-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.account-confirm{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:.85rem}
+.view-account .field{max-width:420px}
 
 /* ==========================================================
    8 · FIGURES, ANNOTATED CODE AND MATERIAL
@@ -1252,17 +1252,17 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
    refers to; centred, it would float in the middle of ten lines of code and stop
    pointing at anything. The `<pre>` does NOT take start: it stretches to the end
    of the grid row, and it is that stretching that seams the background. */
-.exemplo{margin:24px 0}
+.example{margin:24px 0}
 /* The file name was alone on the right; now the copy button joins it. They stay
    together at the right end, over the code column, because that is the column
    the button acts on — put it at the far left and it would sit over the notes,
    which are not what gets copied. */
-.exemplo-barra{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:5px}
-.exemplo-arq{font-size:.64rem;letter-spacing:.06em}
+.example-bar{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:5px}
+.example-file{font-size:.64rem;letter-spacing:.06em}
 /* In the example the bar is outside the block's frame, so the button gives back
-   the 5px the `.cod-barra` padding provides there — otherwise it would hang
+   the 5px the `.code-bar` padding provides there — otherwise it would hang
    past the right edge of the code column. */
-.exemplo-barra .cod-copiar{margin-right:-4px}
+.example-bar .code-copy{margin-right:-4px}
 
 /* ONE COLUMN IS THE DEFAULT, and two are the exception.
 
@@ -1274,44 +1274,44 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
    Stacked, the note comes BEFORE the snippet: read the explanation and then the
    code is the order that works without the side-by-side alignment tying the two
    together. It is the shape the phone always had. */
-.exemplo-grade{display:grid;grid-template-columns:minmax(0,1fr);row-gap:0}
-.exemplo-nota{
+.example-grid{display:grid;grid-template-columns:minmax(0,1fr);row-gap:0}
+.example-note{
   padding:12px 0 8px;
   font-size:.86rem;line-height:1.62;color:var(--paper-dim);
 }
-.exemplo-nota:empty{padding:0}
-.exemplo-nota code{
+.example-note:empty{padding:0}
+.example-note code{
   font-family:'IBM Plex Mono',monospace;font-size:.86em;
   background:var(--panel);padding:1px 5px;border-radius:3px;color:var(--paper);
 }
-.exemplo-nota strong{color:var(--paper)}
+.example-note strong{color:var(--paper)}
 
-.exemplo-cod{
+.example-code{
   margin:0;padding:10px 18px;overflow-x:auto;
   scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
   background:var(--panel);border-left:2px solid var(--wire);
   font-family:'IBM Plex Mono',monospace;font-size:.79rem;line-height:1.7;
   color:var(--paper);white-space:pre;
 }
-.exemplo-saida{
+.example-output{
   margin-top:10px;padding:9px 16px;
   background:var(--ink);border:1px solid var(--wire);border-radius:4px;
 }
-.exemplo-saida-rot{
+.example-output-label{
   display:block;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px;
 }
-.exemplo-saida .cod{margin:0;padding:0;background:none;border:0;font-size:.76rem;color:var(--paper-dim)}
-.exemplo-vazio{display:none}
+.example-output .code{margin:0;padding:0;background:none;border:0;font-size:.76rem;color:var(--paper-dim)}
+.example-empty{display:none}
 
 /* THE LESSON'S SINGLE CUT, and it comes out of the arithmetic, not of taste.
 
    Two things happen here at the same time, because they are the same thing: the
    code block opens into two columns AND the whole lesson moves to the wide
-   width. Two columns need `--cod` + `--nota-min` + the gap between them:
+   width. Two columns need `--code` + `--note-min` + the gap between them:
 
      604 + 300 + 30 = 934px
 
-   And `--amplo` cannot go past what the arrows allow — `100vw - trilho - 152`.
+   And `--wide` cannot go past what the arrows allow — `100vw - rail - 152`.
    Equating the two:
 
      100vw - 380 - 152 >= 934   →   100vw >= 1466
@@ -1323,70 +1323,70 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
    column. */
 @media(min-width:1466px){
   .portal{
-    /* from here up what squeezes is the arrow, not `.conteudo`'s padding: 152
+    /* from here up what squeezes is the arrow, not `.content`'s padding: 152
        is more than the padding's 88 at any width in this range */
-    --amplo:min(
-      calc(var(--cod) + var(--nota) + 30px),
-      calc(100vw - var(--trilho) - 152px)
+    --wide:min(
+      calc(var(--code) + var(--note) + 30px),
+      calc(100vw - var(--rail) - 152px)
     );
-    --tela:var(--amplo);
+    --screen:var(--wide);
   }
-  .exemplo-grade{
+  .example-grid{
     /* the code is FIXED and the note absorbs whatever is left: shrinking the
        column that does not wrap is what produces the scrollbar */
-    grid-template-columns:minmax(var(--nota-min),1fr) var(--cod);
+    grid-template-columns:minmax(var(--note-min),1fr) var(--code);
     column-gap:30px;
   }
-  .exemplo-nota{align-self:start;padding:11px 0}
+  .example-note{align-self:start;padding:11px 0}
   /* the file's breathing room goes at the block's ends, not on every snippet:
      the middle has to join without a seam */
-  .exemplo-cod{padding:0 18px}
-  .exemplo-cod:first-of-type{padding-top:12px}
-  .exemplo-cod:last-of-type{padding-bottom:12px}
-  .exemplo-saida{grid-column:2}
+  .example-code{padding:0 18px}
+  .example-code:first-of-type{padding-top:12px}
+  .example-code:last-of-type{padding-bottom:12px}
+  .example-output{grid-column:2}
 }
 
 /* ---------- the three colours of the highlighting ----------
    Red for the language's structure, blue for the literals, white for the rest.
    Comments in the muted grey — they are the only thing read as prose, and prose
    inside code should not compete with the code. */
-.t-pal{color:var(--amber)}
-.t-txt,.t-num{color:var(--phosphor)}
+.t-kw{color:var(--amber)}
+.t-str,.t-num{color:var(--phosphor)}
 .t-com{color:var(--paper-dim);font-style:italic}
-.t-fun,.t-pro{color:var(--paper)}
+.t-fun,.t-prop{color:var(--paper)}
 
 /* Below 900px the two columns do not fit without chopping up the code. The note
    goes ABOVE the snippet: read the explanation and then the code is the order
    that works when there is no side-by-side alignment tying the two together. */
 @media(max-width:900px){
-  .exemplo-grade{grid-template-columns:1fr}
-  .exemplo-nota{padding:12px 0 8px}
-  .exemplo-cod{padding:10px 14px}
-  .exemplo-cod:first-of-type{padding-top:10px}
-  .exemplo-saida{grid-column:1}
-  .exemplo-vazio{display:none}
+  .example-grid{grid-template-columns:1fr}
+  .example-note{padding:12px 0 8px}
+  .example-code{padding:10px 14px}
+  .example-code:first-of-type{padding-top:10px}
+  .example-output{grid-column:1}
+  .example-empty{display:none}
 }
 
 /* ---------- supporting material ---------- */
-.materiais{margin:22px 0 0;display:flex;flex-direction:column;gap:2px}
-.materiais-topo{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
-.materiais-topo h3{font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:400}
-.materiais-topo .mono{font-size:.66rem}
+.materials{margin:22px 0 0;display:flex;flex-direction:column;gap:2px}
+.materials-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
+.materials-top h3{font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:400}
+.materials-top .mono{font-size:.66rem}
 .mat{
   display:flex;align-items:center;gap:12px;padding:10px 12px;
   border:1px solid var(--wire);border-radius:5px;background:var(--panel);
   transition:border-color .15s,background .15s;
 }
 .mat:hover{border-color:var(--phosphor);background:var(--ink)}
-.mat-icone,.mat-baixar{display:grid;place-items:center;flex:0 0 auto;color:var(--paper-dim)}
-.mat-icone svg{width:22px;height:22px}
-.mat-baixar{margin-left:auto}
-.mat-baixar svg{width:17px;height:17px}
-.mat:hover .mat-baixar{color:var(--phosphor)}
-.mat-meio{display:flex;flex-direction:column;gap:2px;min-width:0}
-.mat-tit{font-size:.9rem;color:var(--paper)}
+.mat-icon,.mat-download{display:grid;place-items:center;flex:0 0 auto;color:var(--paper-dim)}
+.mat-icon svg{width:22px;height:22px}
+.mat-download{margin-left:auto}
+.mat-download svg{width:17px;height:17px}
+.mat:hover .mat-download{color:var(--phosphor)}
+.mat-middle{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mat-title{font-size:.9rem;color:var(--paper)}
 .mat-meta{font-size:.64rem;letter-spacing:.04em}
-.curso-lado .materiais{margin:0}
+.course-side .materials{margin:0}
 
 /* ==========================================================
    9 · EXAMS
@@ -1396,42 +1396,42 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
    ordinary block: the exam is the only thing in the portal that has a
    consequence — failing costs a recorded grade — and a piece that looks like
    all the others does not warn of that. */
-.prova-cartao{
-  /* explicit `flex-direction`: `.bloco` stacks in a column, and without this
+.exam-card{
+  /* explicit `flex-direction`: `.block` stacks in a column, and without this
      line the card inherited the stacking and the button fell underneath,
      centred. */
   display:flex;flex-direction:row;flex-wrap:wrap;
   align-items:center;justify-content:space-between;gap:18px;
   border-color:var(--phosphor-dim);
 }
-.prova-cartao.passou{border-color:var(--phosphor)}
-.prova-cartao-texto{display:flex;flex-direction:column;gap:5px;min-width:220px;flex:1}
-.prova-cartao-rot{
+.exam-card.passed{border-color:var(--phosphor)}
+.exam-card-text{display:flex;flex-direction:column;gap:5px;min-width:220px;flex:1}
+.exam-card-label{
   font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--phosphor);
 }
-.prova-cartao-texto h2{font-family:'Space Grotesk',sans-serif;font-size:1.15rem}
-.prova-cartao-texto p{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
-.prova-cartao-nota{color:var(--paper) !important}
-.prova-cartao-nota.passou{color:var(--phosphor) !important}
-.prova-cartao-acao{display:flex;flex-direction:column;gap:10px;min-width:190px}
-.prova-cartao-acao .barra{width:100%}
+.exam-card-text h2{font-family:'Space Grotesk',sans-serif;font-size:1.15rem}
+.exam-card-text p{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
+.exam-card-score{color:var(--paper) !important}
+.exam-card-score.passed{color:var(--phosphor) !important}
+.exam-card-action{display:flex;flex-direction:column;gap:10px;min-width:190px}
+.exam-card-action .bar{width:100%}
 
-.tela-prova .prova-regras .prosa-lista{margin:0}
-.prova-aviso,.prova-antes{
+.view-exam .exam-rules .prose-list{margin:0}
+.exam-notice,.exam-before{
   margin-top:12px;padding:10px 12px;border-radius:4px;font-size:.85rem;line-height:1.5;
   background:var(--ink);border:1px solid var(--wire);color:var(--paper-dim);
 }
-.prova-antes.passou{border-color:var(--phosphor);color:var(--paper)}
-.prova-nota{font-size:2.4rem !important}
-.prova-nota.passou strong{color:var(--phosphor)}
-.prova-nota.faltou strong{color:var(--paper-dim)}
+.exam-before.passed{border-color:var(--phosphor);color:var(--paper)}
+.exam-score{font-size:2.4rem !important}
+.exam-score.passed strong{color:var(--phosphor)}
+.exam-score.missed strong{color:var(--paper-dim)}
 
 /* Held back: while the exam is not closed, the verdict only says that the
    answer went in. The colour is neutral on purpose — any green or red here
    would give away the result the exam is holding. */
-.v-registrado{color:var(--paper-dim) !important;border-color:var(--wire) !important}
-.wz-ponto.feito{border-color:var(--paper-dim);color:var(--paper)}
-.wz-cuidado{background:var(--panel) !important;color:var(--paper) !important;border-color:var(--phosphor) !important}
+.v-recorded{color:var(--paper-dim) !important;border-color:var(--wire) !important}
+.wz-dot.done{border-color:var(--paper-dim);color:var(--paper)}
+.wz-warn{background:var(--panel) !important;color:var(--paper) !important;border-color:var(--phosphor) !important}
 
 /* ==========================================================
    10 · WIDTHS
@@ -1441,62 +1441,62 @@ html[data-tema="claro"] .cert-in{--linkedin:#0a66c2}
    the vitrine uses in its modal, and for the same reason: any narrower than
    that, and two columns read worse than one. */
 @media(min-width:1024px){
-  .curso-colunas{grid-template-columns:minmax(0,1fr) 320px}
+  .course-cols{grid-template-columns:minmax(0,1fr) 320px}
 }
 
 /* The rail becomes a drawer at 1180px — the same cut at which the vitrine's bar
    stops fitting on one line, and for the same reason: below that there is no
    width for persistent chrome and content at the same time. */
 @media(max-width:1180px){
-  .portal{--trilho:0px;grid-template-columns:minmax(0,1fr)}
-  .trilho{
+  .portal{--rail:0px;grid-template-columns:minmax(0,1fr)}
+  .rail{
     position:fixed;top:64px;left:0;bottom:0;width:min(300px,84vw);z-index:110;
     background:var(--ink);transform:translateX(-102%);transition:transform .22s ease;
     height:auto;
   }
-  body.trilho-aberto .trilho{transform:none}
-  .trilho{width:min(340px,88vw)}
-  body.sem-trilho .trilho-btn{display:none}
-  .trilho-btn{display:block}
-  .trilho-veu{display:block;position:fixed;inset:64px 0 0;background:rgba(10,14,20,.6);z-index:105}
-  .nav-contexto{margin-left:14px}
+  body.rail-open .rail{transform:none}
+  .rail{width:min(340px,88vw)}
+  body.no-rail .rail-btn{display:none}
+  .rail-btn{display:block}
+  .rail-veil{display:block;position:fixed;inset:64px 0 0;background:rgba(10,14,20,.6);z-index:105}
+  .nav-context{margin-left:14px}
 }
 
 @media(max-width:860px){
   /* base.css already turns the graph into a list; here we only release the
      fixed height */
-  .tela-trilha .grafo-caixa{height:auto}
-  .ctx-nome{display:none}
+  .view-track .graph-box{height:auto}
+  .ctx-name{display:none}
 }
 
 @media(max-width:700px){
-  .conteudo{--pad-x:16px;--pad-y:20px;padding:var(--pad-y) var(--pad-x) 48px}
-  .busca-veu{padding:0}
-  .busca-caixa{width:100%;max-height:100%;height:100%;border-radius:0;border:0}
-  .dsp-linha{grid-template-columns:minmax(0,1fr) auto;gap:8px}
-  .dsp-linha .barra{grid-column:1/-1}
-  .aula-pe{flex-direction:column;align-items:stretch}
-  .aula-nav{justify-content:space-between}
-  .wz-pe{flex-wrap:wrap}
+  .content{--pad-x:16px;--pad-y:20px;padding:var(--pad-y) var(--pad-x) 48px}
+  .search-veil{padding:0}
+  .search-box{width:100%;max-height:100%;height:100%;border-radius:0;border:0}
+  .perf-row{grid-template-columns:minmax(0,1fr) auto;gap:8px}
+  .perf-row .bar{grid-column:1/-1}
+  .lesson-foot{flex-direction:column;align-items:stretch}
+  .lesson-nav{justify-content:space-between}
+  .wz-foot{flex-wrap:wrap}
   /* the two tile columns stay side by side down to quite narrow: splitting into
      two columns IS the exercise, and stacking them would erase the metaphor */
-  .assoc-colunas{gap:7px}
-  .ficha{padding:9px 10px;font-size:.8rem}
+  .matching-cols{gap:7px}
+  .tile{padding:9px 10px;font-size:.8rem}
 }
 
 @media(max-width:620px){
-  .nav-contexto{display:none}
-  .tela-head h1{font-size:1.25rem}
+  .nav-context{display:none}
+  .view-head h1{font-size:1.25rem}
   /* Search goes before everything else — it is the most dispensable item on the
      bar, because the Catalogue is one tap away in the rail and it already has
      the field. Without this the account avatar was clipped by the right border
-     at 390px. It is the vitrine's own order of sacrifice, where "Área do aluno"
+     at 390px. It is the vitrine's own order of sacrifice, where "Student area"
      gives way first. */
-  #busca-btn{display:none}
-  .conta-avatar{width:28px;height:28px}
+  #search-btn{display:none}
+  .account-avatar{width:28px;height:28px}
 }
 
 @media(prefers-reduced-motion:reduce){
-  .trilho{transition:none}
-  .cartao:hover,.curso-no:hover{transform:none}
+  .rail{transition:none}
+  .card:hover,.course-node:hover{transform:none}
 }

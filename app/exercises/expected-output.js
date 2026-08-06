@@ -22,30 +22,30 @@ export default {
 
   body(ex, uid) {
     return (
-      '<div class="cod-bloco">' +
-        '<div class="cod-barra">' +
-          '<span class="cod-ling">' + esc(ex.language || 'texto') + '</span>' +
+      '<div class="code-block">' +
+        '<div class="code-bar">' +
+          '<span class="code-lang">' + esc(ex.language || 'text') + '</span>' +
           copyButton() +
         '</div>' +
-        '<pre class="cod"><code>' + esc(ex.givenCode) + '</code></pre>' +
+        '<pre class="code"><code>' + esc(ex.givenCode) + '</code></pre>' +
       '</div>' +
-      '<label class="ex-rotulo" for="saida-' + uid + '">' + txt('o que aparece na tela') + '</label>' +
-      '<textarea id="saida-' + uid + '" class="ex-campo mono" rows="4" spellcheck="false" ' +
-        'autocapitalize="off" autocorrect="off" placeholder="' + txt('digite a saída exata') + '"></textarea>' +
-      '<p class="ex-nota">' + txt('A comparação é exata: espaços e quebras de linha contam.') + '</p>'
+      '<label class="ex-label" for="saida-' + uid + '">' + txt('what appears on screen') + '</label>' +
+      '<textarea id="saida-' + uid + '" class="ex-field mono" rows="4" spellcheck="false" ' +
+        'autocapitalize="off" autocorrect="off" placeholder="' + txt('type the exact output') + '"></textarea>' +
+      '<p class="ex-note">' + txt('The comparison is exact: spaces and line breaks count.') + '</p>'
     );
   },
 
   collect(root) {
-    const v = root.querySelector('.ex-campo').value;
+    const v = root.querySelector('.ex-field').value;
     return v.trim() ? v : null;
   },
 
   reveal(root, ex, v) {
-    root.querySelector('.ex-campo').disabled = true;
+    root.querySelector('.ex-field').disabled = true;
     if (v && v.simulated) return;      // no server: claim nothing
-    const matches = root.querySelector('.ex-campo').value.replace(/\s+$/, '') === String(ex.answer).replace(/\s+$/, '');
-    root.querySelector('.ex-campo').classList.toggle('campo-certo', matches);
-    root.querySelector('.ex-campo').classList.toggle('campo-errado', !matches);
+    const matches = root.querySelector('.ex-field').value.replace(/\s+$/, '') === String(ex.answer).replace(/\s+$/, '');
+    root.querySelector('.ex-field').classList.toggle('field-right', matches);
+    root.querySelector('.ex-field').classList.toggle('field-wrong', !matches);
   },
 };

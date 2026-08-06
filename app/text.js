@@ -23,14 +23,14 @@ export function formatted(s) {
 
 /* ---------- copying the code ----------
 
-   THE BUTTON COPIES A PROGRAM, NOT A SCREEN REGION. In an `exemplo` the code is
+   THE BUTTON COPIES A PROGRAM, NOT A SCREEN REGION. In an `example` the code is
    deliberately cut into snippets with a note beside each one, and that is the
    whole point of the block — but nobody wants a third of a program. So the
    button gathers EVERY snippet of the block, in order, and hands over the file
    as it would be written. It is what gobyexample.com does, and it is the same
    argument the block itself makes: the right column is one file.
 
-   The output of an `exemplo` is not copyable. It is what the program prints,
+   The output of an `example` is not copyable. It is what the program prints,
    not something anyone pastes into an editor — offering it would be offering
    the wrong half.
 
@@ -48,8 +48,8 @@ const ICON_COPIED = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" 
   'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
 
 export const copyButton = () =>
-  '<button type="button" class="cod-copiar" data-copiar ' +
-    'title="' + txt('Copiar o código') + '" aria-label="' + txt('Copiar o código') + '">' +
+  '<button type="button" class="code-copy" data-copy ' +
+    'title="' + txt('Copy the code') + '" aria-label="' + txt('Copy the code') + '">' +
     ICON_COPY + '</button>';
 
 export const COPY_ICONS = { copy: ICON_COPY, copied: ICON_COPIED };
@@ -58,19 +58,19 @@ export const COPY_ICONS = { copy: ICON_COPY, copied: ICON_COPIED };
 
      'text'                        → paragraph, with `code` and **bold**
      ['a', 'b']                    → list
-     { codigo: 'css', texto: … }   → code block
-     { imagem: url, legenda, alt } → figure
-     { svg: '<svg…>', legenda }    → diagram drawn right here
-     { exemplo: { … } }            → annotated code, Go By Example style
+     { code: 'css', text: … }     → code block
+     { image: url, caption, alt }  → figure
+     { svg: '<svg…>', caption }    → diagram drawn right here
+     { example: { … } }            → annotated code, Go By Example style
 
    The code block arrived when the first PRACTICAL course was written. In
-   `web-fundamentos`, which is conceptual, a backtick mid-sentence was enough;
+   `web-fundamentals`, which is conceptual, a backtick mid-sentence was enough;
    in `html-css` there is no way to teach a selector without showing it over
    three lines with the indentation intact. The content asked for it, the
    architecture did not foresee it — and that is why the shape is still only
    what the content uses.
 
-   It reuses `.cod-bloco`, the same component the exercises use: code looks the
+   It reuses `.code-block`, the same component the exercises use: code looks the
    same wherever it shows up in the portal.
 
    Deliberately not Markdown. The real content will come from a database in
@@ -82,7 +82,7 @@ export function prose(body) {
   if (!body || !body.length) return '';
   return body.map((block) => {
     if (Array.isArray(block)) {
-      return '<ul class="prosa-lista">' + block.map((i) => '<li>' + formatted(i) + '</li>').join('') + '</ul>';
+      return '<ul class="prose-list">' + block.map((i) => '<li>' + formatted(i) + '</li>').join('') + '</ul>';
     }
     if (block && typeof block === 'object') {
       if (block.example) return annotatedExample(block.example);
@@ -94,12 +94,12 @@ export function prose(body) {
         /* The bar now renders even with no language to show: it carries the
            copy button, and a block you cannot copy because its author left the
            label out would be an odd thing to explain. */
-        return '<div class="cod-bloco prosa-cod">' +
-          '<div class="cod-barra">' +
-            '<span class="cod-ling">' + esc(block.code || '') + '</span>' +
+        return '<div class="code-block prose-code">' +
+          '<div class="code-bar">' +
+            '<span class="code-lang">' + esc(block.code || '') + '</span>' +
             copyButton() +
           '</div>' +
-          '<pre class="cod"><code>' + esc(block.text) + '</code></pre>' +
+          '<pre class="code"><code>' + esc(block.text) + '</code></pre>' +
         '</div>';
       }
     }
@@ -111,7 +111,7 @@ export function prose(body) {
 
    TWO FORMS, and the difference is not style: it is where the pixel comes from.
 
-   `imagem` is a file — a screenshot, a photo, an exported diagram. It is what
+   `image` is a file — a screenshot, a photo, an exported diagram. It is what
    the real content will use, served from a CDN.
 
    `svg` is a drawing WRITTEN HERE, which enters the document and therefore
@@ -127,7 +127,7 @@ export function prose(body) {
 function figure(b) {
   const body = b.svg
     ? '<div class="fig-svg">' + b.svg + '</div>'
-    : '<img src="' + esc(b.image) + '" alt="' + esc(b.alt || b.caption || '') + '" loading="lazy">';
+    : '<img src="' + esc(b.image) + '" choice="' + esc(b.choice || b.caption || '') + '" loading="lazy">';
   return '<figure class="fig">' + body +
     (b.caption ? '<figcaption>' + formatted(b.caption) + '</figcaption>' : '') +
   '</figure>';
@@ -153,11 +153,11 @@ function figure(b) {
    The highlighting comes from further down this file, in three colours — red
    for the structure of the language, blue for literals, white for the rest.
 
-     { exemplo: {
-         linguagem: 'css',
-         arquivo: 'barra.css',                    // optional
-         partes: [ { codigo: '…', nota: 'why this' }, … ],
-         saida: '…'                               // optional
+     { example: {
+         language: 'css',
+         file: 'bar.css',                    // optional
+         parts: [ { code: '…', note: 'why this' }, … ],
+         output: '…'                               // optional
      } }
 
    On a narrow screen the two columns become one, with the note BEFORE the
@@ -165,21 +165,21 @@ function figure(b) {
    without the sideways alignment tying the two together. */
 function annotatedExample(ex) {
   const parts = ex.parts || [];
-  return '<div class="exemplo">' +
-    '<div class="exemplo-barra">' +
-      '<span class="exemplo-arq mono dim">' + esc(ex.file || ex.language || '') + '</span>' +
+  return '<div class="example">' +
+    '<div class="example-bar">' +
+      '<span class="example-file mono dim">' + esc(ex.file || ex.language || '') + '</span>' +
       (parts.length ? copyButton() : '') +
     '</div>' +
-    '<div class="exemplo-grade">' +
+    '<div class="example-grid">' +
       parts.map((p) => (
-        '<p class="exemplo-nota">' + (p.note ? formatted(p.note) : '') + '</p>' +
-        '<pre class="exemplo-cod"><code>' + highlight(p.code, ex.language) + '</code></pre>'
+        '<p class="example-note">' + (p.note ? formatted(p.note) : '') + '</p>' +
+        '<pre class="example-code"><code>' + highlight(p.code, ex.language) + '</code></pre>'
       )).join('') +
       (ex.output
-        ? '<span class="exemplo-vazio" aria-hidden="true"></span>' +
-          '<div class="exemplo-saida">' +
-            '<span class="exemplo-saida-rot mono dim">' + txt('saída') + '</span>' +
-            '<pre class="cod"><code>' + esc(ex.output) + '</code></pre>' +
+        ? '<span class="example-empty" aria-hidden="true"></span>' +
+          '<div class="example-output">' +
+            '<span class="example-output-label mono dim">' + txt('output') + '</span>' +
+            '<pre class="code"><code>' + esc(ex.output) + '</code></pre>' +
           '</div>'
         : '') +
     '</div>' +
@@ -234,28 +234,28 @@ const JS_KEYWORDS = ['const', 'let', 'var', 'function', 'return', 'if', 'else', 
 
 /* Each language is a list of [class, expression]. The order is the precedence:
    the first one to match at a position wins. The class names are short because
-   they reach the DOM as `t-com`, `t-txt`, `t-num`… */
+   they reach the DOM as `t-com`, `t-str`, `t-num`… */
 const RULES = {
   javascript: [
     ['com', /\/\/[^\n]*|\/\*[\s\S]*?\*\//],
-    ['txt', /`(?:\\[\s\S]|[^`\\])*`|"(?:\\[\s\S]|[^"\\\n])*"|'(?:\\[\s\S]|[^'\\\n])*'/],
+    ['str', /`(?:\\[\s\S]|[^`\\])*`|"(?:\\[\s\S]|[^"\\\n])*"|'(?:\\[\s\S]|[^'\\\n])*'/],
     ['num', /\b\d[\d_]*(?:\.\d+)?(?:e[+-]?\d+)?n?\b/i],
-    ['pal', new RegExp('\\b(?:' + JS_KEYWORDS.join('|') + ')\\b')],
+    ['kw', new RegExp('\\b(?:' + JS_KEYWORDS.join('|') + ')\\b')],
     ['fun', /\b[A-Za-z_$][\w$]*(?=\s*\()/],
   ],
   css: [
     ['com', /\/\*[\s\S]*?\*\//],
-    ['txt', /"(?:\\[\s\S]|[^"\\\n])*"|'(?:\\[\s\S]|[^'\\\n])*'/],
-    ['pal', /@[\w-]+|![\w-]+/],
+    ['str', /"(?:\\[\s\S]|[^"\\\n])*"|'(?:\\[\s\S]|[^'\\\n])*'/],
+    ['kw', /@[\w-]+|![\w-]+/],
     ['num', /#[0-9a-f]{3,8}\b|\b\d+(?:\.\d+)?(?:px|rem|em|ch|%|vw|vh|fr|s|ms|deg)?\b/i],
     ['fun', /[.#][\w-]+|&?::?[\w-]+(?=[\s,{:])/],
-    ['pro', /[-a-z]+(?=\s*:)/],
+    ['prop', /[-a-z]+(?=\s*:)/],
   ],
   html: [
     ['com', /<!--[\s\S]*?-->/],
-    ['txt', /"(?:[^"\n])*"|'(?:[^'\n])*'/],
-    ['pal', /<\/?[\w-]+|\/?>/],
-    ['pro', /\b[\w-]+(?==)/],
+    ['str', /"(?:[^"\n])*"|'(?:[^'\n])*'/],
+    ['kw', /<\/?[\w-]+|\/?>/],
+    ['prop', /\b[\w-]+(?==)/],
   ],
 };
 RULES.js = RULES.javascript;

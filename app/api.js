@@ -27,7 +27,7 @@ export const session = () => echo(state.now().session);
 
 // FUTURE: real authentication. Today any name gets in — it is a skeleton.
 export function signIn({ name, email }) {
-  state.change((e) => { e.session = { name: name || 'Aluno', email: email || '' }; });
+  state.change((e) => { e.session = { name: name || 'Student', email: email || '' }; });
   return echo(state.now().session);
 }
 
@@ -36,7 +36,7 @@ export function signOut() {
   return echo(null);
 }
 
-/* FUTURE: `PATCH /conta/email`, and the change only takes effect once confirmed
+/* FUTURE: `PATCH /account/email`, and the change only takes effect once confirmed
    at the NEW address — otherwise changing the e-mail becomes the easiest way to
    take over an account. Here it takes effect right away, because there is
    nowhere to send the confirmation. */
@@ -45,7 +45,7 @@ export function changeEmail(email) {
   return echo(state.now().session);
 }
 
-/* FUTURE: `PATCH /conta/senha`, with the current password checked ON THE
+/* FUTURE: `PATCH /account/password`, with the current password checked ON THE
    SERVER. The new password is not stored anywhere here — see state.js. */
 export function changePassword() {
   state.markPasswordChange();
@@ -95,7 +95,7 @@ export function resumeFrom() {
 
   if (e.last && courseById(e.last.courseId)) {
     const { courseId, lessonIx } = e.last;
-    return echo({ ...e.last, sectionId: e.last.sectionId || firstSection(cursoId, aulaIx) });
+    return echo({ ...e.last, sectionId: e.last.sectionId || firstSection(courseId, lessonIx) });
   }
   const t = e.enrollment && trackById(e.enrollment.trackId);
   if (!t) return echo(null);
@@ -128,15 +128,15 @@ export async function grade(ex, answer) {
   return gradeLocally(ex, answer);
 }
 
-// FUTURE: POST /avaliar → throwaway container (execution) or sympy (CAS).
+// FUTURE: POST /grade → throwaway container (execution) or sympy (CAS).
 async function gradeOnServer(ex, answer) {
   await new Promise((r) => setTimeout(r, 420));   // the wait is part of the UI
   return {
     correct: null,                                 // null = it was not checked
     simulated: true,
     detail: ex.type === 'expression-answer'
-      ? 'Equivalência simbólica exige o CAS no servidor.'
-      : 'A execução dos casos de teste exige o contêiner no servidor.',
-    resposta: answer,
+      ? 'Symbolic equivalence needs the CAS on the server.'
+      : 'Running the test cases needs the container on the server.',
+    response: answer,
   };
 }

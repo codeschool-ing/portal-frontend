@@ -12,7 +12,7 @@
 
 window.I18N.pt = window.I18N.pt || {};
 window.I18N.pt.courses = {
-  "web-fundamentos": {
+  "web-fundamentals": {
     "name": "Fundamentos da Web e Internet",
     "summary": "Entenda o que acontece entre digitar um endereço e a página aparecer — a base que sustenta qualquer carreira web.",
     "syllabus": [
@@ -86,7 +86,7 @@ window.I18N.pt.courses = {
       "Depuração no navegador e tratamento de exceções"
     ]
   },
-  "ia-dev": {
+  "ai-dev": {
     "name": "IA no Desenvolvimento",
     "summary": "Programe acompanhado: assistentes de código, agentes e integração de IA nos seus projetos.",
     "syllabus": [
@@ -165,7 +165,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Os dois são necessários."
   },
-  "front-qualidade": {
+  "front-quality": {
     "name": "Testes, Segurança e Acessibilidade",
     "summary": "O que separa um site que funciona de um produto confiável.",
     "syllabus": [
@@ -215,7 +215,7 @@ window.I18N.pt.courses = {
       "Progressive Web App: manifesto, instalação e notificações"
     ]
   },
-  "front-entrega": {
+  "front-delivery": {
     "name": "Deploy, Design Systems e GraphQL",
     "summary": "Publique, padronize e integre — o trabalho de quem entrega produto, não página.",
     "syllabus": [
@@ -239,7 +239,7 @@ window.I18N.pt.courses = {
       "Monitoramento de erros no cliente e relatórios de falha"
     ]
   },
-  "front-multiplataforma": {
+  "front-multiplatform": {
     "name": "Apps Desktop e Mobile com Web",
     "summary": "Leve o que você já sabe de web para as lojas de aplicativos e para o desktop.",
     "syllabus": [
@@ -412,7 +412,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Nenhum. Este curso ensina a linguagem do zero — é o ponto de entrada de quem nunca programou em Java."
   },
-  "java-funcional": {
+  "java-functional": {
     "name": "Java: Funcional e Concorrente",
     "summary": "O Java que mudou: lambdas, streams, threads virtuais e a biblioteca padrão que se usa todo dia.",
     "syllabus": [
@@ -540,7 +540,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Nenhum. Este curso ensina a linguagem do zero — é o ponto de entrada de quem nunca programou em Go."
   },
-  "go-concorrencia": {
+  "go-concurrency": {
     "name": "Go: Concorrência e Testes",
     "summary": "A parte de Go que não existe em outras linguagens: milhares de tarefas ao mesmo tempo, sem framework e sem susto.",
     "syllabus": [
@@ -585,7 +585,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Exige o curso de Go: aqui se assume sintaxe, interfaces e erros."
   },
-  "go-producao": {
+  "go-production": {
     "name": "Go em Produção: CLIs, Ferramental e Performance",
     "summary": "O ferramental que faz Go ser a linguagem da infraestrutura: linha de comando, perfilamento, compilação cruzada e os cantos avançados.",
     "syllabus": [
@@ -624,7 +624,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Exige concorrência e alguma experiência de projeto: é o curso mais avançado da trilha."
   },
-  "bancos-sql": {
+  "sql-databases": {
     "name": "Bancos de Dados Relacionais e SQL",
     "summary": "Modele, consulte e proteja os dados que sustentam qualquer sistema.",
     "syllabus": [
@@ -679,7 +679,7 @@ window.I18N.pt.courses = {
       "CORS, HTTPS, CSP e o OWASP Top 10 aplicado a APIs"
     ]
   },
-  "servidores-cache": {
+  "servers-cache": {
     "name": "Servidores Web e Cache",
     "summary": "Ponha a aplicação no ar e faça-a responder rápido sob carga.",
     "syllabus": [
@@ -703,7 +703,7 @@ window.I18N.pt.courses = {
       "Estouro de cache (stampede) e aquecimento"
     ]
   },
-  "testes-cicd": {
+  "testing-cicd": {
     "name": "Testes Automatizados e CI/CD",
     "summary": "Entregue com frequência sem medo: automatize a verificação e a publicação.",
     "syllabus": [
@@ -833,7 +833,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Exige Docker. É o curso mais avançado de infraestrutura do catálogo. GitOps, observabilidade e esteira aparecem como panorama — cada um tem curso próprio depois deste."
   },
-  "arquitetura": {
+  "architecture": {
     "name": "Arquitetura de Sistemas",
     "summary": "As decisões que definem se um sistema cresce ou trava — e como comunicá-las.",
     "syllabus": [
@@ -858,7 +858,7 @@ window.I18N.pt.courses = {
       "Registrar decisões de arquitetura (ADRs) e defendê-las"
     ]
   },
-  "escala": {
+  "scale": {
     "name": "Escala e Observabilidade",
     "summary": "O que acontece quando o sistema cresce — e como enxergar o que está acontecendo.",
     "syllabus": [
@@ -911,7 +911,7 @@ window.I18N.pt.courses = {
       "Agendamento de tarefas: cron e systemd timers"
     ]
   },
-  "redes": {
+  "networks": {
     "name": "Redes e Protocolos",
     "summary": "Como os dados viajam — e o que fazer quando param de viajar.",
     "syllabus": [
@@ -935,7 +935,7 @@ window.I18N.pt.courses = {
       "Diagnóstico: ping, dig, nslookup, traceroute, mtr, netstat/ss e tcpdump"
     ]
   },
-  "nuvem": {
+  "cloud": {
     "name": "Nuvem e Serverless",
     "summary": "Onde a infraestrutura mora hoje: provedores, serviços gerenciados e computação sem servidor.",
     "syllabus": [
@@ -1007,7 +1007,7 @@ window.I18N.pt.courses = {
       "Auditoria: quem mudou o quê, quando e por quê"
     ]
   },
-  "observabilidade": {
+  "observability": {
     "name": "Observabilidade e Operação",
     "summary": "Enxergar o que acontece em produção — e agir antes que o usuário perceba.",
     "syllabus": [
@@ -1057,7 +1057,7 @@ window.I18N.pt.courses = {
       "pandas para tabelas e requests para consumir APIs"
     ]
   },
-  "dados-fundamentos": {
+  "data-fundamentals": {
     "name": "Fundamentos de Engenharia de Dados",
     "summary": "O mapa da profissão: o que faz um engenheiro de dados e como o dado percorre a empresa.",
     "syllabus": [
@@ -1081,7 +1081,7 @@ window.I18N.pt.courses = {
       "Teorema CAP aplicado a plataformas de dados"
     ]
   },
-  "modelagem-dw": {
+  "warehouse-modeling": {
     "name": "Modelagem de Dados e Data Warehouse",
     "summary": "Organize o dado para responder perguntas de negócio, não só para guardar registros.",
     "syllabus": [
@@ -1158,7 +1158,7 @@ window.I18N.pt.courses = {
       "Formatos colunares e otimização de leitura"
     ]
   },
-  "dados-governanca": {
+  "data-governance": {
     "name": "Segurança, Governança e Privacidade de Dados",
     "summary": "Dado é responsabilidade: proteja, rastreie e cumpra a lei.",
     "syllabus": [
@@ -1230,7 +1230,7 @@ window.I18N.pt.courses = {
       "Detecção de desvio de dados e de conceito, e retreino"
     ]
   },
-  "redes-enderecamento": {
+  "networks-addressing": {
     "name": "Endereçamento, Roteamento e Comutação",
     "summary": "O coração da rede: dividir endereços, escolher caminhos e ligar os equipamentos que fazem o pacote chegar.",
     "syllabus": [
@@ -1267,7 +1267,7 @@ window.I18N.pt.courses = {
       "Roteamento entre VLANs e switches de camada 3"
     ]
   },
-  "redes-disponibilidade": {
+  "networks-availability": {
     "name": "VPNs, Wireless e Alta Disponibilidade",
     "summary": "Rede que não cai e que chega em todo canto: túneis, wi-fi bem projetado, redundância e diagnóstico com captura de pacotes.",
     "syllabus": [
@@ -1304,7 +1304,7 @@ window.I18N.pt.courses = {
       "Documentar o incidente: sintoma, hipótese, teste e correção"
     ]
   },
-  "redes-seguranca": {
+  "networks-security": {
     "name": "Segurança de Redes",
     "summary": "Defender a rede de verdade: firewall bem configurado, criptografia entendida, ataques conhecidos e acesso pelo menor privilégio.",
     "syllabus": [
@@ -1341,7 +1341,7 @@ window.I18N.pt.courses = {
       "Registro, auditoria e resposta a incidentes"
     ]
   },
-  "redes-automacao": {
+  "networks-automation": {
     "name": "Automação de Redes",
     "summary": "Pare de configurar equipamento por equipamento: descreva a rede em código, valide e aplique em escala.",
     "syllabus": [
@@ -1418,7 +1418,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Saber usar computador e internet no dia a dia."
   },
-  "prompt-confiabilidade": {
+  "prompt-reliability": {
     "name": "Prompts Confiáveis: Avaliação e Boas Práticas",
     "summary": "A distância entre um prompt de demonstração e um que roda em produção: medir, versionar e não confiar na sorte.",
     "syllabus": [
@@ -1453,7 +1453,7 @@ window.I18N.pt.courses = {
       "Calibração: alinhar a confiança declarada ao acerto real"
     ]
   },
-  "ia-seguranca": {
+  "ai-security": {
     "name": "Segurança em IA e Red Teaming",
     "summary": "Sistemas com IA falham de formas novas. Aprenda a atacar os seus antes que alguém ataque — e a defendê-los.",
     "syllabus": [
@@ -1490,7 +1490,7 @@ window.I18N.pt.courses = {
       "LGPD aplicada aos dados enviados a modelos de terceiros"
     ]
   },
-  "ia-modelos": {
+  "ai-models": {
     "name": "Modelos de IA: Escolha, Plataformas e APIs",
     "summary": "Não existe o melhor modelo — existe o modelo certo para a sua tarefa, no seu orçamento. Aprenda a escolher e a integrar.",
     "syllabus": [
@@ -1526,7 +1526,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Os dois são necessários."
   },
-  "embeddings-vetores": {
+  "embeddings-vectors": {
     "name": "Embeddings e Bancos Vetoriais",
     "summary": "Busca por significado, não por palavra. A base técnica que sustenta RAG, recomendação e classificação.",
     "syllabus": [
@@ -1587,7 +1587,7 @@ window.I18N.pt.courses = {
       "Custo por consulta e cache de recuperação"
     ]
   },
-  "agentes-mcp": {
+  "agents-mcp": {
     "name": "Agentes de IA e MCP",
     "summary": "Quando o modelo para de responder e começa a agir: ferramentas, laço de decisão, multiagentes e o protocolo MCP.",
     "syllabus": [
@@ -1619,7 +1619,7 @@ window.I18N.pt.courses = {
       "Custo, latência e limites de um agente em produção"
     ]
   },
-  "llm-observabilidade": {
+  "llm-observability": {
     "name": "Observabilidade e Avaliação de LLM em Produção",
     "summary": "Funcionou na demonstração não é funcionou: instrumente, avalie e teste regressão a cada mudança.",
     "syllabus": [
@@ -1676,7 +1676,7 @@ window.I18N.pt.courses = {
       "Acessibilidade: legendas, audiodescrição e transcrição"
     ]
   },
-  "arquitetura-papel": {
+  "architecture-role": {
     "name": "O Papel do Arquiteto de Software",
     "summary": "Arquiteto não é o programador mais antigo da sala: é quem decide, documenta e responde pelas escolhas estruturais.",
     "syllabus": [
@@ -1708,7 +1708,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Trilha de Desenvolvimento Back-end concluída — ou experiência equivalente."
   },
-  "padroes-projeto": {
+  "design-patterns": {
     "name": "Padrões e Princípios de Projeto",
     "summary": "O vocabulário estrutural da profissão: SOLID, DDD, CQRS, TDD e os paradigmas que sustentam decisões de projeto.",
     "syllabus": [
@@ -1741,7 +1741,7 @@ window.I18N.pt.courses = {
       "Escolher o padrão pelo problema, não pelo currículo"
     ]
   },
-  "modelagem-arquitetura": {
+  "architecture-modeling": {
     "name": "Modelagem e Frameworks de Arquitetura",
     "summary": "Desenhar para ser entendido: diagramas que comunicam, decisões registradas e os frameworks que o mercado corporativo cobra.",
     "syllabus": [
@@ -1769,7 +1769,7 @@ window.I18N.pt.courses = {
       "Apresentar arquitetura para técnicos e para não técnicos"
     ]
   },
-  "software-corporativo": {
+  "enterprise-software": {
     "name": "Software Corporativo e Integração",
     "summary": "A realidade das empresas grandes: ERP, CRM, BPM e o trabalho de integrar sistemas que ninguém pode desligar.",
     "syllabus": [
@@ -1797,7 +1797,7 @@ window.I18N.pt.courses = {
       "Compra versus construção: como fundamentar a decisão"
     ]
   },
-  "gestao-processos": {
+  "process-management": {
     "name": "Gestão, Processos e Estimativas",
     "summary": "O arquiteto vive entre a técnica e a gestão: entenda os métodos, as cerimônias e como estimar sem inventar número.",
     "syllabus": [
@@ -1826,7 +1826,7 @@ window.I18N.pt.courses = {
       "Certificações: PMI, ITIL, Prince2, Scrum e as de nuvem"
     ]
   },
-  "arquiteto-comunicacao": {
+  "architect-communication": {
     "name": "Comunicação, Consultoria e Liderança Técnica",
     "summary": "A parte que derruba mais arquiteto que qualquer dificuldade técnica: explicar, convencer, formar gente e dizer não.",
     "syllabus": [
@@ -1856,7 +1856,7 @@ window.I18N.pt.courses = {
       "Reputação técnica: palestras, artigos e comunidade"
     ]
   },
-  "informatica-essencial": {
+  "computing-essentials": {
     "name": "Informática Essencial",
     "summary": "O começo de tudo: entender o computador por dentro, dominar as ferramentas do dia a dia e não ter medo de mexer.",
     "syllabus": [
@@ -1887,7 +1887,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Nenhum. É o primeiro curso da escola."
   },
-  "sistemas-operacionais": {
+  "operating-systems": {
     "name": "Sistemas Operacionais: Windows, Linux e macOS",
     "summary": "Os três sistemas que você vai encontrar em qualquer empresa — instalados, configurados e administrados por você.",
     "syllabus": [
@@ -1918,7 +1918,7 @@ window.I18N.pt.courses = {
       "Diagnóstico: logs do sistema, modo de segurança e recuperação"
     ]
   },
-  "virtualizacao": {
+  "virtualization": {
     "name": "Virtualização e Laboratórios",
     "summary": "Monte seu laboratório: várias máquinas em um só computador, para testar, errar e voltar atrás sem medo.",
     "syllabus": [
@@ -1947,7 +1947,7 @@ window.I18N.pt.courses = {
       "Isolar o laboratório da rede real"
     ]
   },
-  "suporte-tecnico": {
+  "tech-support": {
     "name": "Suporte Técnico e Atendimento",
     "summary": "Metade do trabalho é técnica; a outra metade é entender a pessoa do outro lado e registrar o que foi feito.",
     "syllabus": [
@@ -1976,7 +1976,7 @@ window.I18N.pt.courses = {
       "Panorama das certificações de entrada: CompTIA A+, Linux+ e Network+"
     ]
   },
-  "seguranca-fundamentos": {
+  "security-fundamentals": {
     "name": "Fundamentos de Segurança da Informação",
     "summary": "O vocabulário e a mentalidade da área: o que é risco, o que é defesa em camadas e por que confiança é o problema.",
     "syllabus": [
@@ -2008,7 +2008,7 @@ window.I18N.pt.courses = {
       "Carreiras da área: SOC, pentest, GRC, forense e AppSec"
     ]
   },
-  "criptografia": {
+  "cryptography": {
     "name": "Criptografia Aplicada",
     "summary": "Sem entender criptografia você só repete configuração de tutorial. Aqui você entende o que cada opção protege.",
     "syllabus": [
@@ -2039,7 +2039,7 @@ window.I18N.pt.courses = {
       "Erros clássicos: chave no código, algoritmo próprio e reuso de nonce"
     ]
   },
-  "ataques-ameacas": {
+  "attacks-threats": {
     "name": "Ataques, Ameaças e Engenharia Social",
     "summary": "Conhecer o ataque para reconhecê-lo: como cada golpe funciona, que rastro deixa e o que realmente o impede.",
     "syllabus": [
@@ -2079,7 +2079,7 @@ window.I18N.pt.courses = {
       "MITRE ATT&CK: táticas, técnicas e procedimentos"
     ]
   },
-  "defesa-hardening": {
+  "defense-hardening": {
     "name": "Defesa de Endpoint e Hardening",
     "summary": "Reduzir a superfície de ataque máquina por máquina: configuração endurecida, proteção de endpoint e correção em dia.",
     "syllabus": [
@@ -2112,7 +2112,7 @@ window.I18N.pt.courses = {
       "Análise de arquivos e URLs: VirusTotal, urlscan, any.run, Joe Sandbox e WHOIS"
     ]
   },
-  "soc-resposta": {
+  "soc-response": {
     "name": "SOC, Monitoramento e Resposta a Incidentes",
     "summary": "O trabalho do time azul: ver o que está acontecendo, decidir se é incidente e conduzir a resposta até o relatório.",
     "syllabus": [
@@ -2184,7 +2184,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Os dois são necessários."
   },
-  "nuvem-seguranca": {
+  "cloud-security": {
     "name": "Segurança em Nuvem",
     "summary": "Na nuvem a culpa é dividida, mas a conta é sua: entenda o modelo de responsabilidade e onde as falhas acontecem.",
     "syllabus": [
@@ -2215,7 +2215,7 @@ window.I18N.pt.courses = {
       "Conformidade, região do dado e soberania"
     ]
   },
-  "codigo-seguro": {
+  "secure-code": {
     "name": "Codificação Segura",
     "summary": "A maioria das falhas não é invadida: é escrita. Aprenda a programar de forma que o ataque não tenha por onde entrar.",
     "syllabus": [
@@ -2249,7 +2249,7 @@ window.I18N.pt.courses = {
       "OWASP ASVS e as folhas de referência (Cheat Sheets) no dia a dia"
     ]
   },
-  "modelagem-ameacas": {
+  "threat-modeling": {
     "name": "Modelagem de Ameaças e Risco",
     "summary": "Descobrir a falha no desenho custa uma reunião; descobrir em produção custa um incidente. Modele antes de construir.",
     "syllabus": [
@@ -2278,7 +2278,7 @@ window.I18N.pt.courses = {
       "Modelagem contínua: integrar ao refinamento e à revisão de projeto"
     ]
   },
-  "pipeline-seguro": {
+  "secure-pipeline": {
     "name": "Segurança na Esteira e Cadeia de Suprimentos",
     "summary": "Segurança que roda a cada commit: varredura na esteira, imagem endurecida, dependência sob controle e política como código.",
     "syllabus": [
@@ -2313,7 +2313,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Os dois são necessários."
   },
-  "bi-negocio": {
+  "bi-business": {
     "name": "BI para o Negócio: KPIs e Aplicações",
     "summary": "Antes da ferramenta vem a pergunta. Entenda como a empresa funciona e que número realmente muda uma decisão.",
     "syllabus": [
@@ -2348,7 +2348,7 @@ window.I18N.pt.courses = {
       "Relatórios de conformidade e obrigações regulatórias"
     ]
   },
-  "excel-analitico": {
+  "excel-analytics": {
     "name": "Excel para Análise de Dados",
     "summary": "A ferramenta que toda empresa já tem — usada de verdade: tabela dinâmica, Power Query e modelo de dados.",
     "syllabus": [
@@ -2380,7 +2380,7 @@ window.I18N.pt.courses = {
       "Limites do Excel e quando migrar para banco ou plataforma de BI"
     ]
   },
-  "estatistica": {
+  "statistics": {
     "name": "Estatística para Análise de Dados",
     "summary": "A base que separa quem lê número de quem entende número: descrever, comparar, testar e não confundir correlação com causa.",
     "syllabus": [
@@ -2416,7 +2416,7 @@ window.I18N.pt.courses = {
       "Significância estatística versus relevância prática"
     ]
   },
-  "dados-limpeza": {
+  "data-cleaning": {
     "name": "Limpeza e Preparação de Dados",
     "summary": "Oitenta por cento do trabalho está aqui: dado sujo entra, decisão errada sai. Aprenda a tratar antes de analisar.",
     "syllabus": [
@@ -2448,7 +2448,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Os dois são necessários."
   },
-  "visualizacao": {
+  "visualization": {
     "name": "Visualização de Dados",
     "summary": "O gráfico certo faz o dado falar; o errado mente sem querer. Aprenda a escolher, desenhar e não enganar.",
     "syllabus": [
@@ -2482,7 +2482,7 @@ window.I18N.pt.courses = {
       "Ferramentas: Excel, Power BI, Tableau e bibliotecas de código"
     ]
   },
-  "bi-tecnicas": {
+  "bi-techniques": {
     "name": "Técnicas Analíticas: Séries Temporais, Testes A/B e Coortes",
     "summary": "As três análises que a empresa mais pede: para onde vamos, qual versão é melhor e por que o cliente some.",
     "syllabus": [
@@ -2515,7 +2515,7 @@ window.I18N.pt.courses = {
       "Estratégias de mitigação e uso ético do modelo"
     ]
   },
-  "dados-storytelling": {
+  "data-storytelling": {
     "name": "Comunicação e Storytelling com Dados",
     "summary": "Análise que ninguém entende não muda nada. Aprenda a contar a história do dado e a ser levado a sério na reunião.",
     "syllabus": [
@@ -2545,7 +2545,7 @@ window.I18N.pt.courses = {
       "Portfólio: projeto de análise de ponta a ponta que mostra o seu processo"
     ]
   },
-  "qa-fundamentos": {
+  "qa-fundamentals": {
     "name": "Fundamentos de Qualidade de Software",
     "summary": "Testar não é procurar defeito no fim: é decidir o que vale a pena verificar, e quando.",
     "syllabus": [
@@ -2582,7 +2582,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Não exige programação. É o ponto de entrada da trilha de Qualidade."
   },
-  "testes-manuais": {
+  "manual-testing": {
     "name": "Teste Manual e Gestão de Testes",
     "summary": "A parte do trabalho que nenhuma ferramenta faz: entender o produto, escrever o caso e provar o defeito.",
     "syllabus": [
@@ -2619,7 +2619,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Não exige programação."
   },
-  "automacao-web": {
+  "web-automation": {
     "name": "Automação de Testes Web",
     "summary": "O robô que executa a regressão inteira em minutos — e que só compensa se não quebrar a cada mudança de tela.",
     "syllabus": [
@@ -2656,7 +2656,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Exige lógica de programação e JavaScript básico."
   },
-  "automacao-api-mobile": {
+  "api-mobile-automation": {
     "name": "Automação de API e Mobile",
     "summary": "Testar onde o defeito é mais barato de achar: na API, antes da tela — e no aplicativo, onde o usuário está.",
     "syllabus": [
@@ -2693,7 +2693,7 @@ window.I18N.pt.courses = {
     ],
     "prerequisites": "Exige noção de programação. Não depende do curso de automação web — os dois podem ser feitos em qualquer ordem."
   },
-  "testes-nao-funcionais": {
+  "non-functional-testing": {
     "name": "Testes Não Funcionais",
     "summary": "O sistema faz o que deve — mas aguenta, é acessível e resiste a quem quer quebrá-lo de propósito?",
     "syllabus": [
@@ -2742,19 +2742,25 @@ window.I18N.pt.tracks = {
   "backend": {
     "name": "Desenvolvimento Back-end",
     "goal": "A formação de quem constrói o que sustenta a aplicação: dados, APIs, servidores e escala. Baseada no roadmap público de Back-end da comunidade roadmap.sh — a linguagem do servidor é escolha sua, e o caminho volta a se juntar depois dela.",
-    "outcome": "Back-end Developer júnior"
+    "outcome": "Back-end Developer júnior",
+    "steps": {
+      "3": {
+        "choice": "a linguagem do servidor",
+        "note": "Domine uma bem antes de saltar para outra. O resto da trilha é igual em qualquer caminho."
+      }
+    }
   },
   "devops": {
     "name": "DevOps e SRE",
     "goal": "A formação de quem sustenta a operação: sistemas, redes, nuvem, automação e observabilidade. Sequência baseada no roadmap público de DevOps da comunidade roadmap.sh. Metade dos cursos vem das trilhas anteriores — quem já fez Front-end ou Back-end entra com meio caminho andado.",
     "outcome": "DevOps Engineer / SRE júnior"
   },
-  "dados": {
+  "data": {
     "name": "Engenharia de Dados",
     "goal": "A formação de quem constrói a infraestrutura que sustenta decisões: modelagem, pipelines, big data e governança. Sequência baseada no roadmap público de Data Engineer da comunidade roadmap.sh, que recomenda Python e SQL como pré-requisitos. Metade dos cursos vem das trilhas anteriores.",
     "outcome": "Data Engineer júnior"
   },
-  "redes-infra": {
+  "networks-infra": {
     "name": "Redes e Infraestrutura",
     "goal": "A formação de quem faz o pacote chegar: endereçamento, roteamento, wi-fi, segurança e automação. Sequência baseada no roadmap público de Network Engineer da comunidade roadmap.sh — sete dos onze cursos vêm das trilhas anteriores.",
     "outcome": "Network Engineer júnior"
@@ -2764,22 +2770,22 @@ window.I18N.pt.tracks = {
     "goal": "A trilha curta do catálogo e a única que não exige saber programar: quem escreve, atende, ensina ou decide também precisa disso. Cobre o roadmap público de Prompt Engineering da comunidade roadmap.sh por inteiro, incluindo o de AI Red Teaming que ele referencia.",
     "outcome": "Especialista em Engenharia de Prompt"
   },
-  "ia": {
+  "ai": {
     "name": "Engenharia de IA",
     "goal": "A formação de quem constrói produtos com IA: escolha de modelo, embeddings, RAG, agentes, MCP, avaliação e multimodal. Sequência baseada no roadmap público de AI Engineer da comunidade roadmap.sh — a base de programação vem de Python.",
     "outcome": "AI Engineer júnior"
   },
-  "arquitetura-software": {
+  "software-architecture": {
     "name": "Arquitetura de Software",
     "goal": "A única trilha do catálogo que exige outra antes: é continuação de carreira, não porta de entrada. Para quem já desenvolve e vai passar a decidir — padrões, modelagem, integração corporativa, gestão e comunicação. Sequência baseada no roadmap público de Software Architect da comunidade roadmap.sh, que pede Back-end como pré-requisito.",
     "outcome": "Arquiteto(a) de Software"
   },
-  "ti-suporte": {
+  "it-support": {
     "name": "Fundamentos de TI e Suporte",
     "goal": "A porta de entrada da escola e a primeira trilha que não exige nada: começa no gabinete aberto e termina com você atendendo, diagnosticando e documentando. Cobre os blocos Fundamental IT Skills, Operating Systems e a base de rede do roadmap público de Cyber Security da comunidade roadmap.sh.",
     "outcome": "Técnico(a) de Suporte / Help Desk"
   },
-  "seguranca": {
+  "security": {
     "name": "Segurança Cibernética",
     "goal": "Ataque e defesa no mesmo caminho: fundamentos, criptografia, ameaças, hardening, SOC, teste de intrusão e nuvem. É a metade grande do roadmap público de Cyber Security da comunidade roadmap.sh — a outra metade virou a trilha de Fundamentos de TI e Suporte, que serve de base para esta.",
     "outcome": "Analista de Segurança da Informação"
@@ -2799,19 +2805,50 @@ window.I18N.pt.tracks = {
     "goal": "A formação de quem garante que o software faz o que promete — e aguenta o que prometeram por ele. Sequência baseada no roadmap público de QA Engineer da comunidade roadmap.sh. Como em BI, ninguém precisa programar para começar: são 330h até o primeiro curso de programação, e é a segunda porta de entrada do catálogo para quem está mudando de carreira.",
     "outcome": "QA Engineer júnior"
   },
-  "python-tec": {
+  "python-tech": {
     "name": "Python",
     "goal": "Para quem quer dominar a linguagem, não um cargo. O tronco é igual para todos — a linguagem bem aprendida, com versionamento — e no fim você escolhe onde aplicá-la: no servidor, em dados ou em IA. Baseada no roadmap público de Python da comunidade roadmap.sh.",
-    "outcome": "Domínio de Python"
+    "outcome": "Domínio de Python",
+    "steps": {
+      "3": {
+        "choice": "onde aplicar o Python",
+        "note": "Aqui a trilha não volta a se juntar: cada caminho é uma aplicação diferente da mesma linguagem.",
+        "options": [
+          "Servidor e APIs",
+          "Dados",
+          "IA"
+        ]
+      }
+    }
   },
-  "go-tec": {
+  "go-tech": {
     "name": "Go",
     "goal": "A linguagem em que o Docker, o Kubernetes e o Terraform foram escritos. O tronco vai da sintaxe à concorrência — a parte de Go que não existe em outras linguagens — e no fim você escolhe o lado: construir serviços ou ferramenta de infraestrutura. Baseada no roadmap público de Go da roadmap.sh.",
-    "outcome": "Domínio de Go"
+    "outcome": "Domínio de Go",
+    "steps": {
+      "3": {
+        "choice": "o lado do Go",
+        "note": "Os dois partem da mesma concorrência: um constrói o serviço, o outro constrói a ferramenta que opera o serviço.",
+        "options": [
+          "Serviços e APIs",
+          "Ferramentas e Infraestrutura"
+        ]
+      }
+    }
   },
-  "sql-tec": {
+  "sql-tech": {
     "name": "SQL e Bancos de Dados",
     "goal": "A tecnologia que mais emprega e menos exige: SQL se aprende sem saber programar. É a trilha de quem vem do administrativo, do contábil ou da gestão e cansou de pedir relatório para alguém. Depois do banco, você escolhe o que fazer com o dado. Baseada nos roadmaps públicos de SQL e PostgreSQL da comunidade roadmap.sh.",
-    "outcome": "Domínio de SQL e bancos de dados"
+    "outcome": "Domínio de SQL e bancos de dados",
+    "steps": {
+      "2": {
+        "choice": "o que fazer com o dado",
+        "note": "Os dois caminhos partem do mesmo banco: um olha para a decisão, o outro para o volume.",
+        "options": [
+          "Análise e BI",
+          "Engenharia de Dados"
+        ]
+      }
+    }
   }
 };

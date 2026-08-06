@@ -1,7 +1,7 @@
 # bundle.py's output: generated from index.html + assets/ + app/.
 # It is for emailing around or opening off disk, not for publishing — when
 # served, the browser caches each file separately.
-/portal-aluno.html
+/portal-student.html
 
 # The portal has no build and no dependencies: `node_modules` only exists when
 # playwright is installed to run the smoke suite.

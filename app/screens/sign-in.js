@@ -13,43 +13,43 @@ import { esc } from '../text.js';
 
 export default async function signIn() {
   const el = document.createElement('div');
-  el.className = 'tela tela-entrar';
+  el.className = 'view view-signin';
 
   const options = TRACKS_BY_FAMILY().map(([family, list]) =>
-    '<optgroup label="' + txt('trilhas por ' + family) + '">' +
+    '<optgroup label="' + txt('tracks by ' + family) + '">' +
       list.map((t) => '<option value="' + esc(t.id) + '">' + esc(t.name) + '</option>').join('') +
     '</optgroup>').join('');
 
   el.innerHTML =
-    '<div class="entrar-caixa">' +
+    '<div class="signin-box">' +
       '<div class="term-bar">' +
         '<span class="dot d-r"></span><span class="dot d-y"></span><span class="dot d-g"></span>' +
-        '<span class="modal-arquivo">sessao.nova</span>' +
+        '<span class="modal-file">session.new</span>' +
       '</div>' +
-      '<div class="entrar-corpo">' +
-        '<h1>' + txt('Área do aluno') + '</h1>' +
-        '<p class="entrar-sub">' + txt('Entre para retomar de onde parou.') + '</p>' +
-        '<form id="form-entrar" novalidate>' +
-          '<div class="campo"><label for="e-nome">' + txt('nome') + '</label>' +
-            '<input id="e-nome" type="text" required autocomplete="name" placeholder="' + txt('seu nome') + '" /></div>' +
-          '<div class="campo"><label for="e-trilha">' + txt('sua trilha') + '</label>' +
-            '<select id="e-trilha">' + options + '</select></div>' +
-          '<button type="submit" class="btn btn-primary">' + txt('Entrar') + '</button>' +
+      '<div class="signin-body">' +
+        '<h1>' + txt('Student area') + '</h1>' +
+        '<p class="signin-sub">' + txt('Sign in to pick up where you left off.') + '</p>' +
+        '<form id="form-signin" novalidate>' +
+          '<div class="field"><label for="e-name">' + txt('name') + '</label>' +
+            '<input id="e-name" type="text" required autocomplete="name" placeholder="' + txt('your name') + '" /></div>' +
+          '<div class="field"><label for="e-track">' + txt('your track') + '</label>' +
+            '<select id="e-track">' + options + '</select></div>' +
+          '<button type="submit" class="btn btn-primary">' + txt('Sign in') + '</button>' +
         '</form>' +
-        '<p class="entrar-aviso mono dim">' +
-          txt('[esqueleto — não há autenticação: qualquer nome entra]') +
+        '<p class="signin-notice mono dim">' +
+          txt('[skeleton — there is no authentication: any name gets in]') +
         '</p>' +
       '</div>' +
     '</div>';
 
-  el.querySelector('#form-entrar').addEventListener('submit', async (e) => {
+  el.querySelector('#form-signin').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = el.querySelector('#e-nome').value.trim();
-    if (!name) return el.querySelector('#e-nome').focus();
+    const name = el.querySelector('#e-name').value.trim();
+    if (!name) return el.querySelector('#e-name').focus();
     await api.signIn({ name: name });
-    await api.enrol(el.querySelector('#e-trilha').value);
-    goTo('/painel');
+    await api.enrol(el.querySelector('#e-track').value);
+    goTo('/dashboard');
   });
 
-  return { title: txt('Entrar'), el, after: () => el.querySelector('#e-nome').focus() };
+  return { title: txt('Sign in'), el, after: () => el.querySelector('#e-name').focus() };
 }

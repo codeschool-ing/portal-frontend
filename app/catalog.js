@@ -3,7 +3,7 @@
 
    PROVENANCE: `trackGraph` came from the vitrine's `assets/script.js`
    (codeschool-ing.github.io), all but verbatim. Only one thing changed: there
-   the algorithm read the fork choice from a global `escolhas` object fed by
+   the algorithm read the fork choice from a global `choices` object fed by
    clicks on the tabs; here it is injected by the caller, because in the portal
    the choice is the student's enrolment and comes from storage.
 
@@ -11,14 +11,14 @@
    most valuable piece in the vitrine's repository and must never be rewritten
    again.
 
-   The catalogue's own field names (`cursos`, `topicos`, `depende`, `opcoes`,
-   `ligacoes`, `horas`) stay in Portuguese: `dados.js` is a verbatim copy shared
+   The catalogue's own field names (`courses`, `topics`, `requires`, `options`,
+   `links`, `hours`) are English, like the rest: the catalogue is authoredred
    with the vitrine, and renaming half of a shared contract only makes the two
    repositories drift.
 
    The shape `trackGraph` returns is English (`nodes`, `columns`, `level`) — it
    is internal to this module and `graph.js`, and the two were renamed together.
-   A node's `kind` is still `curso` / `garfo` / `saida`, because those are the
+   A node's `kind` is `course` / `fork` / `outcome`, because those are the
    values, not the field name, and they name things the catalogue declares.
    ========================================================================== */
 
@@ -26,8 +26,8 @@ export const courseById = (id) => COURSES.find((c) => c.id === id);
 export const trackById = (id) => TRACKS.find((t) => t.id === id);
 
 /* ---------- tracks with a fork ----------
-   An item of `cursos` is either a course id (a string) or a choice step (an
-   object with `opcoes`). Hence three different readings of the same track: all
+   An item of `courses` is either a course id (a string) or a choice step (an
+   object with `options`). Hence three different readings of the same track: all
    the possible courses, the chosen path, and the hours of that path. */
 export const isChoice = (item) => typeof item === 'object' && Array.isArray(item.options);
 
@@ -46,7 +46,7 @@ export const hoursOf = (ids) => ids.reduce((s, id) => s + (courseById(id)?.hours
 
 // how many tracks a course appears in (the same course can serve several)
 export const tracksWithCourse = (id) => TRACKS.filter((t) => allCourses(t).includes(id));
-// the inverse of `depende`: which courses this one unlocks
+// the inverse of `requires`: which courses this one unlocks
 export const unlockedBy = (id) => COURSES.filter((c) => (c.requires || []).includes(id));
 
 // workload range: the shortest and the longest possible path
@@ -62,12 +62,12 @@ export function hoursRange(t) {
 }
 
 /* ---------- lesson = topic ----------
-   The catalogue has no concept of a lesson: the finest grain is `topicos`. The
+   The catalogue has no concept of a lesson: the finest grain is `topics`. The
    portal adopts the topic as the lesson, and does not invent a third key — the
    pipeline's exercises are already indexed by `topico`.
 
    BUT THE DISPLAYED TITLE CANNOT BE THE KEY. `applyContent()` rewrites
-   `c.topicos` in place on every language switch, so in English the title becomes
+   `c.topics` in place on every language switch, so in English the title becomes
    "Types, coercion, strict equality and falsy values" and no exercise matches.
    The defect shows up without anyone touching anything: the browser only has to
    be set to another language, which is the case for most people outside Brazil.
@@ -91,7 +91,7 @@ export function courseLessons(id) {
 /* ---------- a track's graph ----------
    Every course on the path becomes a node; a choice step becomes a single node
    (the block), because it is a decision, not a course. The edges come from each
-   course's `depende` field, clipped to what exists in this track. A node's level
+   course's `requires` field, clipped to what exists in this track. A node's level
    is 1 + the highest level among its prerequisites, which puts side by side
    everything that can be done at the same time. */
 export function trackGraph(t, activeOption = DEFAULT_OPTION) {
@@ -105,8 +105,8 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
       ofCourse[item] = item;
       return;
     }
-    const nodeId = 'garfo:' + idx;
-    nodes.push({ id: nodeId, kind: 'garfo', step: item, idx: idx, courses: item.options[activeOption(t.id, idx)].courses });
+    const nodeId = 'fork:' + idx;
+    nodes.push({ id: nodeId, kind: 'fork', step: item, idx: idx, courses: item.options[activeOption(t.id, idx)].courses });
     item.options.forEach((o) => o.courses.forEach((c) => { forkMembers[c] = nodeId; }));
     item.options[activeOption(t.id, idx)].courses.forEach((c) => { ofCourse[c] = nodeId; });
   });
@@ -127,7 +127,7 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
       });
     });
     // no prerequisite at all inside this track: the curriculum order applies,
-    // or courses like `nuvem` and `testes-cicd` would all land on level one
+    // or courses like `cloud` and `testing-cicd` would all land on level one
     if (!deps.size && i > 0) deps.add(nodes[i - 1].id);
     node.deps = [...deps];
   });
@@ -136,7 +136,7 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
   // the graph does not end in loose courses with no outgoing arrow
   const hasSuccessor = {};
   nodes.forEach((n) => n.deps.forEach((d) => { hasSuccessor[d] = true; }));
-  nodes.push({ id: '@saida', kind: 'saida', courses: [], deps: nodes.filter((n) => !hasSuccessor[n.id]).map((n) => n.id) });
+  nodes.push({ id: '@outcome', kind: 'outcome', courses: [], deps: nodes.filter((n) => !hasSuccessor[n.id]).map((n) => n.id) });
 
   const successors = {};
   nodes.forEach((n) => n.deps.forEach((d) => { (successors[d] = successors[d] || []).push(n.id); }));
@@ -166,7 +166,7 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
     queue.push(n.id);
   });
   if (stuck.length && window.console) {
-    console.warn('trilha "' + t.name + '": dependência circular em ' + stuck.map((n) => n.id).join(', '));
+    console.warn('track "' + t.name + '": circular dependency at ' + stuck.map((n) => n.id).join(', '));
   }
 
   // group by level, leaving no gap in the sequence of columns
@@ -298,13 +298,13 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
   const initial = columns.map((col) => col.slice());
   let seed = 1;   // linear congruential generator: it shuffles the same way every time
   const draw = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
-  const RESTARTS = ['curriculo', 'invertida', 'sorteio', 'sorteio', 'sorteio', 'sorteio'];
+  const RESTARTS = ['as-authored', 'reversed', 'shuffled', 'shuffled', 'shuffled', 'shuffled'];
 
   RESTARTS.forEach((restart) => {
     columns.length = 0;
     initial.forEach((col) => {
-      if (restart === 'curriculo') return columns.push(col.slice());
-      if (restart === 'invertida') return columns.push(col.slice().reverse());
+      if (restart === 'as-authored') return columns.push(col.slice());
+      if (restart === 'reversed') return columns.push(col.slice().reverse());
       const a = col.slice();
       for (let i = a.length - 1; i > 0; i -= 1) {
         const j = Math.floor(draw() * (i + 1));
@@ -316,7 +316,7 @@ export function trackGraph(t, activeOption = DEFAULT_OPTION) {
     /* on a shuffled restart, climb the hill BEFORE the barycentre: if the
        barycentre runs first it reorders everything by neighbours and erases the
        shuffle, and the restart stops being a different restart */
-    if (restart === 'sorteio') { transpose(true); keep(); }
+    if (restart === 'shuffled') { transpose(true); keep(); }
     for (let pass = 0; pass < 2; pass += 1) {
       const aggregate = pass % 2 ? MEDIAN : MEAN;
       for (let v = 1; v < columns.length; v += 1) {

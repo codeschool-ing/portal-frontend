@@ -5,7 +5,7 @@
    and pressing Ctrl+C does nothing; the code button does. Everything below is
    in service of that single rule, and it is worth being precise about what it
    buys, because the file this repository ships makes the limit obvious:
-   `portal-aluno.html` carries every lesson inline, so view-source, DevTools or
+   `portal-student.html` carries every lesson inline, so view-source, DevTools or
    JavaScript turned off all read the whole course. This is friction, not
    protection. What protects content is a server that does not serve what the
    student has not bought — which is Stage 2's job, not this file's.
@@ -34,7 +34,7 @@
    ONE LISTENER FOR THE WHOLE DOCUMENT, and not one per block. Code blocks are
    rebuilt on every section change and on every language switch, and a listener
    per block would leak one on each rebuild — the same reasoning the graph
-   already follows with its edge highlight. The button carries `data-copiar` and
+   already follows with its edge highlight. The button carries `data-copy` and
    the document decides what to do with it.
 
    WHAT GETS COPIED IS DECIDED BY WHERE THE BUTTON SITS, not by an attribute
@@ -59,21 +59,21 @@ import { COPY_ICONS } from './text.js';
 
 const HELD = 1600;   // how long the button stays in its "copied" state
 
-/* Inside an `exemplo` the program is cut into snippets with a note beside each
+/* Inside an `example` the program is cut into snippets with a note beside each
    one; joining them back is the point — nobody wants a third of a program.
-   Inside a `.cod-bloco` there is a single `<pre>`.
+   Inside a `.code-block` there is a single `<pre>`.
 
    `textContent` and never `innerHTML`: the snippets went through `highlight()`
    and are wrapped in `<span>`s, so reading the markup would paste the colours
    along with the code. It also decodes what `esc()` wrote, which is the round
    trip we want — what is copied is what the author typed. */
 export function codeToCopy(button) {
-  const example = button.closest('.exemplo');
+  const example = button.closest('.example');
   if (example) {
-    return [...example.querySelectorAll('.exemplo-cod')].map((el) => el.textContent).join('\n');
+    return [...example.querySelectorAll('.example-code')].map((el) => el.textContent).join('\n');
   }
-  const block = button.closest('.cod-bloco');
-  const pre = block && block.querySelector('pre.cod');
+  const block = button.closest('.code-block');
+  const pre = block && block.querySelector('pre.code');
   return pre ? pre.textContent : '';
 }
 
@@ -107,18 +107,18 @@ async function toClipboard(text) {
    describe the past instead of what it does. */
 function flash(button, ok) {
   clearTimeout(button.dataset.timer);
-  const label = ok ? txt('código copiado') : txt('não foi possível copiar');
+  const label = ok ? txt('code copied') : txt('could not copy');
   button.innerHTML = ok ? COPY_ICONS.copied : COPY_ICONS.copy;
-  button.classList.toggle('copiado', ok);
-  button.classList.toggle('falhou', !ok);
+  button.classList.toggle('copied', ok);
+  button.classList.toggle('failed', !ok);
   button.setAttribute('aria-label', label);
   button.setAttribute('title', label);
 
   button.dataset.timer = setTimeout(() => {
     button.innerHTML = COPY_ICONS.copy;
-    button.classList.remove('copiado', 'falhou');
-    button.setAttribute('aria-label', txt('Copiar o código'));
-    button.setAttribute('title', txt('Copiar o código'));
+    button.classList.remove('copied', 'failed');
+    button.setAttribute('aria-label', txt('Copy the code'));
+    button.setAttribute('title', txt('Copy the code'));
   }, HELD);
 }
 
@@ -131,7 +131,7 @@ const ownField = (node) => Boolean(node?.closest?.('input, textarea, [contentedi
 
 export function wireCopy() {
   document.addEventListener('click', async (e) => {
-    const button = e.target.closest('[data-copiar]');
+    const button = e.target.closest('[data-copy]');
     if (!button) return;
     const code = codeToCopy(button);
     if (!code) return;

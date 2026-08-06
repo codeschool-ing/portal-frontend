@@ -32,13 +32,13 @@ export const wrongOnes = () => answersWithExercise().filter((r) => r.checked && 
 
 export default async function performance() {
   const el = document.createElement('div');
-  el.className = 'tela tela-desempenho';
+  el.className = 'view screen-performance';
   const all = answersWithExercise();
 
   if (!all.length) {
     return {
-      title: txt('Desempenho'),
-      el: empty(txt('Você ainda não respondeu nenhum exercício. Faça uma avaliação e volte aqui.')),
+      title: txt('Performance'),
+      el: empty(txt('You have not answered any exercises yet. Take an assessment and come back.')),
     };
   }
 
@@ -61,67 +61,67 @@ export default async function performance() {
 
   const row = (label, d) => {
     const p = Math.round((d.lastCorrect / d.total) * 100);
-    return '<div class="dsp-linha">' +
-      '<span class="dsp-rot">' + esc(label) + '</span>' +
+    return '<div class="perf-row">' +
+      '<span class="perf-label">' + esc(label) + '</span>' +
       bar(p, d.lastCorrect + ' de ' + d.total) +
-      '<span class="dsp-num">' + d.lastCorrect + '/' + d.total + '</span>' +
+      '<span class="perf-num">' + d.lastCorrect + '/' + d.total + '</span>' +
     '</div>';
   };
 
   const wrong = wrongOnes();
 
   el.innerHTML =
-    '<header class="tela-head">' +
-      '<h1>' + txt('Como você está indo') + '</h1>' +
+    '<header class="view-head">' +
+      '<h1>' + txt('How you are doing') + '</h1>' +
     '</header>' +
 
-    '<section class="bloco">' +
-      '<div class="trilha-numeros">' +
-        '<span><b>' + pct + '%</b>' + txt('de acerto') + '</span>' +
-        '<span><b>' + right + '/' + checked.length + '</b>' + txt('exercícios conferidos') + '</span>' +
-        '<span><b>' + attempts + '</b>' + txt('tentativas') + '</span>' +
-        (pending ? '<span><b>' + pending + '</b>' + txt('aguardando o servidor') + '</span>' : '') +
+    '<section class="block">' +
+      '<div class="track-numbers">' +
+        '<span><b>' + pct + '%</b>' + txt('correct') + '</span>' +
+        '<span><b>' + right + '/' + checked.length + '</b>' + txt('exercises checked') + '</span>' +
+        '<span><b>' + attempts + '</b>' + txt('attempts') + '</span>' +
+        (pending ? '<span><b>' + pending + '</b>' + txt('waiting for the server') + '</span>' : '') +
       '</div>' +
       bar(pct, pct + '%') +
       (pending
-        ? '<p class="conta-nota mono dim">' +
-            txt('Os tipos que precisam de execução ainda não são conferidos, e por isso não entram na taxa.') +
+        ? '<p class="account-note mono dim">' +
+            txt('The types that need execution are not checked yet, so they stay out of the rate.') +
           '</p>'
         : '') +
     '</section>' +
 
-    '<section class="bloco">' +
-      '<div class="bloco-topo"><h2>' + txt('Por tipo de exercício') + '</h2></div>' +
+    '<section class="block">' +
+      '<div class="block-top"><h2>' + txt('By exercise type') + '</h2></div>' +
       groupBy((r) => r.ex.type).map(([k, d]) => row(txt(k), d)).join('') +
     '</section>' +
 
-    '<section class="bloco">' +
-      '<div class="bloco-topo"><h2>' + txt('Por curso') + '</h2></div>' +
+    '<section class="block">' +
+      '<div class="block-top"><h2>' + txt('By course') + '</h2></div>' +
       groupBy((r) => r.courseId).map(([k, d]) => row(courseById(k)?.name || k, d)).join('') +
     '</section>' +
 
     (wrong.length
-      ? '<section class="bloco">' +
-          '<div class="bloco-topo">' +
-            '<h2>' + txt('O que você errou') + '</h2>' +
-            '<a class="btn btn-primary" href="#/refazer">' +
+      ? '<section class="block">' +
+          '<div class="block-top">' +
+            '<h2>' + txt('What you got wrong') + '</h2>' +
+            '<a class="btn btn-primary" href="#/redo">' +
               (wrong.length === 1
-                ? txt('Refazer o que você errou')
-                : txt('Refazer os') + ' ' + wrong.length + ' ' + txt('errados')) + ' →</a>' +
+                ? txt('Redo what you got wrong')
+                : txt('Redo the') + ' ' + wrong.length + ' ' + txt('wrong ones')) + ' →</a>' +
           '</div>' +
-          '<ul class="dsp-errados">' +
+          '<ul class="perf-wrong">' +
             wrong.map((r) => {
               const a = courseLessons(r.courseId)[r.lessonIx];
               const c = courseById(r.courseId);
-              return '<li><a href="#/curso/' + esc(r.courseId) + '/aula/' + r.lessonIx + '/avaliacao">' +
-                '<span class="de-tipo">' + txt(r.ex.type) + '</span>' +
-                '<span class="de-enunciado">' + esc(r.ex.prompt) + '</span>' +
-                '<span class="de-onde">' + esc(c ? c.name : r.courseId) + (a ? ' · ' + esc(a.title) : '') + '</span>' +
+              return '<li><a href="#/course/' + esc(r.courseId) + '/lesson/' + r.lessonIx + '/assessment">' +
+                '<span class="de-type">' + txt(r.ex.type) + '</span>' +
+                '<span class="de-prompt">' + esc(r.ex.prompt) + '</span>' +
+                '<span class="de-where">' + esc(c ? c.name : r.courseId) + (a ? ' · ' + esc(a.title) : '') + '</span>' +
               '</a></li>';
             }).join('') +
           '</ul>' +
         '</section>'
-      : '<section class="bloco"><p class="vazio">' + txt('Nenhum erro pendente. Bom trabalho.') + '</p></section>');
+      : '<section class="block"><p class="empty">' + txt('No mistakes pending. Good work.') + '</p></section>');
 
-  return { title: txt('Desempenho'), el };
+  return { title: txt('Performance'), el };
 }

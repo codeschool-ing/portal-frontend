@@ -25,19 +25,19 @@ const plausibleEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || '').
    the bar measures and informs, and the minimum is only the length. */
 function passwordStrength(s) {
   const v = String(s || '');
-  if (v.length < 8) return { pct: Math.min(30, v.length * 4), rotulo: 'curta demais', ok: false };
+  if (v.length < 8) return { pct: Math.min(30, v.length * 4), label: 'too short', ok: false };
   let points = Math.min(50, v.length * 3);
   if (/[a-z]/.test(v) && /[A-Z]/.test(v)) points += 12;
   if (/\d/.test(v)) points += 12;
   if (/[^\w]/.test(v)) points += 14;
   if (new Set(v).size > 10) points += 12;
   const pct = Math.min(100, points);
-  return { pct, rotulo: pct >= 80 ? 'forte' : (pct >= 55 ? 'razoável' : 'fraca'), ok: true };
+  return { pct, label: pct >= 80 ? 'strong' : (pct >= 55 ? 'fair' : 'weak'), ok: true };
 }
 
 export default async function account() {
   const el = document.createElement('div');
-  el.className = 'tela tela-conta';
+  el.className = 'view view-account';
   const session = await api.session();
   const t = studentTrack();
   const p = t ? trackProgress(t) : null;
@@ -46,34 +46,34 @@ export default async function account() {
   void now;
 
   const options = TRACKS_BY_FAMILY().map(([family, list]) =>
-    '<optgroup label="' + txt('trilhas por ' + family) + '">' +
+    '<optgroup label="' + txt('tracks by ' + family) + '">' +
       list.map((x) => '<option value="' + esc(x.id) + '"' + (t && x.id === t.id ? ' selected' : '') + '>' +
         esc(x.name) + '</option>').join('') +
     '</optgroup>').join('');
 
   el.innerHTML =
-    '<header class="tela-head">' +
-      '<h1>' + esc(session?.name || txt('aluno')) + '</h1>' +
+    '<header class="view-head">' +
+      '<h1>' + esc(session?.name || txt('student')) + '</h1>' +
     '</header>' +
 
-    '<section class="bloco">' +
-      '<div class="bloco-topo"><h2>' + txt('Sua trilha') + '</h2></div>' +
-      '<div class="campo"><label for="c-trilha">' + txt('trilha atual') + '</label>' +
-        '<select id="c-trilha">' + options + '</select></div>' +
-      (p ? '<p class="conta-nota">' + p.feitas + '/' + p.total + ' ' + txt('aulas') + ' · ' + p.pct + '%</p>' : '') +
-      '<p class="conta-nota mono dim">' +
-        txt('Trocar de trilha não apaga nada: o progresso é por curso, e curso compartilhado continua contando.') +
+    '<section class="block">' +
+      '<div class="block-top"><h2>' + txt('Your track') + '</h2></div>' +
+      '<div class="field"><label for="c-track">' + txt('current track') + '</label>' +
+        '<select id="c-track">' + options + '</select></div>' +
+      (p ? '<p class="account-note">' + p.done + '/' + p.total + ' ' + txt('lessons') + ' · ' + p.pct + '%</p>' : '') +
+      '<p class="account-note mono dim">' +
+        txt('Switching track erases nothing: progress is per course, and a shared course keeps counting.') +
       '</p>' +
     '</section>' +
 
-    '<section class="bloco">' +
-      '<div class="bloco-topo">' +
-        '<h2>' + txt('Plano') + '</h2>' +
-        '<a class="bloco-link" href="#/plano">' + txt('ver detalhes do plano') + ' →</a>' +
+    '<section class="block">' +
+      '<div class="block-top">' +
+        '<h2>' + txt('Plan') + '</h2>' +
+        '<a class="block-link" href="#/plan">' + txt('see plan details') + ' →</a>' +
       '</div>' +
-      '<p class="conta-nota">' +
+      '<p class="account-note">' +
         '<strong>' + esc(plan ? plan.name : '—') + '</strong> · ' +
-        (plan && plan.price === 0 ? txt('grátis') : 'R$ ' + (plan?.price ?? 0) + ' ' + txt(plan?.cycle || '')) +
+        (plan && plan.price === 0 ? txt('free') : 'R$ ' + (plan?.price ?? 0) + ' ' + txt(plan?.cycle || '')) +
       '</p>' +
     '</section>' +
 
@@ -82,69 +82,69 @@ export default async function account() {
        consequences, different confirmations and, on the server, different
        endpoints. Joining them under one "save" would only make people change one
        by accident. */
-    '<section class="bloco">' +
-      '<div class="bloco-topo"><h2>' + txt('E-mail') + '</h2></div>' +
+    '<section class="block">' +
+      '<div class="block-top"><h2>' + txt('E-mail') + '</h2></div>' +
       '<form id="f-email" novalidate>' +
-        '<div class="campo">' +
-          '<label for="c-email">' + txt('e-mail de acesso') + '</label>' +
+        '<div class="field">' +
+          '<label for="c-email">' + txt('sign-in e-mail') + '</label>' +
           '<input type="email" id="c-email" autocomplete="email" value="' + esc(acc.email) + '" ' +
-            'placeholder="voce@exemplo.com">' +
+            'placeholder="voce@example.com">' +
         '</div>' +
-        '<div class="conta-acao">' +
-          '<button type="submit" class="btn btn-primary">' + txt('Trocar e-mail') + '</button>' +
-          '<span class="conta-aviso mono" id="a-email" aria-live="polite"></span>' +
-        '</div>' +
-      '</form>' +
-      '<p class="conta-nota mono dim">' +
-        txt('Na Etapa 2 a troca só vale depois de confirmada no endereço novo — senão trocar o e-mail seria a forma mais fácil de tomar uma conta.') +
-      '</p>' +
-    '</section>' +
-
-    '<section class="bloco">' +
-      '<div class="bloco-topo"><h2>' + txt('Senha') + '</h2></div>' +
-      '<form id="f-senha" novalidate>' +
-        '<div class="campo">' +
-          '<label for="c-senha-atual">' + txt('senha atual') + '</label>' +
-          '<input type="password" id="c-senha-atual" autocomplete="current-password">' +
-        '</div>' +
-        '<div class="campo">' +
-          '<label for="c-senha-nova">' + txt('senha nova') + '</label>' +
-          '<input type="password" id="c-senha-nova" autocomplete="new-password">' +
-          '<span class="senha-medida"><span class="barra"><span class="barra-cheia" style="width:0"></span></span>' +
-            '<span class="senha-rotulo mono dim"></span></span>' +
-        '</div>' +
-        '<div class="campo">' +
-          '<label for="c-senha-rep">' + txt('repita a senha nova') + '</label>' +
-          '<input type="password" id="c-senha-rep" autocomplete="new-password">' +
-        '</div>' +
-        '<div class="conta-acao">' +
-          '<button type="submit" class="btn btn-primary">' + txt('Trocar senha') + '</button>' +
-          '<span class="conta-aviso mono" id="a-senha" aria-live="polite"></span>' +
+        '<div class="account-action">' +
+          '<button type="submit" class="btn btn-primary">' + txt('Change e-mail') + '</button>' +
+          '<span class="account-notice mono" id="a-email" aria-live="polite"></span>' +
         '</div>' +
       '</form>' +
-      '<p class="conta-nota mono dim">' +
-        txt('Nenhuma senha é guardada aqui: não há autenticação no portal ainda, e gravá-la no navegador daria a impressão contrária.') +
+      '<p class="account-note mono dim">' +
+        txt('In Stage 2 the change only takes effect once confirmed at the new address — otherwise changing the e-mail would be the easiest way to take over an account.') +
       '</p>' +
     '</section>' +
 
-    '<section class="bloco bloco-risco">' +
-      '<div class="bloco-topo"><h2>' + txt('Apagar meu progresso') + '</h2></div>' +
-      '<p class="conta-nota">' + txt('Remove aulas concluídas, respostas e a matrícula. Não há desfazer.') + '</p>' +
-      '<button type="button" class="btn btn-ghost btn-risco" id="c-zerar">' + txt('Apagar tudo') + '</button>' +
-      '<p class="conta-confirma" id="c-confirma" hidden>' +
-        '<span>' + txt('Tem certeza?') + '</span>' +
-        '<button type="button" class="btn btn-risco" id="c-sim">' + txt('Sim, apagar') + '</button>' +
-        '<button type="button" class="btn btn-ghost" id="c-nao">' + txt('Cancelar') + '</button>' +
+    '<section class="block">' +
+      '<div class="block-top"><h2>' + txt('Password') + '</h2></div>' +
+      '<form id="f-password" novalidate>' +
+        '<div class="field">' +
+          '<label for="c-password-current">' + txt('current password') + '</label>' +
+          '<input type="password" id="c-password-current" autocomplete="current-password">' +
+        '</div>' +
+        '<div class="field">' +
+          '<label for="c-password-new">' + txt('new password') + '</label>' +
+          '<input type="password" id="c-password-new" autocomplete="new-password">' +
+          '<span class="password-meter"><span class="bar"><span class="bar-fill" style="width:0"></span></span>' +
+            '<span class="password-label mono dim"></span></span>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label for="c-password-repeat">' + txt('repeat the new password') + '</label>' +
+          '<input type="password" id="c-password-repeat" autocomplete="new-password">' +
+        '</div>' +
+        '<div class="account-action">' +
+          '<button type="submit" class="btn btn-primary">' + txt('Change password') + '</button>' +
+          '<span class="account-notice mono" id="a-password" aria-live="polite"></span>' +
+        '</div>' +
+      '</form>' +
+      '<p class="account-note mono dim">' +
+        txt('No password is stored here: there is no authentication in the portal yet, and writing one to the browser would give the opposite impression.') +
       '</p>' +
     '</section>' +
 
-    '<section class="bloco">' +
-      '<button type="button" class="btn btn-ghost" id="c-sair">' + txt('Sair') + '</button>' +
+    '<section class="block block-risk">' +
+      '<div class="block-top"><h2>' + txt('Erase my progress') + '</h2></div>' +
+      '<p class="account-note">' + txt('Removes completed lessons, answers and the enrolment. There is no undo.') + '</p>' +
+      '<button type="button" class="btn btn-ghost btn-risk" id="c-erase">' + txt('Erase everything') + '</button>' +
+      '<p class="account-confirm" id="c-confirm" hidden>' +
+        '<span>' + txt('Are you sure?') + '</span>' +
+        '<button type="button" class="btn btn-risk" id="c-yes">' + txt('Yes, erase') + '</button>' +
+        '<button type="button" class="btn btn-ghost" id="c-no">' + txt('Cancel') + '</button>' +
+      '</p>' +
+    '</section>' +
+
+    '<section class="block">' +
+      '<button type="button" class="btn btn-ghost" id="c-signout">' + txt('Sign out') + '</button>' +
     '</section>';
 
-  el.querySelector('#c-trilha').addEventListener('change', async (e) => {
+  el.querySelector('#c-track').addEventListener('change', async (e) => {
     await api.enrol(e.target.value);
-    goTo('/trilha');
+    goTo('/track');
   });
 
   /* ---------- e-mail ---------- */
@@ -153,53 +153,53 @@ export default async function account() {
     e.preventDefault();
     const value = el.querySelector('#c-email').value.trim();
     if (!plausibleEmail(value)) {
-      emailNotice.className = 'conta-aviso mono ruim';
-      emailNotice.textContent = txt('esse endereço não parece um e-mail');
+      emailNotice.className = 'account-notice mono bad';
+      emailNotice.textContent = txt('that address does not look like an e-mail');
       return;
     }
     await api.changeEmail(value);
-    emailNotice.className = 'conta-aviso mono bom';
-    emailNotice.textContent = txt('e-mail atualizado');
+    emailNotice.className = 'account-notice mono good';
+    emailNotice.textContent = txt('e-mail updated');
   });
 
   /* ---------- password ---------- */
-  const fresh = el.querySelector('#c-senha-nova');
-  const meter = el.querySelector('.senha-medida .barra-cheia');
-  const label = el.querySelector('.senha-rotulo');
+  const fresh = el.querySelector('#c-password-new');
+  const meter = el.querySelector('.password-meter .bar-fill');
+  const label = el.querySelector('.password-label');
   fresh.addEventListener('input', () => {
     const f = passwordStrength(fresh.value);
     meter.style.width = f.pct + '%';
-    label.textContent = fresh.value ? txt(f.rotulo) : '';
+    label.textContent = fresh.value ? txt(f.label) : '';
   });
 
-  const passwordNotice = el.querySelector('#a-senha');
-  el.querySelector('#f-senha').addEventListener('submit', async (e) => {
+  const passwordNotice = el.querySelector('#a-password');
+  el.querySelector('#f-password').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const currentPassword = el.querySelector('#c-senha-atual').value;
-    const repeat = el.querySelector('#c-senha-rep').value;
+    const currentPassword = el.querySelector('#c-password-current').value;
+    const repeat = el.querySelector('#c-password-repeat').value;
     const say = (text, good) => {
-      passwordNotice.className = 'conta-aviso mono ' + (good ? 'bom' : 'ruim');
+      passwordNotice.className = 'account-notice mono ' + (good ? 'good' : 'bad');
       passwordNotice.textContent = txt(text);
     };
     /* The order of the checks is the order the person filled the form in:
        pointing at the last field when the first is empty tells them to fix the
        wrong thing. */
-    if (!currentPassword) return say('digite a senha atual', false);
-    if (!passwordStrength(fresh.value).ok) return say('a senha nova precisa de pelo menos 8 caracteres', false);
-    if (fresh.value !== repeat) return say('as duas senhas novas não conferem', false);
-    if (fresh.value === currentPassword) return say('a senha nova é igual à atual', false);
+    if (!currentPassword) return say('type your current password', false);
+    if (!passwordStrength(fresh.value).ok) return say('the new password needs at least 8 characters', false);
+    if (fresh.value !== repeat) return say('the two new passwords do not match', false);
+    if (fresh.value === currentPassword) return say('the new password is the same as the current', false);
     await api.changePassword(fresh.value);
-    el.querySelectorAll('#f-senha input').forEach((i) => { i.value = ''; });
+    el.querySelectorAll('#f-password input').forEach((i) => { i.value = ''; });
     meter.style.width = '0';
     label.textContent = '';
-    return say('senha trocada', true);
+    return say('password changed', true);
   });
 
-  const confirm = el.querySelector('#c-confirma');
-  el.querySelector('#c-zerar').addEventListener('click', () => { confirm.hidden = false; });
-  el.querySelector('#c-nao').addEventListener('click', () => { confirm.hidden = true; });
-  el.querySelector('#c-sim').addEventListener('click', () => { reset(); goTo('/entrar'); });
-  el.querySelector('#c-sair').addEventListener('click', async () => { await api.signOut(); goTo('/entrar'); });
+  const confirm = el.querySelector('#c-confirm');
+  el.querySelector('#c-erase').addEventListener('click', () => { confirm.hidden = false; });
+  el.querySelector('#c-no').addEventListener('click', () => { confirm.hidden = true; });
+  el.querySelector('#c-yes').addEventListener('click', () => { reset(); goTo('/sign-in'); });
+  el.querySelector('#c-signout').addEventListener('click', async () => { await api.signOut(); goTo('/sign-in'); });
 
-  return { title: txt('Conta'), el };
+  return { title: txt('Account'), el };
 }

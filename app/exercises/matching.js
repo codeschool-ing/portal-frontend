@@ -42,20 +42,20 @@ export default {
     const spare = right.length - ex.pairs.length;
 
     const tile = (text, side) =>
-      '<button type="button" class="ficha ficha-' + side + '" data-valor="' + esc(text) + '">' +
+      '<button type="button" class="tile tile-' + side + '" data-value="' + esc(text) + '">' +
         formatted(text) +
       '</button>';
 
     return (
-      '<p class="ex-instrucao">' +
-        txt('Toque num item da esquerda e depois no par dele à direita.') +
-        (spare > 0 ? ' <strong>' + spare + ' ' + txt('opções ficam de fora.') + '</strong>' : '') +
+      '<p class="ex-instruction">' +
+        txt('Tap an item on the left, then its pair on the right.') +
+        (spare > 0 ? ' <strong>' + spare + ' ' + txt('options are left out.') + '</strong>' : '') +
       '</p>' +
-      '<div class="assoc-colunas">' +
-        '<div class="assoc-col assoc-col-esq">' + left.map((t) => tile(t, 'esq')).join('') + '</div>' +
-        '<div class="assoc-col assoc-col-dir">' + right.map((t) => tile(t, 'dir')).join('') + '</div>' +
+      '<div class="matching-cols">' +
+        '<div class="matching-col matching-col-left">' + left.map((t) => tile(t, 'left')).join('') + '</div>' +
+        '<div class="matching-col matching-col-right">' + right.map((t) => tile(t, 'right')).join('') + '</div>' +
       '</div>' +
-      '<p class="assoc-conta"><span class="assoc-feitos">0</span>/' + ex.pairs.length + ' ' + txt('pares') + '</p>'
+      '<p class="matching-count"><span class="assoc-done">0</span>/' + ex.pairs.length + ' ' + txt('pairs') + '</p>'
     );
   },
 
@@ -67,15 +67,15 @@ export default {
     const total = exercise.pairs.length;
 
     const clear = () => {
-      root.querySelectorAll('.ficha.sel').forEach((f) => f.classList.remove('sel'));
+      root.querySelectorAll('.tile.sel').forEach((f) => f.classList.remove('sel'));
       state.left = null;
     };
 
     root.addEventListener('click', (e) => {
-      const f = e.target.closest('.ficha');
+      const f = e.target.closest('.tile');
       if (!f || f.disabled || state.locked) return;
 
-      if (f.classList.contains('ficha-esq')) {
+      if (f.classList.contains('tile-left')) {
         clear();
         f.classList.add('sel');
         state.left = f;
@@ -83,21 +83,21 @@ export default {
       }
 
       // clicked on the right without picking a left one: nothing to pair yet
-      if (!state.left) { f.classList.add('tremendo'); setTimeout(() => f.classList.remove('tremendo'), 300); return; }
+      if (!state.left) { f.classList.add('shaking'); setTimeout(() => f.classList.remove('shaking'), 300); return; }
 
-      const leftValue = state.left.dataset.valor;
-      const rightValue = f.dataset.valor;
+      const leftValue = state.left.dataset.value;
+      const rightValue = f.dataset.value;
       state.map[leftValue] = rightValue;
 
       if (key[leftValue] === rightValue) {
         [state.left, f].forEach((el) => {
           el.classList.remove('sel');
-          el.classList.add('ficha-certa');
+          el.classList.add('tile-right');
           el.disabled = true;
         });
         state.left = null;
         state.done += 1;
-        root.querySelector('.assoc-feitos').textContent = state.done;
+        root.querySelector('.assoc-done').textContent = state.done;
         if (state.done === total) {
           state.locked = true;
           done({ map: state.map, errors: state.errors });
@@ -108,10 +108,10 @@ export default {
       // wrong: mark both, count it, and let go after a moment
       state.errors += 1;
       const pair = [state.left, f];
-      pair.forEach((el) => el.classList.add('ficha-errada'));
+      pair.forEach((el) => el.classList.add('tile-wrong'));
       state.locked = true;
       setTimeout(() => {
-        pair.forEach((el) => el.classList.remove('ficha-errada', 'sel'));
+        pair.forEach((el) => el.classList.remove('tile-wrong', 'sel'));
         state.left = null;
         state.locked = false;
       }, WRONG_PAIR_PAUSE);
@@ -121,18 +121,18 @@ export default {
   collect(root) {
     // the wrapper only calls this if the student hits "Responder" before closing
     // every pair — that answer is partial, and partial is not a pass
-    const done = Number(root.querySelector('.assoc-feitos').textContent);
+    const done = Number(root.querySelector('.assoc-done').textContent);
     return done > 0 ? { map: {}, errors: -1, partial: true } : null;
   },
 
   reveal(root, ex, v) {
-    root.querySelectorAll('.ficha').forEach((f) => { f.disabled = true; });
+    root.querySelectorAll('.tile').forEach((f) => { f.disabled = true; });
     if (v.errors > 0) {
       const p = document.createElement('p');
-      p.className = 'assoc-erros';
+      p.className = 'matching-errors';
       p.textContent = v.errors === 1
-        ? txt('1 par foi tentado errado antes de fechar.')
-        : v.errors + ' ' + txt('pares foram tentados errado antes de fechar.');
+        ? txt('1 pair was tried wrong before it closed.')
+        : v.errors + ' ' + txt('pairs were tried wrong before closing.');
       root.appendChild(p);
     }
   },

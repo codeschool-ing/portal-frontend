@@ -26,25 +26,25 @@ export default {
     const hidden = Math.max(0, tests.length - shown.length);
 
     const cases = shown.map((t) => (
-      '<div class="caso">' +
-        '<span class="caso-desc">' + formatted(t.description || '') + '</span>' +
-        '<div class="caso-io">' +
-          '<div><span class="caso-rot">' + txt('entrada') + '</span><pre class="cod"><code>' + esc(t.input) + '</code></pre></div>' +
-          '<div><span class="caso-rot">' + txt('saída') + '</span><pre class="cod"><code>' + esc(t.expectedOutput) + '</code></pre></div>' +
+      '<div class="case">' +
+        '<span class="case-desc">' + formatted(t.description || '') + '</span>' +
+        '<div class="case-io">' +
+          '<div><span class="case-label">' + txt('input') + '</span><pre class="code"><code>' + esc(t.input) + '</code></pre></div>' +
+          '<div><span class="case-label">' + txt('output') + '</span><pre class="code"><code>' + esc(t.expectedOutput) + '</code></pre></div>' +
         '</div>' +
       '</div>'
     )).join('');
 
     return (
-      '<label class="ex-rotulo" for="cod-' + uid + '">' + txt('sua solução') + '</label>' +
-      '<div class="cod-bloco cod-editor">' +
-        '<div class="cod-barra"><span class="cod-ling">' + esc(ex.language || '') + '</span></div>' +
-        '<textarea id="cod-' + uid + '" class="ex-campo mono cod-area" rows="10" spellcheck="false" ' +
+      '<label class="ex-label" for="cod-' + uid + '">' + txt('your solution') + '</label>' +
+      '<div class="code-block code-editor">' +
+        '<div class="code-bar"><span class="code-lang">' + esc(ex.language || '') + '</span></div>' +
+        '<textarea id="cod-' + uid + '" class="ex-field mono code-area" rows="10" spellcheck="false" ' +
           'autocapitalize="off" autocorrect="off">' + esc(ex.skeleton || '') + '</textarea>' +
       '</div>' +
       (cases
-        ? '<div class="casos"><span class="casos-tit">' + txt('exemplos') + '</span>' + cases +
-          (hidden ? '<p class="ex-nota">' + hidden + ' ' + txt('casos de teste ficam ocultos.') + '</p>' : '') +
+        ? '<div class="cases"><span class="cases-title">' + txt('examples') + '</span>' + cases +
+          (hidden ? '<p class="ex-note">' + hidden + ' ' + txt('test cases stay hidden.') + '</p>' : '') +
           '</div>'
         : '')
     );
@@ -53,7 +53,7 @@ export default {
   setup(root) {
     // Tab inside the editor indents instead of jumping to the next field —
     // without this you cannot write any Python at all.
-    const area = root.querySelector('.cod-area');
+    const area = root.querySelector('.code-area');
     if (!area) return;
     area.addEventListener('keydown', (e) => {
       if (e.key !== 'Tab') return;
@@ -65,11 +65,11 @@ export default {
   },
 
   collect(root) {
-    const v = root.querySelector('.cod-area').value;
+    const v = root.querySelector('.code-area').value;
     return v.trim() ? v : null;
   },
 
   reveal(root) {
-    root.querySelector('.cod-area').disabled = true;
+    root.querySelector('.code-area').disabled = true;
   },
 };

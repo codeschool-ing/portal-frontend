@@ -27,38 +27,38 @@ export default {
     const options = order.map((ix) => {
       const a = ex.choices[ix];
       return (
-        '<label class="alt" data-ix="' + ix + '">' +
+        '<label class="choice" data-ix="' + ix + '">' +
           '<input type="' + (many ? 'checkbox' : 'radio') + '" name="alt-' + uid + '" value="' + ix + '" />' +
-          '<span class="alt-marca" aria-hidden="true"></span>' +
-          '<span class="alt-txt">' + formatted(a.text) + '</span>' +
-          '<span class="alt-porque" hidden>' + formatted(a.why || '') + '</span>' +
+          '<span class="choice-mark" aria-hidden="true"></span>' +
+          '<span class="choice-text">' + formatted(a.text) + '</span>' +
+          '<span class="choice-why" hidden>' + formatted(a.why || '') + '</span>' +
         '</label>'
       );
     }).join('');
 
     return (
-      (many ? '<p class="ex-instrucao">' + txt('Marque todas as que se aplicam.') + '</p>' : '') +
-      '<div class="alts">' + options + '</div>'
+      (many ? '<p class="ex-instruction">' + txt('Select all that apply.') + '</p>' : '') +
+      '<div class="choices">' + options + '</div>'
     );
   },
 
   collect(root) {
-    const ticked = [...root.querySelectorAll('.alt input:checked')].map((i) => Number(i.value));
+    const ticked = [...root.querySelectorAll('.choice input:checked')].map((i) => Number(i.value));
     if (!ticked.length) return null;
-    return root.querySelector('.alt input[type="checkbox"]') ? ticked : ticked[0];
+    return root.querySelector('.choice input[type="checkbox"]') ? ticked : ticked[0];
   },
 
   reveal(root, ex, v) {
-    root.querySelectorAll('.alt').forEach((el) => {
+    root.querySelectorAll('.choice').forEach((el) => {
       const ix = Number(el.dataset.ix);
       const a = ex.choices[ix];
       const ticked = el.querySelector('input').checked;
-      el.classList.toggle('alt-certa', Boolean(a.correct));
-      el.classList.toggle('alt-perdida', Boolean(a.correct) && !ticked);
-      el.classList.toggle('alt-errada', !a.correct && ticked);
+      el.classList.toggle('choice-right', Boolean(a.correct));
+      el.classList.toggle('choice-missed', Boolean(a.correct) && !ticked);
+      el.classList.toggle('choice-wrong', !a.correct && ticked);
       el.querySelector('input').disabled = true;
       // only now: the justification is feedback, not a hint
-      const p = el.querySelector('.alt-porque');
+      const p = el.querySelector('.choice-why');
       if (p.textContent.trim()) p.hidden = false;
     });
     void v;

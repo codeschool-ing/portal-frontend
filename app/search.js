@@ -30,7 +30,7 @@
    2. It ignores accents. Someone typing "coercao" wants to find "coerção", and
       on a phone people almost always type without accents.
 
-   The group keys (`secoes`, `aulas`, `cursos`…) stay in Portuguese: they are
+   The group keys (`sections`, `lessons`, `courses`…) are English, like
    i18n keys for the group labels, and the key is the Portuguese text by design.
    ========================================================================== */
 
@@ -80,7 +80,7 @@ function buildIndex() {
   };
 
   COURSES.forEach((c) => {
-    add('cursos', c.name, c.category + ' · ' + c.hours + 'h', '#/curso/' + c.id,
+    add('courses', c.name, c.category + ' · ' + c.hours + 'h', '#/course/' + c.id,
       c.summary, c.category, (c.syllabus || []).join(' '));
 
     const lessons = courseLessons(c.id);
@@ -88,30 +88,30 @@ function buildIndex() {
 
     lessons.forEach((a) => {
       const sections = lessonSections(c.id, a.key);
-      const first = '#/curso/' + c.id + '/aula/' + a.ix + '/' + sections[0].id;
-      /* The translated title AND the Portuguese key: see the header of this
-         file. In Portuguese the two are the same string, and then the key stays
-         out — repeated, it would become the excerpt of the result. */
-      add('aulas', a.title, c.name, first, a.key === a.title ? '' : a.key);
+      const first = '#/course/' + c.id + '/lesson/' + a.ix + '/' + sections[0].id;
+      /* The translated title AND the join key: see the header of this file. In
+         English — the source language — the two are the same string, and then
+         the key stays out; repeated, it would become the result's excerpt. */
+      add('lessons', a.title, c.name, first, a.key === a.title ? '' : a.key);
 
       /* A section only becomes a result where the content was written. In the 84
          courses with no text, the "section" is a wrapper with the same name as
          the lesson, and listing it would return every result twice. */
       if (hasContent) {
         sections.forEach((s) => {
-          if (s.tipo !== 'conteudo') return;
-          add('secoes', s.title, c.name + ' · ' + a.title,
-            '#/curso/' + c.id + '/aula/' + a.ix + '/' + s.id,
+          if (s.type !== 'content') return;
+          add('sections', s.title, c.name + ' · ' + a.title,
+            '#/course/' + c.id + '/lesson/' + a.ix + '/' + s.id,
             plainText(s.body));
         });
       }
 
       /* Only the prompt. The type was here once and left: nobody searches for
-         "ordenacao", and as the item's body it became a one-word excerpt under
+         "ordering", and as the item's body it became a one-word excerpt under
          every exercise. */
       lessonExercises(c.id, a.key).forEach((ex) => {
-        add('exercicios', ex.prompt, c.name + ' · ' + a.title,
-          '#/curso/' + c.id + '/aula/' + a.ix + '/avaliacao');
+        add('exercises', ex.prompt, c.name + ' · ' + a.title,
+          '#/course/' + c.id + '/lesson/' + a.ix + '/assessment');
       });
     });
   });
@@ -120,16 +120,16 @@ function buildIndex() {
     const c = courseById(note.courseId);
     const a = courseLessons(note.courseId)[note.lessonIx];
     if (!c || !a) return;
-    add('notas', note.text, c.name + ' · ' + a.title,
-      '#/curso/' + note.courseId + '/aula/' + note.lessonIx + '/' + note.sectionId);
+    add('notes', note.text, c.name + ' · ' + a.title,
+      '#/course/' + note.courseId + '/lesson/' + note.lessonIx + '/' + note.sectionId);
   });
 
   return items;
 }
 
-const GROUPS = ['secoes', 'aulas', 'cursos', 'exercicios', 'notas'];
+const GROUPS = ['sections', 'lessons', 'courses', 'exercises', 'notes'];
 export const GROUP_LABEL = {
-  sections: 'seções', lessons: 'aulas', courses: 'cursos', exercises: 'exercícios', notes: 'suas notas',
+  sections: 'sections', lessons: 'lessons', courses: 'courses', exercises: 'exercises', notes: 'your notes',
 };
 
 const PER_GROUP = 5;
