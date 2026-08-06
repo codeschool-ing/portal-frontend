@@ -270,7 +270,7 @@ def main():
 
            The PDFs come as `data:` URIs because the portal has to work opened off
            disk, as a single file — a link to `assets/something.pdf` dies after the
-           bundle. In Etapa 2 this becomes a signed URL from a bucket, and the shape
+           bundle. In Stage 2 this becomes a signed URL from a bucket, and the shape
            of the record does not change: only the `data` field stops being
            inlined.
            ========================================================================== */

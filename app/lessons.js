@@ -105,7 +105,7 @@ export const sectionIndex = (sections, secId) => {
 
    1. The same PDF serves more than one section without being duplicated.
    2. The record is what changes when the file stops being a `data:` URI and
-      becomes a signed URL from a bucket, in Etapa 2. The section still says only
+      becomes a signed URL from a bucket, in Stage 2. The section still says only
       the key — not one line of content has to be rewritten on that day.
 
    A key that is not in the registry is IGNORED, on purpose: material removed

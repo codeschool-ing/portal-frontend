@@ -41,7 +41,7 @@ export function formatted(s) {
    same wherever it shows up in the portal.
 
    Deliberately not Markdown. The real content will come from a database in
-   Etapa 2, and inventing a dialect now would only create a migration.
+   Stage 2, and inventing a dialect now would only create a migration.
 
    The block keys stay in Portuguese because they are content-file fields, and
    the content files are written by the school. */
