@@ -14,8 +14,9 @@
    access.
 
    The class names, the `data-*` attributes and the course states (`done`,
-   `current`, `available`, `ahead`) stay in Portuguese: they are the DOM
-   contract that base.css — a verbatim copy of the vitrine's stylesheet — styles.
+   `current`, `available`, `ahead`) are the DOM contract that base.css styles.
+   base.css is the vitrine's stylesheet with its selectors renamed to English;
+   the shapes and the cascade are untouched.
    ========================================================================== */
 
 import {
@@ -29,7 +30,7 @@ import { esc } from './text.js';
 export function courseState(id) {
   if (courseDone(id)) return 'done';
   const p = courseProgress(id);
-  if (p.feitas > 0) return 'current';
+  if (p.done > 0) return 'current';
   const deps = courseById(id)?.requires || [];
   const ready = deps.every((d) => courseDone(d));
   return ready ? 'available' : 'ahead';
@@ -57,13 +58,13 @@ function courseCard(id, order, deps) {
       (order ? '<span class="order">' + txt('level') + ' ' + order + '</span>' : '') +
       '<span class="node-state" data-state="' + st + '">' + txt(STATE_LABEL[st]) + '</span>' +
       '<span class="name">' + esc(c.name) + '</span>' +
-      (trackCount > 1 ? '<span class="tag-compartilhado">' + txt('in') + ' ' + trackCount + ' ' + txt('tracks') + '</span>' : '') +
+      (trackCount > 1 ? '<span class="tag-shared">' + txt('in') + ' ' + trackCount + ' ' + txt('tracks') + '</span>' : '') +
       '<span class="meta">' + c.hours + 'h · ' + txt(c.level) + '</span>' +
       (p.total
-        ? '<span class="node-bar" role="img" aria-label="' + p.feitas + ' de ' + p.total + '">' +
+        ? '<span class="node-bar" role="img" aria-label="' + p.done + ' de ' + p.total + '">' +
             '<span class="node-bar-fill" style="width:' + p.pct + '%"></span>' +
           '</span>' +
-          '<span class="node-count">' + p.feitas + '/' + p.total + ' ' + txt('sections') + '</span>'
+          '<span class="node-count">' + p.done + '/' + p.total + ' ' + txt('sections') + '</span>'
         : '') +
       (requires.length && st === 'ahead'
         ? '<span class="requires">' + txt('recommended after') + ' ' + esc(requires.join(' + ')) + '</span>'
@@ -105,7 +106,7 @@ export function buildTrack(t) {
       const sel = activeOption(t.id, node.idx);
       const tabs = item.options.map((o, j) =>
         '<button class="fork-tab' + (j === sel ? ' on' : '') + '" type="button" ' +
-        'data-garfo="' + node.idx + '" data-opcao="' + j + '">' + esc(o.name) +
+        'data-fork="' + node.idx + '" data-option="' + j + '">' + esc(o.name) +
         '<span class="fork-h">' + hoursOf(o.courses) + 'h</span></button>').join('');
       const inside = item.options[sel].courses.map((id) => courseCard(id)).join('');
       return (
@@ -120,7 +121,7 @@ export function buildTrack(t) {
         '</div>'
       );
     }).join('');
-    return '<div class="level" data-nivel="' + v + '"><div class="subcol">' + cards + '</div></div>';
+    return '<div class="level" data-level="' + v + '"><div class="subcol">' + cards + '</div></div>';
   }).join('');
 
   const workload = min === max
@@ -147,7 +148,7 @@ export function buildTrack(t) {
     '</div>' +
     '<div class="graph-legend">' +
       Object.entries(STATE_LABEL).map(([k, r]) =>
-        '<span class="leg"><i class="leg-cor no-' + k + '"></i>' + txt(r) + '</span>').join('') +
+        '<span class="leg"><i class="leg-color node-' + k + '"></i>' + txt(r) + '</span>').join('') +
     '</div>'
   );
 }

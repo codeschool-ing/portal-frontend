@@ -18,9 +18,9 @@
 import { esc, formatted } from '../text.js';
 
 const OP_NAME = {
-  diff: 'derivada',
+  diff: 'derivative',
   integrate: 'integral',
-  simplify: 'simplificação',
+  simplify: 'simplification',
 };
 
 export default {

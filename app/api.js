@@ -27,7 +27,7 @@ export const session = () => echo(state.now().session);
 
 // FUTURE: real authentication. Today any name gets in — it is a skeleton.
 export function signIn({ name, email }) {
-  state.change((e) => { e.session = { name: name || 'Aluno', email: email || '' }; });
+  state.change((e) => { e.session = { name: name || 'Student', email: email || '' }; });
   return echo(state.now().session);
 }
 
@@ -45,7 +45,7 @@ export function changeEmail(email) {
   return echo(state.now().session);
 }
 
-/* FUTURE: `PATCH /account/senha`, with the current password checked ON THE
+/* FUTURE: `PATCH /account/password`, with the current password checked ON THE
    SERVER. The new password is not stored anywhere here — see state.js. */
 export function changePassword() {
   state.markPasswordChange();
@@ -95,7 +95,7 @@ export function resumeFrom() {
 
   if (e.last && courseById(e.last.courseId)) {
     const { courseId, lessonIx } = e.last;
-    return echo({ ...e.last, sectionId: e.last.sectionId || firstSection(cursoId, aulaIx) });
+    return echo({ ...e.last, sectionId: e.last.sectionId || firstSection(courseId, lessonIx) });
   }
   const t = e.enrollment && trackById(e.enrollment.trackId);
   if (!t) return echo(null);
@@ -128,7 +128,7 @@ export async function grade(ex, answer) {
   return gradeLocally(ex, answer);
 }
 
-// FUTURE: POST /avaliar → throwaway container (execution) or sympy (CAS).
+// FUTURE: POST /grade → throwaway container (execution) or sympy (CAS).
 async function gradeOnServer(ex, answer) {
   await new Promise((r) => setTimeout(r, 420));   // the wait is part of the UI
   return {

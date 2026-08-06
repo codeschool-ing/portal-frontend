@@ -92,7 +92,7 @@ function globalRail(path) {
     return '<a class="rail-course no-' + st + '" href="#/course/' + esc(id) + '">' +
       '<span class="tc-mark" data-state="' + st + '" aria-hidden="true"></span>' +
       '<span class="tc-nome">' + esc(c.name) + '</span>' +
-      '<span class="tc-count">' + p.feitas + '/' + p.total + '</span>' +
+      '<span class="tc-count">' + p.done + '/' + p.total + '</span>' +
     '</a>';
   }).join('');
 
@@ -135,7 +135,7 @@ function courseRail(params, path) {
           '<span class="ta-num">' + txt('lesson') + ' ' + String(a.ix + 1).padStart(2, '0') + '</span>' +
           '<span class="ta-tit">' + esc(a.title) + '</span>' +
         '</a>' +
-        '<span class="ta-count">' + pa.feitas + '/' + pa.total + '</span>' +
+        '<span class="ta-count">' + pa.done + '/' + pa.total + '</span>' +
       '</div>';
 
     if (!open) return head;
@@ -182,8 +182,8 @@ function courseRail(params, path) {
     '<a class="rail-back" href="#/track">← ' + txt('my track') + '</a>' +
     '<div class="rail-sec">' +
       '<span class="rail-tit">' + esc(c.name) + '</span>' +
-      bar(p.pct, p.feitas + ' de ' + p.total) +
-      '<span class="rail-count">' + p.feitas + '/' + p.total + ' ' + txt('sections') + '</span>' +
+      bar(p.pct, p.done + ' de ' + p.total) +
+      '<span class="rail-count">' + p.done + '/' + p.total + ' ' + txt('sections') + '</span>' +
       '<div class="rail-lessons">' + rows + '</div>' +
       examRow +
     '</div>'

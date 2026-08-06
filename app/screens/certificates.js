@@ -147,7 +147,7 @@ const ICON_LINKEDIN = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden=
 
 export default async function certificates() {
   const el = document.createElement('div');
-  el.className = 'view tela-certificados';
+  el.className = 'view screen-certificates';
 
   const who = now().session?.name || 'Aluno';
   const today = DATE(new Date());
@@ -173,7 +173,7 @@ export default async function certificates() {
           onPath.reduce((s, id) => s + (courseById(id)?.hours || 0), 0) + 'h',
         who: who,
         when: today,
-        key: 'trilha.' + t.id,
+        key: 'track.' + t.id,
         grade: txt('track exam:') + ' ' + examResult('track:' + t.id).best + '%',
       })
       : '') +
@@ -203,7 +203,7 @@ export default async function certificates() {
       meta: model.hours + 'h · ' + txt(model.level) + (t ? ' · ' + t.name : ''),
       who: who,
       when: today,
-      key: 'example.curso',
+      key: 'example.course',
       sample: true,
       grade: txt('final exam:') + ' 90%',
     })) +
@@ -214,7 +214,7 @@ export default async function certificates() {
         (onPath.reduce((s, id) => s + (courseById(id)?.hours || 0), 0) || 380) + 'h',
       who: who,
       when: today,
-      key: 'example.trilha',
+      key: 'example.track',
       sample: true,
       grade: txt('track exam:') + ' 84%',
     }));

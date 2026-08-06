@@ -26,7 +26,7 @@ let hits = [];
 function create() {
   panel = document.createElement('div');
   panel.className = 'search-veil';
-  panel.id = 'busca-painel';
+  panel.id = 'search-panel';
   panel.hidden = true;
   panel.innerHTML =
     '<div class="search-box" role="dialog" aria-modal="true" aria-label="' + txt('Search') + '">' +

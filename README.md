@@ -31,7 +31,7 @@ node tools/examples/check.mjs   # the code examples really do run
 ## A single file, to open off disk
 
 ```sh
-python3 tools/bundle/bundle.py     # -> portal-aluno.html
+python3 tools/bundle/bundle.py     # -> portal-student.html
 ```
 
 It inlines the CSS, the scripts and the favicon and — the step the vitrine's
@@ -54,7 +54,7 @@ The same smoke suite runs against the bundle, and that is how we know it has not
 regressed:
 
 ```sh
-PORTAL="file://$PWD" PAGE=/portal-aluno.html node tools/smoke/smoke.mjs
+PORTAL="file://$PWD" PAGE=/portal-student.html node tools/smoke/smoke.mjs
 ```
 
 The portal is still served from `index.html` + `assets/` + `app/`; the bundle is
@@ -426,7 +426,7 @@ mechanism is the same; what changes is the weight of each half.
 
 That is why the **only divergence** between the two copies of `i18n-runtime.js`
 is the `DINAMICOS` list, which moved out of the code and became
-`window.I18N_DINAMICOS`, defined in `index.html`. It exists so that there is no
+`window.I18N_DYNAMIC`, defined in `index.html`. It exists so that there is no
 other divergence.
 
 **Interface and content are different things.** The interface translates into the
@@ -749,7 +749,7 @@ solution they wrote in their own editor — which is not the thing being
 protected.
 
 **This is friction, not protection, and the repository makes that obvious.**
-`portal-aluno.html` ships every lesson inline, so view-source, DevTools or
+`portal-student.html` ships every lesson inline, so view-source, DevTools or
 JavaScript turned off all read the whole course. What actually protects content
 is a server that does not serve what the student has not bought — Stage 2's job,
 not this layer's. It is worth writing down so nobody later mistakes the one for

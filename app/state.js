@@ -152,17 +152,17 @@ export function sectionDone(courseId, ix, sectionId) {
 
 export function lessonProgress(courseId, ix) {
   const a = courseLessons(courseId)[ix];
-  if (!a) return { feitas: 0, total: 0, pct: 0 };
+  if (!a) return { done: 0, total: 0, pct: 0 };
   // only the countable ones: an assessment with no exercises yet shows on
   // screen but stays out of the denominator, or the course would never close
   const sections = countableSections(courseId, a.key);
   const done = sections.filter((s) => sectionDone(courseId, ix, s.id)).length;
-  return { feitas: done, total: sections.length, pct: sections.length ? Math.round((done / sections.length) * 100) : 0 };
+  return { done: done, total: sections.length, pct: sections.length ? Math.round((done / sections.length) * 100) : 0 };
 }
 
 export const lessonDone = (courseId, ix) => {
   const p = lessonProgress(courseId, ix);
-  return p.total > 0 && p.feitas === p.total;
+  return p.total > 0 && p.done === p.total;
 };
 
 export function courseProgress(courseId) {
@@ -173,12 +173,12 @@ export function courseProgress(courseId) {
       if (sectionDone(courseId, ix, s.id)) done += 1;
     });
   });
-  return { feitas: done, total, pct: total ? Math.round((done / total) * 100) : 0 };
+  return { done: done, total, pct: total ? Math.round((done / total) * 100) : 0 };
 }
 
 export const courseDone = (courseId) => {
   const p = courseProgress(courseId);
-  return p.total > 0 && p.feitas === p.total;
+  return p.total > 0 && p.done === p.total;
 };
 
 /* ---------- exams ----------

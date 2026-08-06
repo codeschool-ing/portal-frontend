@@ -2,7 +2,7 @@
    Pieces that more than one screen uses.
 
    It exists so that two places do not compute the same number in two different
-   ways — the same reason the vitrine's terminal reads `CURSOS` instead of having
+   ways — the same reason the vitrine's terminal reads `COURSES` instead of having
    the answers written by hand: no screen may contradict another, because they
    all read the same source.
    ========================================================================== */
@@ -26,9 +26,9 @@ export function trackProgress(t) {
   path.forEach((id) => {
     const p = courseProgress(id);
     total += p.total;
-    done += p.feitas;
+    done += p.done;
   });
-  return { feitas: done, total, pct: total ? Math.round((done / total) * 100) : 0, courses: path.length };
+  return { done: done, total, pct: total ? Math.round((done / total) * 100) : 0, courses: path.length };
 }
 
 export function bar(pct, label) {
@@ -43,7 +43,7 @@ export const studentTrack = () => {
 
 export function empty(message) {
   const el = document.createElement('div');
-  el.className = 'view tela-vazia';
+  el.className = 'view screen-empty';
   el.innerHTML = '<p class="empty">' + esc(message) + '</p>';
   return el;
 }

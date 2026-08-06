@@ -46,7 +46,7 @@ export default async function track() {
     // choice changes the path and therefore the levels
     const tab = e.target.closest('.fork-tab');
     if (tab) {
-      chooseOption(t.id, Number(tab.dataset.fork), Number(tab.dataset.opcao));
+      chooseOption(t.id, Number(tab.dataset.fork), Number(tab.dataset.option));
       el.innerHTML = buildTrack(t) + card();
       drawEdges(el, t);
       return;

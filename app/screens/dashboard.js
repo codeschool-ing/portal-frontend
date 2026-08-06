@@ -16,7 +16,7 @@ import { esc } from '../text.js';
 
 export default async function dashboard() {
   const el = document.createElement('div');
-  el.className = 'view tela-painel';
+  el.className = 'view screen-dashboard';
 
   const session = await api.session();
   const t = studentTrack();
@@ -43,7 +43,7 @@ export default async function dashboard() {
           txt('lesson') + ' ' + (a.ix + 1) + '/' + lessons.length + ' · ' +
           txt('section') + ' ' + (sections.indexOf(s) + 1) + '/' + sections.length +
         '</span>' +
-        bar(p.pct, p.feitas + ' de ' + p.total) +
+        bar(p.pct, p.done + ' de ' + p.total) +
         '<span class="resume-btn btn btn-primary">' + txt('Continue') + ' →</span>' +
       '</a>'
     );
@@ -74,7 +74,7 @@ export default async function dashboard() {
           '</div>' +
           '<div class="track-numbers">' +
             '<span><b>' + pt.pct + '%</b>' + txt(' of the track') + '</span>' +
-            '<span><b>' + pt.feitas + '/' + pt.total + '</b>' + txt('sections') + '</span>' +
+            '<span><b>' + pt.done + '/' + pt.total + '</b>' + txt('sections') + '</span>' +
             '<span><b>' + pt.courses + '</b>' + txt('courses on the path') + '</span>' +
             '<span><b>→</b>' + esc(t.outcome) + '</span>' +
           '</div>' +
@@ -94,8 +94,8 @@ export default async function dashboard() {
                   txt(st === 'current' ? 'in progress' : 'available') + '</span>' +
                 '<span class="card-name">' + esc(c.name) + '</span>' +
                 '<span class="card-meta">' + c.hours + 'h · ' + txt(c.level) + '</span>' +
-                bar(p.pct, p.feitas + ' de ' + p.total) +
-                '<span class="card-count">' + p.feitas + '/' + p.total + ' ' + txt('sections') + '</span>' +
+                bar(p.pct, p.done + ' de ' + p.total) +
+                '<span class="card-count">' + p.done + '/' + p.total + ' ' + txt('sections') + '</span>' +
               '</a>';
             }).join('') +
           '</div>' +

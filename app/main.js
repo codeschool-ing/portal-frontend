@@ -140,7 +140,7 @@ function paintContext() {
       '<div class="ctx-menu" role="menu">' +
         '<a class="ctx-op ctx-map" href="#/track">' + txt('see the track map') + ' →</a>' +
         TRACKS_BY_FAMILY().map(([family, list]) =>
-          '<span class="ctx-group">' + txt('tracks por ' + family) + '</span>' +
+          '<span class="ctx-group">' + txt('tracks by ' + family) + '</span>' +
           list.map((x) => '<button type="button" class="ctx-op' + (x.id === t.id ? ' on' : '') + '" ' +
             'data-track="' + esc(x.id) + '">' + esc(x.name) + '</button>').join('')).join('') +
       '</div>' +
@@ -273,7 +273,7 @@ function routeParams() {
 wireCopy();
 
 /* ---------- i18n: the vitrine's sequence, in the same order ---------- */
-saveBase();     // stores the Portuguese of COURSES/TRACKS/DEPOIMENTOS
+saveBase();     // stores the English source strings of COURSES/TRACKS
 mapTexts();       // walks the text nodes of the static skeleton
 applyLanguage();  // applies content + texts + selector, and rebuilds the screen
 

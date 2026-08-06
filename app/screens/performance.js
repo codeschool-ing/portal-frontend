@@ -32,7 +32,7 @@ export const wrongOnes = () => answersWithExercise().filter((r) => r.checked && 
 
 export default async function performance() {
   const el = document.createElement('div');
-  el.className = 'view tela-desempenho';
+  el.className = 'view screen-performance';
   const all = answersWithExercise();
 
   if (!all.length) {

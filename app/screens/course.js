@@ -29,7 +29,7 @@ export default async function course({ id }) {
   const materials = courseMaterials(id);
 
   const el = document.createElement('div');
-  el.className = 'view tela-curso';
+  el.className = 'view screen-course';
 
   el.innerHTML =
     '<header class="course-head">' +
@@ -44,8 +44,8 @@ export default async function course({ id }) {
         '<span>' + lessons.length + ' ' + txt('lessons') + '</span>' +
         '<span>' + txt('in') + ' ' + tracksWithCourse(id).length + ' ' + txt('tracks') + '</span>' +
       '</div>' +
-      bar(p.pct, p.feitas + ' de ' + p.total) +
-      '<p class="course-count">' + p.feitas + '/' + p.total + ' ' + txt('sections completed') + '</p>' +
+      bar(p.pct, p.done + ' de ' + p.total) +
+      '<p class="course-count">' + p.done + '/' + p.total + ' ' + txt('sections completed') + '</p>' +
     '</header>' +
 
     '<div class="course-cols">' +
@@ -70,7 +70,7 @@ export default async function course({ id }) {
                 (sections.length > 1 ? sections.length + ' ' + txt('sections') : txt('1 section')) +
                 (hasAssessment ? ' · ' + txt('with an assessment') : '') +
               '</span>' +
-              '<span class="lesson-prog">' + pa.feitas + '/' + pa.total + '</span>' +
+              '<span class="lesson-prog">' + pa.done + '/' + pa.total + '</span>' +
             '</a></li>';
           }).join('') +
         '</ol>' +
@@ -88,7 +88,7 @@ export default async function course({ id }) {
 
       '<aside class="course-side">' +
         (materials.length
-          ? '<section class="block">' + materialList(materials, { title: 'Material do curso' }) + '</section>'
+          ? '<section class="block">' + materialList(materials, { title: 'Course material' }) + '</section>'
           : '') +
         (c.syllabus?.length
           ? '<section class="block"><div class="block-top"><h2>' + txt('Syllabus') + '</h2></div>' +
@@ -100,11 +100,11 @@ export default async function course({ id }) {
           : '') +
         ((c.requires || []).length
           ? '<section class="block"><div class="block-top"><h2>' + txt('After') + '</h2></div>' +
-            '<div class="related">' + c.requires.map((d) => link(d, 'antes')).join('') + '</div></section>'
+            '<div class="related">' + c.requires.map((d) => link(d, 'before')).join('') + '</div></section>'
           : '') +
         (opens.length
           ? '<section class="block"><div class="block-top"><h2>' + txt('Opens the way to') + '</h2></div>' +
-            '<div class="related">' + opens.map((x) => link(x.id, 'depois')).join('') + '</div></section>'
+            '<div class="related">' + opens.map((x) => link(x.id, 'after')).join('') + '</div></section>'
           : '') +
       '</aside>' +
     '</div>';
@@ -112,8 +112,8 @@ export default async function course({ id }) {
   return { title: c.name, el };
 }
 
-function link(id, dir) {
+function link(id, direction) {
   const c = courseById(id);
   if (!c) return '';
-  return '<a class="link-chip elo-' + dir + '" href="#/course/' + esc(id) + '">' + esc(c.name) + '</a>';
+  return '<a class="link-chip link-' + direction + '" href="#/course/' + esc(id) + '">' + esc(c.name) + '</a>';
 }

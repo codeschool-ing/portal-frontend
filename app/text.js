@@ -48,7 +48,7 @@ const ICON_COPIED = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" 
   'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
 
 export const copyButton = () =>
-  '<button type="button" class="code-copy" data-copiar ' +
+  '<button type="button" class="code-copy" data-copy ' +
     'title="' + txt('Copy the code') + '" aria-label="' + txt('Copy the code') + '">' +
     ICON_COPY + '</button>';
 
@@ -60,7 +60,7 @@ export const COPY_ICONS = { copy: ICON_COPY, copied: ICON_COPIED };
      ['a', 'b']                    → list
      { code: 'css', text: … }     → code block
      { image: url, caption, alt }  → figure
-     { svg: '<svg…>', legenda }    → diagram drawn right here
+     { svg: '<svg…>', caption }    → diagram drawn right here
      { example: { … } }            → annotated code, Go By Example style
 
    The code block arrived when the first PRACTICAL course was written. In
@@ -111,7 +111,7 @@ export function prose(body) {
 
    TWO FORMS, and the difference is not style: it is where the pixel comes from.
 
-   `imagem` is a file — a screenshot, a photo, an exported diagram. It is what
+   `image` is a file — a screenshot, a photo, an exported diagram. It is what
    the real content will use, served from a CDN.
 
    `svg` is a drawing WRITTEN HERE, which enters the document and therefore
@@ -154,10 +154,10 @@ function figure(b) {
    for the structure of the language, blue for literals, white for the rest.
 
      { example: {
-         linguagem: 'css',
-         arquivo: 'bar.css',                    // optional
-         partes: [ { codigo: '…', note: 'why this' }, … ],
-         saida: '…'                               // optional
+         language: 'css',
+         file: 'bar.css',                    // optional
+         parts: [ { code: '…', note: 'why this' }, … ],
+         output: '…'                               // optional
      } }
 
    On a narrow screen the two columns become one, with the note BEFORE the

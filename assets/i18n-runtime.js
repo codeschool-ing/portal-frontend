@@ -1,10 +1,10 @@
 /* ==========================================================================
    codeschool.ing — internationalisation (pt-BR · en · es · fr · it)
 
-   THE KEY IS THE PORTUGUESE TEXT ITSELF. That has three good consequences:
-   Portuguese needs no dictionary (it is the source), the HTML needs no
+   THE KEY IS THE ENGLISH TEXT ITSELF. That has three good consequences:
+   English needs no dictionary (it is the source), the HTML needs no
    `data-i18n` attributes, and any string not yet translated falls back to
-   Portuguese by itself, without breaking the screen.
+   English by itself, without breaking the screen.
 
    The dictionaries live in assets/i18n.js, under window.I18N. Their keys — and
    the shape of the catalogue objects they carry (`courses`, `tracks`, `name`,
@@ -27,7 +27,8 @@ const LANGUAGES = [
   { code: 'fr', html: 'fr',    label: 'Français',   short: 'FR' },
   { code: 'it', html: 'it',    label: 'Italiano',   short: 'IT' },
 ];
-const LANG_KEY = 'codeschool-idioma';
+const LANG_KEY = 'codeschool-language';
+const LANG_KEY_LEGACY = 'codeschool-idioma';   // what the key was called before the rename
 
 function browserLanguage() {
   const list = (navigator.languages && navigator.languages.length)
@@ -39,9 +40,20 @@ function browserLanguage() {
   return 'en';
 }
 
+/* A student who had already picked a language stored it under the old key. Read
+   it, move it, and forget the old name — otherwise the rename silently resets
+   everyone to browser detection, which for most of them means a different
+   language than the one they chose. */
 let LANG = (() => {
   try {
-    const saved = localStorage.getItem(LANG_KEY);
+    let saved = localStorage.getItem(LANG_KEY);
+    if (!saved) {
+      saved = localStorage.getItem(LANG_KEY_LEGACY);
+      if (saved) {
+        localStorage.setItem(LANG_KEY, saved);
+        localStorage.removeItem(LANG_KEY_LEGACY);
+      }
+    }
     if (saved && LANGUAGES.some((i) => i.code === saved)) return saved;
   } catch (e) { /* private mode: fall back to detection */ }
   return browserLanguage();
@@ -59,15 +71,11 @@ function txt(s) {
    JavaScript are left out: they rebuild themselves from the data.
 
    THE ONE DIVERGENCE FROM THE VITRINE'S COPY: the list comes from
-   `window.I18N_DINAMICOS` when the page defines one. In the vitrine this list is
+   `window.I18N_DYNAMIC` when the page defines one. In the vitrine this list is
    the exception — eleven containers in an otherwise static HTML; here it is
    nearly the whole page, so it moved out of the code and into index.html. It
    exists so that there is no other divergence. */
-const DYNAMIC = window.I18N_DINAMICOS || [
-  '#trilha-painel', '#cursos-grade', '#chips-cat', '#modal-corpo',
-  '#abas-carreira', '#abas-tecnologia', '#depos', '#m-interesse',
-  '#drop-trilhas-lista', '#drop-filtros-lista', '.drop-atual',
-];
+const DYNAMIC = window.I18N_DYNAMIC || [];
 const originalTexts = [];   // { el, kind, original, raw }
 
 function mapTexts() {
@@ -197,10 +205,10 @@ function closeLanguageMenu() {
   if (c) { c.classList.remove('is-open'); c.querySelector('.lang-btn').setAttribute('aria-expanded', 'false'); }
 }
 
-function switchLanguage(cod) {
-  if (cod === LANG) return;
-  LANG = cod;
-  try { localStorage.setItem(LANG_KEY, cod); } catch (e) { /* private mode */ }
+function switchLanguage(code) {
+  if (code === LANG) return;
+  LANG = code;
+  try { localStorage.setItem(LANG_KEY, code); } catch (e) { /* private mode */ }
   applyLanguage();
 }
 

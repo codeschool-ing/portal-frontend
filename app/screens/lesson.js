@@ -81,7 +81,7 @@ export default async function lesson({ id, ix, sec }) {
 
   const el = document.createElement('div');
   const hasVideoHere = section.type === 'content' && section.video !== undefined;
-  el.className = 'view view-lesson' + (hasVideoHere ? ' lesson-with-video' : ' aula-so-texto');
+  el.className = 'view view-lesson' + (hasVideoHere ? ' lesson-with-video' : ' lesson-text-only');
 
   const steps = sections.map((s, i) => (
     '<a class="step' + (i === pos ? ' on' : '') + (sectionDone(id, n, s.id) ? ' done' : '') +
@@ -151,7 +151,7 @@ export default async function lesson({ id, ix, sec }) {
       : '') +
 
     (section.type === 'assessment'
-      ? '<section class="block aula-exercicios' + (section.pending ? ' assessment-pending' : '') + '">' +
+      ? '<section class="block lesson-exercises' + (section.pending ? ' assessment-pending' : '') + '">' +
           (section.pending
             ? '<p class="mono dim">' + txt('[assessment in preparation — this topic\'s exercises have not been produced yet]') + '</p>'
             : '') +
@@ -189,7 +189,7 @@ export default async function lesson({ id, ix, sec }) {
 
   if (section.type === 'assessment' && !section.pending) {
     const exercises = await api.lessonExercises(id, a.key);
-    el.querySelector('.aula-exercicios').appendChild(buildAssessment(exercises, { courseId: id, lessonIx: n }));
+    el.querySelector('.lesson-exercises').appendChild(buildAssessment(exercises, { courseId: id, lessonIx: n }));
   }
 
   const frame = el.querySelector('.video-facade');

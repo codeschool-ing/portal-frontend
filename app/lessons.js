@@ -36,9 +36,9 @@ import {
   courseLessons,
 } from './catalog.js';
 
-/* How strong the pipeline's verification marks are, in order. `criticado` went
-   through probes and a judge; `execucao` had its answer key confirmed by the
-   interpreter; `estrutura` only passed the mechanical checks. */
+/* How strong the pipeline's verification marks are, in order. `critiqued` went
+   through probes and a judge; `execution` had its answer key confirmed by the
+   interpreter; `structure` only passed the mechanical checks. */
 const STRENGTH = { structure: 0, execution: 1, critiqued: 2 };
 
 export function lessonExercises(courseId, key, { minimum = 'structure' } = {}) {
@@ -54,12 +54,12 @@ export function lessonSections(courseId, key) {
 
   const sections = written?.length
     ? written.map((s) => ({ ...s, type: 'content' }))
-    : [{ id: 'content', title: 'Conteúdo', type: 'content', body: null }];
+    : [{ id: 'content', title: 'Content', type: 'content', body: null }];
 
   const exercises = lessonExercises(courseId, key);
   sections.push({
     id: 'assessment',
-    title: 'Avaliação',
+    title: 'Assessment',
     type: 'assessment',
     count: exercises.length,
     pending: exercises.length === 0,
@@ -99,7 +99,7 @@ export const sectionIndex = (sections, sectionId) => {
 
 /* ---------- supplementary material ----------
 
-   A section refers to material by KEY (`materials: ['wf-dns-resumo']`), and the
+   A section refers to material by KEY (`materials: ['wf-dns-cheatsheet']`), and the
    record with title, size and bytes lives in `window.MATERIALS`. Two reasons,
    and the second is the one that matters:
 

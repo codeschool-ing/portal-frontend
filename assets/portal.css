@@ -72,21 +72,21 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 
 /* THE LESSON HAS ONE WIDTH, and that width has two values.
 
-     --trilho    the menu column
-     --leitura   820px: the narrow column, where the lesson lives while the
+     --rail    the menu column
+     --reading   820px: the narrow column, where the lesson lives while the
                  annotated code block still fits stacked. Prose above ~68
                  characters per line tires the eye, and this is the number that
                  gives 68.
-     --amplo     the wide column, where the lesson lives when the code block
+     --wide     the wide column, where the lesson lives when the code block
                  opens in two columns — it has one column that does not wrap for
                  comfort, and that column is what dictates the size.
-     --tela      which of the two is in force right now. EVERYTHING in the lesson
+     --screen      which of the two is in force right now. EVERYTHING in the lesson
                  uses this one: the title, the breadcrumbs, the steps, the prose,
                  the player, the example, the material, the footer.
 
    This was the third attempt, and the first two got it wrong the same way. The
    first let the player bleed edge to edge while the text stayed at 820. The
-   second released the example (and later the player) to `--amplo` and left the
+   second released the example (and later the player) to `--wide` and left the
    rest at 820. Both produced the SAME thing: different left margins inside one
    lesson, the eye hunting for where the line starts on every scroll.
 
@@ -95,15 +95,15 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
    asking "who went past the ceiling?" and started asking "do they all start in
    the same column?", which is the real rule.
 
-   The price is declared: at `--amplo` the prose line reaches 121ch (measured),
+   The price is declared: at `--wide` the prose line reaches 121ch (measured),
    against the comfortable 68. That is what a single width costs, and it only
    happens on a large screen, where the alternative was the misalignment.
 
    The navigation arrows live in the gap that is left over, and they derive from
-   `--tela` too: when the lesson widens, the gap shrinks and they follow. */
+   `--screen` too: when the lesson widens, the gap shrinks and they follow. */
 .portal{
-  --trilho:380px;
-  --leitura:820px;
+  --rail:380px;
+  --reading:820px;
   /* The annotated code block has two columns, and the right one does NOT wrap
      for comfort: either the program fits, or a scrollbar appears. So its width
      comes from a MEASUREMENT of the content, not from a guess.
@@ -112,34 +112,34 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
        browser); the longest line in the examples has 74 characters → 562px
        plus the block's 36px of padding                             → 598px
 
-     `--cod` is 604: a little more than that, and the slack is the six pixels
-     that keep the bar from appearing over a single character. `--nota` is the
-     comfort of the text column; `--nota-min`, the minimum below which it stops
+     `--code` is 604: a little more than that, and the slack is the six pixels
+     that keep the bar from appearing over a single character. `--note` is the
+     comfort of the text column; `--note-min`, the minimum below which it stops
      being readable and the two columns stop being worth it. */
-  --cod:604px;
-  --nota:440px;
-  --nota-min:300px;
+  --code:604px;
+  --note:440px;
+  --note-min:300px;
   /* THE CEILING OF THE WIDE COLUMN COMES FROM THE ARROW, not from a chosen
      number. The arrows sit in the middle of the gap and are 44px wide; to leave
      16px between the arrow and the content, the gap on each side needs
      4 × 38 = 152px in total:
 
-       --amplo <= 100vw - rail - 152
+       --wide <= 100vw - rail - 152
 
      Until that is the tighter bound, the one in charge is `.content`'s
-     padding. And the floor is the block's content: `--cod + --nota + 30`, above
+     padding. And the floor is the block's content: `--code + --note + 30`, above
      which widening would only stretch the text column. */
-  --amplo:min(
-    calc(var(--cod) + var(--nota) + 30px),
-    calc(100vw - var(--trilho) - 2 * var(--pad-x))
+  --wide:min(
+    calc(var(--code) + var(--note) + 30px),
+    calc(100vw - var(--rail) - 2 * var(--pad-x))
   );
-  --tela:var(--leitura);
+  --screen:var(--reading);
   display:grid;
   /* 380 and not 272: at 272 nearly every lesson name wrapped onto two or three
      lines, and a list of thirteen wrapped items becomes a wall. The 50px that
      came later buy the difference between "Front-end with React and TypeScript"
      on one line or on two. */
-  grid-template-columns:var(--trilho) minmax(0,1fr);
+  grid-template-columns:var(--rail) minmax(0,1fr);
   min-height:100vh;
   padding-top:64px;               /* the bar is fixed and has a fixed height */
 }
@@ -437,10 +437,10 @@ body.no-rail .rail{display:none}
 
 .graph-legend{display:flex;flex-wrap:wrap;gap:16px}
 .leg{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--paper-dim)}
-.leg-cor{width:11px;height:11px;border-radius:2px;border:1px solid var(--wire);background:var(--ink)}
-.leg-cor.node-done{border-color:var(--phosphor-dim);background:rgba(91,140,255,.25)}
-.leg-cor.node-current{border-color:var(--amber)}
-.leg-cor.node-ahead{opacity:.5}
+.leg-color{width:11px;height:11px;border-radius:2px;border:1px solid var(--wire);background:var(--ink)}
+.leg-color.node-done{border-color:var(--phosphor-dim);background:rgba(91,140,255,.25)}
+.leg-color.node-current{border-color:var(--amber)}
+.leg-color.node-ahead{opacity:.5}
 
 /* ==========================================================
    4 · COURSE AND LESSON
@@ -490,7 +490,7 @@ body.no-rail .rail{display:none}
 /* ---------- the lesson, now in sections ---------- */
 /* one width for the whole screen, and every child inherits it by being a child
    — none of them declares a width of its own */
-.view-lesson{max-width:var(--tela)}
+.view-lesson{max-width:var(--screen)}
 .lesson-head{display:flex;flex-direction:column;gap:12px}
 
 /* The steps are the lesson's spine: where I am among the sections and how much
@@ -531,11 +531,11 @@ body.no-rail .rail{display:none}
    something other than prose" — which it could not say while it lived inside
    another frame.
 
-   PROSE NO LONGER HAS A CEILING OF ITS OWN — it goes to `--tela`, like
+   PROSE NO LONGER HAS A CEILING OF ITS OWN — it goes to `--screen`, like
    everything else.
 
    It used to have `max-width:68ch`, the classic line limit for long reading.
-   The effect was that, at `--amplo`, the paragraph stopped at 605px while the
+   The effect was that, at `--wide`, the paragraph stopped at 605px while the
    player and the example beside it went to 1074 — the same left margin and
    three right margins, which is the misalignment from the other end.
 
@@ -646,7 +646,7 @@ body.no-rail .rail{display:none}
 
 /* THE ARROWS LIVE IN THE SCREEN'S LEFTOVER, not glued to the text.
 
-   The lesson is at most `--tela` wide and is centred in the area the rail
+   The lesson is at most `--screen` wide and is centred in the area the rail
    leaves. What remains on both sides — the "gap" — is space no content uses,
    and it is exactly where a navigation control belongs: close enough to be
    reached, far enough not to fight for the line with the word being read.
@@ -655,7 +655,7 @@ body.no-rail .rail{display:none}
      left arrow   → centred in the gap between the rail and the column
      right arrow  → centred in the gap between the column and the screen edge
 
-   It is `--tela`, and not `--leitura`: when the lesson widens the gap shrinks,
+   It is `--screen`, and not `--reading`: when the lesson widens the gap shrinks,
    and an arrow positioned by the narrow column would sit on top of the wide
    one's content.
 
@@ -673,11 +673,11 @@ body.no-rail .rail{display:none}
   .side-arrow:hover{color:var(--phosphor);border-color:var(--phosphor);background:var(--ink)}
   .side-arrow svg{width:20px;height:20px}
   .side-left{
-    left:calc(var(--trilho) + (100vw - var(--trilho) - var(--tela)) / 4);
+    left:calc(var(--rail) + (100vw - var(--rail) - var(--screen)) / 4);
     transform:translate(-50%,-50%);
   }
   .side-right{
-    right:calc((100vw - var(--trilho) - var(--tela)) / 4);
+    right:calc((100vw - var(--rail) - var(--screen)) / 4);
     transform:translate(50%,-50%);
   }
   /* with the arrows at the sides the whole footer goes away: it only repeated
@@ -1307,11 +1307,11 @@ html[data-theme="light"] .cert-in{--linkedin:#0a66c2}
 
    Two things happen here at the same time, because they are the same thing: the
    code block opens into two columns AND the whole lesson moves to the wide
-   width. Two columns need `--cod` + `--nota-min` + the gap between them:
+   width. Two columns need `--code` + `--note-min` + the gap between them:
 
      604 + 300 + 30 = 934px
 
-   And `--amplo` cannot go past what the arrows allow — `100vw - rail - 152`.
+   And `--wide` cannot go past what the arrows allow — `100vw - rail - 152`.
    Equating the two:
 
      100vw - 380 - 152 >= 934   →   100vw >= 1466
@@ -1325,16 +1325,16 @@ html[data-theme="light"] .cert-in{--linkedin:#0a66c2}
   .portal{
     /* from here up what squeezes is the arrow, not `.content`'s padding: 152
        is more than the padding's 88 at any width in this range */
-    --amplo:min(
-      calc(var(--cod) + var(--nota) + 30px),
-      calc(100vw - var(--trilho) - 152px)
+    --wide:min(
+      calc(var(--code) + var(--note) + 30px),
+      calc(100vw - var(--rail) - 152px)
     );
-    --tela:var(--amplo);
+    --screen:var(--wide);
   }
   .example-grid{
     /* the code is FIXED and the note absorbs whatever is left: shrinking the
        column that does not wrap is what produces the scrollbar */
-    grid-template-columns:minmax(var(--nota-min),1fr) var(--cod);
+    grid-template-columns:minmax(var(--note-min),1fr) var(--code);
     column-gap:30px;
   }
   .example-note{align-self:start;padding:11px 0}
@@ -1448,7 +1448,7 @@ html[data-theme="light"] .cert-in{--linkedin:#0a66c2}
    stops fitting on one line, and for the same reason: below that there is no
    width for persistent chrome and content at the same time. */
 @media(max-width:1180px){
-  .portal{--trilho:0px;grid-template-columns:minmax(0,1fr)}
+  .portal{--rail:0px;grid-template-columns:minmax(0,1fr)}
   .rail{
     position:fixed;top:64px;left:0;bottom:0;width:min(300px,84vw);z-index:110;
     background:var(--ink);transform:translateX(-102%);transition:transform .22s ease;

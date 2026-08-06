@@ -4,7 +4,7 @@ open straight off disk (file://). It inlines the CSS, the classic scripts and th
 favicon — and resolves the ES module graph, which is the step the vitrine's tool
 did not need.
 
-    python3 tools/bundle/bundle.py   -> portal-aluno.html (at the root)
+    python3 tools/bundle/bundle.py   -> portal-student.html (at the root)
     python3 bundle.py output.html
 
 The portal is still served from index.html + assets/ + app/. This file only
@@ -46,7 +46,7 @@ import sys
 
 HERE = pathlib.Path(__file__).parent
 ROOT = HERE.parent.parent           # the portal lives at the root; the tool in tools/bundle/
-OUTPUT = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / 'portal-aluno.html'
+OUTPUT = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / 'portal-student.html'
 
 MODULE_ENTRY = 'app/main.js'
 

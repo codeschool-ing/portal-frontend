@@ -31,7 +31,7 @@ export default async function notes() {
   list.forEach((n) => { (byCourse[n.courseId] = byCourse[n.courseId] || []).push(n); });
 
   const el = document.createElement('div');
-  el.className = 'view tela-notas';
+  el.className = 'view screen-notes';
   el.innerHTML =
     '<header class="view-head">' +
       '<h1>' + txt('Your notes') + '</h1>' +

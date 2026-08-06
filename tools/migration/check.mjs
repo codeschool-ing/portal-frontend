@@ -13,7 +13,7 @@
    and it checks the thing that actually has to be right: what was written back.
 
        node tools/migration/check.mjs
-       PORTAL="file://$PWD" PAGE=/portal-aluno.html node tools/migration/check.mjs
+       PORTAL="file://$PWD" PAGE=/portal-student.html node tools/migration/check.mjs
    ========================================================================== */
 import { chromium } from 'playwright';
 

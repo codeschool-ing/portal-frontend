@@ -246,7 +246,7 @@ html[data-theme="light"] .lang-op.on{background:rgba(43,82,201,.09)}
 .tabs-box{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex:0 0 auto}
 /* the last row opens the same breathing room the top of the track leaves for the
    graph: the name+objective block ends up centred between the two */
-.tabs-box[data-familia="tecnologia"]{margin-bottom:18px}
+.tabs-box[data-family="tecnologia"]{margin-bottom:18px}
 /* "TRILHAS POR TECNOLOGIA" on a single line would eat 165px of the tabs. Letting
    it wrap onto two lines costs the label the same ~100px of width, and the height
    is already the tab button's — it pushes nothing. */
@@ -438,7 +438,7 @@ html[data-theme="light"] .outcome-seal{background:rgba(212,15,40,.07);box-shadow
 .course-node .order{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--phosphor-dim);letter-spacing:.1em}
 .course-node .name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.95rem;line-height:1.18}
 .course-node .meta{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--paper-dim);margin-top:auto;padding-top:5px}
-.course-node .tag-compartilhado{
+.course-node .tag-shared{
   font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--amber);
   border:1px solid currentColor;border-radius:2px;padding:1px 6px;align-self:flex-start;
 }
@@ -736,7 +736,7 @@ a.channel:hover{border-color:var(--phosphor-dim);transform:translateY(-2px)}
 .modal[hidden]{display:none}
 .modal{
   position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;
-  background:rgba(4,6,10,.88);backdrop-filter:blur(6px);animation:surgir .22s ease;
+  background:rgba(4,6,10,.88);backdrop-filter:blur(6px);animation:appear .22s ease;
 }
 /* With the modal open the background does not scroll. Trapping only the wheel and
    touch in JavaScript was not enough: the browser's scrollbar, the trackpad's
@@ -746,7 +746,7 @@ a.channel:hover{border-color:var(--phosphor-dim);transform:translateY(-2px)}
 html.modal-open,
 html.modal-open body{overflow:hidden}
 html.modal-open .screen{overflow:hidden}
-@keyframes surgir{from{opacity:0}to{opacity:1}}
+@keyframes appear{from{opacity:0}to{opacity:1}}
 /* `100%`, not `96vw`: `.modal` already reserves the margin in its own padding.
    At 96vw the box was wider than the grid cell on any screen below 1000px,
    overflowed on both sides and, since only the right-hand side is reachable, the

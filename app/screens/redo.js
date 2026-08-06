@@ -24,7 +24,7 @@ export default async function redo() {
   }
 
   const el = document.createElement('div');
-  el.className = 'view tela-refazer';
+  el.className = 'view screen-redo';
   el.innerHTML =
     '<header class="view-head">' +
       '<h1>' + txt('The ones you got wrong') + '</h1>' +

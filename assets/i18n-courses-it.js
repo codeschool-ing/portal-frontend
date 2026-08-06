@@ -1,14 +1,16 @@
 /* ==========================================================================
-   codeschool.ing — catalogo in italiano
+   codeschool.ing — the catalog in Italian
 
-   Só os campos de conteúdo dos cursos (`nome`, `resumo`, `ementa`,
-   `topicos`, `requisitos`). Interface, trilhas e depoimentos ficam em
-   assets/i18n.js.
+   Only the courses' content fields (`name`, `summary`, `syllabus`, `topics`,
+   `prerequisites`). The rest of the dictionary — interface and tracks — is in
+   assets/i18n.js; this file was split off because on its own it weighs more
+   than all the others put together.
 
-   Vale a mesma regra do resto: campo ausente cai de volta no português.
+   The same rule as everywhere else applies: a missing field falls back to
+   English, the source language.
 
-   "trilha" é `percorso`; nome próprio de tecnologia fica intacto. Nomes de
-   curso seguem o uso do mercado italiano, não a tradução literal.
+   "track" is `percorso`; a technology's proper name stays intact. Course names
+   follow Italian market usage, not the literal translation.
    ========================================================================== */
 window.I18N.it.courses = {
 

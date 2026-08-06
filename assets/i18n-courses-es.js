@@ -1,15 +1,16 @@
 /* ==========================================================================
-   codeschool.ing — catálogo em espanhol
+   codeschool.ing — the catalog in Spanish
 
-   Só os campos de conteúdo dos cursos (`nome`, `resumo`, `ementa`,
-   `topicos`, `requisitos`). O resto do dicionário — interface e trilhas —
-   está em assets/i18n.js; este arquivo ficou de fora porque sozinho pesa
-   mais que todos os outros somados.
+   Only the courses' content fields (`name`, `summary`, `syllabus`, `topics`,
+   `prerequisites`). The rest of the dictionary — interface and tracks — is in
+   assets/i18n.js; this file was split off because on its own it weighs more
+   than all the others put together.
 
-   Vale a mesma regra do resto: campo ausente cai de volta no português.
+   The same rule as everywhere else applies: a missing field falls back to
+   English, the source language.
 
-   Espanhol neutro (latino-americano), que é o público que chega pelo
-   Mercosul: "computadora" e não "ordenador", "video" e não "vídeo".
+   Neutral (Latin American) Spanish, which is the audience arriving through
+   Mercosur: "computadora" and not "ordenador", "video" and not "vídeo".
    ========================================================================== */
 window.I18N.es.courses = {
 

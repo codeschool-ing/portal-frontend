@@ -55,7 +55,7 @@ export default {
         '<div class="matching-col matching-col-left">' + left.map((t) => tile(t, 'left')).join('') + '</div>' +
         '<div class="matching-col matching-col-right">' + right.map((t) => tile(t, 'right')).join('') + '</div>' +
       '</div>' +
-      '<p class="matching-count"><span class="assoc-feitos">0</span>/' + ex.pairs.length + ' ' + txt('pairs') + '</p>'
+      '<p class="matching-count"><span class="assoc-done">0</span>/' + ex.pairs.length + ' ' + txt('pairs') + '</p>'
     );
   },
 
@@ -97,7 +97,7 @@ export default {
         });
         state.left = null;
         state.done += 1;
-        root.querySelector('.assoc-feitos').textContent = state.done;
+        root.querySelector('.assoc-done').textContent = state.done;
         if (state.done === total) {
           state.locked = true;
           done({ map: state.map, errors: state.errors });
@@ -121,7 +121,7 @@ export default {
   collect(root) {
     // the wrapper only calls this if the student hits "Responder" before closing
     // every pair — that answer is partial, and partial is not a pass
-    const done = Number(root.querySelector('.assoc-feitos').textContent);
+    const done = Number(root.querySelector('.assoc-done').textContent);
     return done > 0 ? { map: {}, errors: -1, partial: true } : null;
   },
 

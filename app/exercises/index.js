@@ -5,7 +5,7 @@
    button, verdict — and each type module handles only the interactive middle.
    The contract:
 
-     types          : which `tipo` values this module answers for
+     types          : which `type` values this module answers for
      selfCompleting : optional. `true` when the exercise itself can tell that it
                       is finished (the matching type, which checks pair by
                       pair). The wrapper hides "Responder" and waits.
@@ -51,7 +51,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
   const exam = Boolean(options.exam);
   const uid = ex.id || `${ex.course}:${ex.topic}:${ix}`;
   const el = document.createElement('article');
-  el.className = 'ex ex-' + ex.type + (exam ? ' ex-prova' : '');
+  el.className = 'ex ex-' + ex.type + (exam ? ' ex-exam' : '');
   // the DOM id: answers are stored under it, and it is how you can tell WHICH
   // exercise is on screen without depending on the prompt text
   el.dataset.ex = uid;
@@ -73,9 +73,9 @@ export function buildExercise(ex, ctx, ix, options = {}) {
       ? '<details class="ex-hint"><summary>' + txt('hint') + '</summary><p>' + formatted(ex.socraticHint) + '</p></details>'
       : '') +
     '<div class="ex-actions">' +
-      (mod.selfCompleting ? '' : '<button type="button" class="btn btn-primary ex-responder">' +
-        txt(exam ? 'Registrar resposta' : 'Responder') + '</button>') +
-      (exam ? '' : '<button type="button" class="btn btn-ghost ex-refazer" hidden>' + txt('Try again') + '</button>') +
+      (mod.selfCompleting ? '' : '<button type="button" class="btn btn-primary ex-answer">' +
+        txt(exam ? 'Record answer' : 'Answer') + '</button>') +
+      (exam ? '' : '<button type="button" class="btn btn-ghost ex-retry" hidden>' + txt('Try again') + '</button>') +
     '</div>' +
     '<div class="ex-verdict" aria-live="polite"></div>';
 
@@ -88,7 +88,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
       out.textContent = txt('Answer before checking.');
       return;
     }
-    const button = el.querySelector('.ex-responder');
+    const button = el.querySelector('.ex-answer');
     if (button) button.disabled = true;
     out.className = 'ex-verdict v-waiting';
     out.textContent = txt('checking…');
@@ -107,7 +107,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
     } else {
       mod.reveal(body, ex, v);
       showVerdict(el, ex, v);
-      el.querySelector('.ex-refazer').hidden = false;
+      el.querySelector('.ex-retry').hidden = false;
     }
     el.dispatchEvent(new CustomEvent('exercise:answered', { bubbles: true, detail: { ex, v } }));
   }
@@ -120,10 +120,10 @@ export function buildExercise(ex, ctx, ix, options = {}) {
   const previous = !exam && ctx && answerFor(ctx.courseId, ctx.lessonIx, uid);
   if (previous?.correct) markAlreadyDone(el, previous);
 
-  const answerButton = el.querySelector('.ex-responder');
+  const answerButton = el.querySelector('.ex-answer');
   if (answerButton) answerButton.addEventListener('click', () => check(mod.collect(body)));
 
-  const retry = el.querySelector('.ex-refazer');
+  const retry = el.querySelector('.ex-retry');
   if (retry) {
     retry.addEventListener('click', () => {
       const fresh = buildExercise(ex, ctx, ix, options);
@@ -191,7 +191,7 @@ function markAlreadyDone(el, previous) {
 export function buildAssessment(exercises, ctx, options = {}) {
   const exam = Boolean(options.exam);
   const el = document.createElement('div');
-  el.className = 'wizard' + (exam ? ' wizard-prova' : '');
+  el.className = 'wizard' + (exam ? ' wizard-exam' : '');
   const states = exercises.map(() => ({ answered: false, correct: null }));
   let current = 0;
   let submitted = false;
@@ -202,13 +202,13 @@ export function buildAssessment(exercises, ctx, options = {}) {
       '<span class="wz-count"></span>' +
       '<div class="wz-dots" role="tablist"></div>' +
     '</header>' +
-    '<div class="wz-palco"></div>' +
+    '<div class="wz-stage"></div>' +
     '<footer class="wz-foot">' +
       '<button type="button" class="btn btn-ghost wz-antes">← ' + txt('previous') + '</button>' +
-      '<button type="button" class="btn btn-primary wz-depois">' + txt('next') + ' →</button>' +
+      '<button type="button" class="btn btn-primary wz-next">' + txt('next') + ' →</button>' +
     '</footer>';
 
-  const stage = el.querySelector('.wz-palco');
+  const stage = el.querySelector('.wz-stage');
   const dots = el.querySelector('.wz-dots');
 
   function paintHeader() {
@@ -231,7 +231,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
     el.querySelector('.wz-antes').disabled = current === 0;
     const last = current === exercises.length - 1;
     const blank = states.filter((s) => !s.answered).length;
-    const next = el.querySelector('.wz-depois');
+    const next = el.querySelector('.wz-next');
     if (submitted) next.textContent = txt('exam submitted');
     else if (!last) next.textContent = txt('next') + ' →';
     else if (!exam) next.textContent = txt('see the result');
@@ -272,7 +272,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
       screens.forEach((t) => {
         if (!t) return;
         if (t.revealExam) t.revealExam();
-        t.querySelectorAll('.ex-responder, input, textarea, select, button').forEach((b) => { b.disabled = true; });
+        t.querySelectorAll('.ex-answer, input, textarea, select, button').forEach((b) => { b.disabled = true; });
       });
     }
 
@@ -288,11 +288,11 @@ export function buildAssessment(exercises, ctx, options = {}) {
         '<p class="wz-res-score"><strong>' + right + '</strong>/' + exercises.length + ' ' + txt('correct') + '</p>') +
       (unchecked ? '<p class="wz-res-note">' + unchecked + ' ' + txt('are waiting to be checked on the server.') + '</p>' : '') +
       (unanswered ? '<p class="wz-res-note">' + unanswered + ' ' + txt('unanswered.') + '</p>' : '') +
-      '<button type="button" class="btn btn-ghost wz-voltar">' +
+      '<button type="button" class="btn btn-ghost wz-back">' +
         txt(exam ? 'Review the exam question by question' : 'Review the questions') + '</button>';
     stage.appendChild(r);
-    r.querySelector('.wz-voltar').addEventListener('click', () => show(0));
-    el.querySelector('.wz-depois').disabled = true;
+    r.querySelector('.wz-back').addEventListener('click', () => show(0));
+    el.querySelector('.wz-next').disabled = true;
     paintHeader();
     el.dispatchEvent(new CustomEvent('assessment:concluida', {
       bubbles: true,
@@ -315,7 +315,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
     if (b) show(Number(b.dataset.ir));
   });
   el.querySelector('.wz-antes').addEventListener('click', () => show(Math.max(0, current - 1)));
-  el.querySelector('.wz-depois').addEventListener('click', () => {
+  el.querySelector('.wz-next').addEventListener('click', () => {
     if (current !== exercises.length - 1) { confirming = false; show(current + 1); return; }
     /* Submitting with blank questions asks for a second click. It is not a
        modal: the button itself says how many are left and what will happen.

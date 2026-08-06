@@ -25,14 +25,14 @@ const plausibleEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || '').
    the bar measures and informs, and the minimum is only the length. */
 function passwordStrength(s) {
   const v = String(s || '');
-  if (v.length < 8) return { pct: Math.min(30, v.length * 4), rotulo: 'curta demais', ok: false };
+  if (v.length < 8) return { pct: Math.min(30, v.length * 4), label: 'too short', ok: false };
   let points = Math.min(50, v.length * 3);
   if (/[a-z]/.test(v) && /[A-Z]/.test(v)) points += 12;
   if (/\d/.test(v)) points += 12;
   if (/[^\w]/.test(v)) points += 14;
   if (new Set(v).size > 10) points += 12;
   const pct = Math.min(100, points);
-  return { pct, rotulo: pct >= 80 ? 'forte' : (pct >= 55 ? 'razoável' : 'fraca'), ok: true };
+  return { pct, label: pct >= 80 ? 'strong' : (pct >= 55 ? 'fair' : 'weak'), ok: true };
 }
 
 export default async function account() {
@@ -46,7 +46,7 @@ export default async function account() {
   void now;
 
   const options = TRACKS_BY_FAMILY().map(([family, list]) =>
-    '<optgroup label="' + txt('tracks por ' + family) + '">' +
+    '<optgroup label="' + txt('tracks by ' + family) + '">' +
       list.map((x) => '<option value="' + esc(x.id) + '"' + (t && x.id === t.id ? ' selected' : '') + '>' +
         esc(x.name) + '</option>').join('') +
     '</optgroup>').join('');
@@ -60,7 +60,7 @@ export default async function account() {
       '<div class="block-top"><h2>' + txt('Your track') + '</h2></div>' +
       '<div class="field"><label for="c-track">' + txt('current track') + '</label>' +
         '<select id="c-track">' + options + '</select></div>' +
-      (p ? '<p class="account-note">' + p.feitas + '/' + p.total + ' ' + txt('lessons') + ' · ' + p.pct + '%</p>' : '') +
+      (p ? '<p class="account-note">' + p.done + '/' + p.total + ' ' + txt('lessons') + ' · ' + p.pct + '%</p>' : '') +
       '<p class="account-note mono dim">' +
         txt('Switching track erases nothing: progress is per course, and a shared course keeps counting.') +
       '</p>' +
@@ -169,7 +169,7 @@ export default async function account() {
   fresh.addEventListener('input', () => {
     const f = passwordStrength(fresh.value);
     meter.style.width = f.pct + '%';
-    label.textContent = fresh.value ? txt(f.rotulo) : '';
+    label.textContent = fresh.value ? txt(f.label) : '';
   });
 
   const passwordNotice = el.querySelector('#a-password');
@@ -184,15 +184,15 @@ export default async function account() {
     /* The order of the checks is the order the person filled the form in:
        pointing at the last field when the first is empty tells them to fix the
        wrong thing. */
-    if (!currentPassword) return say('digite a senha current', false);
-    if (!passwordStrength(fresh.value).ok) return say('a senha nova precisa de pelo menos 8 caracteres', false);
-    if (fresh.value !== repeat) return say('as duas senhas novas não conferem', false);
-    if (fresh.value === currentPassword) return say('a senha nova é igual à current', false);
+    if (!currentPassword) return say('type your current password', false);
+    if (!passwordStrength(fresh.value).ok) return say('the new password needs at least 8 characters', false);
+    if (fresh.value !== repeat) return say('the two new passwords do not match', false);
+    if (fresh.value === currentPassword) return say('the new password is the same as the current', false);
     await api.changePassword(fresh.value);
     el.querySelectorAll('#f-password input').forEach((i) => { i.value = ''; });
     meter.style.width = '0';
     label.textContent = '';
-    return say('senha trocada', true);
+    return say('password changed', true);
   });
 
   const confirm = el.querySelector('#c-confirm');

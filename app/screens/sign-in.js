@@ -16,7 +16,7 @@ export default async function signIn() {
   el.className = 'view view-signin';
 
   const options = TRACKS_BY_FAMILY().map(([family, list]) =>
-    '<optgroup label="' + txt('tracks por ' + family) + '">' +
+    '<optgroup label="' + txt('tracks by ' + family) + '">' +
       list.map((t) => '<option value="' + esc(t.id) + '">' + esc(t.name) + '</option>').join('') +
     '</optgroup>').join('');
 

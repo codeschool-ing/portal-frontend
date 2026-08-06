@@ -31,7 +31,7 @@ const DASH = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-
 
 export default async function plan() {
   const el = document.createElement('div');
-  el.className = 'view tela-plano';
+  el.className = 'view screen-plan';
   const current = currentPlan();
   const account = studentAccount();
   const plans = window.PLANS || [];
@@ -58,7 +58,7 @@ export default async function plan() {
       '<p>' + txt('What you subscribed to, what it includes and what changes if you switch.') + '</p>' +
     '</header>' +
 
-    '<section class="block pl-atual">' +
+    '<section class="block pl-current">' +
       '<div class="pl-current-top">' +
         '<div>' +
           '<span class="pl-label mono">' + txt('current plan') + '</span>' +

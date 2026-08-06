@@ -30,7 +30,7 @@ import { chromium } from 'playwright';
 const BASE = process.env.PORTAL || 'http://127.0.0.1:8899';
 const CHROME = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 /* PAGE points the test at the single-file bundle instead of the served site:
-   PORTAL=file:///path PAGE=/portal-aluno.html node tools/smoke/smoke.mjs */
+   PORTAL=file:///path PAGE=/portal-student.html node tools/smoke/smoke.mjs */
 const PAGE = process.env.PAGE || '/index.html';
 const errors = [];
 const b = await chromium.launch({ executablePath: CHROME });
@@ -213,7 +213,7 @@ const answer = async (sel, fn, expected) => {
   if (!await goToType(kind)) { ok(kind, false, 'not found in the wizard'); return; }
   const ex = p.locator(sel);
   await fn(ex);
-  const button = ex.locator('.ex-responder');
+  const button = ex.locator('.ex-answer');
   if (await button.count()) await button.click();   // matching finishes on its own
   await p.waitForFunction((s) => document.querySelector(s + ' .ex-verdict')?.className.match(/v-(right|wrong|pending)/),
     sel, { timeout: 5000 });
@@ -297,7 +297,7 @@ await p.waitForSelector('.step');
 const steps = await p.$$eval('.step-title', (e) => e.map((x) => x.textContent));
 ok('the hosting topic became 5 sections + assessment', steps.length === 6, steps.join(' · '));
 ok('the first section is the shared-hosting one', /compartilhada/i.test(steps[0]), steps[0]);
-ok('the last one is always the assessment', /avalia/i.test(steps[steps.length - 1]), steps[steps.length - 1]);
+ok('the last one is always the assessment', /assessment/i.test(steps[steps.length - 1]), steps[steps.length - 1]);
 ok('prose rendered', (await p.locator('.lesson-text p').count()) >= 2);
 ok('a content section reserves the video frame', await p.locator('.video-facade').isVisible());
 ok('the rail opens the current lesson sections', (await p.locator('.rail-section').count()) === 6);
@@ -448,13 +448,13 @@ await goToType('quiz');
 const wrongIx = await p.evaluate(() =>
   window.SAMPLE_EXERCISES.find((e) => e.id === 'wf-03-quiz').choices.findIndex((a) => !a.correct));
 await p.locator(`.ex-quiz .choice[data-ix="${wrongIx}"]`).click();
-await p.locator('.ex-quiz .ex-responder').click();
+await p.locator('.ex-quiz .ex-answer').click();
 await p.waitForFunction(() => document.querySelector('.ex-quiz .ex-verdict')?.className.includes('v-wrong'),
   null, { timeout: 5000 });
 ok('got one wrong on purpose', true);
 
 await p.goto(BASE + PAGE + '#/performance');
-await p.waitForSelector('.tela-desempenho, .tela-vazia');
+await p.waitForSelector('.screen-performance, .screen-empty');
 ok('performance shows what was answered', (await p.locator('.perf-row').count()) > 0);
 const wrongCount = await p.locator('.perf-wrong li').count();
 ok('it lists the wrong ones', wrongCount > 0, wrongCount + ' wrong');
@@ -686,11 +686,11 @@ ok('the course announces the exam', await p.locator('.exam-card').isVisible());
 ok('the exam shows in the rail', (await p.locator('.rail-exam').count()) === 1);
 
 await p.click('.exam-card .btn');
-await p.waitForSelector('.wizard-prova');
+await p.waitForSelector('.wizard-exam');
 const questionCount = await p.locator('.wz-dot').count();
 ok('ten questions drawn', questionCount === 10, questionCount + ' questions');
 ok('the hint does not show in an exam', (await p.locator('.ex-hint').count()) === 0);
-ok('there is no "try again" in an exam', (await p.locator('.ex-refazer').count()) === 0);
+ok('there is no "try again" in an exam', (await p.locator('.ex-retry').count()) === 0);
 
 /* THE REGRESSION THAT MATTERS: in an exam the verdict is held back. If it showed,
    you could try until you got it right and the exam would stop measuring. */
@@ -708,7 +708,7 @@ const answerEverything = async (correctly) => {
     if (!ixs) continue;                       // a type this loop cannot answer
     const targets = correctly ? ixs : [ixs.includes(0) ? 1 : 0];
     for (const k of targets) await p.locator(`.ex .choice[data-ix="${k}"]`).click();
-    const bt = p.locator('.ex .ex-responder');
+    const bt = p.locator('.ex .ex-answer');
     if (await bt.count()) await bt.click();
     await p.waitForTimeout(130);
   }
@@ -719,9 +719,9 @@ ok('no right/wrong verdict before submitting',
 ok('the answer is recorded, and says so', (await p.locator('.v-recorded').count()) > 0);
 
 await p.locator('.wz-dot').nth(questionCount - 1).click();
-await p.locator('.wz-depois').click();               // submit (or ask for confirmation)
+await p.locator('.wz-next').click();               // submit (or ask for confirmation)
 await p.waitForTimeout(200);
-if (!(await p.locator('.wz-result').count())) await p.locator('.wz-depois').click();
+if (!(await p.locator('.wz-result').count())) await p.locator('.wz-next').click();
 await p.waitForSelector('.wz-result');
 const score = await p.locator('.exam-score').innerText();
 ok('the exam closes with a score', /%/.test(score), score);
@@ -731,7 +731,7 @@ ok('the result is stored', await p.evaluate(() =>
 /* Walks the questions one by one: the wizard keeps ONE in the document at a
    time, so counting across the whole document would measure only the one on
    screen. */
-await p.locator('.wz-voltar').click();
+await p.locator('.wz-back').click();
 await p.waitForTimeout(150);
 let opened = 0;
 for (let i = 0; i < questionCount; i += 1) {
@@ -742,14 +742,14 @@ for (let i = 0; i < questionCount; i += 1) {
 ok('after submitting, the verdicts open', opened > 0, opened + ' of ' + questionCount);
 ok('no answer stayed held back', (await p.locator('.v-recorded').count()) === 0);
 ok('after submitting, you cannot answer again',
-  await p.evaluate(() => [...document.querySelectorAll('.ex input, .ex .ex-responder')].every((e) => e.disabled)));
+  await p.evaluate(() => [...document.querySelectorAll('.ex input, .ex .ex-answer')].every((e) => e.disabled)));
 
 console.log('\n== 15. the track exam and the certificates ==');
 await p.goto(BASE + PAGE + '#/track');
 await p.waitForSelector('.exam-card');
 ok('the track announces its exam', await p.locator('.exam-card').isVisible());
 await p.click('.exam-card .btn');
-await p.waitForSelector('.wizard-prova');
+await p.waitForSelector('.wizard-exam');
 const trackQuestions = await p.locator('.wz-dot').count();
 ok('fifteen questions, from more than one course', trackQuestions === 15, trackQuestions + ' questions');
 
@@ -761,7 +761,7 @@ ok('no certificate issued without a passed exam',
   (await p.locator('.cert:not(.cert-sample)').count()) === 0);
 
 console.log('\n== 16. the // tags are gone ==');
-for (const [path, sel] of [['#/dashboard', '.resume'], ['#/catalog', '.tela-catalogo'], ['#/certificates', '.cert']]) {
+for (const [path, sel] of [['#/dashboard', '.resume'], ['#/catalog', '.view-catalog'], ['#/certificates', '.cert']]) {
   await p.goto(BASE + PAGE + path);
   await p.waitForSelector(sel);
   ok('no tag on ' + path, (await p.locator('.view-head .tag').count()) === 0);
@@ -899,7 +899,7 @@ ok('there is video outside the first section', Object.keys(positions).length >= 
    element that earned the right to escape, while the real defect (different
    margins inside the same lesson) went through. Now the question is the rule:
    ALL of the screen's children begin and end in the same column, and it is
-   `--tela`.
+   `--screen`.
 
    The test walks EVERY written section of the three courses, one at a time. It
    is expensive (one navigation per section) and it is the only way for the rule
@@ -978,7 +978,7 @@ ok('and the dialog is named', /Certificate/.test(await p.locator('.modal-cert').
   await p.locator('.modal-cert').getAttribute('aria-label'));
 ok('and it grows on screen', await p.evaluate(() => {
   const inside = document.querySelector('.modal-cert .cert-student').getBoundingClientRect().height;
-  const outside = document.querySelector('.tela-certificados .cert-student').getBoundingClientRect().height;
+  const outside = document.querySelector('.screen-certificates .cert-student').getBoundingClientRect().height;
   return inside > outside;
 }));
 ok('the background freezes', await p.evaluate(() =>
@@ -1266,7 +1266,7 @@ await p2.click('#form-signin button[type=submit]'); await p2.waitForTimeout(300)
 await p2.goto(BASE + PAGE + '#/course/javascript/lesson/1/assessment', { waitUntil: 'networkidle' });
 await p2.waitForSelector('.ex');
 console.log('\n== 24. nothing revealed before answering ==');
-ok('redo is hidden', (await p2.locator('.ex-refazer:visible').count()) === 0);
+ok('redo is hidden', (await p2.locator('.ex-retry:visible').count()) === 0);
 ok('justifications are hidden', (await p2.locator('.choice-why:visible').count()) === 0);
 ok('verdicts are empty', (await p2.locator('.ex-verdict:visible').count()) === 0);
 await b2.close();

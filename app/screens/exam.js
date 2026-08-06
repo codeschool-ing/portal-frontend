@@ -66,7 +66,7 @@ function build(exam, progress) {
             (previous.passed ? '✓ ' + txt('You have already passed this exam.') : txt('Your best score so far:')) +
             ' <strong>' + previous.best + '%</strong> ' +
             txt('in') + ' ' + previous.attempts + ' ' +
-            txt(previous.attempts === 1 ? 'tentativa' : 'tentativas') + '.' +
+            txt(previous.attempts === 1 ? 'attempt' : 'attempts') + '.' +
           '</p>'
         : '') +
       (ready
@@ -77,7 +77,7 @@ function build(exam, progress) {
           '</p>') +
     '</section>' +
 
-    '<section class="block prova-palco"></section>';
+    '<section class="block exam-stage"></section>';
 
   void attempt;
 
@@ -90,7 +90,7 @@ function build(exam, progress) {
     });
     return {
       html:
-        '<span class="wz-res-label">' + txt(n.passed ? 'aprovado' : 'not yet') + '</span>' +
+        '<span class="wz-res-label">' + txt(n.passed ? 'passed' : 'not yet') + '</span>' +
         '<p class="wz-res-score exam-score' + (n.passed ? ' passed' : ' missed') + '">' +
           '<strong>' + n.pct + '%</strong>' +
         '</p>' +
@@ -102,7 +102,7 @@ function build(exam, progress) {
     };
   };
 
-  el.querySelector('.prova-palco').appendChild(
+  el.querySelector('.exam-stage').appendChild(
     buildAssessment(
       exam.items.map((i) => i.ex),
       exam.items.map((i) => i.ctx),
@@ -132,7 +132,7 @@ export async function trackExamScreen() {
    promise. */
 export function examCard({ key, href, scope, count, progress }) {
   const r = examResult(key);
-  const state = r?.passed ? 'passed' : (r ? 'tentou' : 'novo');
+  const state = r?.passed ? 'passed' : (r ? 'attempted' : 'new');
   return '<section class="block exam-card ' + state + '">' +
     '<div class="exam-card-text">' +
       '<span class="exam-card-label mono">' +

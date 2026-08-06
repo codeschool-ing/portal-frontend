@@ -5,7 +5,7 @@
    and pressing Ctrl+C does nothing; the code button does. Everything below is
    in service of that single rule, and it is worth being precise about what it
    buys, because the file this repository ships makes the limit obvious:
-   `portal-aluno.html` carries every lesson inline, so view-source, DevTools or
+   `portal-student.html` carries every lesson inline, so view-source, DevTools or
    JavaScript turned off all read the whole course. This is friction, not
    protection. What protects content is a server that does not serve what the
    student has not bought — which is Stage 2's job, not this file's.
@@ -34,7 +34,7 @@
    ONE LISTENER FOR THE WHOLE DOCUMENT, and not one per block. Code blocks are
    rebuilt on every section change and on every language switch, and a listener
    per block would leak one on each rebuild — the same reasoning the graph
-   already follows with its edge highlight. The button carries `data-copiar` and
+   already follows with its edge highlight. The button carries `data-copy` and
    the document decides what to do with it.
 
    WHAT GETS COPIED IS DECIDED BY WHERE THE BUTTON SITS, not by an attribute
@@ -131,7 +131,7 @@ const ownField = (node) => Boolean(node?.closest?.('input, textarea, [contentedi
 
 export function wireCopy() {
   document.addEventListener('click', async (e) => {
-    const button = e.target.closest('[data-copiar]');
+    const button = e.target.closest('[data-copy]');
     if (!button) return;
     const code = codeToCopy(button);
     if (!code) return;

@@ -35,13 +35,13 @@ export function fileSize(bytes) {
   return (bytes / (1024 * 1024)).toFixed(1).replace('.', ',') + ' MB';
 }
 
-export function materialList(materials, { titulo } = {}) {
+export function materialList(materials, { title } = {}) {
   if (!materials.length) return '';
-  return '<section class="materiais">' +
-    '<div class="materiais-topo">' +
-      '<h3>' + txt(titulo || 'Material complementar') + '</h3>' +
+  return '<section class="materials">' +
+    '<div class="materials-top">' +
+      '<h3>' + txt(title || 'Supporting material') + '</h3>' +
       '<span class="mono dim">' + materials.length + ' ' +
-        txt(materials.length === 1 ? 'arquivo' : 'arquivos') + '</span>' +
+        txt(materials.length === 1 ? 'file' : 'files') + '</span>' +
     '</div>' +
     materials.map((m) => {
       const kind = m.kind || 'link';
@@ -50,14 +50,14 @@ export function materialList(materials, { titulo } = {}) {
         // an external link opens away; a file downloads, under the record's name
         (external ? ' target="_blank" rel="noopener"' : ' download="' + esc(m.file || '') + '"') + '>' +
         '<span class="mat-icone" aria-hidden="true">' + svg(ICON[kind] || ICON.link) + '</span>' +
-        '<span class="mat-meio">' +
+        '<span class="mat-middle">' +
           '<span class="mat-tit">' + esc(m.title) + '</span>' +
           '<span class="mat-meta mono dim">' + esc(kind.toUpperCase()) +
             (m.bytes ? ' · ' + fileSize(m.bytes) : '') +
-            (m.aula ? ' · ' + esc(m.aula) : '') +
+            (m.lesson ? ' · ' + esc(m.lesson) : '') +
           '</span>' +
         '</span>' +
-        '<span class="mat-baixar" aria-hidden="true">' + svg(external ? ICON.link : DOWNLOAD_ARROW) + '</span>' +
+        '<span class="mat-download" aria-hidden="true">' + svg(external ? ICON.link : DOWNLOAD_ARROW) + '</span>' +
       '</a>';
     }).join('') +
   '</section>';

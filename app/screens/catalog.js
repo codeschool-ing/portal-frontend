@@ -14,17 +14,17 @@ import { esc } from '../text.js';
 
 export default async function catalogue() {
   const el = document.createElement('div');
-  el.className = 'tela tela-catalogo';
+  el.className = 'view view-catalog';
 
-  const categories = ['todas', ...new Set(COURSES.map((c) => c.category))];
+  const categories = ['all', ...new Set(COURSES.map((c) => c.category))];
 
   el.innerHTML =
-    '<header class="tela-head">' +
+    '<header class="screen-head">' +
       '<h1>' + txt('All courses') + '</h1>' +
     '</header>' +
-    '<div class="filtros">' +
-      '<div class="busca">' +
-        '<span class="busca-ico" aria-hidden="true">⌕</span>' +
+    '<div class="filters">' +
+      '<div class="search">' +
+        '<span class="search-ico" aria-hidden="true">⌕</span>' +
         '<input type="search" id="cat-search" placeholder="' + txt('search courses...') + '" aria-label="' + txt('Search courses') + '" />' +
       '</div>' +
       /* THE CATEGORY ROW SCROLLS, AND WITH ARROWS. There are nine categories,
@@ -52,12 +52,12 @@ export default async function catalogue() {
 
   const grid = el.querySelector('#cat-grid');
   const field = el.querySelector('#cat-search');
-  let category = 'todas';
+  let category = 'all';
 
   function paint() {
     const term = field.value.trim().toLowerCase();
     const list = COURSES.filter((c) => {
-      if (category !== 'todas' && c.category !== category) return false;
+      if (category !== 'all' && c.category !== category) return false;
       if (!term) return true;
       // searches name, summary, syllabus and topics — as on the vitrine
       const target = [c.name, c.summary, ...(c.syllabus || []), ...(c.topics || [])].join(' ').toLowerCase();
@@ -68,12 +68,12 @@ export default async function catalogue() {
       const lessons = courseLessons(c.id).length;
       const p = courseProgress(c.id);
       const st = courseState(c.id);
-      return '<a class="cartao no-' + st + '" href="#/curso/' + esc(c.id) + '">' +
-        '<span class="cartao-cat">' + esc(c.category) + '</span>' +
-        '<span class="cartao-nome">' + esc(c.name) + '</span>' +
-        '<span class="cartao-resumo">' + esc(c.summary) + '</span>' +
-        '<span class="cartao-meta">' + c.hours + 'h · ' + txt(c.level) + ' · ' + lessons + ' ' + txt('lessons') + '</span>' +
-        (p.feitas ? bar(p.pct, p.feitas + ' de ' + p.total) : '') +
+      return '<a class="card node-' + st + '" href="#/course/' + esc(c.id) + '">' +
+        '<span class="card-cat">' + esc(c.category) + '</span>' +
+        '<span class="card-name">' + esc(c.name) + '</span>' +
+        '<span class="card-summary">' + esc(c.summary) + '</span>' +
+        '<span class="card-meta">' + c.hours + 'h · ' + txt(c.level) + ' · ' + lessons + ' ' + txt('lessons') + '</span>' +
+        (p.done ? bar(p.pct, p.done + ' de ' + p.total) : '') +
       '</a>';
     }).join('');
     el.querySelector('#cat-empty').hidden = list.length > 0;
