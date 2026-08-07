@@ -417,6 +417,30 @@ export function saveExam(key, { pct, passed, lastCorrect, total }) {
   });
 }
 
+/* The server's copy of the same thing, replacing this one wholesale.
+
+   Wholesale and not merged, because the server computes it from the attempts it
+   holds and this browser's copy is a cache of that — merging would let a result
+   erased on one device come back from another. `saveExam` above stays: with no
+   backend configured it is still the only record there is.
+
+   `lastCorrect`/`lastTotal` are dropped rather than invented. The summary
+   carries the percentage and not the counts behind it, and a zero here would
+   render as "0 of 0 questions graded" under a score of 80%. */
+export function replaceExams(list) {
+  const exams = {};
+  (list || []).forEach((e) => {
+    exams[e.scope + ':' + e.scopeId] = {
+      attempts: e.attempts,
+      best: e.best,
+      passed: e.passed,
+      lastPct: e.lastPct,
+      lastAt: e.lastAt,
+    };
+  });
+  change((e) => { e.exams = exams; });
+}
+
 export const answerFor = (courseId, ix, exId) =>
   lessonRecord(courseId, ix)?.exercises?.[exId] || null;
 

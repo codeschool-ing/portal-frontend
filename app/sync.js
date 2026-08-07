@@ -150,3 +150,27 @@ export const register = (name, email, password) =>
   request('POST', '/api/accounts', { name, email, password });
 export const signOut = () => request('DELETE', '/api/session');
 export const session = () => request('GET', '/api/session');
+
+/* ---------- the exam ----------
+
+   NOT `push`. Every write above is fire and forget because the local copy is
+   already written, the routes are idempotent, and the next sign-in's import
+   replays whatever was missed. NONE of that is true here: an exam answer has no
+   local copy to fall back on, the import does not carry attempts, and a lost
+   one is a lost mark on a paper that closes. So these await, and a failure
+   reaches the screen.
+
+   `examStart` returns the attempt in progress or draws a new one — the server
+   decides which, and that decision is the whole of ARCHITECTURE.md 4.2. */
+const enc = encodeURIComponent;
+
+export const examStart = (scope, scopeId, choices) =>
+  request('POST', `/api/exams/${enc(scope)}/${enc(scopeId)}`, choices ? { choices } : undefined);
+
+export const examAnswer = (attemptId, exerciseId, response) =>
+  request('PUT', `/api/exams/attempts/${enc(attemptId)}/answers/${enc(exerciseId)}`, response);
+
+export const examSubmit = (attemptId) =>
+  request('POST', `/api/exams/attempts/${enc(attemptId)}/submit`);
+
+export const examSummaries = () => request('GET', '/api/exams');

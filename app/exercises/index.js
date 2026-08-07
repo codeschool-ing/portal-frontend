@@ -93,7 +93,19 @@ export function buildExercise(ex, ctx, ix, options = {}) {
     out.className = 'ex-verdict v-waiting';
     out.textContent = txt('checking…');
 
-    const v = await api.grade(ex, answer);
+    let v;
+    try {
+      v = await api.grade(ex, answer, options.attempt);
+    } catch (e) {
+      /* Only reachable inside a server-drawn exam, where the answer is a
+         request and not a comparison. It has to be said rather than swallowed:
+         the mark is on a paper that closes, and a silent failure would be
+         discovered as a zero at submit. */
+      out.className = 'ex-verdict v-empty';
+      out.textContent = txt('That answer did not reach the server. Try again.') + ' ' + (e.message || '');
+      if (button) button.disabled = false;
+      return;
+    }
     if (ctx) saveAnswer(ctx.courseId, ctx.lessonIx, uid, v);
 
     if (exam) {
@@ -103,7 +115,17 @@ export function buildExercise(ex, ctx, ix, options = {}) {
       out.className = 'ex-verdict v-recorded';
       out.innerHTML = '<strong>' + txt('answer recorded') + '</strong> ' +
         txt('the result comes at the end of the exam.');
-      el.revealExam = () => { mod.reveal(body, ex, v); showVerdict(el, ex, v); };
+      /* The verdict this closure captured is the one grading produced, which in
+         a server-drawn exam is no verdict at all — the paper had no key to
+         compare against. Submitting brings the real one back, so reveal takes
+         an override, and the question is shown against the answer the server
+         gave rather than against nothing. */
+      el.revealExam = (fromServer) => {
+        const shown = fromServer || v;
+        if (fromServer) applyKey(ex, fromServer);
+        mod.reveal(body, ex, shown);
+        showVerdict(el, ex, shown);
+      };
     } else {
       mod.reveal(body, ex, v);
       showVerdict(el, ex, v);
@@ -188,6 +210,44 @@ function markAlreadyDone(el, previous) {
    lock — the assessment could not be stricter than it.
    ========================================================================== */
 
+/* Put the answer key back on the exercise, from what the server said.
+
+   The renderers mark the right answer by reading the exercise — `choices[i]
+   .correct`, `items` in order, `answer`. A server-drawn exam has none of those
+   fields, on purpose, so revealing would mark nothing at all. Rather than teach
+   three renderers a second way to find the same thing, the verdict is grafted
+   back on before they run.
+
+   IT IS NOT A LEAK. The key arrives with the verdict, which arrives at submit,
+   which is when the exam is over — that is what revealing a result means. What
+   never arrives is anything that was not asked: `code`'s hidden test cases are
+   sealed too, and no verdict carries them. */
+function applyKey(ex, v) {
+  if (!v || v.expected === undefined || v.expected === null) return;
+  switch (ex.type) {
+    case 'quiz':
+      (ex.choices || []).forEach((c, i) => {
+        c.correct = i === v.expected;
+        if (v.explanations && v.explanations[i]) c.why = v.explanations[i];
+      });
+      break;
+    case 'multiple-choice':
+      (ex.choices || []).forEach((c, i) => {
+        c.correct = Array.isArray(v.expected) && v.expected.includes(i);
+        if (v.explanations && v.explanations[i]) c.why = v.explanations[i];
+      });
+      break;
+    case 'ordering':
+      if (Array.isArray(v.expected)) ex.items = v.expected;
+      break;
+    case 'expected-output':
+      ex.answer = String(v.expected);
+      break;
+    default:
+      break;
+  }
+}
+
 export function buildAssessment(exercises, ctx, options = {}) {
   const exam = Boolean(options.exam);
   const el = document.createElement('div');
@@ -252,26 +312,51 @@ export function buildAssessment(exercises, ctx, options = {}) {
 
   function show(i) {
     current = i;
-    if (!screens[i]) screens[i] = buildExercise(exercises[i], contextFor(i), i, { exam });
+    if (!screens[i]) screens[i] = buildExercise(exercises[i], contextFor(i), i, { exam, attempt: options.attempt });
     stage.textContent = '';
     stage.appendChild(screens[i]);
     paintHeader();
   }
 
-  function finish() {
-    const right = states.filter((s) => s.correct === true).length;
-    const unchecked = states.filter((s) => s.answered && s.correct === null).length;
-    const unanswered = states.filter((s) => !s.answered).length;
+  async function finish() {
+    const count = () => ({
+      right: states.filter((s) => s.correct === true).length,
+      unchecked: states.filter((s) => s.answered && s.correct === null).length,
+      unanswered: states.filter((s) => !s.answered).length,
+    });
+    const { right, unchecked, unanswered } = count();
 
     /* The exam OPENS here: every answered question reveals the verdict that was
        held back, and answering stops being possible. It is the line between
        measuring and teaching — before it the exam measures, after it it
        teaches. */
+    /* AWAITED, and that is why this function is async: in a server-drawn exam
+       the result is a request, and revealing before it comes back would reveal
+       nothing — the browser has no key to reveal against. */
+    const grade = options.onSubmit
+      ? await options.onSubmit({ right, unchecked, unanswered, states })
+      : null;
+
+    /* The verdicts the server sent, by exercise id. They replace what grading
+       produced, because in a server-drawn exam grading produced `null` for
+       everything — the dots would stay grey and the score would be a lie. */
+    if (grade && grade.verdicts) {
+      exercises.forEach((ex, i) => {
+        const v = grade.verdicts[ex.id];
+        if (v) states[i] = { answered: states[i].answered, correct: v.correct, server: v };
+      });
+    }
+    /* Recounted AFTER, or the notes below describe the exam as it was a moment
+       before the result arrived: in a server-drawn exam every answer was
+       `correct: null` until this point, and the screen would say all ten are
+       waiting to be checked underneath a score of 20%. */
+    const final = count();
+
     if (exam) {
       submitted = true;
-      screens.forEach((t) => {
+      screens.forEach((t, i) => {
         if (!t) return;
-        if (t.revealExam) t.revealExam();
+        if (t.revealExam) t.revealExam(states[i] && states[i].server);
         t.querySelectorAll('.ex-answer, input, textarea, select, button').forEach((b) => { b.disabled = true; });
       });
     }
@@ -279,15 +364,12 @@ export function buildAssessment(exercises, ctx, options = {}) {
     stage.textContent = '';
     const r = document.createElement('div');
     r.className = 'wz-result';
-    const grade = options.onSubmit
-      ? options.onSubmit({ right, unchecked, unanswered, states })
-      : null;
     r.innerHTML =
       (grade ? grade.html : '') +
       (grade ? '' : '<span class="wz-res-label">' + txt('result') + '</span>' +
-        '<p class="wz-res-score"><strong>' + right + '</strong>/' + exercises.length + ' ' + txt('correct') + '</p>') +
-      (unchecked ? '<p class="wz-res-note">' + unchecked + ' ' + txt('are waiting to be checked on the server.') + '</p>' : '') +
-      (unanswered ? '<p class="wz-res-note">' + unanswered + ' ' + txt('unanswered.') + '</p>' : '') +
+        '<p class="wz-res-score"><strong>' + final.right + '</strong>/' + exercises.length + ' ' + txt('correct') + '</p>') +
+      (final.unchecked ? '<p class="wz-res-note">' + final.unchecked + ' ' + txt('are waiting to be checked on the server.') + '</p>' : '') +
+      (final.unanswered ? '<p class="wz-res-note">' + final.unanswered + ' ' + txt('unanswered.') + '</p>' : '') +
       '<button type="button" class="btn btn-ghost wz-back">' +
         txt(exam ? 'Review the exam question by question' : 'Review the questions') + '</button>';
     stage.appendChild(r);
@@ -296,7 +378,7 @@ export function buildAssessment(exercises, ctx, options = {}) {
     paintHeader();
     el.dispatchEvent(new CustomEvent('assessment:concluida', {
       bubbles: true,
-      detail: { lastCorrect: right, total: exercises.length },
+      detail: { lastCorrect: final.right, total: exercises.length },
     }));
   }
 
@@ -323,7 +405,17 @@ export function buildAssessment(exercises, ctx, options = {}) {
        mistake on this screen — after submitting there is no way back. */
     const blank = states.filter((s) => !s.answered).length;
     if (exam && blank && !confirming) { confirming = true; paintHeader(); return; }
-    finish();
+    el.querySelector('.wz-next').disabled = true;
+    finish().catch((e) => {
+      /* The submit failed. The exam is NOT closed — nothing was revealed and
+         nothing was disabled — so the button comes back and the paper is still
+         open, which is the only recovery that does not cost the attempt. */
+      el.querySelector('.wz-next').disabled = false;
+      const note = document.createElement('p');
+      note.className = 'wz-res-note wz-error';
+      note.textContent = txt('The exam could not be submitted.') + ' ' + (e.message || '');
+      stage.appendChild(note);
+    });
   });
 
   show(0);

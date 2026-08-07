@@ -43,6 +43,12 @@ export async function signIn({ name, email, password }) {
   const account = await sync.signIn(email, password);
   state.change((e) => { e.session = { name: account.name, email: account.email }; });
   await sync.adopt();
+  /* And the exams, which `adopt` does not carry: the progress import is about
+     sections and notes, and an exam result is neither — it is computed from
+     attempts the server holds, and this browser's copy is a cache of that. A
+     student signing in on a second device would otherwise see a course they
+     passed offering to be taken for the first time. */
+  await refreshExams();
   return state.now().session;
 }
 
@@ -144,17 +150,58 @@ export function lessonExercises(courseId, topicKey, options) {
 
 /* Grade one answer.
 
-   Four types are graded on the client because they are pure comparison. Three
-   are not: `code` and `expected-output` have to run code, and
-   `expression-answer` needs a CAS (sympy). The vitrine's docs already record
-   that running student code requires a throwaway container — that is not a
-   shortcut, it is the intended design.
+   THREE PATHS, and which one runs is decided here so that no screen has to
+   know:
 
-   Both paths go through HERE, with the same verdict shape, so the day the
-   server exists only the body of the `if` changes. */
-export async function grade(ex, answer) {
+     inside a server-drawn exam  →  the answer is RECORDED and nothing else.
+                                    There is no verdict to return: the paper
+                                    has no answer key in it, and the result
+                                    arrives at submit.
+     four types, no exam         →  pure comparison, on the client, because the
+                                    feedback is immediate and the wait would be
+                                    a network round trip per question.
+     the other three             →  `code` and `expected-output` run code and
+                                    `expression-answer` needs a CAS; with no
+                                    backend they come back unchecked, which is
+                                    what they have always done.
+
+   `attempt` is the id of a server-drawn exam and is absent everywhere else.
+   Its presence is what tells this function it is grading nothing. */
+export async function grade(ex, answer, attempt) {
+  if (attempt) return recordExamAnswer(attempt, ex, answer);
   if (NEEDS_SERVER.includes(ex.type)) return gradeOnServer(ex, answer);
   return gradeLocally(ex, answer);
+}
+
+/* The wire shape, one named field per kind.
+
+   Named rather than a bare value, so the server can answer 400 with the shape
+   it expected instead of grading a zero value as wrong — which would look, to
+   the student, exactly like having got it wrong. `matching` is here for
+   completeness and is not drawn into an exam yet: its screen checks each pair
+   the moment it is made, which needs the pairing the exam withholds. */
+function toWire(ex, answer) {
+  switch (ex.type) {
+    case 'quiz': return { choice: answer };
+    case 'multiple-choice': return { choices: answer || [] };
+    case 'ordering': return { order: answer || [] };
+    case 'matching': return { pairs: answer || [] };
+    case 'expected-output': return { text: answer == null ? '' : String(answer) };
+    case 'code': return { source: answer == null ? '' : String(answer) };
+    case 'expression-answer': return { expression: answer == null ? '' : String(answer) };
+    default: return { response: answer };
+  }
+}
+
+/* Awaited, unlike every other write the portal sends the server.
+
+   The others are fire and forget because the local copy is already written and
+   the next sign-in replays what was missed. An exam answer has neither: it is
+   a mark on a paper that closes, so a failure has to reach the student while
+   they can still press the button again. */
+async function recordExamAnswer(attempt, ex, answer) {
+  await sync.examAnswer(attempt, ex.id, toWire(ex, answer));
+  return { correct: null, recorded: true };
 }
 
 // FUTURE: POST /grade → throwaway container (execution) or sympy (CAS).
@@ -168,4 +215,43 @@ async function gradeOnServer(ex, answer) {
       : 'Running the test cases needs the container on the server.',
     response: answer,
   };
+}
+
+/* ---------- the exam ----------
+
+   Two implementations of one signature, and the choice is `sync.configured()`.
+   With no backend the portal draws and grades its own exam, which is what it
+   has always done and what the single-file bundle still has to do off a disk.
+   With one, the paper is the server's: drawn there, stamped into an attempt,
+   and graded there.
+
+   The difference a student can see is that the second one holds the verdict
+   even from the browser's memory. The first cannot — the answer key is in the
+   page — and that is the honest limit of a portal with no server, not a bug. */
+export const examOnServer = () => sync.configured();
+
+export async function startExam(scope, scopeId, choices) {
+  const attempt = await sync.examStart(scope, scopeId, choices);
+  return {
+    id: attempt.id,
+    ordinal: attempt.ordinal,
+    questions: attempt.questions || [],
+    responses: attempt.responses || {},
+  };
+}
+
+export async function submitExam(attemptId) {
+  const result = await sync.examSubmit(attemptId);
+  // The summary the screens read comes back from the server too, rather than
+  // being recomputed here from the result: best-result-wins is its rule and
+  // two implementations of it would disagree the first time someone retook a
+  // passed exam.
+  await refreshExams();
+  return result;
+}
+
+export async function refreshExams() {
+  if (!sync.configured()) return;
+  const { exams } = await sync.examSummaries();
+  state.replaceExams(exams);
 }

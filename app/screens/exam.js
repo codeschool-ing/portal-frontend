@@ -17,7 +17,8 @@
 
 import { courseById } from '../catalog.js';
 import { courseProgress, activeOption, examResult, examAttempts, saveExam } from '../state.js';
-import { courseExam, trackExam, examScore, PASS_MARK } from '../exams.js';
+import { openCourseExam, openTrackExam, examScore, PASS_MARK } from '../exams.js';
+import * as api from '../api.js';
 import { buildAssessment } from '../exercises/index.js';
 import { studentTrack, trackProgress, bar, empty } from './common.js';
 import { esc } from '../text.js';
@@ -82,13 +83,18 @@ function build(exam, progress) {
   void attempt;
 
   /* The exam's result is written BY THE SCREEN, not by the wizard: this is where
-     "passed" means something, and this is where it gets stored. */
-  const onSubmit = ({ states }) => {
-    const n = examScore(states);
-    saveExam(exam.key, {
-      pct: n.pct, passed: n.passed, lastCorrect: n.lastCorrect, total: n.judged,
-    });
+     "passed" means something, and this is where it gets stored.
+
+     TWO WAYS OF ARRIVING AT IT, and the difference is who computed it. With no
+     backend the states in the browser are all there is, so the score is counted
+     here and kept here. With one, the paper was the server's and so is the
+     result: `submitExam` closes the attempt, grades it, and brings back a
+     verdict per question — which the wizard needs anyway to reveal anything,
+     since the paper it drew had no answer key in it. */
+  const onSubmit = async ({ states }) => {
+    const n = exam.attempt ? await submitToServer(exam.attempt) : local(states);
     return {
+      verdicts: n.verdicts,
       html:
         '<span class="wz-res-label">' + txt(n.passed ? 'passed' : 'not yet') + '</span>' +
         '<p class="wz-res-score exam-score' + (n.passed ? ' passed' : ' missed') + '">' +
@@ -102,11 +108,34 @@ function build(exam, progress) {
     };
   };
 
+  function local(states) {
+    const n = examScore(states);
+    saveExam(exam.key, {
+      pct: n.pct, passed: n.passed, lastCorrect: n.lastCorrect, total: n.judged,
+    });
+    return n;
+  }
+
+  /* Nothing is stored here: `submitExam` refreshes the summaries from the
+     server afterwards, and recomputing best-result-wins on this side would be a
+     second implementation of a rule that only stays right while there is one. */
+  async function submitToServer(attemptId) {
+    const r = await api.submitExam(attemptId);
+    return {
+      pct: r.pct,
+      passed: r.passed,
+      lastCorrect: r.correct,
+      judged: r.judged,
+      pending: r.pending,
+      verdicts: r.verdicts,
+    };
+  }
+
   el.querySelector('.exam-stage').appendChild(
     buildAssessment(
       exam.items.map((i) => i.ex),
       exam.items.map((i) => i.ctx),
-      { exam: true, onSubmit },
+      { exam: true, onSubmit, attempt: exam.attempt },
     ),
   );
 
@@ -116,16 +145,43 @@ function build(exam, progress) {
 export async function courseExamScreen({ id }) {
   const c = courseById(id);
   if (!c) return { title: txt('Exam'), el: empty(txt('Course not found.')) };
-  const exam = courseExam(id, examAttempts('course:' + id));
+  const exam = await openExam(() => openCourseExam(id, examAttempts('course:' + id)));
+  if (!exam) return { title: txt('Exam') + ' · ' + c.name, el: pending(c.name) };
   return { title: txt('Exam') + ' · ' + c.name, el: build(exam, courseProgress(id)) };
 }
 
 export async function trackExamScreen() {
   const t = studentTrack();
   if (!t) return { title: txt('Exam'), el: empty(txt('You have not chosen a track yet.')) };
-  const exam = trackExam(t, activeOption, examAttempts('track:' + t.id));
+  const exam = await openExam(() => openTrackExam(t, activeOption, examAttempts('track:' + t.id)));
+  if (!exam) return { title: txt('Exam') + ' · ' + t.name, el: pending(t.name) };
   return { title: txt('Exam') + ' · ' + t.name, el: build(exam, trackProgress(t)) };
 }
+
+/* The server refuses to open an exam it has no questions for, with a 409 — a
+   course whose exercises are not written yet. That is not a failure on anyone's
+   part and it is the same state the local draw shows as an empty `items`, so
+   both arrive at the same screen. Anything else is a real failure and is
+   allowed to reach the router. */
+async function openExam(draw) {
+  try {
+    return await draw();
+  } catch (e) {
+    if (e.status === 409) return null;
+    throw e;
+  }
+}
+
+const pending = (title) => {
+  const el = document.createElement('div');
+  el.className = 'view view-exam';
+  el.innerHTML =
+    '<header class="view-head"><h1>' + txt('Exam') + ' · ' + esc(title) + '</h1></header>' +
+    '<section class="block assessment-pending"><p class="mono dim">' +
+      txt('[exam in preparation — this course has no exercises produced yet]') +
+    '</p></section>';
+  return el;
+};
 
 /* The card that announces the exam, at the end of the course page and of the
    track page. It is the same piece in both places because it is the same

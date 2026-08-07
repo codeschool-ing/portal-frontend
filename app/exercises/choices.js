@@ -57,8 +57,14 @@ export default {
       el.classList.toggle('choice-missed', Boolean(a.correct) && !ticked);
       el.classList.toggle('choice-wrong', !a.correct && ticked);
       el.querySelector('input').disabled = true;
-      // only now: the justification is feedback, not a hint
+      /* Only now: the justification is feedback, not a hint.
+
+         It may also ARRIVE only now. A server-drawn exam has no `why` in the
+         paper — that is the point of the paper — so the span was rendered
+         empty and the text comes back with the verdict. Written here rather
+         than at build time, because that is when it exists. */
       const p = el.querySelector('.choice-why');
+      if (!p.textContent.trim() && a.why) p.innerHTML = formatted(a.why);
       if (p.textContent.trim()) p.hidden = false;
     });
     void v;
