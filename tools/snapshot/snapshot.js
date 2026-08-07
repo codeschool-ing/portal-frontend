@@ -179,6 +179,31 @@ for (const c of COURSES) {
   }
 }
 
+/* ---- tracks ----------------------------------------------------------------
+   The server needs these to assemble a TRACK EXAM. The paper is drawn from the
+   exercises of the track's courses, and if the client said which courses those
+   were, a student could sit a "track exam" drawn from one easy course — the
+   whole point of the draw moving server-side is that it is not the client's.
+
+   FLATTENED INTO ONE SHAPE. The catalogue authors a step as either a course id
+   or `{choice, note, options:[{name, courses}]}`; here every step is
+   `{isChoice, options:[[courseId]]}`, so a plain course is one option of one
+   course. A union type costs the server more than a boolean and an index, and
+   the note and the option names are copy the server never renders.
+
+   THE OPTION ORDER IS A CONTRACT. `activeOption(trackId, stepIx)` in the portal
+   stores an INDEX in the student's browser, and the server checks a requested
+   option against the ones declared here. Reordering the options of a step
+   reassigns everyone's choice — silently, to a neighbouring path. */
+const tracks = TRACKS.map((t) => ({
+  id: t.id,
+  title: t.name,
+  family: t.family,
+  steps: t.courses.map((item) => (typeof item === 'string'
+    ? { isChoice: false, options: [[item]] }
+    : { isChoice: true, options: item.options.map((o) => o.courses.slice()) })),
+}));
+
 const materials = Object.entries(window.MATERIALS || {}).map(([key, m]) => ({
   key,
   title: m.title || key,
@@ -253,4 +278,20 @@ if (problems.length) {
   process.exit(1);
 }
 
-process.stdout.write(JSON.stringify({ courses, exercises, materials }, null, 2) + '\n');
+/* A track naming a course that is not in the catalogue arrives at `ingest` as a
+   foreign-key violation; here it names the track and the course. */
+const courseIds = new Set(COURSES.map((c) => c.id));
+for (const t of tracks) {
+  if (!t.steps.length) problems.push(`the track ${t.id} has no steps`);
+  t.steps.forEach((step, ix) => {
+    if (!step.options.length) problems.push(`${t.id} step ${ix} offers nothing`);
+    step.options.forEach((option, optIx) => {
+      if (!option.length) problems.push(`${t.id} step ${ix} option ${optIx} has no courses`);
+      for (const id of option) {
+        if (!courseIds.has(id)) problems.push(`${t.id} names the course ${id}, which is not in the catalogue`);
+      }
+    });
+  });
+}
+
+process.stdout.write(JSON.stringify({ courses, tracks, exercises, materials }, null, 2) + '\n');
