@@ -131,14 +131,32 @@ for (let i = 0; i < opened.questions; i++) {
     if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); }
     const field = ex.querySelector('.ex-field, .code-area');
     if (field) { field.value = 'something'; field.dispatchEvent(new Event('input', { bubbles: true })); }
+    /* A matching is answered by GESTURE and has no field to fill: a left tile,
+       then a right one, for each pair. Without this the button was pressed with
+       nothing placed, and the exercise answered "Answer before checking." — see
+       the wait below, which is where that showed up. */
+    const lefts = [...ex.querySelectorAll('.tile-left')];
+    const rights = [...ex.querySelectorAll('.tile-right')];
+    lefts.forEach((l, ix) => {
+      if (!rights[ix]) return;
+      l.click();
+      rights[ix].click();
+    });
     const btn = ex.querySelector('.ex-answer');
     if (!btn || btn.disabled) return 'no button';
     btn.click();
     return 'clicked';
   });
   if (answered !== 'clicked') { console.log('    q' + i + ': ' + answered); continue; }
+  /* ON THE CLASS AND NOT ON THE TEXT. This waited for the word "checking" to
+     leave the verdict, and `checking…` is indeed what the pending state says —
+     but so does "Answer before checking.", which is what a matching answered
+     with nothing placed says, and that one never goes away. The suite hung for
+     eight seconds and then threw, on a draw that happened to include one.
+     `v-waiting` is the state itself, and it is not translated. */
   await page.waitForFunction(() =>
-    !/checking/i.test(document.querySelector('.wz-stage .ex-verdict')?.textContent || ''), null, { timeout: 8000 });
+    !document.querySelector('.wz-stage .ex-verdict')?.classList.contains('v-waiting'),
+  null, { timeout: 8000 });
 }
 
 const beforeSubmit = await page.evaluate(() => ({
@@ -197,6 +215,158 @@ const summary = await page.evaluate(async () => {
   return state.examResult('course:javascript');
 });
 check(summary && summary.attempts === 1, 'the summary came back from the server: ' + JSON.stringify(summary));
+
+/* ==========================================================================
+   THE CERTIFICATE.
+
+   The other half the smoke suite cannot reach. Over there the portal has no
+   backend, so nothing has been ISSUED and the screen says so; here one exists,
+   and what is worth checking is that the number a student can read and copy is
+   the SERVER's — because the portal used to hash one out of the course id and
+   the student's name, and a hash resolves to "no certificate under this code"
+   on the page an employer opens.
+
+   HOW THIS HARNESS PASSES AN EXAM, AND WHAT THAT SAYS. It reads the answers off
+   `GET /api/exercises/{course}/{lesson}` — the PRACTICE route, which serves the
+   key on purpose, because in a lesson the feedback is immediate and grading on
+   the client is what keeps it instant.
+
+   That route answers WHILE AN EXAM IS OPEN, and every question drawn onto the
+   paper comes back out of it with its key attached. Sealing the exam projection
+   is not sealing the exam while the practice projection of the same exercises
+   is one fetch away in the same session. So this block passes an exam exactly
+   the way a student with an open console could, and it is here as a witness as
+   much as a fixture: the day that route learns to refuse a course with an open
+   attempt, these lines stop working, and whoever closes it will have to hand
+   the harness a key by some other road.
+   ========================================================================== */
+console.log('\n== the certificate ==');
+
+const none = await page.evaluate(async () => {
+  const r = await fetch('/api/certificates', { credentials: 'include' });
+  return (await r.json()).certificates || [];
+});
+check(none.length === 0, 'nothing is issued for an exam that was not passed');
+
+const sat = await page.evaluate(async ([course]) => {
+  const j = async (method, path, body) => {
+    const r = await fetch(path, {
+      method,
+      credentials: 'include',
+      headers: body === undefined ? {} : { 'Content-Type': 'application/json' },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    const t = await r.text();
+    return t ? JSON.parse(t) : null;
+  };
+
+  const key = new Map();
+  for (let ix = 0; ix < 40; ix += 1) {
+    const p = await j('GET', '/api/exercises/' + course + '/' + ix);
+    const list = p && (p.exercises || p);
+    if (!Array.isArray(list)) break;
+    for (const ex of list) key.set(ex.id, ex);
+  }
+
+  const attempt = await j('POST', '/api/exams/course/' + course);
+  const kinds = [];
+  for (const q of attempt.questions) {
+    const k = key.get(q.id);
+    if (!k) continue;
+    /* Matched by TEXT and never by index: the exam shuffles the choices and the
+       items, which is the whole point of shuffling them. */
+    let body;
+    if (q.type === 'quiz') {
+      const right = k.choices.find((c) => c.correct);
+      body = { choice: q.choices.findIndex((c) => c.text === right.text) };
+    } else if (q.type === 'multiple-choice') {
+      const rights = k.choices.filter((c) => c.correct).map((c) => c.text);
+      body = { choices: q.choices.map((c, i) => (rights.includes(c.text) ? i : -1)).filter((i) => i >= 0) };
+    } else if (q.type === 'ordering') {
+      body = { order: k.items.slice() };
+    } else if (q.type === 'matching') {
+      body = { pairs: q.pairs.map((p) => (k.pairs.find((kp) => kp.left === p.left) || {}).right || '') };
+    } else if (q.type === 'expected-output') {
+      body = { text: k.answer };
+    } else {
+      continue;   // code and expression-answer: nobody checks them yet
+    }
+    await j('PUT', '/api/exams/attempts/' + attempt.id + '/answers/' + encodeURIComponent(q.id), body);
+    kinds.push(q.type);
+  }
+  const result = await j('POST', '/api/exams/attempts/' + attempt.id + '/submit');
+  return { kinds: kinds, pct: result.pct, passed: result.passed };
+}, [COURSE]);
+check(sat.passed === true, 'an exam passed at ' + sat.pct + '% — ' + sat.kinds.join(', '));
+
+/* Lazily issued: nothing is minted inside the submit, and ASKING is what
+   issues. Asking twice is a read, because the insert conflicts on the holder
+   and the scope and does nothing. */
+const mine = await page.evaluate(async () => {
+  const one = await (await fetch('/api/certificates', { credentials: 'include' })).json();
+  const two = await (await fetch('/api/certificates', { credentials: 'include' })).json();
+  return { first: one.certificates, second: two.certificates };
+});
+check(mine.first.length === 1, 'passing it issued one certificate');
+check(mine.second.length === 1 && mine.second[0].code === mine.first[0].code,
+  'and asking again returns that one rather than minting a second');
+const cert = mine.first[0];
+console.log('    ' + JSON.stringify(cert));
+
+await page.goto(PORTAL + '/index.html#/certificates', { waitUntil: 'networkidle' });
+await page.waitForSelector('.cert:not(.cert-sample)');
+const shown = await page.evaluate(() => {
+  const art = document.querySelector('.cert:not(.cert-sample)');
+  return {
+    code: art.dataset.code || '',
+    printed: art.querySelector('.cert-code').textContent.trim(),
+    holder: art.querySelector('.cert-student').textContent.trim(),
+    title: art.querySelector('.cert-course').textContent.trim(),
+  };
+});
+check(shown.printed === cert.code,
+  'the number printed on the document is the server\'s: ' + shown.printed);
+check(shown.code === cert.code, 'and the element carries it as a datum, not only as text');
+check(shown.holder === cert.holderName, 'the holder is the one on the row: ' + shown.holder);
+check(shown.title === cert.title, 'and so is the title: ' + shown.title);
+
+await page.locator('.cert:not(.cert-sample)').first().click();
+await page.waitForSelector('.modal-cert');
+const href = await page.locator('.modal-actions .cert-in:not(.cert-png)').first().getAttribute('href');
+check(Boolean(href) && href.includes('certId=' + encodeURIComponent(cert.code)),
+  'the LinkedIn form is filled in with that code');
+const certUrl = href ? new URL(href).searchParams.get('certUrl') : '';
+check(certUrl === PORTAL + '/certificate/' + encodeURIComponent(cert.code),
+  'and points at where the page really is: ' + certUrl);
+
+/* The page a stranger opens. No session on this request — it is the one route
+   in the server that answers without one. */
+const publicPage = await page.evaluate(async (u) => {
+  const r = await fetch(u, { credentials: 'omit' });
+  return { status: r.status, type: r.headers.get('content-type') || '', body: await r.text() };
+}, certUrl);
+check(publicPage.status === 200 && /text\/html/.test(publicPage.type),
+  'the validation page answers HTML without a session');
+check(publicPage.body.includes(cert.holderName) && publicPage.body.includes(cert.title),
+  'and names the holder and what they completed');
+check(/og:title/.test(publicPage.body), 'with a preview card for whoever pastes the link');
+
+/* Typed off a piece of paper: any casing, no groups, and the letters Crockford
+   leaves out folded onto the ones they are mistaken for. */
+const mistyped = cert.code.toLowerCase().replace(/-/g, '').replace(/0/g, 'o').replace(/1/g, 'l');
+const loose = await page.evaluate(async (c) => {
+  const r = await fetch('/certificate/' + encodeURIComponent(c), { credentials: 'omit' });
+  return { status: r.status, body: await r.text() };
+}, mistyped);
+check(loose.status === 200 && loose.body.includes(cert.holderName),
+  'and it survives being typed off paper: ' + mistyped);
+
+const unknown = await page.evaluate(async () => {
+  const r = await fetch('/certificate/CS-ZZZZ-ZZZZ-ZZZZ-ZZZZ-ZZZZ-ZZZZ-ZZ', { credentials: 'omit' });
+  return { status: r.status, body: await r.text() };
+});
+check(unknown.status === 200, 'a code nobody holds answers 200 and not 404 — the URL is on a profile');
+check(/no certificate/i.test(unknown.body), 'and says so');
 
 await browser.close();
 console.log(fail.length ? '\n' + fail.length + ' FAILED' : '\nall good');

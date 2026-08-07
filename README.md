@@ -541,7 +541,7 @@ before closing an exercise.
 ## What is skeleton and what is settled
 
 **Disposable:** the content of `assets/exercises-sample.js`, the sign-in screen
-(any name gets in), the lessons' text, the certificate with no validation code.
+(any name gets in), the lessons' text.
 
 **Settled:** the exercise format — the fields are exactly the ones the pipeline
 emits (`prompt`, `socraticHint`, `options[].{text,correct,why}`, `items`,
@@ -803,6 +803,50 @@ Two suites, because the two modes need different things to run:
 `tools/smoke/smoke.mjs` covers the local exam and runs in CI;
 `tools/exam-server/check.mjs` covers the server one and needs a Go process, a
 database and an ingested catalogue, so it is run by hand.
+
+### The certificate is issued, or it is not
+
+The screen used to hash the course id and the student's name into something
+shaped like `CS-XXXX-XXXX-XXXX`. That was the right placeholder while nothing
+issued one — deterministic, so it did not change between visits — and it became
+the wrong thing to keep the moment `GET /api/certificates` started answering.
+Two codes for one document is worse than none, because the one a student can
+read and copy is the one the public page answers *"no certificate under this
+code"* to.
+
+So there are two modes, and they differ in what EXISTS rather than in where a
+number comes from:
+
+| | with a backend | without one |
+|---|---|---|
+| the list | `GET /api/certificates`, which mints whatever a passed exam owes | derived here, from a completed course and a passed exam |
+| the code | the server's | none, and the footer says so |
+| LinkedIn | `profile/add`, filled in | disabled, with the reason on the button |
+| the PNG | yes | yes |
+
+The PNG stays in both, and the LinkedIn button does not, because they answer to
+different facts. `profile/add` posts a **credential naming an issuer**, and with
+no server there is no issuer. A picture is a picture, and this one carries "no
+code has been issued" in its own footer wherever it goes.
+
+Everything the document asserts — the holder's name, the title, the workload —
+comes from the row and never from the catalogue. The row is a **snapshot** taken
+when the exam was passed, so retitling a course does not silently rewrite a
+document already on a profile; reading the catalogue instead would undo the only
+thing a snapshot is for. That includes the language: the title is English even
+when the interface is not, because the validation page is English and the number
+in the footer is an invitation to go and compare the two.
+
+The validation URL is built from where the API is and not from where the portal
+is. `GET /certificate/{code}` is the backend's route — server-rendered HTML,
+because a crawler building a preview card cannot run a hash-routed
+single-page app — and `api.codeschool.ing` is the same site at a different
+origin. A hard-coded `codeschool.ing/certificate/…` would be a dead link on
+somebody's profile.
+
+A **revoked** certificate is shown and marked, not hidden. The URL is already
+out there answering "revoked"; dropping the card would leave the holder the last
+to know.
 
 ## Content: image, diagram and annotated code
 

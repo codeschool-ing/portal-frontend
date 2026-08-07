@@ -48,6 +48,13 @@ function readCard(art) {
     meta: text('.cert-meta'),
     when: foot[0] || '',
     code: text('.cert-code'),
+    /* The code as a DATUM, next to the code as a line of text, and they are not
+       the same thing. The footer says "no code has been issued" when none was,
+       which is right on the document and wrong in a file name — scraping it
+       produced `codeschool-ing-nocodehasbeenissued.png`, and something
+       different in each of the five languages. The attribute is absent instead
+       of being a sentence, which is what a file name can fall back from. */
+    id: art.dataset.code || '',
   };
 }
 
@@ -255,7 +262,7 @@ export async function downloadCertificatePNG(art) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'codeschool-ing-' + (d.code || 'certificate').replace(/[^\w-]+/g, '') + '.png';
+  a.download = 'codeschool-ing-' + (d.id || 'certificate').replace(/[^\w-]+/g, '') + '.png';
   document.body.appendChild(a);
   a.click();
   a.remove();

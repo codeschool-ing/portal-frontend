@@ -255,3 +255,39 @@ export async function refreshExams() {
   const { exams } = await sync.examSummaries();
   state.replaceExams(exams);
 }
+
+/* ---------- certificates ----------
+
+   THE PORTAL NO LONGER MINTS A CODE. It used to hash the course id and the
+   student's name into something shaped like `CS-XXXX-XXXX-XXXX`, which was the
+   right placeholder while nothing issued one and is the wrong thing to keep now
+   that something does: the server's code is the one the public page resolves,
+   and a portal showing a different one hands the student a number that answers
+   "no certificate under this code" to whoever types it.
+
+   So there are two modes, and they differ in what EXISTS rather than in where a
+   code comes from:
+
+     with a backend  →  the certificates are the server's, whole. Code, holder,
+                        title and date are the document's own fields, because
+                        the row is a snapshot taken at issuance and not a view
+                        of the present.
+     without one     →  no certificate has been issued, by anybody. The screen
+                        still shows what was earned in this browser; what it
+                        does not do is put a number on it.
+
+   Not cached in state.js, unlike the exam summaries. Those are read by four
+   screens and consulted on every render; this is read by one screen, and a copy
+   would be a second place for a revocation to fail to arrive. */
+export const certificatesOnServer = () => sync.configured();
+
+export async function certificates() {
+  if (!sync.configured()) return [];
+  const { certificates: list } = await sync.certificates();
+  return list || [];
+}
+
+/* Where the code resolves. Empty with no backend, and that emptiness is what
+   the screen reads to know there is nothing to link to. */
+export const certificateUrl = (code) =>
+  sync.publicUrl('/certificate/' + encodeURIComponent(code));
