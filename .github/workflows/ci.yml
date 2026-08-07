@@ -49,6 +49,13 @@ jobs:
       - name: Nothing on screen is stuck in English
         run: node tools/i18n/check.mjs
 
+      # It refuses rather than exports when a course dictionary has drifted out
+      # of step with the catalogue, or when a lesson would reach `ingest` in a
+      # shape it rejects. Both are invisible in a diff, and the second one
+      # arrives as a constraint violation halfway through a mirror.
+      - name: The backend's snapshot still builds
+        run: node tools/snapshot/snapshot.js > /dev/null
+
       - name: The version is readable, and is a version
         run: |
           set -euo pipefail
