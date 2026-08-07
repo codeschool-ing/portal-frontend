@@ -830,6 +830,23 @@ body.no-rail .rail{display:none}
 .matching-count{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
 .matching-errors{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--amber);margin-top:8px}
 
+/* ---------- matching, in an EXAM ----------
+
+   A pair here is CHOSEN, not confirmed: nothing has been checked and nothing
+   will be until the exam closes. So the styling has to say "this is where you
+   put it" without saying "this is right" — a paired tile keeps the neutral
+   border and gains the chosen text under it, which is also the only way to see
+   your own answer without breaking the pair to look. */
+.tile-paired{border-color:var(--phosphor-dim);background:rgba(91,140,255,.05)}
+.tile-taken{opacity:.4;cursor:default}
+.tile-chosen{
+  display:block;margin-top:5px;font-family:'IBM Plex Mono',monospace;
+  font-size:.72rem;color:var(--paper-dim);
+}
+/* After the exam: the pairing arrives with the verdict and the wrong ones say
+   what the right answer was, since this is the first time anybody sees it. */
+.tile-chosen.tile-answer{color:var(--phosphor)}
+
 /* ---------- code and expected output ---------- */
 .code-block{border:1px solid var(--wire);border-radius:5px;overflow:hidden;background:var(--panel)}
 /* The bar became a row: the language on the left, the copy button on the right.

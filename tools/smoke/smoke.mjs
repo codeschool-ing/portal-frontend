@@ -1426,5 +1426,84 @@ await p3.waitForTimeout(200);
 ok('and pasteable', (await p3.locator('.note-field').first().inputValue()) === 'a note of my own');
 await b3.close();
 
+/* ==========================================================================
+   `matching` in an exam, with no backend.
+
+   The type has two gestures now. In PRACTICE every pair is checked as it lands
+   — green and locked, red and undone — and the measure is the path: how many
+   were tried wrong before it closed. In an EXAM nothing is checked until the
+   exam does, so the mapping is where the student put it and the mapping is the
+   answer, which is how internal/assessment grades one. The two have to agree,
+   or the same paper would score differently depending on whether a backend was
+   configured.
+
+   html-css has 8 exercises and a course exam draws 10, so the whole bank is on
+   the paper and both of its matchings are certain to be there. A "skip if not
+   drawn" here would be a check that quietly stops running.
+   ========================================================================== */
+console.log('\n== 26. matching, in an exam ==');
+
+const b4 = await chromium.launch(CHROME ? { executablePath: CHROME } : {});
+const p4 = await b4.newPage({ viewport: { width: 1280, height: 1000 } });
+await p4.goto(BASE + PAGE, { waitUntil: 'networkidle' });
+await p4.fill('#e-name', 'X'); await p4.selectOption('#e-track', 'frontend');
+await p4.click('#form-signin button[type=submit]'); await p4.waitForTimeout(300);
+await p4.goto(BASE + PAGE + '#/course/html-css/exam', { waitUntil: 'networkidle' });
+await p4.waitForSelector('.wizard-exam .ex', { timeout: 15000 });
+
+const total4 = await p4.locator('.wz-dot').count();
+let atMatching = -1;
+for (let i = 0; i < total4; i += 1) {
+  await p4.evaluate((ix) => document.querySelectorAll('.wz-dot')[ix].click(), i);
+  await p4.waitForTimeout(50);
+  if (await p4.locator('.wz-stage .ex-matching').count()) { atMatching = i; break; }
+}
+ok('a matching is on the paper', atMatching >= 0, 'question ' + (atMatching + 1) + ' of ' + total4);
+
+/* The answer button is there, which it is not during practice: without
+   feedback there is nothing for the exercise to close on. */
+ok('it does not close itself in an exam',
+  (await p4.locator('.wz-stage .ex-answer').count()) === 1);
+
+/* Pair everything CORRECTLY, reading the key off the page — which a student
+   could also do here, and which is exactly what the server-drawn exam prevents
+   and this mode cannot. The point of the check is the grading, not the secrecy. */
+await p4.evaluate(async () => {
+  const root = document.querySelector('.wz-stage .ex-matching');
+  const id = root.closest('.ex').dataset.ex;
+  const ex = window.SAMPLE_EXERCISES.find((e) => e.id === id);
+  for (const pair of ex.pairs) {
+    [...root.querySelectorAll('.tile-left')].find((t) => t.dataset.value === pair.left).click();
+    [...root.querySelectorAll('.tile-right')].find((t) => t.dataset.value === pair.right).click();
+  }
+});
+await p4.waitForTimeout(200);
+ok('every pair is placed and none is judged',
+  (await p4.locator('.wz-stage .tile-left[data-with]').count()) > 0
+  && (await p4.locator('.wz-stage .tile-wrong').count()) === 0);
+
+await p4.locator('.wz-stage .ex-answer').click();
+await p4.waitForTimeout(400);
+ok('answering records and reveals nothing',
+  (await p4.locator('.wz-stage .tile-wrong').count()) === 0
+  && (await p4.locator('.wz-stage .v-recorded').count()) === 1);
+
+await p4.evaluate((last) => document.querySelectorAll('.wz-dot')[last].click(), total4 - 1);
+await p4.waitForTimeout(150);
+await p4.locator('.wz-next').click(); await p4.waitForTimeout(250);
+if (!(await p4.locator('.wz-result').count())) await p4.locator('.wz-next').click();
+await p4.waitForSelector('.wz-result', { timeout: 15000 });
+
+await p4.locator('.wz-back').click(); await p4.waitForTimeout(150);
+await p4.evaluate((ix) => document.querySelectorAll('.wz-dot')[ix].click(), atMatching);
+await p4.waitForTimeout(150);
+/* Graded by the MAPPING: every pair was right, so the dot is right — not
+   "0 pairs tried wrong", which is the practice measure and would also have
+   passed a student who never placed anything. */
+ok('a perfect mapping is marked right',
+  (await p4.evaluate((ix) => document.querySelectorAll('.wz-dot')[ix].classList.contains('right'), atMatching)));
+ok('and the pairing is shown', (await p4.locator('.wz-stage .tile-left.tile-right').count()) > 0);
+await b4.close();
+
 console.log(failures ? `\n${failures} FAILURE(S)` : '\neverything passed');
 process.exit(failures ? 1 : 0);

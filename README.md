@@ -786,10 +786,18 @@ opened off a disk with no server near it, and the smoke suite drives that file.
 What the local one cannot do is hold a verdict it already has. That is the
 honest limit of a portal with no server, and it is the reason the server exists.
 
-`matching` is not drawn into a server exam yet. Its screen checks each pair the
-moment it is made — green and locked, or red and undone — and that needs the
-pairing the exam withholds; the server excludes it by name until there is a
-keyless screen for it.
+`matching` has TWO GESTURES, and the difference is not cosmetic. In practice
+every pair is checked as it lands — green and locked, red and undone — so the
+final mapping is always right and the measure has to be the PATH: how many were
+tried wrong before it closed. In an exam nothing is checked until the exam is,
+so the mapping is where the student put it and the mapping is the answer, which
+is how `internal/assessment` grades one. Both sides implement the same rule,
+because the same paper must not score differently depending on whether a backend
+was configured.
+
+The exam gesture needs an undo, which practice never did: there a wrong pair
+undoes itself, and here tapping a pair — either side — is the only way to change
+your mind. Without it a mis-tap would be a lost mark.
 
 Two suites, because the two modes need different things to run:
 `tools/smoke/smoke.mjs` covers the local exam and runs in CI;

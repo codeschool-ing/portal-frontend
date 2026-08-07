@@ -45,14 +45,27 @@ export function gradeLocally(ex, answer) {
     }
 
     case 'matching': {
-      /* This type has immediate feedback: a wrong pair comes undone on the
-         spot, so the final mapping is ALWAYS right — you only have to keep
-         trying. Comparing the map to the key would give everyone 100%.
+      /* TWO MEASURES, because there are two gestures.
 
-         So the measure becomes the PATH: how many pairs were tried and refused
-         before it closed. Zero mistakes is a pass. It is the pipeline's
-         yardstick applied to the process — getting there by elimination does
-         not count as knowing. */
+         In PRACTICE the feedback is immediate — a wrong pair comes undone on
+         the spot — so the final mapping is ALWAYS right and comparing it to the
+         key would give everyone 100%. The measure becomes the PATH: how many
+         pairs were tried and refused before it closed. Zero mistakes is a pass.
+         It is the pipeline's yardstick applied to the process: getting there by
+         elimination does not count as knowing.
+
+         In an EXAM nothing is checked as it lands, so there is no path — the
+         mapping is where the student put it, and the mapping is the answer.
+         That is also how the server grades one, and the two have to agree or a
+         course exam and a track exam would score the same paper differently
+         depending on whether a backend was configured. */
+      if (Array.isArray(answer)) {
+        const want = ex.pairs.map((p) => p.right);
+        const right = answer.length === want.length && want.every((r, i) => answer[i] === r);
+        /* `expected`, the same name the server's verdict uses, so the reveal
+           reads one field whichever side graded. */
+        return verdict(right, { expected: want });
+      }
       if (!answer || answer.partial) return verdict(false, { partial: true });
       return verdict(answer.errors === 0, { errors: answer.errors, total: ex.pairs.length });
     }
