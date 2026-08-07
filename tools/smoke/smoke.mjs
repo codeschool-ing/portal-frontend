@@ -26,15 +26,24 @@
    ========================================================================== */
 
 import { chromium } from 'playwright';
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 
 const BASE = process.env.PORTAL || 'http://127.0.0.1:8899';
-const CHROME = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const CONTAINER_CHROME = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+/* Where Chromium is. `CHROME` names it outright; otherwise, if the path this
+   container happens to use is there, use it; otherwise let Playwright resolve
+   its own download — which is what a contributor's laptop and CI both have,
+   and neither of them has the path below. Passing a path that does not exist
+   fails the launch with a message about the file rather than about the
+   browser. */
+const CHROME = process.env.CHROME
+  || (existsSync(CONTAINER_CHROME) ? CONTAINER_CHROME : undefined);
 /* PAGE points the test at the single-file bundle instead of the served site:
    PORTAL=file:///path PAGE=/portal-student.html node tools/smoke/smoke.mjs */
 const PAGE = process.env.PAGE || '/index.html';
 const errors = [];
-const b = await chromium.launch({ executablePath: CHROME });
+const b = await chromium.launch(CHROME ? { executablePath: CHROME } : {});
 // `acceptDownloads` so the certificate's PNG button can be exercised: without
 // it Playwright cancels the download and the test would pass on a button that
 // never produced a file.
@@ -1335,7 +1344,7 @@ else console.log('  none');
 await b.close();
 
 // regression: the redo button must not exist visibly before answering
-const b2 = await chromium.launch({ executablePath: CHROME });
+const b2 = await chromium.launch(CHROME ? { executablePath: CHROME } : {});
 const p2 = await b2.newPage({ viewport: { width: 1440, height: 900 } });
 await p2.goto(BASE + PAGE + '#/sign-in', { waitUntil: 'networkidle' });
 await p2.fill('#e-name', 'X'); await p2.selectOption('#e-track', 'backend');
@@ -1364,7 +1373,7 @@ await b2.close();
    then check it survived. Asserting "nothing was copied" any other way cannot
    tell a blocked copy from a copy that quietly wrote an empty string. */
 console.log('\n== 25. one door out, and it is the code button ==');
-const b3 = await chromium.launch({ executablePath: CHROME });
+const b3 = await chromium.launch(CHROME ? { executablePath: CHROME } : {});
 const c3 = await b3.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
 const p3 = await c3.newPage();
 await p3.goto(BASE + PAGE + '#/sign-in');

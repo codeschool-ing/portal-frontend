@@ -29,6 +29,10 @@ node tools/examples/check.mjs   # the code examples really do run
 node tools/i18n/check.mjs       # nothing on screen is stuck in English
 ```
 
+All four run in CI on every pull request — `.github/workflows/ci.yml`. They are
+not `aleogr/pipeline`'s: the organisation's shared workflows are Go, and there
+is none here.
+
 ## Cutting a release
 
 The version lives in `index.html`, in `<meta name="version">`, and nowhere else — not in a

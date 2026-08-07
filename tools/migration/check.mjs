@@ -16,10 +16,19 @@
        PORTAL="file://$PWD" PAGE=/portal-student.html node tools/migration/check.mjs
    ========================================================================== */
 import { chromium } from 'playwright';
+import { existsSync } from 'node:fs';
 
 const BASE = process.env.PORTAL || 'http://localhost:8765';
 const PAGE = process.env.PAGE || '/index.html';
-const CHROME = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const CONTAINER_CHROME = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+/* Where Chromium is. `CHROME` names it outright; otherwise, if the path this
+   container happens to use is there, use it; otherwise let Playwright resolve
+   its own download — which is what a contributor's laptop and CI both have,
+   and neither of them has the path below. Passing a path that does not exist
+   fails the launch with a message about the file rather than about the
+   browser. */
+const CHROME = process.env.CHROME
+  || (existsSync(CONTAINER_CHROME) ? CONTAINER_CHROME : undefined);
 const KEY = 'codeschool-portal';
 
 let failures = 0;
@@ -55,7 +64,7 @@ const LEGACY = {
   ultima: { cursoId: 'javascript', aulaIx: 0, secId: 'let-const' },
 };
 
-const b = await chromium.launch({ executablePath: CHROME });
+const b = await chromium.launch(CHROME ? { executablePath: CHROME } : {});
 const p = await b.newPage();
 p.on('pageerror', (e) => { failures += 1; console.log('  PAGEERROR ' + e.message); });
 
