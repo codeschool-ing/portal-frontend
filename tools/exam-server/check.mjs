@@ -32,6 +32,7 @@
    ========================================================================== */
 import { chromium } from 'playwright';
 import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 
 const CONTAINER_CHROME = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const CHROME = process.env.CHROME
@@ -226,23 +227,24 @@ check(summary && summary.attempts === 1, 'the summary came back from the server:
    the student's name, and a hash resolves to "no certificate under this code"
    on the page an employer opens.
 
-   HOW THIS HARNESS PASSES AN EXAM, AND WHAT THAT SAYS. It reads the answers off
-   `GET /api/exercises/{course}/{lesson}` — the PRACTICE route, which serves the
-   key on purpose, because in a lesson the feedback is immediate and grading on
-   the client is what keeps it instant.
+   HOW THIS HARNESS PASSES AN EXAM, AND WHY IT IS ALLOWED TO. It reads
+   `assets/exam-pool.js` OFF DISK — which is a thing a test runner in the
+   repository can do and a student cannot, and that asymmetry is the whole
+   reason the file exists.
 
-   THE ORDER OF THE TWO FETCHES IS THE WHOLE POINT NOW. That route used to
-   answer while an exam was open, and every question on the paper came back out
-   of it with its key attached — sealing the exam projection seals nothing while
-   the practice projection of the same rows answers in the same session. The
-   server closes that: a course a paper drew on answers `409` until it is
-   submitted, and the check below is the regression test for it.
+   It used to read the answers off `GET /api/exercises/{course}/{lesson}`, the
+   practice route, which serves the key on purpose. Two things closed that road
+   in turn, and both are checked below:
 
-   What the server cannot close is reading the key BEFORE opening the paper,
-   which is exactly what this harness does — the loop runs, and then the attempt
-   starts. It stays that way on purpose. It is the honest shape of the residual,
-   and the day exams draw from a pool practice never serves, this stops working
-   and whoever changed it will need to hand the harness a key by another road.
+     the practice route now answers `409` while a paper drawn on that course is
+     open — so the lookup DURING an exam is gone;
+
+     and exams are drawn from a pool that route never serves at all, whether or
+     not anything is open — so the pre-fetch is gone too, which is the one no
+     amount of route-closing could have fixed.
+
+   The second is why this file reads a file. When the harness needed a new road,
+   that was the sign the old one had really been shut.
    ========================================================================== */
 console.log('\n== the certificate ==');
 
@@ -252,7 +254,41 @@ const none = await page.evaluate(async () => {
 });
 check(none.length === 0, 'nothing is issued for an exam that was not passed');
 
-const sat = await page.evaluate(async ([course]) => {
+/* The exam bank, from the file the page does not load. Read here and handed to
+   the browser as an argument — it never becomes a global, and the page it is
+   handed to could not have fetched it. */
+const examPool = await (async () => {
+  const src = await readFile(new URL('../../assets/exam-pool.js', import.meta.url), 'utf8');
+  const w = { EXAM_POOL: undefined };
+  // eslint-disable-next-line no-new-func
+  new Function('window', src)(w);
+  return (w.EXAM_POOL || []).filter((ex) => ex.course === COURSE);
+})();
+check(examPool.length > 0, 'the exam pool has ' + examPool.length + ' questions for ' + COURSE);
+
+/* THE RESIDUAL, CLOSED — and this is where it is checked, with NOTHING open.
+   Closing the practice route during an exam stopped the lookup mid-paper and
+   could never stop the pre-fetch. Two pools does: the route serves the practice
+   pool whatever is or is not open, so walking every lesson of the course finds
+   no exam question at all. */
+const swept = await page.evaluate(async ([course]) => {
+  const seen = [];
+  for (let ix = 0; ix < 40; ix += 1) {
+    const r = await fetch('/api/exercises/' + course + '/' + ix, { credentials: 'include' });
+    if (!r.ok) break;
+    const body = await r.json();
+    if (!Array.isArray(body.exercises)) break;
+    seen.push(...body.exercises.map((e) => e.id));
+  }
+  return seen;
+}, [COURSE]);
+const poolIDs = new Set(examPool.map((e) => e.id));
+const reachable = swept.filter((id) => poolIDs.has(id));
+check(swept.length > 0, 'sweeping every lesson reaches ' + swept.length + ' practice exercises');
+check(reachable.length === 0,
+  'and not one exam question, with nothing open' + (reachable.length ? ': ' + reachable.join(', ') : ''));
+
+const sat = await page.evaluate(async ([course, bank]) => {
   const j = async (method, path, body) => {
     const r = await fetch(path, {
       method,
@@ -264,13 +300,7 @@ const sat = await page.evaluate(async ([course]) => {
     return t ? JSON.parse(t) : null;
   };
 
-  const key = new Map();
-  for (let ix = 0; ix < 40; ix += 1) {
-    const p = await j('GET', '/api/exercises/' + course + '/' + ix);
-    const list = p && (p.exercises || p);
-    if (!Array.isArray(list)) break;
-    for (const ex of list) key.set(ex.id, ex);
-  }
+  const key = new Map(bank.map((ex) => [ex.id, ex]));
 
   const attempt = await j('POST', '/api/exams/course/' + course);
 
@@ -309,7 +339,7 @@ const sat = await page.evaluate(async ([course]) => {
   return { kinds: kinds, pct: result.pct, passed: result.passed,
     shutStatus: shut.status, shutBody: shutBody, reopenedStatus: reopened.status,
     reopenedHadKey: /"correct":|"answer":|"referenceExpression":/.test(await reopened.text()) };
-}, [COURSE]);
+}, [COURSE, examPool]);
 check(sat.passed === true, 'an exam passed at ' + sat.pct + '% — ' + sat.kinds.join(', '));
 
 /* The hole this harness used to walk through. Practice serves the answer key
