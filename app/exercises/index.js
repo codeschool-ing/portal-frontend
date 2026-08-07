@@ -67,13 +67,13 @@ export function buildExercise(ex, ctx, ix, options = {}) {
       (ex.difficulty ? '<span class="ex-difficulty">' + txt(ex.difficulty) + '</span>' : '') +
     '</header>' +
     '<p class="ex-prompt">' + formatted(ex.prompt) + '</p>' +
-    '<div class="ex-body">' + mod.body(ex, uid) + '</div>' +
+    '<div class="ex-body">' + mod.body(ex, uid, { exam }) + '</div>' +
     // the hint is scaffolding for someone learning; in an exam it is a cheat sheet
     (ex.socraticHint && !exam
       ? '<details class="ex-hint"><summary>' + txt('hint') + '</summary><p>' + formatted(ex.socraticHint) + '</p></details>'
       : '') +
     '<div class="ex-actions">' +
-      (mod.selfCompleting ? '' : '<button type="button" class="btn btn-primary ex-answer">' +
+      (selfCompleting(mod, exam) ? '' : '<button type="button" class="btn btn-primary ex-answer">' +
         txt(exam ? 'Record answer' : 'Answer') + '</button>') +
       (exam ? '' : '<button type="button" class="btn btn-ghost ex-retry" hidden>' + txt('Try again') + '</button>') +
     '</div>' +
@@ -134,7 +134,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
     el.dispatchEvent(new CustomEvent('exercise:answered', { bubbles: true, detail: { ex, v } }));
   }
 
-  if (mod.setup) mod.setup(body, { exercise: ex, done: check });
+  if (mod.setup) mod.setup(body, { exercise: ex, done: check, exam });
 
   /* "already solved" is useful memory in an assessment and hands over the
      answer key in an exam: the exam draws from the same bank as the lessons, so
@@ -143,7 +143,7 @@ export function buildExercise(ex, ctx, ix, options = {}) {
   if (previous?.correct) markAlreadyDone(el, previous);
 
   const answerButton = el.querySelector('.ex-answer');
-  if (answerButton) answerButton.addEventListener('click', () => check(mod.collect(body)));
+  if (answerButton) answerButton.addEventListener('click', () => check(mod.collect(body, { exam })));
 
   const retry = el.querySelector('.ex-retry');
   if (retry) {
@@ -210,6 +210,19 @@ function markAlreadyDone(el, previous) {
    lock — the assessment could not be stricter than it.
    ========================================================================== */
 
+/* Whether the exercise closes itself.
+ *
+ * `matching` does during practice — the last pair lands and there is nothing
+ * left to answer — and does NOT in an exam, where there is no feedback to close
+ * on: the student pairs everything up and then presses the button like every
+ * other type. So it is a question about the MODE and not only about the type.
+ */
+function selfCompleting(mod, exam) {
+  return typeof mod.selfCompleting === 'function'
+    ? mod.selfCompleting(exam)
+    : Boolean(mod.selfCompleting);
+}
+
 /* Put the answer key back on the exercise, from what the server said.
 
    The renderers mark the right answer by reading the exercise — `choices[i]
@@ -242,6 +255,13 @@ function applyKey(ex, v) {
       break;
     case 'expected-output':
       ex.answer = String(v.expected);
+      break;
+    case 'matching':
+      /* `expected[i]` is the right-hand text of pair i, which is exactly what
+         the sealed half holds and what the public one had removed. */
+      if (Array.isArray(v.expected)) {
+        (ex.pairs || []).forEach((p, i) => { p.right = v.expected[i]; });
+      }
       break;
     default:
       break;

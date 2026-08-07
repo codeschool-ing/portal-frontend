@@ -56,6 +56,7 @@ window.I18N = {
       "invoicing": "Factura y cobro por identificación fiscal"
     },
     ui: {
+      "Tap an item on the left, then its pair on the right. Tap a pair again to undo it.": "Toca un elemento de la izquierda y después su par a la derecha. Toca un par otra vez para deshacerlo.",
       "That answer did not reach the server. Try again.": "Esa respuesta no llegó al servidor. Inténtalo de nuevo.",
       "The exam could not be submitted.": "No se pudo enviar el examen.",
       " of the track": " del itinerario",
@@ -543,6 +544,7 @@ window.I18N = {
       "invoicing": "Facturation et paiement au nom d’une société"
     },
     ui: {
+      "Tap an item on the left, then its pair on the right. Tap a pair again to undo it.": "Touchez un élément à gauche, puis son pendant à droite. Touchez une paire à nouveau pour la défaire.",
       "That answer did not reach the server. Try again.": "Cette réponse n’est pas arrivée au serveur. Réessayez.",
       "The exam could not be submitted.": "L’examen n’a pas pu être envoyé.",
       " of the track": " du parcours",
@@ -1030,6 +1032,7 @@ window.I18N = {
       "invoicing": "Fattura e pagamento con partita IVA"
     },
     ui: {
+      "Tap an item on the left, then its pair on the right. Tap a pair again to undo it.": "Tocca un elemento a sinistra e poi il suo pari a destra. Tocca di nuovo una coppia per annullarla.",
       "That answer did not reach the server. Try again.": "Questa risposta non è arrivata al server. Riprova.",
       "The exam could not be submitted.": "Non è stato possibile inviare l’esame.",
       " of the track": " del percorso",

@@ -14,6 +14,7 @@
 window.I18N = window.I18N || {};
 window.I18N.pt = window.I18N.pt || {};
 window.I18N.pt.ui = {
+  "Tap an item on the left, then its pair on the right. Tap a pair again to undo it.": "Toque em um item da esquerda e depois no par dele à direita. Toque de novo em um par para desfazer.",
   "That answer did not reach the server. Try again.": "Essa resposta não chegou ao servidor. Tente de novo.",
   "The exam could not be submitted.": "Não foi possível enviar a prova.",
   " of the track": "da trilha",
