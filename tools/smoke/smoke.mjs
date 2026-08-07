@@ -1528,5 +1528,40 @@ ok('a perfect mapping is marked right',
 ok('and the pairing is shown', (await p4.locator('.wz-stage .tile-left.tile-right').count()) > 0);
 await b4.close();
 
+console.log('\n== 27. the exam pool is not in the page ==');
+/* THE PROPERTY THE TWO POOLS EXIST FOR, checked where it can actually fail.
+   `assets/exam-pool.js` is the exam bank with its answer keys, and index.html
+   must never load it — the snapshot tool refuses to export if the tag is there,
+   and this is the same claim from the other side: the page, in a browser, with
+   the globals it really ended up with. */
+const b5 = await chromium.launch(CHROME ? { executablePath: CHROME } : {});
+const p5 = await (await b5.newContext()).newPage();
+await p5.goto(BASE + PAGE, { waitUntil: 'networkidle' });
+const pool = await p5.evaluate(() => ({
+  examGlobal: typeof window.EXAM_POOL,
+  practice: (window.SAMPLE_EXERCISES || []).length,
+  examIds: (window.SAMPLE_EXERCISES || []).filter((e) => String(e.id).startsWith('x-')).length,
+}));
+ok('the page defines no exam pool', pool.examGlobal === 'undefined', pool.examGlobal);
+ok('and the practice pool is still there', pool.practice > 0, pool.practice + ' exercises');
+/* By id prefix rather than by counting: the exam questions are the `x-` ones,
+   and one of them leaking into SAMPLE_EXERCISES is what a stray concat would
+   look like. */
+ok('no exam question reached the practice global', pool.examIds === 0, pool.examIds + ' found');
+
+/* And the bundle, which is the copy that travels furthest — a single file
+   somebody opens off a disk. If the exam bank were inlined there it would be
+   the one form of this that cannot be fixed by a redeploy. */
+const bundled = await readFile(new URL('../../portal-student.html', import.meta.url), 'utf8')
+  .catch(() => '');
+if (bundled) {
+  ok('the single-file bundle carries no exam question',
+    !bundled.includes('x-js-coercion-1') && !bundled.includes('EXAM_POOL'),
+    bundled.length + ' bytes');
+} else {
+  console.log('  --    no portal-student.html to check; run tools/bundle/bundle.py first');
+}
+await b5.close();
+
 console.log(failures ? `\n${failures} FAILURE(S)` : '\neverything passed');
 process.exit(failures ? 1 : 0);

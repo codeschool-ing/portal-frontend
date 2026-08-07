@@ -804,6 +804,54 @@ Two suites, because the two modes need different things to run:
 `tools/exam-server/check.mjs` covers the server one and needs a Go process, a
 database and an ingested catalogue, so it is run by hand.
 
+### `assets/exam-pool.js`, which index.html does not load
+
+That line is the whole mechanism, and it is worth saying plainly because it
+looks like an omission.
+
+Every other exercise file is in a `<script>` tag, answer key and all, because
+lesson practice grades on the client and immediate feedback is worth it. Which
+means an exam drawn from those exercises was answerable before it was drawn:
+`window.SAMPLE_EXERCISES.find(e => e.id === …).choices.find(c => c.correct)`, no
+request, no devtools — view-source is enough. Measured on a real server-drawn
+paper: **nine questions, nine of them in the page, eight with a usable key.**
+
+The backend now refuses the practice route while a paper drawn on that course is
+open, which stops the lookup DURING an exam. It cannot stop the one before it,
+and neither can anything else while the same exercise is both a lesson's practice
+and a paper's question. So they are not both.
+
+| | practice | exam |
+|---|---|---|
+| file | `assets/exercises-*.js` | `assets/exam-pool.js` |
+| in a `<script>` tag | yes | **no** |
+| in the bundle | yes | no — the bundler inlines what index.html references |
+| reaches the mirror | through `snapshot.js`, `_pool: "practice"` | through `snapshot.js`, `_pool: "exam"` |
+| a route serves it | `GET /api/exercises/…` | none |
+
+**The pool follows the FILE, not a field.** `snapshot.js` stamps `_pool` on the
+way out, refuses to export if a page-loaded file declares one, and refuses if
+`index.html` ever references `exam-pool.js`. A field would be one typo away from
+putting a question whose key already shipped onto a paper, which is the exact
+failure the two pools exist to make impossible.
+
+Three checks guard it, and all three were confirmed to fail when the guard is
+removed: the snapshot tool's refusal, `smoke.mjs` §27 — `window.EXAM_POOL` is
+undefined in a real browser and no `x-` id reached `SAMPLE_EXERCISES`, and the
+same for the single-file bundle — and `tools/exam-server/check.mjs`, which sweeps
+every lesson of a course against a real server with nothing open and finds no
+exam question.
+
+That last suite now reads the pool **off disk**, which it could not do before and
+which a student cannot do at all. When the harness needed a new road, that was
+the sign the old one had really been shut.
+
+What it costs is content: exam questions have to be written separately from
+practice ones. That is not only a cost — a student who has drilled the practice
+set has learned the material and should not then be examined on the drill.
+`assets/exam-pool.js` currently holds 36 placeholder questions across the four
+courses that have exercises, marked `structure` and unreviewed.
+
 ### The certificate is issued, or it is not
 
 The screen used to hash the course id and the student's name into something

@@ -175,8 +175,47 @@ const courses = COURSES.map((c) => ({
 const exercises = [];
 for (const c of COURSES) {
   for (const topic of c.topics) {
-    for (const ex of lessonExercises(c.id, topic)) exercises.push(ex);
+    for (const ex of lessonExercises(c.id, topic)) {
+      exercises.push({ ...ex, _pool: 'practice' });
+    }
   }
+}
+
+/* ---- and the exam pool, which the page does not load ------------------------
+
+   THE POOL IS A PROPERTY OF WHICH FILE AN EXERCISE IS IN, and it is stamped
+   here rather than authored. A `_pool` field would be one typo away from putting
+   a question whose answer key already shipped inside index.html onto a paper —
+   the exact failure the two pools exist to make impossible — so the page-loaded
+   files may not carry the field at all, and this refuses the export if one does.
+
+   Everything above came out of `window.SAMPLE_EXERCISES`, which the page defines
+   in four `<script>` tags. `assets/exam-pool.js` defines `window.EXAM_POOL`, is
+   in no `<script>` tag, and is read from disk right here — so its answer keys
+   exist in this process, in the snapshot, and in the server's `sealed` column,
+   and nowhere a browser can reach. */
+for (const ex of exercises) {
+  if ('_pool' in ex && ex._pool !== 'practice') {
+    problems.push(`${ex.id} declares a _pool, but it is in a file the page loads: its key has already shipped`);
+  }
+}
+
+/* The one line that has to keep being true. If somebody adds the script tag —
+   to "fix" an exam that looks empty in the portal, say — every answer key in the
+   exam pool ships to every visitor, and nothing else in this repository would
+   notice. It is checked here because this is the tool that has both files open. */
+if (/exam-pool\.js/.test(read('index.html'))) {
+  console.error('snapshot: refusing to export.\n  ' +
+    'index.html references assets/exam-pool.js. That file is the exam bank, ' +
+    'answer keys included, and the page must never load it.');
+  process.exit(1);
+}
+
+globalThis.window.EXAM_POOL = undefined;
+// eslint-disable-next-line no-new-func
+new Function('w', read('assets/exam-pool.js') + ';w.EXAM_POOL = window.EXAM_POOL;')(globalThis.window);
+for (const ex of globalThis.window.EXAM_POOL || []) {
+  exercises.push({ ...ex, _pool: 'exam' });
 }
 
 /* ---- tracks ----------------------------------------------------------------
