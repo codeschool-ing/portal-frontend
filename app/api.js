@@ -11,6 +11,7 @@
    ========================================================================== */
 
 import * as state from './state.js';
+import * as sync from './sync.js';
 import {
   courseLessons,
   courseById,
@@ -25,15 +26,43 @@ const echo = (v) => Promise.resolve(v);
 
 export const session = () => echo(state.now().session);
 
-// FUTURE: real authentication. Today any name gets in — it is a skeleton.
-export function signIn({ name, email }) {
-  state.change((e) => { e.session = { name: name || 'Student', email: email || '' }; });
-  return echo(state.now().session);
+/* With no backend configured this is the skeleton it always was: any name gets
+   in, because there is nobody to ask. With one, it is identity's `POST
+   /api/session` and the name comes back from the server.
+
+   AND THEN THE IMPORT, before anything reads. That ordering is the whole of
+   ARCHITECTURE.md 4.5: read first and the student lands on a dashboard showing
+   nothing while their progress is still sitting in this browser. They would not
+   wait around to find out it was a race. */
+export async function signIn({ name, email, password }) {
+  if (!sync.configured()) {
+    state.change((e) => { e.session = { name: name || 'Student', email: email || '' }; });
+    return state.now().session;
+  }
+
+  const account = await sync.signIn(email, password);
+  state.change((e) => { e.session = { name: account.name, email: account.email }; });
+  await sync.adopt();
+  return state.now().session;
 }
 
-export function signOut() {
+/* Registration only exists with a backend: there is nothing to register with
+   otherwise, and offering it would be a form that pretends. */
+export async function register({ name, email, password }) {
+  const account = await sync.register(name, email, password);
+  state.change((e) => { e.session = { name: account.name, email: account.email }; });
+  await sync.adopt();
+  return state.now().session;
+}
+
+export async function signOut() {
+  if (sync.configured()) {
+    // The cookie has to go even if the request does not arrive, or the portal
+    // says signed-out while the browser still carries a session.
+    await sync.signOut().catch(() => {});
+  }
   state.change((e) => { e.session = null; });
-  return echo(null);
+  return null;
 }
 
 /* FUTURE: `PATCH /account/email`, and the change only takes effect once confirmed
