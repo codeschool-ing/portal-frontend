@@ -14,7 +14,7 @@ import { courseState } from '../graph.js';
 import { courseExam } from '../exams.js';
 import { examCard } from './exam.js';
 import { materialList } from '../materials.js';
-import { bar, empty } from './common.js';
+import { bar, empty, videoFrame, playsOnClick } from './common.js';
 import { esc, formatted } from '../text.js';
 
 export default async function course({ id }) {
@@ -53,7 +53,7 @@ export default async function course({ id }) {
          it, below the lessons. Loose, it became a second column and pushed the
          sidebar down to the next row. */
       '<div class="course-main">' +
-      videoBlock(c) +
+      videoFrame(c.video, { label: txt('watch the course introduction') }) +
       '<section class="block">' +
         '<div class="block-top"><h2>' + txt('Lessons') + '</h2></div>' +
         '<ol class="lessons">' +
@@ -114,43 +114,9 @@ export default async function course({ id }) {
      asking YouTube for anything and a student who does not watch receives no
      cookie from them. Bound here rather than in main.js's delegation: the
      screen element is new on every render, so the listener goes with it. */
-  el.addEventListener('click', (e) => {
-    const thumb = e.target.closest('[data-video]');
-    if (!thumb) return;
-    const frame = document.createElement('div');
-    frame.className = 'modal-video playing';
-    frame.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' +
-      encodeURIComponent(thumb.dataset.video) + '?autoplay=1&rel=0" ' +
-      'title="' + esc(txt('course introduction')) + '" allowfullscreen ' +
-      'allow="accelerometer; autoplay; encrypted-media; picture-in-picture"></iframe>';
-    thumb.replaceWith(frame);
-  });
+  playsOnClick(el, txt('course introduction'));
 
   return { title: c.name, el };
-}
-
-/* ---------- the course's introduction video ----------
-
-   THE SAME COMPONENT AS THE VITRINE'S, down to the class names: base.css is
-   the vitrine's style.css and already carries `.modal-video`, so a portal-only
-   copy would be a second thing to keep in step for no gain. The class is named
-   after where it first appeared, not after what it is — which is why it looks
-   out of place here and is still the right name to use.
-
-   The frame exists even with no video published. No course carries a `video`
-   yet, so today every course shows the reserved frame; publishing them one at a
-   time then fills the frames in without rearranging anybody's screen. */
-function videoBlock(c) {
-  if (!c.video) {
-    return '<div class="modal-video is-empty" aria-hidden="true">' +
-      '<span class="video-play"></span>' +
-      '<span class="video-notice">' + txt('video coming soon') + '</span></div>';
-  }
-  return '<button type="button" class="modal-video" data-video="' + esc(c.video) + '" ' +
-    'aria-label="' + txt('watch the course introduction') + '">' +
-    '<img src="https://i.ytimg.com/vi/' + encodeURIComponent(c.video) + '/hqdefault.jpg" ' +
-      'alt="" loading="lazy" />' +
-    '<span class="video-play"></span></button>';
 }
 
 function link(id, direction) {
