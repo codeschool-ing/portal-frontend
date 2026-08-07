@@ -231,14 +231,18 @@ check(summary && summary.attempts === 1, 'the summary came back from the server:
    key on purpose, because in a lesson the feedback is immediate and grading on
    the client is what keeps it instant.
 
-   That route answers WHILE AN EXAM IS OPEN, and every question drawn onto the
-   paper comes back out of it with its key attached. Sealing the exam projection
-   is not sealing the exam while the practice projection of the same exercises
-   is one fetch away in the same session. So this block passes an exam exactly
-   the way a student with an open console could, and it is here as a witness as
-   much as a fixture: the day that route learns to refuse a course with an open
-   attempt, these lines stop working, and whoever closes it will have to hand
-   the harness a key by some other road.
+   THE ORDER OF THE TWO FETCHES IS THE WHOLE POINT NOW. That route used to
+   answer while an exam was open, and every question on the paper came back out
+   of it with its key attached — sealing the exam projection seals nothing while
+   the practice projection of the same rows answers in the same session. The
+   server closes that: a course a paper drew on answers `409` until it is
+   submitted, and the check below is the regression test for it.
+
+   What the server cannot close is reading the key BEFORE opening the paper,
+   which is exactly what this harness does — the loop runs, and then the attempt
+   starts. It stays that way on purpose. It is the honest shape of the residual,
+   and the day exams draw from a pool practice never serves, this stops working
+   and whoever changed it will need to hand the harness a key by another road.
    ========================================================================== */
 console.log('\n== the certificate ==');
 
@@ -269,6 +273,12 @@ const sat = await page.evaluate(async ([course]) => {
   }
 
   const attempt = await j('POST', '/api/exams/course/' + course);
+
+  /* And now the same fetch that just worked has to stop working. Reported
+     rather than asserted in here, so the failure names the status. */
+  const shut = await fetch('/api/exercises/' + course + '/0', { credentials: 'include' });
+  const shutBody = await shut.text();
+
   const kinds = [];
   for (const q of attempt.questions) {
     const k = key.get(q.id);
@@ -295,9 +305,23 @@ const sat = await page.evaluate(async ([course]) => {
     kinds.push(q.type);
   }
   const result = await j('POST', '/api/exams/attempts/' + attempt.id + '/submit');
-  return { kinds: kinds, pct: result.pct, passed: result.passed };
+  const reopened = await fetch('/api/exercises/' + course + '/0', { credentials: 'include' });
+  return { kinds: kinds, pct: result.pct, passed: result.passed,
+    shutStatus: shut.status, shutBody: shutBody, reopenedStatus: reopened.status,
+    reopenedHadKey: /"correct":|"answer":|"referenceExpression":/.test(await reopened.text()) };
 }, [COURSE]);
 check(sat.passed === true, 'an exam passed at ' + sat.pct + '% — ' + sat.kinds.join(', '));
+
+/* The hole this harness used to walk through. Practice serves the answer key
+   for the same rows the paper was drawn from, so while the paper is open that
+   route is closed — and the body has to carry no exercise at all, because a 409
+   with the key in it is the same leak with a different number on it. */
+check(sat.shutStatus === 409,
+  'practice is closed while the exam is open (' + sat.shutStatus + ')');
+check(!/"correct":|"answer":|"why":/.test(sat.shutBody),
+  'and the refusal carries no key: ' + sat.shutBody.slice(0, 120));
+check(sat.reopenedStatus === 200 && sat.reopenedHadKey,
+  'and submitting reopens it, key and all (' + sat.reopenedStatus + ')');
 
 /* Lazily issued: nothing is minted inside the submit, and ASKING is what
    issues. Asking twice is a read, because the insert conflicts on the holder
