@@ -14,6 +14,7 @@
    ========================================================================== */
 
 import { route, whenChanged, start, currentPath, dispatch, goTo } from './routes.js';
+import * as sync from './sync.js';
 import { isChoice } from './catalog.js';
 import { subscribe, now } from './state.js';
 import { buildRail, toggleLesson } from './rail.js';
@@ -48,6 +49,10 @@ let booted = false;
 globalThis.redrawAll = () => (booted ? dispatch() : null);
 
 /* ---------- routes ---------- */
+/* Before any screen renders: the write hook has to be in place for the first
+   click, and configured() is a no-op with no backend. */
+sync.start();
+
 route('/sign-in', signIn);
 route('/dashboard', dashboard);
 route('/track', trackScreen);

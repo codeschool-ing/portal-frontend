@@ -33,6 +33,26 @@ All four run in CI on every pull request — `.github/workflows/ci.yml`. They ar
 not `aleogr/pipeline`'s: the organisation's shared workflows are Go, and there
 is none here.
 
+## The server, when there is one
+
+`<meta name="backend">` in index.html, and **empty means local** — which is what
+the single-file bundle needs, since it is opened off a disk with no server
+anywhere near it, and what every screen did before a backend existed.
+
+`same-origin` is the deployed shape and the one portal-backend's config assumes:
+one origin in front of both, which makes the session cookie first-party. It has
+to be spelled out, because the base URL it means is the empty string and empty
+is already taken. An absolute origin also works and is for development, where
+the API runs on another port — it needs CORS with credentials, which the server
+deliberately does not have.
+
+With a backend configured the sign-in screen asks for credentials, and the first
+login runs `POST /api/progress/import` **before** the first read: read first and
+the student lands on an empty dashboard while their progress is still sitting in
+this browser. Writes go to localStorage first and to the server after, without
+waiting — they are idempotent there, and the next login's import replays
+whatever was lost.
+
 ## Cutting a release
 
 The version lives in `index.html`, in `<meta name="version">`, and nowhere else — not in a

@@ -8,6 +8,22 @@
      a release": the line is left out rather than link to a tag that does not
      exist. Cut a release with tools/version/version.js. -->
 <meta name="version" content="dev" />
+
+<!-- Where the API is, and the only place it is written. EMPTY MEANS LOCAL: the
+     portal keeps everything in this browser, which is what the single-file
+     bundle needs — it is opened off a disk with no server anywhere near it —
+     and what every screen did before a backend existed.
+
+     `same-origin` is the deployed shape, and the one portal-backend's config
+     assumes: one origin in front of both, which is what makes the session
+     cookie first-party and SameSite=Lax enough. It has to be spelled out
+     because the base URL it means is the empty string, and empty is already
+     taken by "no backend".
+
+     An absolute origin also works and is for development, where the API runs
+     on another port — it needs CORS with credentials on the server, which the
+     server deliberately does not have. -->
+<meta name="backend" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>codeschool.ing</title>
 <meta name="description" content="codeschool.ing student area: your track, your courses and your exercises." />

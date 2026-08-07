@@ -265,6 +265,16 @@ function save() {
 export const now = () => state;
 export function subscribe(f) { listeners.add(f); return () => listeners.delete(f); }
 
+/* Where a write goes AFTER localStorage. app/sync.js sets this when a backend
+   is configured; with none it stays a no-op, which is what keeps the single-file
+   bundle and every screen working with no server anywhere.
+
+   The local copy is written first, always. The server is the second place the
+   write goes, never the first — a student mid-lesson does not wait on a network
+   round trip to see the next section. */
+let onWrite = () => {};
+export const onEveryWrite = (fn) => { onWrite = fn; };
+
 export function change(fn) {
   fn(state);
   save();
@@ -273,6 +283,64 @@ export function change(fn) {
 export function reset() {
   state = structuredClone(EMPTY);
   save();
+  onWrite({ kind: 'erase' });
+}
+
+/* ---------- the server's copy ----------
+
+   `exportLocal` is what POST /api/progress/import takes: the browser's whole
+   history, in the shape it is already stored in. It is a clone rather than the
+   live object, because the caller sends it over a network and the state must
+   not change under it mid-flight.
+
+   `replaceWith` is the other direction, and it replaces exactly what the server
+   owns — progress, notes and the resume pointer — and nothing else. Session,
+   enrolment, exams and the account are not this module's business to overwrite
+   from a progress snapshot, and a wholesale replace would sign the student out
+   as a side effect of loading their sections. */
+export function exportLocal() {
+  return {
+    progress: structuredClone(state.progress),
+    notes: structuredClone(state.notes),
+    last: state.last ? structuredClone(state.last) : null,
+  };
+}
+
+export function replaceWith(snapshot) {
+  if (!snapshot) return;
+  const progress = {};
+  Object.entries(snapshot.progress || {}).forEach(([courseId, course]) => {
+    const lessons = {};
+    Object.entries(course.lessons || {}).forEach(([ix, lesson]) => {
+      const sections = {};
+      (lesson.sections || []).forEach((id) => { sections[id] = true; });
+      /* `exercises` is kept from the local copy: the server does not carry
+         answers yet — that table waits on the exercises module — and dropping
+         them here would erase what the student got right the moment they
+         signed in. */
+      lessons[ix] = { sections, exercises: state.progress?.[courseId]?.lessons?.[ix]?.exercises || {} };
+    });
+    progress[courseId] = { lessons };
+  });
+
+  const notes = {};
+  (snapshot.notes || []).forEach((n) => {
+    notes[n.courseId] = notes[n.courseId] || {};
+    notes[n.courseId][n.lessonIx] = notes[n.courseId][n.lessonIx] || {};
+    notes[n.courseId][n.lessonIx][n.sectionId] = n.body;
+  });
+
+  change((e) => {
+    e.progress = progress;
+    e.notes = notes;
+    if (snapshot.resume) {
+      e.last = {
+        courseId: snapshot.resume.courseId,
+        lessonIx: snapshot.resume.lessonIx,
+        sectionId: snapshot.resume.sectionId,
+      };
+    }
+  });
 }
 
 /* ---------- reads ----------
@@ -378,6 +446,7 @@ export function markSection(courseId, ix, sectionId, done = true) {
     else delete r.sections[sectionId];
     state.last = { courseId: courseId, lessonIx: ix, sectionId };
   });
+  onWrite({ kind: 'section', courseId, ix, sectionId, done });
 }
 
 export function visitSection(courseId, ix, sectionId) {
@@ -385,6 +454,7 @@ export function visitSection(courseId, ix, sectionId) {
     ensureLesson(courseId, ix);
     state.last = { courseId: courseId, lessonIx: ix, sectionId };
   });
+  onWrite({ kind: 'visit', courseId, ix, sectionId });
 }
 
 export function saveAnswer(courseId, ix, exId, verdict) {
@@ -426,6 +496,7 @@ export function saveNote(courseId, ix, sectionId, text) {
     state.notes[courseId][ix] = state.notes[courseId][ix] || {};
     state.notes[courseId][ix][sectionId] = clean;
   });
+  onWrite({ kind: 'note', courseId, ix, sectionId, body: String(text || '').trim() });
 }
 
 /* Every note, flattened. The notes screen and the search read from here — two
