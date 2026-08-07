@@ -27,11 +27,34 @@ npm i playwright
 node tools/smoke/smoke.mjs      # the whole portal, in a browser
 node tools/examples/check.mjs   # the code examples really do run
 node tools/i18n/check.mjs       # nothing on screen is stuck in English
+node tools/snapshot/snapshot.js  # the backend's snapshot still builds
 ```
 
 All four run in CI on every pull request — `.github/workflows/ci.yml`. They are
 not `aleogr/pipeline`'s: the organisation's shared workflows are Go, and there
 is none here.
+
+## Feeding the backend
+
+`codeschool-ing/portal-backend`'s mirror is loaded from one file, and this is
+the only repository that can build it:
+
+```sh
+node tools/snapshot/snapshot.js > snapshot.json
+ingest -file snapshot.json          # in portal-backend
+```
+
+The catalogue and its four dictionaries exist in the showcase too. THE SECTIONS
+DO NOT — they are authored content, `assets/lessons-*.js`, and they only exist
+here. `ingest` takes one file and prunes whatever is not in it, so a
+catalogue-only export deletes every section in the mirror; the showcase used to
+have one, and it is gone for that reason.
+
+The tool does not reimplement the section rule, it imports `app/lessons.js` and
+calls the same `lessonSections()` the portal calls. The ids it emits have to be
+the ids the portal writes: `progress` validates every write against the mirror,
+and a copy that drifted by one id would have that lesson's writes refused with
+nothing on either side saying why.
 
 ## The server, when there is one
 
