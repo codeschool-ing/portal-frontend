@@ -149,6 +149,36 @@ const courses = COURSES.map((c) => ({
   }),
 }));
 
+/* ---- exercises -------------------------------------------------------------
+   EXPORTED WHOLE, answer key included, and that is not an oversight. The server
+   splits every exercise into what an exam may see and what it may not, and it
+   does that on ITS side on purpose: an exporter that got the split wrong would
+   write `correct` into the public projection and nothing on the server would
+   notice. The secret belongs to whoever keeps it.
+
+   So this is exactly what is authored. It is also exactly what the browser
+   downloads today — which is the problem `internal/exercises` exists to fix,
+   and the fix is the server withholding fields during an exam, not this tool
+   withholding them from the server.
+
+   `_verification` travels with it: it is the publication floor, and the server
+   indexes on it so `?minimum=` can filter without opening the JSON.
+
+   ONE FLAT LIST rather than nested inside the lessons, because that is the shape
+   `ingest` prunes by — the file is the whole set, and an exercise it stopped
+   carrying is one that was withdrawn. Each row names its own course and topic,
+   which is the same join key the sections use.
+
+   Collected through `lessonExercises` for the reason at the top of this file:
+   which exercises belong to a lesson is a rule, and a second copy of it here
+   would be a second answer to the same question. */
+const exercises = [];
+for (const c of COURSES) {
+  for (const topic of c.topics) {
+    for (const ex of lessonExercises(c.id, topic)) exercises.push(ex);
+  }
+}
+
 const materials = Object.entries(window.MATERIALS || {}).map(([key, m]) => ({
   key,
   title: m.title || key,
@@ -195,9 +225,32 @@ for (const c of courses) {
   ids.add(c.id);
 }
 
+/* The exercise id is the join key of every answer a student has already given —
+   `progress[course].lessons[ix].exercises[exId]` in their browser, and a row
+   keyed by the same string on the server. Two exercises sharing one would merge
+   two students' histories into one record and neither side would say so. */
+const exerciseIds = new Set();
+for (const ex of exercises) {
+  if (!ex.id) {
+    problems.push(`an exercise of ${ex.course}/${ex.topic} has no id; the id is what answers point at`);
+    continue;
+  }
+  if (exerciseIds.has(ex.id)) problems.push(`the exercise ${ex.id} appears twice`);
+  exerciseIds.add(ex.id);
+}
+
+/* An exercise whose topic is in no course attaches to no lesson, and `ingest`
+   refuses the whole file for it. Catching it here names the exercise. */
+const topics = new Map(COURSES.map((c) => [c.id, new Set(c.topics)]));
+for (const ex of exercises) {
+  if (!topics.get(ex.course)?.has(ex.topic)) {
+    problems.push(`${ex.id} names ${ex.course}/${JSON.stringify(ex.topic)}, which is in no lesson`);
+  }
+}
+
 if (problems.length) {
   console.error('snapshot: refusing to export.\n  ' + problems.join('\n  '));
   process.exit(1);
 }
 
-process.stdout.write(JSON.stringify({ courses, materials }, null, 2) + '\n');
+process.stdout.write(JSON.stringify({ courses, exercises, materials }, null, 2) + '\n');
