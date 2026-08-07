@@ -318,7 +318,7 @@ ok('the hosting topic became 5 sections + assessment', steps.length === 6, steps
 ok('the first section is the shared-hosting one', /shared/i.test(steps[0]), steps[0]);
 ok('the last one is always the assessment', /assessment/i.test(steps[steps.length - 1]), steps[steps.length - 1]);
 ok('prose rendered', (await p.locator('.lesson-text p').count()) >= 2);
-ok('a content section reserves the video frame', await p.locator('.video-facade').isVisible());
+ok('a content section reserves the video frame', await p.locator('.modal-video').isVisible());
 ok('the rail opens the current lesson sections', (await p.locator('.rail-section').count()) === 6);
 /* The regression that matters, restated after the rename: sections are matched
    by the AUTHORED topic title, which is English now, and the displayed title is
@@ -826,12 +826,18 @@ console.log('\n== 17. the two shapes of a section ==');
    video that never comes — and the promise does not expire. */
 await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/0/roles');
 await p.waitForSelector('.lesson-text');
-ok('a text section has no video frame', (await p.locator('.video-facade').count()) === 0);
+/* `.modal-video` and not `.video-facade`: the lesson had a frame of its own and
+   now uses the course's, which is the vitrine's. Renaming the selector here is
+   the whole of what this suite noticed — and it would have gone on passing
+   against an element that no longer existed if the count checks below had been
+   the only ones, since `count() === 0` is true of a class nobody renders. The
+   one on line 321 is what catches that: it asserts the frame IS there. */
+ok('a text section has no video frame', (await p.locator('.modal-video').count()) === 0);
 ok('and the text starts at the top', await p.evaluate(() =>
   document.querySelector('.crumbs').getBoundingClientRect().top < 200));
 
 await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/0/intro');
-await p.waitForSelector('.video-facade');
+await p.waitForSelector('.modal-video');
 ok('a video section has the frame', true);
 ok('a video-only section does not invent a text block', (await p.locator('.lesson-text').count()) === 0);
 ok('the duration shows on the player', (await p.locator('.video-duration').innerText()).includes('min'));
@@ -841,7 +847,7 @@ ok('the duration shows on the player', (await p.locator('.video-duration').inner
    depending on the section — the eye hunting for the left margin at every
    change. */
 const bleed = await p.evaluate(() => {
-  const v = document.querySelector('.video-facade').getBoundingClientRect();
+  const v = document.querySelector('.modal-video').getBoundingClientRect();
   const t = document.querySelector('.lesson-title').getBoundingClientRect();
   return { left: Math.abs(v.left - t.left), width: Math.round(v.width) };
 });
@@ -858,11 +864,11 @@ await p.waitForTimeout(250);
 /* And the title stays ABOVE the video, as in the text sections: "where am I"
    comes before "what am I watching", and the answer has to be the same in both. */
 ok('the title sits above the player', await p.evaluate(() => {
-  const v = document.querySelector('.video-facade').getBoundingClientRect();
+  const v = document.querySelector('.modal-video').getBoundingClientRect();
   return document.querySelector('.lesson-title').getBoundingClientRect().bottom <= v.top + 1;
 }));
 ok('the player fits on screen', await p.evaluate(() =>
-  document.querySelector('.video-facade').getBoundingClientRect().height <= window.innerHeight * 0.8));
+  document.querySelector('.modal-video').getBoundingClientRect().height <= window.innerHeight * 0.8));
 
 /* THE LESSON HAS ONE WIDTH, and it holds for the title, the prose, the player
    and the example at the same time. The cut is 1466px: below it the lesson stays
@@ -881,8 +887,8 @@ for (const [width, height, expected] of [
   await p.waitForSelector('.example');
   const one = await p.evaluate(() => {
     const r = (s) => document.querySelector(s).getBoundingClientRect();
-    const cx = ['.lesson-title', '.lesson-text p', '.video-facade', '.example'].map(r);
-    const v = r('.video-facade');
+    const cx = ['.lesson-title', '.lesson-text p', '.modal-video', '.example'].map(r);
+    const v = r('.modal-video');
     return {
       widths: cx.map((c) => Math.round(c.width)),
       lefts: [...new Set(cx.map((c) => Math.round(c.left)))],
@@ -902,9 +908,9 @@ for (const [width, height, expected] of [
    example, and never deformed. */
 await p.setViewportSize({ width: 1920, height: 700 });
 await p.goto(BASE + PAGE + '#/course/javascript/lesson/0/let-const');
-await p.waitForSelector('.video-facade');
+await p.waitForSelector('.modal-video');
 const shortWindow = await p.evaluate(() => {
-  const v = document.querySelector('.video-facade').getBoundingClientRect();
+  const v = document.querySelector('.modal-video').getBoundingClientRect();
   const t = document.querySelector('.lesson-title').getBoundingClientRect();
   return {
     ratio: v.width / v.height, width: Math.round(v.width),
@@ -916,7 +922,7 @@ ok('in a short window the player shrinks without deforming', Math.abs(shortWindo
 ok('and it starts again where the text starts', shortWindow.left < 2, shortWindow.left.toFixed(1) + 'px out of line');
 await p.setViewportSize({ width: 1440, height: 900 });
 await p.goto(BASE + PAGE + '#/course/web-fundamentals/lesson/0/intro');
-await p.waitForSelector('.video-facade');
+await p.waitForSelector('.modal-video');
 
 /* In the rail the icon says the NATURE of the section, not only its state. */
 const icons = await p.evaluate(() => {

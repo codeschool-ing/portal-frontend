@@ -32,7 +32,7 @@ import { lessonSections, sectionMaterials } from '../lessons.js';
 import { materialList } from '../materials.js';
 import { sectionDone, visitSection, noteFor, saveNote } from '../state.js';
 import { buildAssessment } from '../exercises/index.js';
-import { empty } from './common.js';
+import { empty, videoFrame, playsOnClick } from './common.js';
 import { esc, prose } from '../text.js';
 
 const ARROW = (d) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
@@ -142,12 +142,7 @@ export default async function lesson({ id, ix, sec }) {
        section without knowing which lesson it belongs to. Where am I comes before
        what am I watching, and the answer is the same in the text sections. */
     (hasVideo
-      ? '<div class="video-facade" data-video="' + esc(videoReady || '') + '">' +
-          (videoReady
-            ? '<button type="button" class="video-play" aria-label="' + txt('Watch') + '">▶</button>'
-            : '<span class="video-soon mono dim">' + txt('video coming soon') + '</span>') +
-          (section.duration ? '<span class="video-duration mono">' + esc(section.duration) + '</span>' : '') +
-        '</div>'
+      ? videoFrame(videoReady, { label: txt('Watch'), duration: section.duration })
       : '') +
 
     (section.type === 'assessment'
@@ -192,15 +187,7 @@ export default async function lesson({ id, ix, sec }) {
     el.querySelector('.lesson-exercises').appendChild(buildAssessment(exercises, { courseId: id, lessonIx: n }));
   }
 
-  const frame = el.querySelector('.video-facade');
-  if (frame) {
-    frame.addEventListener('click', (e) => {
-      const cx = e.currentTarget;
-      if (!cx.dataset.video) return;
-      cx.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(cx.dataset.video) +
-        '?autoplay=1" title="' + esc(section.title) + '" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-    });
-  }
+  playsOnClick(el, section.title);
 
   /* The note saves itself, after a pause following the last keystroke. A save
      button would be one more chance to lose what you wrote. */
