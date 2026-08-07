@@ -174,3 +174,27 @@ export const examSubmit = (attemptId) =>
   request('POST', `/api/exams/attempts/${enc(attemptId)}/submit`);
 
 export const examSummaries = () => request('GET', '/api/exams');
+
+/* ---------- certificates ----------
+
+   `GET /api/certificates` mints whatever a passed exam owes and has not been
+   asked for yet, so this is a read that can write — and it is safe to call on
+   every render, because issuing conflicts on (account, scope, scope_id) and
+   does nothing the second time. */
+export const certificates = () => request('GET', '/api/certificates');
+
+/* The validation page is the BACKEND's, not the portal's.
+
+   `GET /certificate/{code}` is server-rendered HTML — the one route over there
+   that answers without a session — because what opens it is a person checking a
+   claim or a crawler building a preview card, and a single-page app behind a
+   hash route cannot answer either in the first response.
+
+   So the URL printed on a document is built from where the API is, and not from
+   where the portal is. Same origin and they coincide; `api.codeschool.ing` and
+   they do not, and a hard-coded `codeschool.ing/certificate/…` would be a dead
+   link on somebody's profile. */
+export function publicUrl(path) {
+  if (!configured()) return '';
+  return (BASE || location.origin) + path;
+}

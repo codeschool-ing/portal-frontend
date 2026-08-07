@@ -1088,6 +1088,24 @@ body.with-search{overflow:hidden}
 .cert-sample .cert-led{box-shadow:none;background:var(--wire)}
 .cert-sample .cert-brand b{color:var(--paper-dim)}
 
+/* A REVOKED certificate is shown and not hidden: the public page already
+   answers "revoked" to whoever opens the link, and dropping the card would
+   leave the holder the last to know. Marked in the same three ways the sample
+   is — frame, colour and seal — for the same reason: it must not be mistakable
+   for a document that stands, without being read. */
+.cert-void{opacity:.7}
+.cert-void .cert-sheet{border-color:var(--amber)}
+.cert-void .cert-led{box-shadow:none;background:var(--amber)}
+.cert-void .cert-code{color:var(--paper-dim);text-decoration:line-through}
+.cert-seal-void{color:var(--amber);border-color:var(--amber)}
+
+/* The screen knows nothing rather than knowing there is nothing. Said out loud,
+   because an empty list with no explanation reads as "you have none". */
+.cert-offline{
+  font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--amber);
+  border:1px solid var(--amber);border-radius:3px;padding:10px 12px;margin:0 0 18px;
+}
+
 /* ---------- the enlarged certificate ----------
    It is the only artefact of the portal a person wants to LOOK AT rather than
    use. That is why the click opens it big, with the rest of the screen dimmed

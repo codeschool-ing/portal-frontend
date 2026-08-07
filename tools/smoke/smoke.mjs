@@ -1129,31 +1129,54 @@ ok('a certificate is issued with the course done and the exam passed', true);
 
 await p.locator('.cert:not(.cert-sample)').first().click();
 await p.waitForSelector('.modal-cert');
-const profileUrl = await p.locator(LI).first().getAttribute('href');
-ok('there is an add-to-LinkedIn-profile button',
-  profileUrl.startsWith('https://www.linkedin.com/profile/add?'));
-/* The fields LinkedIn needs to fill the form on its own. Missing one of them
-   does not raise an error: it opens a blank form, and nobody fills it. */
-const fields = ['startTask=CERTIFICATION_NAME', 'name=', 'organizationName=', 'issueYear=', 'issueMonth=', 'certId=', 'certUrl='];
-ok('the URL carries every certificate field', fields.every((c) => profileUrl.includes(c)),
-  fields.filter((c) => !profileUrl.includes(c)).join(', ') || 'all of them');
-ok('the code in the URL is the one printed on the document', await p.evaluate(() => {
-  const code = document.querySelector('.modal-cert .cert-code').textContent.trim();
-  const href = document.querySelector('.modal-actions .cert-in:not(.cert-png)').href;
-  return href.includes(encodeURIComponent(code));
+
+/* WHAT THIS SUITE CAN SEE IS THE PORTAL WITH NO BACKEND, and that mode changed:
+   the validation code is the server's now, so with no server there is none. It
+   used to be hashed out of the course id and the student's name — the right
+   placeholder while nothing issued one, and a trap the moment something did,
+   because the number a student can read and copy would be the one the public
+   page answers "no certificate under this code" to.
+
+   So the checks here are the ones that hold with no server, and the ones that
+   need one live in tools/exam-server/check.mjs, against a real API and a real
+   database: that the code on screen is the server's, that the LinkedIn URL
+   carries it, and that opening the URL finds the document. */
+ok('an earned certificate carries no code with no backend', await p.evaluate(() => {
+  const art = document.querySelector('.modal-cert .cert');
+  return !art.dataset.code && !/CS-/.test(art.querySelector('.cert-code').textContent);
 }));
+ok('and the footer says so rather than leaving a blank',
+  (await p.locator('.modal-cert .cert-code').innerText()).trim().length > 5,
+  await p.locator('.modal-cert .cert-code').innerText());
+
+/* The LinkedIn button and the PNG button now answer to DIFFERENT facts, which
+   is the change: `profile/add` posts a credential naming an issuer, and with no
+   server there is no issuer. The picture is still a picture, and it carries the
+   "no code" line in its own footer wherever it goes. */
+ok('the credential cannot be published without an issued code', await p.evaluate((li) => {
+  const a = document.querySelector(li);
+  return a.tagName !== 'A' && a.getAttribute('aria-disabled') === 'true'
+    && (a.getAttribute('title') || '').length > 10;
+}, LI));
+ok('and the reason is on the button', await p.evaluate((li) =>
+  !/sample/i.test(document.querySelector(li).getAttribute('title') || ''), LI),
+  await p.locator(LI).getAttribute('title'));
+ok('the download stays available', await p.evaluate(() =>
+  document.querySelector('.modal-actions .cert-png').tagName === 'BUTTON'));
 
 /* The PNG. Checked by DOWNLOADING it and reading the bytes: a button that
    fires and produces nothing looks identical from the outside, and the file is
    the whole point of it. The signature is PNG's, and the size is the one the
    module declares — a canvas that failed to draw still saves, at 0 bytes. */
-const certCode = (await p.locator('.modal-cert .cert-code').innerText()).trim();
 const [png] = await Promise.all([
   p.waitForEvent('download', { timeout: 15000 }),
   p.locator('.modal-actions .cert-png').click(),
 ]);
-ok('the certificate downloads as a PNG named after its code',
-  png.suggestedFilename() === 'codeschool-ing-' + certCode.replace(/[^\w-]+/g, '') + '.png',
+/* Named from `data-code` and not from the footer's TEXT. Scraping the text gave
+   `codeschool-ing-nocodehasbeenissued.png` here, and a different file name in
+   each of the five languages. */
+ok('the file falls back to a name rather than to a sentence',
+  png.suggestedFilename() === 'codeschool-ing-certificate.png',
   png.suggestedFilename());
 const pngPath = await png.path();
 const bytes = pngPath ? await readFile(pngPath) : Buffer.alloc(0);

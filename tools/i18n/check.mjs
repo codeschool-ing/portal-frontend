@@ -44,7 +44,8 @@ const ACCOUNTED = new Set([
   'l.label',                      // rail.js LINKS
   'ex.type', 'r.ex.type', 'k',    // exercise types (and performance.js groups by them)
   'ex.difficulty',                // exercise difficulties
-  'c.level', 'model.level',       // course levels
+  'c.level', 'model.level',
+  'course.level',                 // course levels
   'c.category',                   // course categories
   'label',                        // certificate kinds, from `label:` below
   'f.label',                      // password-strength verdicts, from `label:` below
