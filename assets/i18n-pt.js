@@ -14,6 +14,8 @@
 window.I18N = window.I18N || {};
 window.I18N.pt = window.I18N.pt || {};
 window.I18N.pt.ui = {
+  "That answer did not reach the server. Try again.": "Essa resposta não chegou ao servidor. Tente de novo.",
+  "The exam could not be submitted.": "Não foi possível enviar a prova.",
   " of the track": "da trilha",
   "// newsletter": "// newsletter",
   "/month": "/mês",

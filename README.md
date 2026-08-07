@@ -761,6 +761,41 @@ samples in three places at once — dashed frame, a seal in the bar and, in plac
 of the validation code, the phrase "no code has been issued". A fake certificate
 that looks like a real one is a problem, not a preview.
 
+### The paper is the server's, when there is one
+
+Everything above draws from the exercise bank in the page — which means the
+answer key is in the page, and an open devtools is a guaranteed 100%. With
+`<meta name="backend">` configured the paper comes from `internal/assessment`
+instead:
+
+```
+POST /api/exams/course/{id}                       the attempt in progress, or a new draw
+PUT  /api/exams/attempts/{id}/answers/{exerciseId} recorded, never graded
+POST /api/exams/attempts/{id}/submit               and only now, the result
+```
+
+The exam an answer belongs to is the whole difference: `api.grade()` takes an
+`attempt`, and its presence is what turns grading into recording. The verdict
+comes back at submit with the right answer and the `why` beside it, and the
+screen grafts those onto the exercise before revealing — the renderers mark the
+right answer by reading the exercise, and a server-drawn paper has no such
+field until the exam is over.
+
+**Both paths stay**, and that is not a hedge: `bundle.py` produces a file
+opened off a disk with no server near it, and the smoke suite drives that file.
+What the local one cannot do is hold a verdict it already has. That is the
+honest limit of a portal with no server, and it is the reason the server exists.
+
+`matching` is not drawn into a server exam yet. Its screen checks each pair the
+moment it is made — green and locked, or red and undone — and that needs the
+pairing the exam withholds; the server excludes it by name until there is a
+keyless screen for it.
+
+Two suites, because the two modes need different things to run:
+`tools/smoke/smoke.mjs` covers the local exam and runs in CI;
+`tools/exam-server/check.mjs` covers the server one and needs a Go process, a
+database and an ingested catalogue, so it is run by hand.
+
 ## Content: image, diagram and annotated code
 
 `prose()` went from three block shapes to six. The three new ones:

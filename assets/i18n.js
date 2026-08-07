@@ -56,6 +56,8 @@ window.I18N = {
       "invoicing": "Factura y cobro por identificación fiscal"
     },
     ui: {
+      "That answer did not reach the server. Try again.": "Esa respuesta no llegó al servidor. Inténtalo de nuevo.",
+      "The exam could not be submitted.": "No se pudo enviar el examen.",
       " of the track": " del itinerario",
       "1 pair was tried wrong before it closed.": "1 par se intentó mal antes de cerrarse.",
       "1 section": "1 sección",
@@ -541,6 +543,8 @@ window.I18N = {
       "invoicing": "Facturation et paiement au nom d’une société"
     },
     ui: {
+      "That answer did not reach the server. Try again.": "Cette réponse n’est pas arrivée au serveur. Réessayez.",
+      "The exam could not be submitted.": "L’examen n’a pas pu être envoyé.",
       " of the track": " du parcours",
       "1 pair was tried wrong before it closed.": "1 paire a été tentée à tort avant de se fermer.",
       "1 section": "1 section",
@@ -1026,6 +1030,8 @@ window.I18N = {
       "invoicing": "Fattura e pagamento con partita IVA"
     },
     ui: {
+      "That answer did not reach the server. Try again.": "Questa risposta non è arrivata al server. Riprova.",
+      "The exam could not be submitted.": "Non è stato possibile inviare l’esame.",
       " of the track": " del percorso",
       "1 pair was tried wrong before it closed.": "1 coppia è stata tentata sbagliata prima di chiudersi.",
       "1 section": "1 sezione",

@@ -39,6 +39,7 @@ import { courseLessons, courseById, trackPath } from './catalog.js';
 import { lessonExercises } from './lessons.js';
 import { NEEDS_SERVER } from './exercises/grade.js';
 import { shuffleWith } from './text.js';
+import * as api from './api.js';
 
 export const PASS_MARK = 70;         // % correct needed to pass
 export const COURSE_QUESTIONS = 10;
@@ -69,6 +70,47 @@ function draw(bank, howMany, seed) {
   return good.concat(rest).slice(0, howMany);
 }
 
+/* ---- the same exam, drawn by the server ------------------------------------
+
+   WHY BOTH EXIST. Everything below this line draws from the bank in the page,
+   which means the answer key is in the page — an open devtools is a guaranteed
+   100%. That is the whole reason internal/assessment exists, and with a backend
+   configured the paper comes from there instead: stamped into an attempt,
+   returned without a key, graded on submit.
+
+   The local draw stays because the portal has to work without a server. The
+   single-file bundle is opened off a disk, the smoke suite drives that file,
+   and a version of this module that assumed a backend would break both. What it
+   cannot do is hold a verdict it already has, and that is the honest limit of a
+   portal with no server rather than a thing to hide.
+
+   `items` comes out the same shape from either: `{ex, ctx}`, so the screen and
+   the wizard below it do not know which one ran. What the server adds is
+   `attempt` — its presence is what makes every answer a recorded one instead of
+   a graded one. */
+async function drawnByServer(scope, scopeId, meta) {
+  const attempt = await api.startExam(scope, scopeId);
+  return {
+    ...meta,
+    attempt: attempt.id,
+    responses: attempt.responses,
+    items: attempt.questions.map((ex) => ({ ex, ctx: contextOf(ex) })),
+    bankSize: null,   // the bank is the server's and it does not say how big
+  };
+}
+
+/* The lesson an exercise came from, resolved from the catalogue by its topic.
+
+   The wizard files an answer under `progress[course].lessons[ix]`, and the
+   server names the lesson by its authored topic title rather than by the index
+   the portal counts in. A topic that resolves to nothing gives a null context,
+   which the wizard reads as "record this nowhere" — the exam still grades, and
+   nothing is filed against the wrong lesson. */
+function contextOf(ex) {
+  const ix = courseLessons(ex.course).findIndex((a) => a.key === ex.topic);
+  return ix < 0 ? null : { courseId: ex.course, lessonIx: ix };
+}
+
 export function courseExam(courseId, attempt = 0) {
   const c = courseById(courseId);
   const bank = courseBank(courseId);
@@ -81,6 +123,35 @@ export function courseExam(courseId, attempt = 0) {
     items: draw(bank, COURSE_QUESTIONS, courseId + ':' + attempt),
     bankSize: bank.length,
   };
+}
+
+/* The two entry points the screens call. Async on both paths, because one of
+   them is a request and a screen written against a synchronous draw would have
+   to be rewritten the day the server arrived — which is the day this was
+   written for. */
+export async function openCourseExam(courseId, attempt = 0) {
+  const c = courseById(courseId);
+  const meta = {
+    key: 'course:' + courseId,
+    scope: 'course',
+    about: courseId,
+    title: c ? c.name : courseId,
+    backTo: '#/course/' + courseId,
+  };
+  if (api.examOnServer()) return drawnByServer('course', courseId, meta);
+  return courseExam(courseId, attempt);
+}
+
+export async function openTrackExam(track, activeOption, attempt = 0) {
+  const meta = {
+    key: 'track:' + track.id,
+    scope: 'track',
+    about: track.id,
+    title: track.name,
+    backTo: '#/track',
+  };
+  if (api.examOnServer()) return drawnByServer('track', track.id, meta);
+  return trackExam(track, activeOption, attempt);
 }
 
 export function trackExam(track, activeOption, attempt = 0) {
