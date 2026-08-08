@@ -1144,6 +1144,13 @@ html[data-theme="light"] .cert-sheet{--cert-grain:rgba(0,0,0,.02)}
 /* inside the modal the certificate is the whole content: no zoom cursor, no
    hover, and with a larger body — that is what it was enlarged for */
 .modal-cert .cert{cursor:default;padding:14px}
+/* "no hover" for real, not only in the cursor. The class-level .cert:hover
+   still animated the border here, and on this enlarged sheet that 200ms
+   border-colour transition repainted the paper on every pass of the cursor —
+   during which the grain's repeating-gradient re-rasterised a frame out of
+   phase, the horizontal line that flickered and vanished. The open document is
+   not a target; its border stays put. */
+.modal-cert .cert:hover{border-color:var(--wire)}
 .modal-cert .cert-sheet{min-height:min(62vh,480px);padding:46px 56px 30px;gap:30px}
 .modal-cert .cert-brand{font-size:1rem}
 /* `5vw` on the font + `min-height` in `vh` make the document grow along with
