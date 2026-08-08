@@ -1034,20 +1034,27 @@ body.with-search{overflow:hidden}
   border:1px solid var(--wire);border-radius:2px;
   padding:26px 30px 16px;
   display:flex;flex-direction:column;gap:22px;min-height:250px;
-  --cert-grain:transparent;
+  --cert-grain:none;
   /* The paper's own grain, over the corner glow that suggests paper under
-     light. Deliberately a touch stronger than the page's ambient scanline
-     (body::before), so the document reads as textured in its own right rather
-     than borrowing the overlay — most of all in the light theme, where a flat
-     white sheet looked bare. Light theme only; on the dark sheet a black band
-     is invisible and the glow already does the work. The PNG export draws the
-     same band, so the file matches the card. One knob: --cert-grain. */
+     light. A touch of texture so the document does not read as a flat white
+     sheet, in the light theme only — on the dark one a black band is invisible
+     and the glow already does the work. The PNG export draws the same band, so
+     the file matches the card.
+
+     A RASTER TILE, not a repeating-gradient. As a gradient the grain
+     re-rasterised a frame out of phase on any partial repaint of this sheet —
+     a button clicked, focus moving, the modal's backdrop-filter recompositing —
+     and the phase slip flashed a horizontal line that vanished. A 1×4 tile
+     (three clear rows, one at ~.02 black) re-blits at a fixed origin instead,
+     so a repaint cannot shift it. One knob: --cert-grain. */
   background:
-    repeating-linear-gradient(to bottom, transparent 0 3px, var(--cert-grain) 3px 4px),
+    var(--cert-grain),
     radial-gradient(120% 90% at 100% 0%, rgba(126,231,135,.05), transparent 55%),
     radial-gradient(90% 80% at 0% 100%, rgba(126,231,135,.035), transparent 60%);
 }
-html[data-theme="light"] .cert-sheet{--cert-grain:rgba(0,0,0,.02)}
+html[data-theme="light"] .cert-sheet{
+  --cert-grain:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAECAYAAABP2FU6AAAADElEQVR42mNgwACsAAAZAAYNVTSFAAAAAElFTkSuQmCC");
+}
 .cert-top{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .cert-brand{
   display:flex;align-items:center;gap:8px;
