@@ -113,7 +113,7 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-function draw(ctx, d, c) {
+function draw(ctx, d, c, light) {
   ctx.fillStyle = c.panel;
   ctx.fillRect(0, 0, W, H);
 
@@ -220,6 +220,23 @@ function draw(ctx, d, c) {
     const w = trackedWidth(ctx, d.code, 2.2);
     tracked(ctx, d.code, W - PAD - w, footY, 2.2);
   }
+
+  /* ---- the portal's scanline grain, last so it lies over everything ----
+     body::before lays a fixed 4px scanline across the whole viewport, the
+     certificate included, so the card on screen wears a faint horizontal
+     weave. The file did not — it came out flat, whitest of all in the light
+     theme where the page's texture is most visible — and a file that does not
+     look like its preview is the one bug this module exists to avoid. Replayed
+     here as the same thing it is there: a 1px black band every 4px under
+     `multiply`, at the same opacity the overlay uses per theme (.10 light,
+     .35 dark). Over the light sheet it darkens into the grain; over the dark
+     one it all but vanishes, exactly as it does on the page. */
+  ctx.save();
+  ctx.globalCompositeOperation = 'multiply';
+  ctx.globalAlpha = light ? 0.10 : 0.35;
+  ctx.fillStyle = 'rgba(0,0,0,0.14)';
+  for (let ly = 3; ly < H; ly += 4) ctx.fillRect(0, ly, W, 1);
+  ctx.restore();
 }
 
 /* The glow needs the accent colour at an alpha. The custom properties are hex,
@@ -251,7 +268,7 @@ export async function downloadCertificatePNG(art) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return false;
   ctx.scale(SCALE, SCALE);
-  draw(ctx, d, palette());
+  draw(ctx, d, palette(), document.documentElement.dataset.theme === 'light');
 
   const blob = await new Promise((res) => {
     if (canvas.toBlob) canvas.toBlob(res, 'image/png');

@@ -179,13 +179,14 @@ function linkedInButtons({ name, code: certCode, when }) {
   });
   const post = LINKEDIN + '/sharing/share-offsite/?' + q({ url: validationUrl(certCode) });
 
-  /* Icon only. The LinkedIn mark is recognised without a caption, and the label
-     took up half the action bar to say what the drawing already says. The text
-     did not disappear — it lives in the `aria-label` and the `title`, which is
-     what a screen reader announces and what the cursor shows. */
-  return '<a class="cert-in" href="' + esc(profile) + '" target="_blank" rel="noopener" ' +
-      'title="' + txt('Add to LinkedIn profile') + '" ' +
-      'aria-label="' + txt('Add to LinkedIn profile') + '">' + ICON_LINKEDIN + '</a>' +
+  /* Both buttons open LinkedIn, and that is exactly why the credential one
+     carries its label. As a bare icon beside "Share" it read as a second way to
+     share — the two were told apart only by a `title` nobody hovers on a phone.
+     They do different things: this one adds the certificate to the profile as a
+     licence, the other posts a link to the feed. The mark keeps the brand blue
+     so it still reads as LinkedIn at a glance; the words carry the difference. */
+  return '<a class="btn btn-ghost cert-add" href="' + esc(profile) + '" target="_blank" rel="noopener" ' +
+      'title="' + txt('Add to LinkedIn profile') + '">' + ICON_LINKEDIN + txt('Add to LinkedIn profile') + '</a>' +
     '<a class="btn btn-ghost cert-share" href="' + esc(post) + '" target="_blank" rel="noopener">' +
       txt('Share') + '</a>';
 }
