@@ -386,7 +386,7 @@ check(shown.title === cert.title, 'and so is the title: ' + shown.title);
 
 await page.locator('.cert:not(.cert-sample)').first().click();
 await page.waitForSelector('.modal-cert');
-const href = await page.locator('.modal-actions .cert-in:not(.cert-png)').first().getAttribute('href');
+const href = await page.locator('.modal-actions .cert-add').first().getAttribute('href');
 check(Boolean(href) && href.includes('certId=' + encodeURIComponent(cert.code)),
   'the LinkedIn form is filled in with that code');
 const certUrl = href ? new URL(href).searchParams.get('certUrl') : '';

@@ -1161,6 +1161,15 @@ body.with-search{overflow:hidden}
 .cert-share{gap:8px}
 .cert-share svg{width:15px;height:15px}
 
+/* The LinkedIn CREDENTIAL button, beside "Share" and once mistaken for it when
+   it was a bare icon. Labelled now; the mark keeps LinkedIn's brand blue (the
+   same theme-adjusted value .cert-in explains) so it still reads as LinkedIn,
+   and turns to the hover colour with the rest of the button. */
+.cert-add{--linkedin:#3b8fd9}
+html[data-theme="light"] .cert-add{--linkedin:#0a66c2}
+.cert-add svg{width:16px;height:16px;color:var(--linkedin)}
+.cert-add:hover svg{color:inherit}
+
 /* THE LINKEDIN BUTTON IS ONLY THE ICON, in their brand colour.
 
    The official blue is #0A66C2, and that is what the light theme uses. On dark
