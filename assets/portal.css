@@ -1047,7 +1047,7 @@ body.with-search{overflow:hidden}
     radial-gradient(120% 90% at 100% 0%, rgba(126,231,135,.05), transparent 55%),
     radial-gradient(90% 80% at 0% 100%, rgba(126,231,135,.035), transparent 60%);
 }
-html[data-theme="light"] .cert-sheet{--cert-grain:rgba(0,0,0,.05)}
+html[data-theme="light"] .cert-sheet{--cert-grain:rgba(0,0,0,.03)}
 .cert-top{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .cert-brand{
   display:flex;align-items:center;gap:8px;
@@ -1178,10 +1178,18 @@ html[data-theme="light"] .cert-sheet{--cert-grain:rgba(0,0,0,.05)}
   --linkedin:#3b8fd9;
   display:grid;place-items:center;width:36px;height:36px;border-radius:5px;
   color:var(--linkedin);border:1px solid transparent;
+  /* No native chrome: the download control is a <button> and the two LinkedIn
+     ones are <a>, so without this the button alone wore the browser's grey box
+     while the anchors did not. All three are just an icon now, boxed only on
+     hover. */
+  background:none;padding:0;font:inherit;-webkit-appearance:none;appearance:none;cursor:pointer;
   transition:background .15s,border-color .15s;
 }
 html[data-theme="light"] .cert-in{--linkedin:#0a66c2}
 .cert-in svg{width:21px;height:21px}
+/* The download is not a LinkedIn action, so it keeps the document's own ink
+   rather than the brand blue the class carries for the two beside it. */
+.cert-png{color:var(--paper)}
 .cert-in:hover{background:var(--panel);border-color:var(--linkedin)}
 /* disabled, and looking it: the button exists to say what will be there */
 .cert-in-off{opacity:.35;cursor:not-allowed}

@@ -231,7 +231,7 @@ function draw(ctx, d, c, light) {
      vanishes. Keep this alpha in step with --cert-grain in portal.css. */
   ctx.save();
   ctx.globalCompositeOperation = 'multiply';
-  ctx.globalAlpha = light ? 0.06 : 0.05;
+  ctx.globalAlpha = light ? 0.04 : 0.05;
   ctx.fillStyle = '#000';
   for (let ly = 3; ly < H; ly += 4) ctx.fillRect(0, ly, W, 1);
   ctx.restore();
