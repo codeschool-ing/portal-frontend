@@ -1523,7 +1523,12 @@ html[data-theme="light"] .cert-png{color:#b3bccb}
   .rail{
     position:fixed;top:64px;left:0;bottom:0;width:min(300px,84vw);z-index:110;
     background:var(--ink);transform:translateX(-102%);transition:transform .22s ease;
-    height:auto;
+    /* Full height from the nav to the floor. `height:auto` here collapsed the
+       drawer to its content — a short menu left a gap of bare veil below it —
+       because with `auto` the browser sizes to content and ignores `bottom`. A
+       definite height fills it, and the base rule's `overflow-y:auto` still lets
+       a long menu scroll inside. */
+    height:calc(100vh - 64px);
   }
   body.rail-open .rail{transform:none}
   .rail{width:min(340px,88vw)}
