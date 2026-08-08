@@ -67,7 +67,7 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
    rule. */
 .portal nav{
   position:static;height:auto;padding:0;z-index:auto;
-  background:none;backdrop-filter:none;border-bottom:0;align-items:stretch;
+  background:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom:0;align-items:stretch;
 }
 
 /* THE LESSON HAS ONE WIDTH, and that width has two values.
@@ -773,7 +773,7 @@ body.no-rail .rail{display:none}
   transition:border-color .15s,background .15s;
 }
 .choice:hover{border-color:var(--phosphor-dim)}
-.choice input{grid-row:1;appearance:none;width:0;height:0;position:absolute;opacity:0}
+.choice input{grid-row:1;-webkit-appearance:none;appearance:none;width:0;height:0;position:absolute;opacity:0}
 .choice-mark{grid-row:1;width:15px;height:15px;margin-top:3px;border:1px solid var(--wire);border-radius:50%;position:relative}
 .ex-multiple-choice .choice-mark{border-radius:3px}
 .choice input:checked ~ .choice-mark{border-color:var(--phosphor)}
@@ -909,7 +909,7 @@ body.no-rail .rail{display:none}
 /* ---------- the ⌘K panel ---------- */
 .search-veil{
   position:fixed;inset:0;z-index:200;
-  background:rgba(10,14,20,.72);backdrop-filter:blur(3px);
+  background:rgba(10,14,20,.72);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
   display:flex;justify-content:center;align-items:flex-start;
   /* high, but not flush: the box appears where the eye already is after the
      shortcut */
@@ -927,6 +927,8 @@ body.with-search{overflow:hidden}
 .search-field{
   flex:1 1 auto;min-width:0;background:none;border:0;color:var(--paper);
   font:inherit;font-size:1rem;outline:none;
+  /* Safari draws a native rounded box for type=search otherwise */
+  -webkit-appearance:none;appearance:none;
 }
 .search-field::-webkit-search-cancel-button{display:none}
 .search-res{
