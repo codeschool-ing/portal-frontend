@@ -1047,7 +1047,7 @@ body.with-search{overflow:hidden}
     radial-gradient(120% 90% at 100% 0%, rgba(126,231,135,.05), transparent 55%),
     radial-gradient(90% 80% at 0% 100%, rgba(126,231,135,.035), transparent 60%);
 }
-html[data-theme="light"] .cert-sheet{--cert-grain:rgba(0,0,0,.03)}
+html[data-theme="light"] .cert-sheet{--cert-grain:rgba(0,0,0,.02)}
 .cert-top{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .cert-brand{
   display:flex;align-items:center;gap:8px;
@@ -1187,9 +1187,14 @@ html[data-theme="light"] .cert-sheet{--cert-grain:rgba(0,0,0,.03)}
 }
 html[data-theme="light"] .cert-in{--linkedin:#0a66c2}
 .cert-in svg{width:21px;height:21px}
-/* The download is not a LinkedIn action, so it keeps the document's own ink
-   rather than the brand blue the class carries for the two beside it. */
+/* The download is not a LinkedIn action, so it keeps a neutral ink rather than
+   the brand blue the class carries for the two beside it. The action bar sits on
+   the modal's dark veil in BOTH themes, though, so the light theme cannot use
+   its own (dark) --paper here — it would vanish against the veil, visible only
+   on hover. Dark theme's --paper is already a light ink, so only light overrides
+   to one that reads on a near-black ground. */
 .cert-png{color:var(--paper)}
+html[data-theme="light"] .cert-png{color:#b3bccb}
 .cert-in:hover{background:var(--panel);border-color:var(--linkedin)}
 /* disabled, and looking it: the button exists to say what will be there */
 .cert-in-off{opacity:.35;cursor:not-allowed}
