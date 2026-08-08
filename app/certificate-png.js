@@ -221,20 +221,18 @@ function draw(ctx, d, c, light) {
     tracked(ctx, d.code, W - PAD - w, footY, 2.2);
   }
 
-  /* ---- the portal's scanline grain, last so it lies over everything ----
-     body::before lays a fixed 4px scanline across the whole viewport, the
-     certificate included, so the card on screen wears a faint horizontal
-     weave. The file did not — it came out flat, whitest of all in the light
-     theme where the page's texture is most visible — and a file that does not
-     look like its preview is the one bug this module exists to avoid. Replayed
-     here as the same thing it is there: a 1px black band every 4px under
-     `multiply`, at the same opacity the overlay uses per theme (.10 light,
-     .35 dark). Over the light sheet it darkens into the grain; over the dark
-     one it all but vanishes, exactly as it does on the page. */
+  /* ---- the sheet's grain, last so it lies over everything ----
+     The card carries a scanline of its own (.cert-sheet's --cert-grain), a
+     touch stronger than the page's ambient overlay so the document reads as
+     textured rather than flat — a flat white certificate looked bare, which is
+     the whole reason this is here. The file has to match the card, so the same
+     1px black band every 4px is drawn under `multiply` at the same weight: on
+     the light sheet it darkens into a grain, on the dark one it all but
+     vanishes. Keep this alpha in step with --cert-grain in portal.css. */
   ctx.save();
   ctx.globalCompositeOperation = 'multiply';
-  ctx.globalAlpha = light ? 0.10 : 0.35;
-  ctx.fillStyle = 'rgba(0,0,0,0.14)';
+  ctx.globalAlpha = light ? 0.06 : 0.05;
+  ctx.fillStyle = '#000';
   for (let ly = 3; ly < H; ly += 4) ctx.fillRect(0, ly, W, 1);
   ctx.restore();
 }

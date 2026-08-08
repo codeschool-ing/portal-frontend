@@ -1034,11 +1034,20 @@ body.with-search{overflow:hidden}
   border:1px solid var(--wire);border-radius:2px;
   padding:26px 30px 16px;
   display:flex;flex-direction:column;gap:22px;min-height:250px;
-  /* the corner glow: suggests paper under light, without costing an image */
+  --cert-grain:transparent;
+  /* The paper's own grain, over the corner glow that suggests paper under
+     light. Deliberately a touch stronger than the page's ambient scanline
+     (body::before), so the document reads as textured in its own right rather
+     than borrowing the overlay — most of all in the light theme, where a flat
+     white sheet looked bare. Light theme only; on the dark sheet a black band
+     is invisible and the glow already does the work. The PNG export draws the
+     same band, so the file matches the card. One knob: --cert-grain. */
   background:
+    repeating-linear-gradient(to bottom, transparent 0 3px, var(--cert-grain) 3px 4px),
     radial-gradient(120% 90% at 100% 0%, rgba(126,231,135,.05), transparent 55%),
     radial-gradient(90% 80% at 0% 100%, rgba(126,231,135,.035), transparent 60%);
 }
+html[data-theme="light"] .cert-sheet{--cert-grain:rgba(0,0,0,.05)}
 .cert-top{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .cert-brand{
   display:flex;align-items:center;gap:8px;
@@ -1158,19 +1167,7 @@ body.with-search{overflow:hidden}
   /* the footer line stacks instead of squeezing date and code onto one line */
   .cert-foot{flex-direction:column;gap:4px}
 }
-.cert-share{gap:8px}
-.cert-share svg{width:15px;height:15px}
-
-/* The LinkedIn CREDENTIAL button, beside "Share" and once mistaken for it when
-   it was a bare icon. Labelled now; the mark keeps LinkedIn's brand blue (the
-   same theme-adjusted value .cert-in explains) so it still reads as LinkedIn,
-   and turns to the hover colour with the rest of the button. */
-.cert-add{--linkedin:#3b8fd9}
-html[data-theme="light"] .cert-add{--linkedin:#0a66c2}
-.cert-add svg{width:16px;height:16px;color:var(--linkedin)}
-.cert-add:hover svg{color:inherit}
-
-/* THE LINKEDIN BUTTON IS ONLY THE ICON, in their brand colour.
+/* THE LINKEDIN BUTTONS ARE ONLY THE ICON, in their brand colour.
 
    The official blue is #0A66C2, and that is what the light theme uses. On dark
    it gives 2.5:1 of contrast against the panel — below the 3:1 an icon needs to
