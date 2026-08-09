@@ -150,6 +150,18 @@ export const register = (name, email, password) =>
   request('POST', '/api/accounts', { name, email, password });
 export const signOut = () => request('DELETE', '/api/session');
 export const session = () => request('GET', '/api/session');
+export const account = () => request('GET', '/api/account');
+
+/* ---------- two-factor ----------
+
+   Optional on the server (off with no key), so these are only ever reached when
+   the account view says the feature is available. signInMfa is the second step
+   of a sign-in that answered { mfaRequired: true }: the challenge rides in a
+   cookie the first step set, so only the code travels here. */
+export const mfaSetup = () => request('POST', '/api/account/mfa/setup');
+export const mfaConfirm = (code) => request('POST', '/api/account/mfa/confirm', { code });
+export const mfaDisable = (password) => request('DELETE', '/api/account/mfa', { password });
+export const signInMfa = (code) => request('POST', '/api/session/mfa', { code });
 
 /* ---------- the exam ----------
 

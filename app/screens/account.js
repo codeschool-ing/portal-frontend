@@ -43,6 +43,12 @@ function versionLine() {
     '<a href="' + esc(url) + '" target="_blank" rel="noopener">v' + esc(version) + '</a></p>';
 }
 
+// The base32 setup key, in groups of four, so it can be read off a screen and
+// typed into an app without losing the place.
+function groupKey(secret) {
+  return String(secret || '').replace(/(.{4})/g, '$1 ').trim();
+}
+
 function passwordStrength(s) {
   const v = String(s || '');
   if (v.length < 8) return { pct: Math.min(30, v.length * 4), label: 'too short', ok: false };
@@ -59,6 +65,7 @@ export default async function account() {
   const el = document.createElement('div');
   el.className = 'view view-account';
   const session = await api.session();
+  const mfa = await api.mfaState();
   const t = studentTrack();
   const p = t ? trackProgress(t) : null;
   const plan = currentPlan();
@@ -147,6 +154,11 @@ export default async function account() {
       '</p>' +
     '</section>' +
 
+    /* Two-factor, only when the server offers it (a key is configured). Its own
+       state machine — off / setting up / recovery codes / on — lives below, in
+       #mfa-block, because the steps replace one another in place. */
+    (mfa.available ? '<section class="block" id="mfa-block"></section>' : '') +
+
     '<section class="block block-risk">' +
       '<div class="block-top"><h2>' + txt('Erase my progress') + '</h2></div>' +
       '<p class="account-note">' + txt('Removes completed lessons, answers and the enrolment. There is no undo.') + '</p>' +
@@ -216,6 +228,109 @@ export default async function account() {
     label.textContent = '';
     return say(txt('password changed'), true);
   });
+
+  /* ---------- two-factor ----------
+     A small state machine in one block: off → setting up → recovery codes → on,
+     and on → off. Each step replaces the last in place, so there is one place to
+     look and no half-open dialogs to leave behind. */
+  if (mfa.available) {
+    const block = el.querySelector('#mfa-block');
+    const head = '<div class="block-top"><h2>' + txt('Two-factor authentication') + '</h2></div>';
+    const noticed = (cls) => {
+      const n = block.querySelector('#mfa-msg');
+      n.className = 'account-notice mono ' + cls;
+      return n;
+    };
+
+    const renderOff = () => {
+      block.innerHTML = head +
+        '<p class="account-note">' + txt('Add a second step at sign-in with an authenticator app.') + '</p>' +
+        '<div class="account-action">' +
+          '<button type="button" class="btn btn-primary" id="mfa-enable">' + txt('Enable two-factor') + '</button>' +
+          '<span class="account-notice mono" id="mfa-msg" aria-live="polite"></span>' +
+        '</div>';
+      block.querySelector('#mfa-enable').addEventListener('click', beginSetup);
+    };
+
+    const renderOn = () => {
+      block.innerHTML = head +
+        '<p class="account-note"><strong>' + txt('Two-factor is on.') + '</strong></p>' +
+        '<form id="mfa-off" novalidate>' +
+          '<div class="field"><label for="mfa-pass">' + txt('confirm your password to turn it off') + '</label>' +
+            '<input type="password" id="mfa-pass" autocomplete="current-password"></div>' +
+          '<div class="account-action">' +
+            '<button type="submit" class="btn btn-ghost btn-risk">' + txt('Turn off two-factor') + '</button>' +
+            '<span class="account-notice mono" id="mfa-msg" aria-live="polite"></span>' +
+          '</div>' +
+        '</form>';
+      block.querySelector('#mfa-off').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pass = block.querySelector('#mfa-pass').value;
+        if (!pass) { noticed('bad').textContent = txt('type your password'); return; }
+        try {
+          await api.mfaDisable(pass);
+        } catch (err) {
+          noticed('bad').textContent = err.message || txt('that did not work — try again');
+          return;
+        }
+        renderOff();
+      });
+    };
+
+    const renderCodes = (codes) => {
+      block.innerHTML = head +
+        '<p class="account-note"><strong>' + txt('Two-factor is on now.') + '</strong></p>' +
+        '<p class="account-note">' +
+          txt('Save these recovery codes. Each works once — they are the way back in if you lose your phone.') + '</p>' +
+        '<ul class="mfa-codes mono">' +
+          (codes || []).map((c) => '<li>' + esc(c) + '</li>').join('') + '</ul>' +
+        '<button type="button" class="btn btn-primary" id="mfa-done">' + txt('Done') + '</button>';
+      block.querySelector('#mfa-done').addEventListener('click', renderOn);
+    };
+
+    async function beginSetup() {
+      let data;
+      try {
+        data = await api.mfaSetup();
+      } catch (err) {
+        noticed('bad').textContent = err.message || txt('that did not work — try again');
+        return;
+      }
+      block.innerHTML = head +
+        '<p class="account-note">' +
+          txt('Add this account to your authenticator app, then enter the code it shows.') + '</p>' +
+        '<p class="account-note mono">' + txt('setup key') + ': <span class="mfa-key">' +
+          esc(groupKey(data.secret)) + '</span></p>' +
+        '<p class="account-note"><a href="' + esc(data.otpauthUrl) + '">' +
+          txt('Open in your authenticator app') + '</a></p>' +
+        '<form id="mfa-confirm" novalidate>' +
+          '<div class="field"><label for="mfa-code">' + txt('authentication code') + '</label>' +
+            '<input type="text" id="mfa-code" inputmode="numeric" autocomplete="one-time-code"></div>' +
+          '<div class="account-action">' +
+            '<button type="submit" class="btn btn-primary">' + txt('Confirm') + '</button>' +
+            '<button type="button" class="btn btn-ghost" id="mfa-cancel">' + txt('Cancel') + '</button>' +
+            '<span class="account-notice mono" id="mfa-msg" aria-live="polite"></span>' +
+          '</div>' +
+        '</form>';
+      block.querySelector('#mfa-cancel').addEventListener('click', renderOff);
+      block.querySelector('#mfa-confirm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = block.querySelector('#mfa-code').value.trim();
+        if (!code) { noticed('bad').textContent = txt('type the code from your app'); return; }
+        let res;
+        try {
+          res = await api.mfaConfirm(code);
+        } catch (err) {
+          noticed('bad').textContent = err.message || txt('that did not work — try again');
+          return;
+        }
+        renderCodes(res.recoveryCodes);
+      });
+    }
+
+    if (mfa.enabled) renderOn();
+    else renderOff();
+  }
 
   const confirm = el.querySelector('#c-confirm');
   el.querySelector('#c-erase').addEventListener('click', () => { confirm.hidden = false; });
