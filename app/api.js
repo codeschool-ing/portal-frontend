@@ -41,6 +41,26 @@ export async function signIn({ name, email, password }) {
   }
 
   const account = await sync.signIn(email, password);
+  /* A second factor is enrolled: the password was right, but no session opened.
+     The server set a short-lived challenge cookie; the caller collects a code
+     and calls completeMfa. Nothing is written to state until then. */
+  if (account && account.mfaRequired) {
+    return { mfaRequired: true };
+  }
+  return afterSignIn(account);
+}
+
+/* completeMfa is the second step: the code (TOTP or recovery) against the
+   challenge cookie the first step set. On success the session opens, exactly as
+   a one-step sign-in ends. */
+export async function completeMfa(code) {
+  const account = await sync.signInMfa(code);
+  return afterSignIn(account);
+}
+
+/* The tail both sign-in paths share: adopt the browser's history into the
+   account, then read back the exams — see the note below. */
+async function afterSignIn(account) {
   state.change((e) => { e.session = { name: account.name, email: account.email }; });
   await sync.adopt();
   /* And the exams, which `adopt` does not carry: the progress import is about
@@ -94,6 +114,24 @@ export function changePlan(planId) {
   state.changePlan(planId);
   return echo(state.currentPlan());
 }
+
+/* ---------- two-factor ----------
+
+   Real only with a backend, and only when that backend offers it (a key is
+   configured). The account screen asks mfaState first and shows the section on
+   `available`; with no backend it is simply off, like registration. */
+export async function mfaState() {
+  if (!sync.configured()) return { available: false, enabled: false };
+  const acc = await sync.account();
+  return { available: !!acc.mfaAvailable, enabled: !!acc.mfaEnabled };
+}
+
+// Begin enrolment: { secret, otpauthUrl } for the app. Nothing is on yet.
+export const mfaSetup = () => sync.mfaSetup();
+// Confirm with a code, turning it on and returning the one-time recovery codes.
+export const mfaConfirm = (code) => sync.mfaConfirm(code);
+// Turn it off; the server re-checks the password.
+export const mfaDisable = (password) => sync.mfaDisable(password);
 
 /* ---------- enrolment ---------- */
 

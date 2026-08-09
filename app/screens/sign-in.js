@@ -63,12 +63,37 @@ export default async function signIn() {
     notice.className = 'signin-notice mono bad';
   };
 
+  /* Enrol then land on the dashboard — the tail both a plain sign-in and a
+     second-factor one end with. The track is captured before the form is
+     redrawn for the code step, so the choice survives that redraw. */
+  let chosenTrack = null;
+  const finish = async () => {
+    await api.enrol(chosenTrack);
+    goTo('/dashboard');
+  };
+
+  // Password was right and a code is owed. Swap the form for a code field; the
+  // challenge cookie is already set, so only the code is needed now.
+  let phase = 'credentials';
+  const showCodeStep = () => {
+    phase = 'mfa';
+    const form = el.querySelector('#form-signin');
+    form.innerHTML =
+      '<p class="signin-sub">' + txt('Enter the code from your authenticator app, or a recovery code.') + '</p>' +
+      '<div class="field"><label for="e-code">' + txt('authentication code') + '</label>' +
+        '<input id="e-code" type="text" inputmode="numeric" autocomplete="one-time-code" /></div>' +
+      '<button type="submit" class="btn btn-primary">' + txt('Verify') + '</button>';
+    notice.textContent = '';
+    form.querySelector('#e-code').focus();
+  };
+
   /* One submit path for both buttons: everything after the credentials is the
      same, and two copies of "enrol, then go to the dashboard" is two places for
      the enrolment to be forgotten. */
   const enter = async (create) => {
     const name = el.querySelector('#e-name').value.trim();
     if (!name) return el.querySelector('#e-name').focus();
+    chosenTrack = el.querySelector('#e-track').value;
 
     try {
       if (!sync.configured()) {
@@ -77,7 +102,11 @@ export default async function signIn() {
         const email = el.querySelector('#e-email').value.trim();
         const password = el.querySelector('#e-password').value;
         if (!email || !password) return el.querySelector('#e-email').focus();
-        await (create ? api.register({ name, email, password }) : api.signIn({ name, email, password }));
+        const result = await (create
+          ? api.register({ name, email, password })
+          : api.signIn({ name, email, password }));
+        // A second factor is enrolled: collect the code before anything else.
+        if (result && result.mfaRequired) return showCodeStep();
       }
     } catch (err) {
       /* The server's own message, because it is the one that knows what went
@@ -85,14 +114,27 @@ export default async function signIn() {
          e-mail as for a wrong password, so relaying it leaks nothing. */
       return say(err.message || txt('that did not work — try again'));
     }
-    await api.enrol(el.querySelector('#e-track').value);
-    goTo('/dashboard');
+    await finish();
+    return undefined;
+  };
+
+  // The second step: the code against the challenge cookie.
+  const verify = async () => {
+    const code = el.querySelector('#e-code').value.trim();
+    if (!code) return el.querySelector('#e-code').focus();
+    try {
+      await api.completeMfa(code);
+    } catch (err) {
+      return say(err.message || txt('that did not work — try again'));
+    }
+    await finish();
     return undefined;
   };
 
   el.querySelector('#form-signin').addEventListener('submit', (e) => {
     e.preventDefault();
-    enter(false);
+    if (phase === 'mfa') verify();
+    else enter(false);
   });
   el.querySelector('#e-register')?.addEventListener('click', () => enter(true));
 

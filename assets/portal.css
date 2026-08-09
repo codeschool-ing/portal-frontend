@@ -1240,6 +1240,14 @@ html[data-theme="light"] .cert-png{color:#b3bccb}
 .account-notice.good{color:var(--phosphor)}
 .account-notice.bad{color:var(--amber)}
 .view-account form{display:flex;flex-direction:column;gap:14px}
+
+/* Two-factor: the setup key and the recovery codes are both things to read off
+   the screen and type or copy, so both select whole on a click. */
+.mfa-key{letter-spacing:.12em;-webkit-user-select:all;user-select:all}
+.mfa-codes{list-style:none;padding:0;margin:8px 0 16px;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.mfa-codes li{background:var(--panel);border:1px solid var(--wire);border-radius:4px;
+  padding:7px 11px;letter-spacing:.08em;-webkit-user-select:all;user-select:all}
 /* The password meter sits FLUSH with the field, not at the foot of the form: it
    comments on that field, and a comment far from what it comments on becomes
    decoration. */
