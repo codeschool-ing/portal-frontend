@@ -67,7 +67,7 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
    rule. */
 .portal nav{
   position:static;height:auto;padding:0;z-index:auto;
-  background:none;backdrop-filter:none;border-bottom:0;align-items:stretch;
+  background:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom:0;align-items:stretch;
 }
 
 /* THE LESSON HAS ONE WIDTH, and that width has two values.
@@ -773,7 +773,7 @@ body.no-rail .rail{display:none}
   transition:border-color .15s,background .15s;
 }
 .choice:hover{border-color:var(--phosphor-dim)}
-.choice input{grid-row:1;appearance:none;width:0;height:0;position:absolute;opacity:0}
+.choice input{grid-row:1;-webkit-appearance:none;appearance:none;width:0;height:0;position:absolute;opacity:0}
 .choice-mark{grid-row:1;width:15px;height:15px;margin-top:3px;border:1px solid var(--wire);border-radius:50%;position:relative}
 .ex-multiple-choice .choice-mark{border-radius:3px}
 .choice input:checked ~ .choice-mark{border-color:var(--phosphor)}
@@ -909,7 +909,7 @@ body.no-rail .rail{display:none}
 /* ---------- the ⌘K panel ---------- */
 .search-veil{
   position:fixed;inset:0;z-index:200;
-  background:rgba(10,14,20,.72);backdrop-filter:blur(3px);
+  background:rgba(10,14,20,.72);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
   display:flex;justify-content:center;align-items:flex-start;
   /* high, but not flush: the box appears where the eye already is after the
      shortcut */
@@ -927,6 +927,8 @@ body.with-search{overflow:hidden}
 .search-field{
   flex:1 1 auto;min-width:0;background:none;border:0;color:var(--paper);
   font:inherit;font-size:1rem;outline:none;
+  /* Safari draws a native rounded box for type=search otherwise */
+  -webkit-appearance:none;appearance:none;
 }
 .search-field::-webkit-search-cancel-button{display:none}
 .search-res{
@@ -1034,10 +1036,26 @@ body.with-search{overflow:hidden}
   border:1px solid var(--wire);border-radius:2px;
   padding:26px 30px 16px;
   display:flex;flex-direction:column;gap:22px;min-height:250px;
-  /* the corner glow: suggests paper under light, without costing an image */
+  --cert-grain:none;
+  /* The paper's own grain, over the corner glow that suggests paper under
+     light. A touch of texture so the document does not read as a flat white
+     sheet, in the light theme only — on the dark one a black band is invisible
+     and the glow already does the work. The PNG export draws the same band, so
+     the file matches the card.
+
+     A RASTER TILE, not a repeating-gradient. As a gradient the grain
+     re-rasterised a frame out of phase on any partial repaint of this sheet —
+     a button clicked, focus moving, the modal's backdrop-filter recompositing —
+     and the phase slip flashed a horizontal line that vanished. A 1×4 tile
+     (three clear rows, one at ~.02 black) re-blits at a fixed origin instead,
+     so a repaint cannot shift it. One knob: --cert-grain. */
   background:
+    var(--cert-grain),
     radial-gradient(120% 90% at 100% 0%, rgba(126,231,135,.05), transparent 55%),
     radial-gradient(90% 80% at 0% 100%, rgba(126,231,135,.035), transparent 60%);
+}
+html[data-theme="light"] .cert-sheet{
+  --cert-grain:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAECAYAAABP2FU6AAAADElEQVR42mNgwACsAAAZAAYNVTSFAAAAAElFTkSuQmCC");
 }
 .cert-top{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .cert-brand{
@@ -1135,6 +1153,13 @@ body.with-search{overflow:hidden}
 /* inside the modal the certificate is the whole content: no zoom cursor, no
    hover, and with a larger body — that is what it was enlarged for */
 .modal-cert .cert{cursor:default;padding:14px}
+/* "no hover" for real, not only in the cursor. The class-level .cert:hover
+   still animated the border here, and on this enlarged sheet that 200ms
+   border-colour transition repainted the paper on every pass of the cursor —
+   during which the grain's repeating-gradient re-rasterised a frame out of
+   phase, the horizontal line that flickered and vanished. The open document is
+   not a target; its border stays put. */
+.modal-cert .cert:hover{border-color:var(--wire)}
 .modal-cert .cert-sheet{min-height:min(62vh,480px);padding:46px 56px 30px;gap:30px}
 .modal-cert .cert-brand{font-size:1rem}
 /* `5vw` on the font + `min-height` in `vh` make the document grow along with
@@ -1158,19 +1183,7 @@ body.with-search{overflow:hidden}
   /* the footer line stacks instead of squeezing date and code onto one line */
   .cert-foot{flex-direction:column;gap:4px}
 }
-.cert-share{gap:8px}
-.cert-share svg{width:15px;height:15px}
-
-/* The LinkedIn CREDENTIAL button, beside "Share" and once mistaken for it when
-   it was a bare icon. Labelled now; the mark keeps LinkedIn's brand blue (the
-   same theme-adjusted value .cert-in explains) so it still reads as LinkedIn,
-   and turns to the hover colour with the rest of the button. */
-.cert-add{--linkedin:#3b8fd9}
-html[data-theme="light"] .cert-add{--linkedin:#0a66c2}
-.cert-add svg{width:16px;height:16px;color:var(--linkedin)}
-.cert-add:hover svg{color:inherit}
-
-/* THE LINKEDIN BUTTON IS ONLY THE ICON, in their brand colour.
+/* THE LINKEDIN BUTTONS ARE ONLY THE ICON, in their brand colour.
 
    The official blue is #0A66C2, and that is what the light theme uses. On dark
    it gives 2.5:1 of contrast against the panel — below the 3:1 an icon needs to
@@ -1181,10 +1194,23 @@ html[data-theme="light"] .cert-add{--linkedin:#0a66c2}
   --linkedin:#3b8fd9;
   display:grid;place-items:center;width:36px;height:36px;border-radius:5px;
   color:var(--linkedin);border:1px solid transparent;
+  /* No native chrome: the download control is a <button> and the two LinkedIn
+     ones are <a>, so without this the button alone wore the browser's grey box
+     while the anchors did not. All three are just an icon now, boxed only on
+     hover. */
+  background:none;padding:0;font:inherit;-webkit-appearance:none;appearance:none;cursor:pointer;
   transition:background .15s,border-color .15s;
 }
 html[data-theme="light"] .cert-in{--linkedin:#0a66c2}
 .cert-in svg{width:21px;height:21px}
+/* The download is not a LinkedIn action, so it keeps a neutral ink rather than
+   the brand blue the class carries for the two beside it. The action bar sits on
+   the modal's dark veil in BOTH themes, though, so the light theme cannot use
+   its own (dark) --paper here — it would vanish against the veil, visible only
+   on hover. Dark theme's --paper is already a light ink, so only light overrides
+   to one that reads on a near-black ground. */
+.cert-png{color:var(--paper)}
+html[data-theme="light"] .cert-png{color:#b3bccb}
 .cert-in:hover{background:var(--panel);border-color:var(--linkedin)}
 /* disabled, and looking it: the button exists to say what will be there */
 .cert-in-off{opacity:.35;cursor:not-allowed}
@@ -1499,7 +1525,12 @@ html[data-theme="light"] .cert-in{--linkedin:#0a66c2}
   .rail{
     position:fixed;top:64px;left:0;bottom:0;width:min(300px,84vw);z-index:110;
     background:var(--ink);transform:translateX(-102%);transition:transform .22s ease;
-    height:auto;
+    /* Full height from the nav to the floor. `height:auto` here collapsed the
+       drawer to its content — a short menu left a gap of bare veil below it —
+       because with `auto` the browser sizes to content and ignores `bottom`. A
+       definite height fills it, and the base rule's `overflow-y:auto` still lets
+       a long menu scroll inside. */
+    height:calc(100vh - 64px);
   }
   body.rail-open .rail{transform:none}
   .rail{width:min(340px,88vw)}

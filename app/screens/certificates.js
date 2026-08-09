@@ -179,16 +179,20 @@ function linkedInButtons({ name, code: certCode, when }) {
   });
   const post = LINKEDIN + '/sharing/share-offsite/?' + q({ url: validationUrl(certCode) });
 
-  /* Both buttons open LinkedIn, and that is exactly why the credential one
-     carries its label. As a bare icon beside "Share" it read as a second way to
-     share — the two were told apart only by a `title` nobody hovers on a phone.
-     They do different things: this one adds the certificate to the profile as a
-     licence, the other posts a link to the feed. The mark keeps the brand blue
-     so it still reads as LinkedIn at a glance; the words carry the difference. */
-  return '<a class="btn btn-ghost cert-add" href="' + esc(profile) + '" target="_blank" rel="noopener" ' +
-      'title="' + txt('Add to LinkedIn profile') + '">' + ICON_LINKEDIN + txt('Add to LinkedIn profile') + '</a>' +
-    '<a class="btn btn-ghost cert-share" href="' + esc(post) + '" target="_blank" rel="noopener">' +
-      txt('Share') + '</a>';
+  /* Both are icons, and both are LinkedIn — told apart by the mark, not a
+     caption. The credential action is the plain "in"; sharing to the feed is the
+     same mark with a small arrow leaving it, so the pair reads as "put this on
+     my profile" and "post this out" without a word on the bar. They do different
+     things: one adds the certificate to the profile as a licence, the other
+     posts its link to the feed. The words did not disappear — they live in the
+     `title` and `aria-label`, which is what the cursor shows and a screen reader
+     announces; an icon button without an accessible name is a mute one. */
+  return '<a class="cert-in" href="' + esc(profile) + '" target="_blank" rel="noopener" ' +
+      'title="' + txt('Add to LinkedIn profile') + '" ' +
+      'aria-label="' + txt('Add to LinkedIn profile') + '">' + ICON_LINKEDIN + '</a>' +
+    '<a class="cert-in cert-share" href="' + esc(post) + '" target="_blank" rel="noopener" ' +
+      'title="' + txt('Share') + '" ' +
+      'aria-label="' + txt('Share') + '">' + ICON_LINKEDIN_SHARE + '</a>';
 }
 
 /* An arrow into a tray: the same drawing the material list uses for a
@@ -199,6 +203,16 @@ const ICON_PNG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 
 const ICON_LINKEDIN = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
   '<path d="M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-.95 1.83-1.95 3.77-1.95 4.03 0 4.78 2.5 4.78 5.76V21h-4v-5.6c0-1.34-.03-3.07-1.9-3.07-1.9 0-2.2 1.46-2.2 2.97V21H9z"/></svg>';
+
+/* The same mark, shrunk to make room for a share arrow leaving it top-right:
+   still LinkedIn at a glance, but "post this out" rather than "this is my
+   profile". The one that carries the feed share, apart from the credential. */
+const ICON_LINKEDIN_SHARE = '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+  '<g fill="currentColor" transform="translate(-1.2 2) scale(.8)">' +
+    '<path d="M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-.95 1.83-1.95 3.77-1.95 4.03 0 4.78 2.5 4.78 5.76V21h-4v-5.6c0-1.34-.03-3.07-1.9-3.07-1.9 0-2.2 1.46-2.2 2.97V21H9z"/>' +
+  '</g>' +
+  '<path d="M16 3.2h4.8V8M20.8 3.2 15 9" fill="none" stroke="currentColor" ' +
+    'stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 /* One issued document, drawn from the SERVER's row.
 
