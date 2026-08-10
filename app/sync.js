@@ -151,6 +151,27 @@ export const register = (name, email, password) =>
 export const signOut = () => request('DELETE', '/api/session');
 export const session = () => request('GET', '/api/session');
 export const account = () => request('GET', '/api/account');
+export const changeName = (name) => request('PATCH', '/api/account/name', { name });
+// Erasing the account. The server re-checks the password and clears the session
+// cookie; the cascade on every table referencing the account does the rest.
+export const deleteAccount = (password) => request('DELETE', '/api/account', { password });
+
+/* The data export is a file to save, not JSON to read, so it does not go through
+   `request`: it wants the raw body as a blob. The session cookie rides along the
+   same way. The server names the file in Content-Disposition; the caller uses a
+   fixed name and does not need to parse the header. */
+export async function exportData() {
+  const res = await fetch(BASE + '/api/account/export', { credentials: 'include' });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    let message = res.statusText;
+    try { message = JSON.parse(text).error.message || message; } catch { /* keep status text */ }
+    const err = new Error(message);
+    err.status = res.status;
+    throw err;
+  }
+  return res.blob();
+}
 // Reissue the confirmation link to the account's own address. No body: the
 // server sends it wherever the signed-in account's e-mail already is.
 export const resendVerification = () => request('POST', '/api/account/verify/resend');
