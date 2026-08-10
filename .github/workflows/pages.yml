@@ -1,0 +1,67 @@
+# Publishes the portal to GitHub Pages, and fills in the backend on the way out.
+#
+# WHY A PUBLISH STEP AT ALL, in a repository that serves from source with no
+# build: the one value that differs between "what the tests drive" and "what a
+# student loads" is the backend. index.html ships EMPTY — the shape the bundle,
+# file:// and the browser suites all need, and empty means "no server, work
+# locally". The served site needs the opposite: the real API.
+#
+# So this is the only place the two diverge, and it is a DEPLOY step, not a
+# serving-from-source one. The checkout is rewritten in the runner and never
+# committed: <meta name="backend"> is filled with the API's origin and that is
+# what Pages serves. The source stays empty, the tests stay green, production
+# talks to the API.
+#
+# The origin is a repository variable (PORTAL_BACKEND) so moving the API needs no
+# code change; it falls back to the deployed api.codeschool.ing.
+#
+# ACTIONS ARE ON VERSION TAGS. ci.yml pins to commit SHAs; pin these the same way
+# before relying on it.
+
+name: Deploy to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One publish at a time; a newer push supersedes an older queued run.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Fill in the backend the served site talks to. Only this checkout is
+      # rewritten, only for the artefact — the committed file keeps its empty
+      # value. The grep fails the publish loudly if the tag ever moves or arrives
+      # already filled, rather than shipping a portal pointed nowhere.
+      - name: Point the served portal at the API
+        env:
+          BACKEND: ${{ vars.PORTAL_BACKEND || 'https://api.codeschool.ing' }}
+        run: |
+          set -euo pipefail
+          before='<meta name="backend" content="" />'
+          after='<meta name="backend" content="'"$BACKEND"'" />'
+          grep -qF "$before" index.html
+          sed -i "s#$before#$after#" index.html
+          echo "backend -> $BACKEND"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deploy
+        uses: actions/deploy-pages@v4
