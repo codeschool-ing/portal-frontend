@@ -174,15 +174,21 @@ function paintAccount() {
     ? '<a class="account-op" href="#/account">' + txt('My account') + '</a>' +
       '<a class="account-op" href="#/plan">' + txt('My plan') + '</a>' +
       '<a class="account-op" href="#/certificates">' + txt('Certificates') + '</a>' +
-      '<a class="account-op" href="https://codeschool.ing">' + txt('Go to the site') + ' ↗</a>'
+      '<a class="account-op" href="https://codeschool.ing">' + txt('Go to the site') + ' ↗</a>' +
+      '<button type="button" class="account-op account-op-btn" id="account-signout">' + txt('Sign out') + '</button>'
     : '<a class="account-op" href="#/sign-in">' + txt('Sign in') + '</a>';
 }
 
-$('#account').addEventListener('click', (e) => {
+$('#account').addEventListener('click', async (e) => {
   if (e.target.closest('.account-btn')) {
     const c = $('#account');
     const opened = c.classList.toggle('is-open');
     c.querySelector('.account-btn').setAttribute('aria-expanded', String(opened));
+  } else if (e.target.closest('#account-signout')) {
+    // Same as the account screen's button: end the session, land on sign-in.
+    $('#account').classList.remove('is-open');
+    await api.signOut();
+    goTo('/sign-in');
   } else if (e.target.closest('.account-op')) {
     $('#account').classList.remove('is-open');
   }
