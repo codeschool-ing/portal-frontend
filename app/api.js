@@ -36,7 +36,9 @@ export const session = () => echo(state.now().session);
    wait around to find out it was a race. */
 export async function signIn({ name, email, password }) {
   if (!sync.configured()) {
-    state.change((e) => { e.session = { name: name || 'Student', email: email || '' }; });
+    // No backend, no address to confirm: mark it verified so the nudge never
+    // shows on the offline bundle or a local run.
+    state.change((e) => { e.session = { name: name || 'Student', email: email || '', emailVerified: true }; });
     return state.now().session;
   }
 
@@ -69,7 +71,21 @@ async function afterSignIn(account) {
      student signing in on a second device would otherwise see a course they
      passed offering to be taken for the first time. */
   await refreshExams();
+  await refreshVerified();
   return state.now().session;
+}
+
+/* The verified-address flag, for the "confirm your e-mail" nudge. It is not in
+   the sign-in or register reply — those carry name and e-mail only — so it comes
+   from /api/account, the one place identity exposes emailVerified. Error-swallowing
+   on purpose: a missing answer must never block sign-in or sign anyone out, it
+   just leaves the banner reading whatever it last knew. */
+export async function refreshVerified() {
+  if (!sync.configured() || !state.now().session) return;
+  try {
+    const acc = await sync.account();
+    state.change((e) => { if (e.session) e.session.emailVerified = !!acc.emailVerified; });
+  } catch { /* keep the last known value */ }
 }
 
 /* Registration only exists with a backend: there is nothing to register with
@@ -78,6 +94,8 @@ export async function register({ name, email, password }) {
   const account = await sync.register(name, email, password);
   state.change((e) => { e.session = { name: account.name, email: account.email }; });
   await sync.adopt();
+  // Fresh accounts are unverified, so this is the first place the nudge appears.
+  await refreshVerified();
   return state.now().session;
 }
 

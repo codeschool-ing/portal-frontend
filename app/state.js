@@ -27,7 +27,7 @@ import { lessonSections, countableSections, sectionCount } from './lessons.js';
 const KEY = 'codeschool-portal';
 
 const EMPTY = {
-  session: null,      // { name, email }
+  session: null,      // { name, email, emailVerified }
   enrollment: null,   // { trackId, choices: { 'backend:3': 1 } }
   progress: {},       // { courseId: { lessons: { ix: { sections, exercises } } } }
   notes: {},          // { courseId: { lessonIx: { sectionId: text } } }

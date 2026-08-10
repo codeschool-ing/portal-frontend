@@ -44,7 +44,7 @@ try{if(localStorage.getItem('codeschool-theme')==='light')document.documentEleme
      exception; here it is nearly the whole page, and that is why it moved out
      of i18n-runtime.js and became configuration — the file stays identical to
      the one over there. -->
-<script>window.I18N_DYNAMIC = ['#content', '#rail', '#nav-context', '#account-menu', '.drop-current'];</script>
+<script>window.I18N_DYNAMIC = ['#content', '#rail', '#nav-context', '#account-menu', '#verify-banner', '.drop-current'];</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -93,6 +93,13 @@ try{if(localStorage.getItem('codeschool-theme')==='light')document.documentEleme
     </div>
   </div>
 </nav>
+
+<!-- Soft nudge, not a gate: registering signs you in immediately (identity's
+     Register), and the confirmation link only sets email_verified_at — it blocks
+     nothing. This bar surfaces that unverified state and dismisses; it is painted
+     from JS (in window.I18N_DYNAMIC) and hidden whenever the address is verified
+     or there is no session. -->
+<div class="verify-banner" id="verify-banner" role="status" hidden></div>
 
 <div class="portal">
   <!-- Rail: answers "where am I" and "how much is left" without a click. It
