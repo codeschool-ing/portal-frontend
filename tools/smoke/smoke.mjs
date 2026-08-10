@@ -49,6 +49,19 @@ const b = await chromium.launch(CHROME ? { executablePath: CHROME } : {});
 // never produced a file.
 const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true });
 const p = await ctx.newPage();
+
+/* The web fonts are the one thing the portal loads from off-site, and whether
+   Google's CDN answers — and with what — is not what this suite tests. A run
+   that counted a font which 404'd as a portal error was really testing the
+   network: it passed or failed by luck, and a merge landed on the unlucky side.
+   Answer the font hosts with an empty stylesheet instead: the request succeeds
+   (so it logs no error, the way aborting it would), the empty sheet pulls no
+   font files, and the page falls back to the system face — which is what a real
+   visitor sees for the first paint anyway (see index.html's async font load).
+   The suite's layout assertions already tolerate that face. */
+await p.route(/fonts\.(googleapis|gstatic)\.com/, (route) =>
+  route.fulfill({ status: 200, contentType: 'text/css', body: '' }).catch(() => {}));
+
 p.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
 p.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
 
