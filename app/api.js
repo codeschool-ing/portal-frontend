@@ -144,7 +144,7 @@ export async function mfaState() {
   return { available: !!acc.mfaAvailable, enabled: !!acc.mfaEnabled };
 }
 
-// Begin enrolment: { secret, otpauthUrl } for the app. Nothing is on yet.
+// Begin enrolment: { secret, otpauthUrl, qrSvg } for the app. Nothing is on yet.
 export const mfaSetup = () => sync.mfaSetup();
 // Confirm with a code, turning it on and returning the one-time recovery codes.
 export const mfaConfirm = (code) => sync.mfaConfirm(code);

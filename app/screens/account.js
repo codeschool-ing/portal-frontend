@@ -299,6 +299,11 @@ export default async function account() {
       block.innerHTML = head +
         '<p class="account-note">' +
           txt('Add this account to your authenticator app, then enter the code it shows.') + '</p>' +
+        // The QR the server rendered from the same otpauth URI: scan it to add
+        // the account. It is our own trusted markup (rectangles, no text or
+        // script), so it goes in as-is; if the server omitted it, the key below
+        // still enrols by hand.
+        (data.qrSvg ? '<div class="mfa-qr">' + data.qrSvg + '</div>' : '') +
         '<p class="account-note mono">' + txt('setup key') + ': <span class="mfa-key">' +
           esc(groupKey(data.secret)) + '</span></p>' +
         '<p class="account-note"><a href="' + esc(data.otpauthUrl) + '">' +
