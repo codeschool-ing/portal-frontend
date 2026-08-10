@@ -70,6 +70,10 @@ export default async function account() {
   const p = t ? trackProgress(t) : null;
   const plan = currentPlan();
   const acc = studentAccount();
+  // The data-export and delete-account controls are the server's to carry out,
+  // so they appear only with a backend wired; without one there is no server
+  // account, only the local copy the "erase my progress" block already clears.
+  const backend = api.configured();
   void now;
 
   const options = TRACKS_BY_FAMILY().map(([family, list]) =>
@@ -102,6 +106,21 @@ export default async function account() {
         '<strong>' + esc(plan ? plan.name : '—') + '</strong> · ' +
         (plan && plan.price === 0 ? txt('free') : 'R$ ' + (plan?.price ?? 0) + ' ' + txt(plan?.cycle || '')) +
       '</p>' +
+    '</section>' +
+
+    '<section class="block">' +
+      '<div class="block-top"><h2>' + txt('Name') + '</h2></div>' +
+      '<form id="f-name" novalidate>' +
+        '<div class="field">' +
+          '<label for="c-name">' + txt('your name') + '</label>' +
+          '<input type="text" id="c-name" autocomplete="name" value="' + esc(session?.name || '') + '" ' +
+            'placeholder="' + txt('your name') + '">' +
+        '</div>' +
+        '<div class="account-action">' +
+          '<button type="submit" class="btn btn-primary">' + txt('Change name') + '</button>' +
+          '<span class="account-notice mono" id="a-name" aria-live="polite"></span>' +
+        '</div>' +
+      '</form>' +
     '</section>' +
 
     /* E-MAIL AND PASSWORD ARE TWO FORMS, and not fields of one profile form.
@@ -170,6 +189,34 @@ export default async function account() {
       '</p>' +
     '</section>' +
 
+    (backend ?
+      '<section class="block">' +
+        '<div class="block-top"><h2>' + txt('Your data') + '</h2></div>' +
+        '<p class="account-note">' +
+          txt('Download a copy of everything the portal holds about you — profile, progress, exam results and certificates — as a file.') + '</p>' +
+        '<div class="account-action">' +
+          '<button type="button" class="btn btn-ghost" id="c-export">' + txt('Download my data') + '</button>' +
+          '<span class="account-notice mono" id="a-export" aria-live="polite"></span>' +
+        '</div>' +
+      '</section>'
+    : '') +
+
+    (backend ?
+      '<section class="block block-risk">' +
+        '<div class="block-top"><h2>' + txt('Delete my account') + '</h2></div>' +
+        '<p class="account-note">' +
+          txt('This erases your account and everything in it — progress, notes, exam results and certificates. It cannot be undone.') + '</p>' +
+        '<form id="f-delete" novalidate>' +
+          '<div class="field"><label for="c-del-pass">' + txt('confirm your password to delete') + '</label>' +
+            '<input type="password" id="c-del-pass" autocomplete="current-password"></div>' +
+          '<div class="account-action">' +
+            '<button type="submit" class="btn btn-risk">' + txt('Delete my account') + '</button>' +
+            '<span class="account-notice mono" id="a-delete" aria-live="polite"></span>' +
+          '</div>' +
+        '</form>' +
+      '</section>'
+    : '') +
+
     '<section class="block">' +
       '<button type="button" class="btn btn-ghost" id="c-signout">' + txt('Sign out') + '</button>' +
     '</section>' +
@@ -194,6 +241,27 @@ export default async function account() {
     await api.changeEmail(value);
     emailNotice.className = 'account-notice mono good';
     emailNotice.textContent = txt('e-mail updated');
+  });
+
+  /* ---------- name ---------- */
+  const nameNotice = el.querySelector('#a-name');
+  el.querySelector('#f-name').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const value = el.querySelector('#c-name').value.trim();
+    if (!value) {
+      nameNotice.className = 'account-notice mono bad';
+      nameNotice.textContent = txt('type your name');
+      return;
+    }
+    try {
+      await api.changeName(value);
+      el.querySelector('.view-head h1').textContent = value;
+      nameNotice.className = 'account-notice mono good';
+      nameNotice.textContent = txt('name updated');
+    } catch (err) {
+      nameNotice.className = 'account-notice mono bad';
+      nameNotice.textContent = err.message || txt('that did not work — try again');
+    }
   });
 
   /* ---------- password ---------- */
@@ -342,6 +410,57 @@ export default async function account() {
   el.querySelector('#c-no').addEventListener('click', () => { confirm.hidden = true; });
   el.querySelector('#c-yes').addEventListener('click', () => { reset(); goTo('/sign-in'); });
   el.querySelector('#c-signout').addEventListener('click', async () => { await api.signOut(); goTo('/sign-in'); });
+
+  /* ---------- data export ---------- (only rendered with a backend) */
+  const exportBtn = el.querySelector('#c-export');
+  if (exportBtn) {
+    const exportNotice = el.querySelector('#a-export');
+    exportBtn.addEventListener('click', async () => {
+      exportBtn.disabled = true;
+      exportNotice.className = 'account-notice mono';
+      exportNotice.textContent = txt('Preparing…');
+      try {
+        const blob = await api.exportData();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'codeschool-data.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        exportNotice.className = 'account-notice mono good';
+        exportNotice.textContent = txt('downloaded');
+      } catch (err) {
+        exportNotice.className = 'account-notice mono bad';
+        exportNotice.textContent = err.message || txt('that did not work — try again');
+      } finally {
+        exportBtn.disabled = false;
+      }
+    });
+  }
+
+  /* ---------- delete account ---------- (only rendered with a backend) */
+  const deleteForm = el.querySelector('#f-delete');
+  if (deleteForm) {
+    const deleteNotice = el.querySelector('#a-delete');
+    deleteForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pass = el.querySelector('#c-del-pass').value;
+      if (!pass) {
+        deleteNotice.className = 'account-notice mono bad';
+        deleteNotice.textContent = txt('type your password');
+        return;
+      }
+      try {
+        await api.deleteAccount(pass);
+        goTo('/sign-in');
+      } catch (err) {
+        deleteNotice.className = 'account-notice mono bad';
+        deleteNotice.textContent = err.message || txt('that did not work — try again');
+      }
+    });
+  }
 
   return { title: txt('Account'), el };
 }

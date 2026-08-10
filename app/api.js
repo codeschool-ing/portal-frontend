@@ -138,6 +138,36 @@ export function changePlan(planId) {
   return echo(state.currentPlan());
 }
 
+/* Whether a backend is wired at all — the account screen shows the data-export
+   and delete-account controls only then, since both are the server's to do. */
+export const configured = () => sync.configured();
+
+/* The display name IS wired to the server when there is one (unlike e-mail and
+   password above, still local echoes): it is the one identity field the LGPD
+   export and the account screen let a student correct, and the name a
+   certificate prints. Local-only without a backend, like everything else. */
+export async function changeName(name) {
+  if (sync.configured()) {
+    const acc = await sync.changeName(name);
+    state.change((e) => { if (e.session) e.session.name = acc.name; });
+  } else {
+    state.change((e) => { if (e.session) e.session.name = String(name || '').trim(); });
+  }
+  return state.now().session;
+}
+
+/* Erase the account on the server, then the browser, then sign out. Only ever
+   called with a backend — there is no server account to delete otherwise. */
+export async function deleteAccount(password) {
+  await sync.deleteAccount(password);
+  state.reset();
+  state.change((e) => { e.session = null; });
+}
+
+/* Download everything the server holds for the account, as a file. The blob and
+   the save belong to the caller, which has the DOM to trigger it. */
+export const exportData = () => sync.exportData();
+
 /* ---------- two-factor ----------
 
    Real only with a backend, and only when that backend offers it (a key is
