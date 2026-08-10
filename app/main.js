@@ -188,6 +188,30 @@ $('#account').addEventListener('click', (e) => {
   }
 });
 
+/* ---------- "confirm your e-mail" nudge ----------
+   Shown while a signed-in account's address is unverified. It gates nothing —
+   registering already signed the student in; this only surfaces that the link in
+   their inbox is still unclicked. Dismiss hides it for this page load only, so it
+   returns on the next visit until the address is confirmed. Painted here (the
+   container is in window.I18N_DYNAMIC) so it survives a screen re-render and picks
+   up the language on the next state change, exactly like the account menu. */
+let bannerDismissed = false;
+function paintVerifyBanner() {
+  const el = $('#verify-banner');
+  const s = now().session;
+  const show = !!(s && s.emailVerified === false) && !bannerDismissed;
+  el.hidden = !show;
+  document.body.classList.toggle('banner-on', show);
+  if (!show) { el.innerHTML = ''; return; }
+  el.innerHTML =
+    '<span class="vb-text"><strong>' + txt('Confirm your e-mail.') + '</strong> ' +
+    txt('We sent a link to') + ' <span class="vb-addr">' + esc(s.email || '') + '</span></span>' +
+    '<button type="button" class="vb-close" aria-label="' + txt('Dismiss') + '">×</button>';
+}
+$('#verify-banner').addEventListener('click', (e) => {
+  if (e.target.closest('.vb-close')) { bannerDismissed = true; paintVerifyBanner(); }
+});
+
 /* ---------- language: the vitrine's selector, unchanged ---------- */
 $('#lang').addEventListener('click', (e) => {
   if (!e.target.closest('.lang-btn')) return;
@@ -267,6 +291,7 @@ subscribe(() => {
   if (now().session) buildRail(rail, currentPath(), routeParams());
   paintContext();
   paintAccount();
+  paintVerifyBanner();
 });
 
 function routeParams() {
@@ -283,5 +308,12 @@ mapTexts();       // walks the text nodes of the static skeleton
 applyLanguage();  // applies content + texts + selector, and rebuilds the screen
 
 paintAccount();
+paintVerifyBanner();
 booted = true;
 start();
+
+/* Reconcile the verified flag with the server for a returning session, so a
+   student who confirmed in another tab does not keep seeing the nudge. Fire and
+   forget: it repaints through the state subscription when it lands, and does
+   nothing when there is no backend or no session. */
+api.refreshVerified();
