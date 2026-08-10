@@ -177,6 +177,17 @@ export async function deleteAccount(password) {
    the save belong to the caller, which has the DOM to trigger it. */
 export const exportData = () => sync.exportData();
 
+/* ---------- sessions ----------
+
+   The account's own live sign-ins, and the two ways to end them. Real only with
+   a backend: without one there is a single browser and nothing to list, so the
+   account screen shows the block only when configured() and these are never
+   reached otherwise. Ending a session takes its public id — never a token; the
+   server decides which row `current` is and refuses to hand back the secret. */
+export const sessions = () => sync.sessions();
+export const revokeSession = (id) => sync.revokeSession(id);
+export const revokeOtherSessions = () => sync.revokeOtherSessions();
+
 /* ---------- two-factor ----------
 
    Real only with a backend, and only when that backend offers it (a key is

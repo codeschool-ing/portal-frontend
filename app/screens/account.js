@@ -49,6 +49,42 @@ function groupKey(secret) {
   return String(secret || '').replace(/(.{4})/g, '$1 ').trim();
 }
 
+/* A device a student can recognise, out of the user-agent the browser sent when
+   the session opened. Not a parser — a handful of substrings, most specific
+   first (Edge and Opera before Chrome, Chrome before Safari, because each of
+   theirs contains the next), falling back to the raw string trimmed so an
+   unknown agent still shows something. */
+function deviceName(ua) {
+  const s = String(ua || '');
+  if (!s) return txt('an unknown device');
+  const os =
+    /Windows/.test(s) ? 'Windows' :
+    /iPhone|iPad|iPod|iOS/.test(s) ? 'iOS' :
+    /Mac OS X|Macintosh/.test(s) ? 'macOS' :
+    /Android/.test(s) ? 'Android' :
+    /Linux/.test(s) ? 'Linux' : '';
+  const browser =
+    /Edg\//.test(s) ? 'Edge' :
+    /OPR\/|Opera/.test(s) ? 'Opera' :
+    /Chrome\//.test(s) ? 'Chrome' :
+    /Firefox\//.test(s) ? 'Firefox' :
+    /Safari\//.test(s) ? 'Safari' : '';
+  if (browser && os) return browser + ' · ' + os;
+  if (browser || os) return browser || os;
+  return s.length > 40 ? s.slice(0, 40) + '…' : s;
+}
+
+// When a session was last used, in the reader's own language. Same shape the
+// certificate and plan screens format dates with, plus the time, since two
+// sessions on one day are what a student is trying to tell apart.
+function sessionWhen(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return new Intl.DateTimeFormat(document.documentElement.lang || 'en', {
+    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  }).format(d);
+}
+
 function passwordStrength(s) {
   const v = String(s || '');
   if (v.length < 8) return { pct: Math.min(30, v.length * 4), label: 'too short', ok: false };
@@ -179,6 +215,10 @@ export default async function account() {
        state machine — off / setting up / recovery codes / on — lives below, in
        #mfa-block, because the steps replace one another in place. */
     (mfa.available ? '<section class="block" id="mfa-block"></section>' : '') +
+
+    /* Devices: the account's live sessions. Server's to know, so backend-only,
+       and filled in below (it fetches, so the screen does not wait on it). */
+    (backend ? '<section class="block" id="sessions-block"></section>' : '') +
 
     '<section class="block block-risk">' +
       '<div class="block-top"><h2>' + txt('Erase my progress') + '</h2></div>' +
@@ -419,6 +459,98 @@ export default async function account() {
 
     if (mfa.enabled) renderOn();
     else renderOff();
+  }
+
+  /* ---------- devices ---------- (only rendered with a backend)
+     Fetch, list, and offer to end. Ending one — by its public id, never a token
+     — or "sign out other devices" both re-fetch, so the list is always what the
+     server holds and never a guess about what a delete did. The current session
+     has no "end" button: ending it is just signing out, which lives in its own
+     block below. */
+  const sessionsBlock = el.querySelector('#sessions-block');
+  if (sessionsBlock) {
+    const head = '<div class="block-top"><h2>' + txt('Devices') + '</h2></div>';
+    const notice = (cls, text) => {
+      const n = sessionsBlock.querySelector('#a-sessions');
+      if (!n) return;
+      n.className = 'account-notice mono ' + cls;
+      n.textContent = text;
+    };
+
+    const render = (rows) => {
+      const others = rows.filter((r) => !r.current);
+      sessionsBlock.innerHTML = head +
+        '<p class="account-note">' +
+          txt('Where your account is signed in. End any session you do not recognise.') + '</p>' +
+        '<ul class="session-list">' +
+          rows.map((r) =>
+            '<li class="session-row' + (r.current ? ' session-current' : '') + '">' +
+              '<div class="session-what">' +
+                '<span class="session-device">' + esc(deviceName(r.userAgent)) + '</span>' +
+                (r.current ? '<span class="session-badge mono">' + txt('this device') + '</span>' : '') +
+              '</div>' +
+              '<div class="session-meta mono dim">' +
+                esc(r.ip || txt('unknown location')) + ' · ' +
+                txt('last active') + ' ' + esc(sessionWhen(r.lastSeenAt)) +
+              '</div>' +
+              (r.current ? '' :
+                '<button type="button" class="btn btn-ghost btn-risk session-end" data-id="' +
+                  esc(r.id) + '">' + txt('End session') + '</button>') +
+            '</li>').join('') +
+        '</ul>' +
+        '<div class="account-action">' +
+          (others.length
+            ? '<button type="button" class="btn btn-ghost btn-risk" id="sessions-others">' +
+                txt('Sign out other devices') + '</button>'
+            : '') +
+          '<span class="account-notice mono" id="a-sessions" aria-live="polite"></span>' +
+        '</div>';
+
+      sessionsBlock.querySelectorAll('.session-end').forEach((b) => {
+        b.addEventListener('click', async () => {
+          b.disabled = true;
+          try {
+            await api.revokeSession(b.dataset.id);
+          } catch (err) {
+            notice('bad', err.message || txt('that did not work — try again'));
+            b.disabled = false;
+            return;
+          }
+          load();
+        });
+      });
+      const othersBtn = sessionsBlock.querySelector('#sessions-others');
+      if (othersBtn) {
+        othersBtn.addEventListener('click', async () => {
+          othersBtn.disabled = true;
+          try {
+            await api.revokeOtherSessions();
+          } catch (err) {
+            notice('bad', err.message || txt('that did not work — try again'));
+            othersBtn.disabled = false;
+            return;
+          }
+          load();
+        });
+      }
+    };
+
+    async function load() {
+      sessionsBlock.innerHTML = head +
+        '<p class="account-note mono dim">' + txt('Loading…') + '</p>';
+      let rows;
+      try {
+        rows = await api.sessions();
+      } catch (err) {
+        sessionsBlock.innerHTML = head +
+          '<p class="account-note mono bad">' +
+            esc(err.message || txt('that did not work — try again')) + '</p>';
+        return;
+      }
+      render(Array.isArray(rows) ? rows : []);
+    }
+
+    load();
   }
 
   const confirm = el.querySelector('#c-confirm');
