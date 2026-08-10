@@ -152,6 +152,13 @@ export const signOut = () => request('DELETE', '/api/session');
 export const session = () => request('GET', '/api/session');
 export const account = () => request('GET', '/api/account');
 export const changeName = (name) => request('PATCH', '/api/account/name', { name });
+// The e-mail change is a request, not an edit: the server mails a link to the
+// NEW address and the change only lands once it is clicked (202, not the account).
+export const changeEmail = (email) => request('POST', '/api/account/email', { email });
+// The server re-checks the current password and, on success, revokes the other
+// sessions but keeps this one (it reads this session's cookie for that).
+export const changePassword = (current, next) =>
+  request('PATCH', '/api/account/password', { current, next });
 // Erasing the account. The server re-checks the password and clears the session
 // cookie; the cascade on every table referencing the account does the rest.
 export const deleteAccount = (password) => request('DELETE', '/api/account', { password });

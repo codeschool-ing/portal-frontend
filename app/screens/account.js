@@ -169,7 +169,9 @@ export default async function account() {
         '</div>' +
       '</form>' +
       '<p class="account-note mono dim">' +
-        txt('No password is stored here: there is no authentication in the portal yet, and writing one to the browser would give the opposite impression.') +
+        (backend
+          ? txt('Your password goes to the server, which keeps only a hash of it — it never stays in the browser. Changing it signs out your other devices.')
+          : txt('No password is stored here: there is no authentication in the portal yet, and writing one to the browser would give the opposite impression.')) +
       '</p>' +
     '</section>' +
 
@@ -238,9 +240,18 @@ export default async function account() {
       emailNotice.textContent = txt('that address does not look like an e-mail');
       return;
     }
-    await api.changeEmail(value);
-    emailNotice.className = 'account-notice mono good';
-    emailNotice.textContent = txt('e-mail updated');
+    try {
+      const res = await api.changeEmail(value);
+      emailNotice.className = 'account-notice mono good';
+      // With a backend the change waits on a link at the new address; the
+      // skeleton has already moved it.
+      emailNotice.textContent = res && res.pending
+        ? txt('Check the new address for a link to confirm the change.')
+        : txt('e-mail updated');
+    } catch (err) {
+      emailNotice.className = 'account-notice mono bad';
+      emailNotice.textContent = err.message || txt('that did not work — try again');
+    }
   });
 
   /* ---------- name ---------- */
@@ -290,7 +301,12 @@ export default async function account() {
     if (!passwordStrength(fresh.value).ok) return say(txt('the new password needs at least 8 characters'), false);
     if (fresh.value !== repeat) return say(txt('the two new passwords do not match'), false);
     if (fresh.value === currentPassword) return say(txt('the new password is the same as the current'), false);
-    await api.changePassword(fresh.value);
+    try {
+      await api.changePassword(currentPassword, fresh.value);
+    } catch (err) {
+      // The server's answer to a wrong current password lands here.
+      return say(err.message || txt('that did not work — try again'), false);
+    }
     el.querySelectorAll('#f-password input').forEach((i) => { i.value = ''; });
     meter.style.width = '0';
     label.textContent = '';

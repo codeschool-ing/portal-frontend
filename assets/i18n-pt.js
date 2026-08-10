@@ -419,6 +419,8 @@ window.I18N.pt.ui = {
   "passed with": "aprovado com",
   "password": "senha",
   "password changed": "senha alterada",
+  "Check the new address for a link to confirm the change.": "Confira o novo endereço — enviamos um link para confirmar a troca.",
+  "Your password goes to the server, which keeps only a hash of it — it never stays in the browser. Changing it signs out your other devices.": "Sua senha vai para o servidor, que guarda apenas um hash dela — nunca fica no navegador. Alterá-la desconecta seus outros dispositivos.",
   "Name": "Nome",
   "Change name": "Alterar nome",
   "type your name": "digite seu nome",
