@@ -152,7 +152,7 @@ body.no-rail .portal{grid-template-columns:minmax(0,1fr)}
    is a tint and a single bold word, nothing louder. */
 .verify-banner{
   margin-top:64px;
-  align-items:center;gap:12px;
+  align-items:center;gap:12px;flex-wrap:wrap;
   padding:10px clamp(16px,4vw,28px);
   background:rgba(255,77,94,.1);
   border-bottom:1px solid var(--wire);
@@ -168,6 +168,16 @@ body.banner-on .portal{padding-top:0}
   color:var(--paper-dim);font-size:1.25rem;line-height:1;padding:2px 8px;border-radius:4px;
 }
 .vb-close:hover{color:var(--paper);background:var(--panel)}
+/* Resend sits between the nudge and the dismiss: an outlined button, quieter
+   than a primary, with a small status line beside it for what came back. */
+.vb-resend{
+  flex:0 0 auto;border:1px solid var(--wire);background:none;cursor:pointer;
+  color:var(--paper);font:inherit;font-size:.82rem;padding:4px 11px;border-radius:6px;
+}
+.vb-resend:hover:not(:disabled){border-color:var(--amber)}
+.vb-resend:disabled{opacity:.5;cursor:default}
+.vb-status{flex:0 0 auto;font-size:.8rem;color:var(--paper-dim)}
+.vb-status.bad{color:var(--amber)}
 body.no-rail .rail{display:none}
 
 /* The padding becomes a VARIABLE because it is not only padding: the edge-to-

@@ -88,6 +88,11 @@ export async function refreshVerified() {
   } catch { /* keep the last known value */ }
 }
 
+/* Ask the server to send the confirmation link again, for the account whose
+   address is still unverified. Nothing here touches state — the banner clears
+   only once the address is actually confirmed, which the link does. */
+export const resendVerification = () => sync.resendVerification();
+
 /* Registration only exists with a backend: there is nothing to register with
    otherwise, and offering it would be a form that pretends. */
 export async function register({ name, email, password }) {

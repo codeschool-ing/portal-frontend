@@ -212,10 +212,27 @@ function paintVerifyBanner() {
   el.innerHTML =
     '<span class="vb-text"><strong>' + txt('Confirm your e-mail.') + '</strong> ' +
     txt('We sent a link to') + ' <span class="vb-addr">' + esc(s.email || '') + '</span></span>' +
+    '<button type="button" class="vb-resend">' + txt('Resend') + '</button>' +
+    '<span class="vb-status" id="vb-status" aria-live="polite"></span>' +
     '<button type="button" class="vb-close" aria-label="' + txt('Dismiss') + '">×</button>';
 }
-$('#verify-banner').addEventListener('click', (e) => {
-  if (e.target.closest('.vb-close')) { bannerDismissed = true; paintVerifyBanner(); }
+$('#verify-banner').addEventListener('click', async (e) => {
+  if (e.target.closest('.vb-close')) { bannerDismissed = true; paintVerifyBanner(); return; }
+  const resend = e.target.closest('.vb-resend');
+  if (!resend) return;
+  // No state changes here, so the banner does not repaint and this feedback
+  // survives until the next visit — by which point the link has been clicked or
+  // the nudge is back. Disable on success so one click is one mail.
+  const status = $('#vb-status');
+  resend.disabled = true;
+  if (status) { status.textContent = ''; status.classList.remove('bad'); }
+  try {
+    await api.resendVerification();
+    if (status) status.textContent = txt('Sent — check your inbox.');
+  } catch {
+    resend.disabled = false;
+    if (status) { status.textContent = txt('that did not work — try again'); status.classList.add('bad'); }
+  }
 });
 
 /* ---------- language: the vitrine's selector, unchanged ---------- */
