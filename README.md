@@ -8,10 +8,22 @@ whoever enrolled actually studies.
 No build and no dependencies, like the vitrine: plain HTML, CSS and ES modules.
 It opens from any static server.
 
-> **Status: skeleton.** The structure stands up and is navigable end to end, but
-> there is no authentication, no server and the content is make-believe. What is
-> already settled is the **shape** — the exercise format, the API signatures and
-> the type contract. See "What is skeleton and what is settled".
+> **Status: live, on a real backend.** The portal publishes to GitHub Pages on
+> every merge to `main` and talks to `api.codeschool.ing`
+> (`codeschool-ing/portal-backend`, on Cloud Run): real accounts, password
+> sign-in, e-mail confirmation, optional two-factor, session management, progress
+> and exam attempts kept server-side, and certificates issued against a public
+> validation page.
+>
+> **It still runs with no server at all**, and that is a property to keep rather
+> than a leftover: `<meta name="backend">` is empty in the repository, which means
+> local-only, and that is the mode the single-file bundle, the `file://` path and
+> the browser suites all use. The served site is the one exception, filled in at
+> publish time — see "The server, when there is one".
+>
+> **What is still make-believe is the content**, not the machinery: 3 of 86
+> courses have written lessons, and the exam pool is placeholder and unreviewed.
+> See "What is skeleton and what is settled".
 
 ## Running it
 
@@ -62,12 +74,23 @@ nothing on either side saying why.
 the single-file bundle needs, since it is opened off a disk with no server
 anywhere near it, and what every screen did before a backend existed.
 
-`same-origin` is the deployed shape and the one portal-backend's config assumes:
-one origin in front of both, which makes the session cookie first-party. It has
-to be spelled out, because the base URL it means is the empty string and empty
-is already taken. An absolute origin also works and is for development, where
-the API runs on another port — it needs CORS with credentials, which the server
-deliberately does not have.
+**The committed value is empty and the served one is not.** `.github/workflows/pages.yml`
+rewrites the tag in the runner on every push to `main` and publishes that, so the
+repository keeps the local-only default that the bundle and the test suites
+depend on while production talks to the API. The value comes from the repository
+variable `PORTAL_BACKEND`, falling back to `https://api.codeschool.ing` — moving
+the API is a variable, not a commit.
+
+Do not commit a filled-in tag. The workflow asserts the empty form is there
+(`grep -qF`, under `set -euo pipefail`) before substituting, so a filled one
+fails the publish rather than shipping twice-substituted markup.
+
+`same-origin` is the other deployed shape and the one portal-backend's config
+assumes: one origin in front of both, which makes the session cookie
+first-party. It has to be spelled out, because the base URL it means is the empty
+string and empty is already taken. An absolute origin — what production uses,
+since the API is on `api.codeschool.ing` — needs CORS with credentials, which the
+server is configured for through `PORTAL_ALLOWED_ORIGINS`.
 
 With a backend configured the sign-in screen asks for credentials, and the first
 login runs `POST /api/progress/import` **before** the first read: read first and
@@ -540,8 +563,13 @@ before closing an exercise.
 
 ## What is skeleton and what is settled
 
-**Disposable:** the content of `assets/exercises-sample.js`, the sign-in screen
-(any name gets in), the lessons' text.
+**Disposable:** the content of `assets/exercises-sample.js`, the lessons' text,
+and the exam pool, which has had no pedagogical review.
+
+The sign-in screen used to be on that list. It is not any more: with a backend
+configured it asks for real credentials and the server answers them. It keeps the
+name-only skeleton for the no-backend mode, which is what the bundle and the
+suites drive — one screen, two modes, and the mode is `<meta name="backend">`.
 
 **Settled:** the exercise format — the fields are exactly the ones the pipeline
 emits (`prompt`, `socraticHint`, `options[].{text,correct,why}`, `items`,
@@ -563,14 +591,14 @@ for it to exist empty than to be retrofitted.
 index.html                     the shell: bar, rail and <main>
 assets/base.css                the vitrine's CSS — selectors now English, so it has diverged
 assets/portal.css              only what the vitrine did not have
-assets/catalog.js              catalogue, in English (becomes an API in Stage 2)
+assets/catalog.js              catalogue, in English (mirrored server-side; see the snapshot tool)
 assets/lessons-*.js            each topic's sections and their text
 assets/exercises-*.js          one file per course, as the pipeline does
 app/catalog.js                 reading the catalogue and the graph — no DOM
 app/lessons.js                 what a lesson is made of: sections + assessment
 app/graph.js                   the graph as a progress map
 app/state.js                   the student's progress (localStorage → server)
-app/api.js                     the make-believe layer, real backend signatures
+app/api.js                     one signature, two modes: server when configured, local when not
 app/routes.js                  the hash router
 app/rail.js                    the side rail
 app/search.js                  the global search index — no DOM
@@ -1205,12 +1233,15 @@ it visible, and invisible it represents no brand at all.
 The first is what the person actually wants: a certificate on a profile is a
 credential; a post disappears from the feed in two days.
 
-The `certUrl` points at a validation page that **does not exist yet** — it is born
-with the server. The URL is built in the settled format on purpose: the day the
-server exists cannot be the day of discovering that the format was different. A
-test checks that the seven fields LinkedIn expects are there and that the code in
-the URL is the same one printed on the document — a malformed URL would only give
-a signal on LinkedIn's site.
+The `certUrl` points at a validation page that **exists**: the backend serves
+`GET /certificate/{code}` as server-rendered HTML — the one route over there that
+answers without a session, because what opens it is a person checking a claim or
+a crawler building a preview card, and neither is served by a hash-routed
+single-page app. The URL was built in this format before that route existed, on
+purpose: the day the server arrived could not also be the day of discovering the
+format was different. A test checks that the seven fields LinkedIn expects are
+there and that the code in the URL is the one printed on the document — a
+malformed URL would only give a signal on LinkedIn's site.
 
 A **sample certificate does not share**. The sentence that said so left the inside
 of the modal — it explained, but stole the whole strip to explain something nobody
