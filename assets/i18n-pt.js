@@ -146,6 +146,8 @@ window.I18N.pt.ui = {
   "My account": "Minha conta",
   "Confirm your e-mail.": "Confirme seu e-mail.",
   "We sent a link to": "Enviamos um link para",
+  "Resend": "Reenviar",
+  "Sent — check your inbox.": "Enviado — confira sua caixa de entrada.",
   "Dismiss": "Dispensar",
   "My plan": "Meu plano",
   "My track": "Minha trilha",

@@ -151,6 +151,9 @@ export const register = (name, email, password) =>
 export const signOut = () => request('DELETE', '/api/session');
 export const session = () => request('GET', '/api/session');
 export const account = () => request('GET', '/api/account');
+// Reissue the confirmation link to the account's own address. No body: the
+// server sends it wherever the signed-in account's e-mail already is.
+export const resendVerification = () => request('POST', '/api/account/verify/resend');
 
 /* ---------- two-factor ----------
 
