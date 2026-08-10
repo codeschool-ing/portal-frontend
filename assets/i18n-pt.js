@@ -88,6 +88,7 @@ window.I18N.pt.ui = {
   "Course not found.": "Curso não encontrado.",
   "Courses": "Cursos",
   "Create an account": "Criar uma conta",
+  "Create an account to start.": "Crie uma conta para começar.",
   "Credit card and Pix, renewing automatically on the card.": "Cartão de crédito e Pix, com renovação automática no cartão.",
   "Dashboard": "Painel",
   "Do I have to take the whole track?": "Preciso fazer a trilha inteira?",

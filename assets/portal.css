@@ -347,6 +347,9 @@ body.no-rail .rail{display:none}
 .account.is-open .account-menu{display:flex}
 .account-op{padding:8px 11px;border-radius:4px;font-size:.86rem;color:var(--paper-dim)}
 .account-op:hover{background:var(--ink);color:var(--paper)}
+/* Sign out is an action, not a link, so it is a <button> — reset to sit flush
+   with the anchors above it. */
+.account-op-btn{display:block;width:100%;text-align:left;font-family:inherit;border:0;background:none;cursor:pointer}
 
 .rail-btn{display:none;background:none;border:0;font-size:1.3rem;color:var(--paper-dim);padding:0 10px;cursor:pointer}
 .rail-veil{display:none}
@@ -1050,7 +1053,11 @@ body.with-search{overflow:hidden}
    The frame is double — the card's border and an inner rule, which is what
    gives the "printed" reading. `--phosphor` stays only on the rule and on the
    brand LED: a document with too much colour looks like an advert. */
-.certs{display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:18px}
+/* `min(430px, 100%)`, not a flat 430px: below 430px of width — a phone held
+   upright — a fixed track is wider than the column and the card spills past the
+   screen edge. The min() lets the track collapse to the available width there,
+   so the collapsed card always fits, in either orientation. */
+.certs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(430px,100%),1fr));gap:18px}
 .cert{
   border:1px solid var(--wire);border-radius:4px;background:var(--panel);
   padding:9px;transition:border-color .2s;

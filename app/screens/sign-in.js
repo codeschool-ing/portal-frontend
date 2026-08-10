@@ -1,9 +1,18 @@
 /* ==========================================================================
-   Sign in.
+   Sign in — and, with a backend, register.
 
-   FUTURE: real authentication. Today any name gets in — the screen exists so the
-   rest of the portal can assume a session exists, not to protect anything. It
-   says so on the screen itself, so nobody confuses a skeleton with security.
+   THREE SHAPES, one screen:
+
+     no backend   the skeleton. Any name gets in, and a track is chosen here
+                  because there is no server to restore one from — the offline
+                  bundle and the browser suites both rely on this.
+     sign in      e-mail and password, nothing else. The name is not a
+                  credential (identity checks the pair and hands the name back),
+                  and the track is not asked: `adopt` leaves the browser's
+                  enrolment alone, so a returning student keeps theirs. Asking
+                  for either was friction that also silently reset the track.
+     register     name, e-mail and password. The track is chosen later, on the
+                  dashboard, the same place a new account is sent to pick one.
    ========================================================================== */
 
 import * as api from '../api.js';
@@ -16,7 +25,12 @@ export default async function signIn() {
   const el = document.createElement('div');
   el.className = 'view view-signin';
 
-  const options = TRACKS_BY_FAMILY().map(([family, list]) =>
+  const backend = sync.configured();
+  let mode = 'signin';        // 'signin' | 'register' — only meaningful with a backend
+  let phase = 'credentials';  // 'credentials' | 'mfa'
+  let chosenTrack = null;     // captured for the skeleton, before the form can be redrawn
+
+  const trackOptions = TRACKS_BY_FAMILY().map(([family, list]) =>
     '<optgroup label="' + txt('tracks by ' + family) + '">' +
       list.map((t) => '<option value="' + esc(t.id) + '">' + esc(t.name) + '</option>').join('') +
     '</optgroup>').join('');
@@ -29,57 +43,72 @@ export default async function signIn() {
       '</div>' +
       '<div class="signin-body">' +
         '<h1>' + txt('Student area') + '</h1>' +
-        '<p class="signin-sub">' + txt('Sign in to pick up where you left off.') + '</p>' +
-        '<form id="form-signin" novalidate>' +
-          '<div class="field"><label for="e-name">' + txt('name') + '</label>' +
-            '<input id="e-name" type="text" required autocomplete="name" placeholder="' + txt('your name') + '" /></div>' +
-          /* The credentials exist only when there is somebody to check them.
-             With no backend the fields would be a form that pretends, and the
-             notice below says so instead. */
-          (sync.configured()
-            ? '<div class="field"><label for="e-email">' + txt('sign-in e-mail') + '</label>' +
-                '<input id="e-email" type="email" required autocomplete="email" ' +
-                'placeholder="' + txt('you@example.com') + '" /></div>' +
-              '<div class="field"><label for="e-password">' + txt('password') + '</label>' +
-                '<input id="e-password" type="password" required autocomplete="current-password" /></div>'
-            : '') +
-          '<div class="field"><label for="e-track">' + txt('your track') + '</label>' +
-            '<select id="e-track">' + options + '</select></div>' +
-          '<button type="submit" class="btn btn-primary">' + txt('Sign in') + '</button>' +
-          (sync.configured()
-            ? '<button type="button" class="btn btn-ghost" id="e-register">' +
-                txt('Create an account') + '</button>'
-            : '') +
-        '</form>' +
-        '<p class="signin-notice mono dim" id="e-notice" aria-live="polite">' +
-          (sync.configured() ? '' : txt('[skeleton — there is no authentication: any name gets in]')) +
-        '</p>' +
+        '<p class="signin-sub" id="e-sub"></p>' +
+        '<form id="form-signin" novalidate></form>' +
+        '<p class="signin-notice mono dim" id="e-notice" aria-live="polite"></p>' +
       '</div>' +
     '</div>';
 
+  const form = el.querySelector('#form-signin');
+  const sub = el.querySelector('#e-sub');
   const notice = el.querySelector('#e-notice');
   const say = (message) => {
     notice.textContent = message;
     notice.className = 'signin-notice mono bad';
   };
 
-  /* Enrol then land on the dashboard — the tail both a plain sign-in and a
-     second-factor one end with. The track is captured before the form is
-     redrawn for the code step, so the choice survives that redraw. */
-  let chosenTrack = null;
+  const nameField = () =>
+    '<div class="field"><label for="e-name">' + txt('name') + '</label>' +
+      '<input id="e-name" type="text" required autocomplete="name" placeholder="' + txt('your name') + '" /></div>';
+
+  function renderForm() {
+    if (!backend) {
+      sub.textContent = txt('Sign in to pick up where you left off.');
+      form.innerHTML =
+        nameField() +
+        '<div class="field"><label for="e-track">' + txt('your track') + '</label>' +
+          '<select id="e-track">' + trackOptions + '</select></div>' +
+        '<button type="submit" class="btn btn-primary">' + txt('Sign in') + '</button>';
+      notice.textContent = txt('[skeleton — there is no authentication: any name gets in]');
+      notice.className = 'signin-notice mono dim';
+      return;
+    }
+    const register = mode === 'register';
+    sub.textContent = register
+      ? txt('Create an account to start.')
+      : txt('Sign in to pick up where you left off.');
+    form.innerHTML =
+      (register ? nameField() : '') +
+      '<div class="field"><label for="e-email">' + txt('sign-in e-mail') + '</label>' +
+        '<input id="e-email" type="email" required autocomplete="email" ' +
+        'placeholder="' + txt('you@example.com') + '" /></div>' +
+      '<div class="field"><label for="e-password">' + txt('password') + '</label>' +
+        '<input id="e-password" type="password" required autocomplete="' +
+        (register ? 'new-password' : 'current-password') + '" /></div>' +
+      '<button type="submit" class="btn btn-primary">' +
+        (register ? txt('Create an account') : txt('Sign in')) + '</button>' +
+      '<button type="button" class="btn btn-ghost" id="e-toggle">' +
+        (register ? txt('Sign in') : txt('Create an account')) + '</button>';
+    notice.textContent = '';
+    notice.className = 'signin-notice mono dim';
+  }
+
+  const focusFirst = () => el.querySelector('#e-name, #e-email, #e-code')?.focus();
+
+  /* Land on the dashboard. The skeleton seeds its track on the way, because
+     nothing else will; the backend does not, because the enrolment already
+     survived in the browser (or, for a new account, is chosen on the dashboard). */
   const finish = async () => {
-    await api.enrol(chosenTrack);
+    if (!backend && chosenTrack) await api.enrol(chosenTrack);
     goTo('/dashboard');
   };
 
-  // Password was right and a code is owed. Swap the form for a code field; the
+  // Password was right and a code is owed: swap the form for a code field. The
   // challenge cookie is already set, so only the code is needed now.
-  let phase = 'credentials';
   const showCodeStep = () => {
     phase = 'mfa';
-    const form = el.querySelector('#form-signin');
+    sub.textContent = txt('Enter the code from your authenticator app, or a recovery code.');
     form.innerHTML =
-      '<p class="signin-sub">' + txt('Enter the code from your authenticator app, or a recovery code.') + '</p>' +
       '<div class="field"><label for="e-code">' + txt('authentication code') + '</label>' +
         '<input id="e-code" type="text" inputmode="numeric" autocomplete="one-time-code" /></div>' +
       '<button type="submit" class="btn btn-primary">' + txt('Verify') + '</button>';
@@ -87,30 +116,30 @@ export default async function signIn() {
     form.querySelector('#e-code').focus();
   };
 
-  /* One submit path for both buttons: everything after the credentials is the
-     same, and two copies of "enrol, then go to the dashboard" is two places for
-     the enrolment to be forgotten. */
-  const enter = async (create) => {
-    const name = el.querySelector('#e-name').value.trim();
-    if (!name) return el.querySelector('#e-name').focus();
-    chosenTrack = el.querySelector('#e-track').value;
-
+  const enter = async () => {
     try {
-      if (!sync.configured()) {
+      if (!backend) {
+        const name = form.querySelector('#e-name').value.trim();
+        if (!name) return form.querySelector('#e-name').focus();
+        chosenTrack = form.querySelector('#e-track').value;
         await api.signIn({ name });
       } else {
-        const email = el.querySelector('#e-email').value.trim();
-        const password = el.querySelector('#e-password').value;
-        if (!email || !password) return el.querySelector('#e-email').focus();
-        const result = await (create
-          ? api.register({ name, email, password })
-          : api.signIn({ name, email, password }));
+        const email = form.querySelector('#e-email').value.trim();
+        const password = form.querySelector('#e-password').value;
+        if (!email || !password) return form.querySelector('#e-email').focus();
+        let result;
+        if (mode === 'register') {
+          const name = form.querySelector('#e-name').value.trim();
+          if (!name) return form.querySelector('#e-name').focus();
+          result = await api.register({ name, email, password });
+        } else {
+          result = await api.signIn({ email, password });
+        }
         // A second factor is enrolled: collect the code before anything else.
         if (result && result.mfaRequired) return showCodeStep();
       }
     } catch (err) {
-      /* The server's own message, because it is the one that knows what went
-         wrong — and identity is careful to say the same thing for an unknown
+      /* The server's own message: identity says the same thing for an unknown
          e-mail as for a wrong password, so relaying it leaks nothing. */
       return say(err.message || txt('that did not work — try again'));
     }
@@ -118,10 +147,9 @@ export default async function signIn() {
     return undefined;
   };
 
-  // The second step: the code against the challenge cookie.
   const verify = async () => {
-    const code = el.querySelector('#e-code').value.trim();
-    if (!code) return el.querySelector('#e-code').focus();
+    const code = form.querySelector('#e-code').value.trim();
+    if (!code) return form.querySelector('#e-code').focus();
     try {
       await api.completeMfa(code);
     } catch (err) {
@@ -131,12 +159,21 @@ export default async function signIn() {
     return undefined;
   };
 
-  el.querySelector('#form-signin').addEventListener('submit', (e) => {
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (phase === 'mfa') verify();
-    else enter(false);
+    else enter();
   });
-  el.querySelector('#e-register')?.addEventListener('click', () => enter(true));
+  // The register/sign-in toggle lives inside the form, which renderForm rebuilds,
+  // so the listener is on the form and reads the button by id.
+  form.addEventListener('click', (e) => {
+    if (e.target.id === 'e-toggle') {
+      mode = mode === 'register' ? 'signin' : 'register';
+      renderForm();
+      focusFirst();
+    }
+  });
 
-  return { title: txt('Sign in'), el, after: () => el.querySelector('#e-name').focus() };
+  renderForm();
+  return { title: txt('Sign in'), el, after: focusFirst };
 }
