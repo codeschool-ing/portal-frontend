@@ -114,20 +114,29 @@ export async function signOut() {
   return null;
 }
 
-/* FUTURE: `PATCH /account/email`, and the change only takes effect once confirmed
-   at the NEW address — otherwise changing the e-mail becomes the easiest way to
-   take over an account. Here it takes effect right away, because there is
-   nowhere to send the confirmation. */
-export function changeEmail(email) {
+/* With a backend the e-mail change is a REQUEST: the server mails a confirmation
+   to the NEW address and the change only lands once that link is clicked — so
+   the local session keeps its current address here, and the caller tells the
+   student to check the new inbox. Without a backend there is nowhere to confirm,
+   so the skeleton changes it at once, as it always did. Returns { pending }. */
+export async function changeEmail(email) {
+  if (sync.configured()) {
+    await sync.changeEmail(email);
+    return { pending: true };
+  }
   state.changeEmail(email);
-  return echo(state.now().session);
+  return { pending: false };
 }
 
-/* FUTURE: `PATCH /account/password`, with the current password checked ON THE
-   SERVER. The new password is not stored anywhere here — see state.js. */
-export function changePassword() {
-  state.markPasswordChange();
-  return echo(true);
+/* The server re-checks the CURRENT password and, on success, revokes the other
+   sessions while keeping this one. Both passwords travel; nothing is stored in
+   the browser. The skeleton, with no server, just records that it changed. */
+export async function changePassword(current, next) {
+  if (sync.configured()) {
+    await sync.changePassword(current, next);
+  } else {
+    state.markPasswordChange();
+  }
 }
 
 /* FUTURE: the billing service. Changing plans will go through checkout,
