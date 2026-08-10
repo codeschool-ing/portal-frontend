@@ -151,6 +151,14 @@ export const register = (name, email, password) =>
 export const signOut = () => request('DELETE', '/api/session');
 export const session = () => request('GET', '/api/session');
 export const account = () => request('GET', '/api/account');
+// The account's live sessions, one flagged `current`. Ending one takes its
+// public id — never the cookie — and the server scopes the delete to the
+// account, so an id only ever reaches its owner's rows. `revokeOtherSessions`
+// is the blunt "sign out everywhere else": the server keeps this session (it
+// reads its cookie) and drops the rest.
+export const sessions = () => request('GET', '/api/sessions');
+export const revokeSession = (id) => request('DELETE', '/api/sessions/' + encodeURIComponent(id));
+export const revokeOtherSessions = () => request('DELETE', '/api/sessions');
 export const changeName = (name) => request('PATCH', '/api/account/name', { name });
 // The e-mail change is a request, not an edit: the server mails a link to the
 // NEW address and the change only lands once it is clicked (202, not the account).

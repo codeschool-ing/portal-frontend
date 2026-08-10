@@ -1300,6 +1300,21 @@ html[data-theme="light"] .cert-png{color:#b3bccb}
 .password-meter .bar{flex:1;max-width:220px}
 .password-label{font-size:.66rem;min-width:8ch}
 
+/* Devices: one live session per row. The "end" button sits at the right on a
+   wide screen and drops under the details on a narrow one, which is why the row
+   wraps rather than forcing a fixed grid. The current session is marked, not
+   endable, and reads a touch brighter so a student finds themselves first. */
+.session-list{list-style:none;padding:0;margin:6px 0 16px;display:flex;flex-direction:column;gap:10px}
+.session-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;
+  background:var(--panel);border:1px solid var(--wire);border-radius:8px;padding:11px 13px}
+.session-row.session-current{border-color:var(--phosphor)}
+.session-what{display:flex;align-items:center;gap:9px;flex:1 1 auto;min-width:0}
+.session-device{font-weight:600}
+.session-badge{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--phosphor);border:1px solid var(--wire);border-radius:4px;padding:1px 6px}
+.session-meta{flex-basis:100%;font-size:.68rem;word-break:break-word}
+.session-end{flex:0 0 auto}
+
 /* ---------- My plan ---------- */
 .pl-current-top{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:18px}
 .pl-label{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--phosphor)}
