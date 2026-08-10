@@ -14,15 +14,23 @@
      bundle needs — it is opened off a disk with no server anywhere near it —
      and what every screen did before a backend existed.
 
-     `same-origin` is the deployed shape, and the one portal-backend's config
-     assumes: one origin in front of both, which is what makes the session
-     cookie first-party and SameSite=Lax enough. It has to be spelled out
-     because the base URL it means is the empty string, and empty is already
-     taken by "no backend".
+     IT SHIPS EMPTY ON PURPOSE. The bundle, `file://` and the browser suites all
+     drive this very file, and empty is the one shape that needs no server. The
+     deploy is what fills it: the Pages workflow injects the real origin as it
+     publishes (.github/workflows/pages.yml), so the served site talks to the API
+     while the source, the bundle and the tests stay local.
 
-     An absolute origin also works and is for development, where the API runs
-     on another port — it needs CORS with credentials on the server, which the
-     server deliberately does not have. -->
+     `same-origin` is one shape: one origin in front of both, the portal and the
+     API under /api, first-party cookie and SameSite=Lax with no CORS. It has to
+     be spelled out because the base URL it means is the empty string, and empty
+     is already taken by "no backend".
+
+     An absolute origin is the other, and the one the deploy injects:
+     api.codeschool.ing, a sibling of the portal's app.codeschool.ing — same
+     site, different origin. The cookie still travels SameSite=Lax under a cookie
+     Domain; what it costs is CORS, which the server has (web.CORS, turned on by
+     PORTAL_ALLOWED_ORIGINS). The same shape serves development, where the API is
+     another port. -->
 <meta name="backend" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>codeschool.ing</title>
