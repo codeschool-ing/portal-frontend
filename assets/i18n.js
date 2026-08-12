@@ -27,31 +27,30 @@ window.I18N = {
   es: {
     plans: {
       "student": {
-        "name": "Estudiante",
-        "summary": "Para probar la escuela entera antes de decidir.",
-        "cycle": "para siempre"
+        "name": "Gratis",
+        "summary": "Il primo corso di ogni percorso, per vedere come funziona la scuola.",
+        "cycle": "per sempre"
       },
       "pro": {
-        "name": "Pro",
-        "summary": "El plan de quien estudia para trabajar con esto.",
-        "cycle": "por mes"
+        "name": "Mensile",
+        "summary": "Tutta la scuola, mese per mese.",
+        "cycle": "al mese"
       },
-      "team": {
-        "name": "Equipos",
-        "summary": "Para equipos y escuelas, con seguimiento de grupo.",
-        "cycle": "por alumno/mes"
+      "annual": {
+        "name": "Annuale",
+        "summary": "Lo stesso, pagato una volta l'anno — due mesi in meno.",
+        "cycle": "all'anno"
       }
     },
     features: {
-      "catalog": "El catálogo entero: 86 cursos y 16 itinerarios",
-      "track": "Un itinerario guiado, con mapa de progreso",
-      "exercises": "Ejercicios y evaluaciones en todas las clases",
-      "exams": "Exámenes finales de curso y de itinerario",
-      "certificate": "Certificados de curso y de itinerario",
-      "material": "Material de apoyo para descargar",
-      "offline": "Clases para ver sin conexión",
-      "reports": "Informes de grupo y exportación",
-      "invoicing": "Factura y cobro por identificación fiscal"
+      "entry": "Il primo corso di ogni percorso, per intero",
+      "catalog": "Tutti gli 86 corsi e i 16 percorsi",
+      "track": "Un percorso guidato, con mappa dei progressi",
+      "exercises": "Esercizi che si correggono da soli, in ogni lezione",
+      "exams": "Esami finali di corso e di percorso",
+      "certificate": "Certificati di corso e di percorso, con codice di validazione",
+      "material": "Materiale di supporto da scaricare",
+      "offline": "Lezioni da guardare offline"
     },
     ui: {
       "Two-factor authentication": "Autenticación en dos factores",
@@ -352,8 +351,8 @@ window.I18N = {
       "Sign out other devices": "Cerrar sesión en los otros dispositivos",
       "an unknown device": "un dispositivo desconocido",
       "Loading…": "Cargando…",
+      "per year": "por año",
       "per month": "al mes",
-      "per student/month": "por alumno/mes",
       "pick up where you left off": "seguir donde lo dejaste",
       "plan": "plan",
       "previous": "anterior",
@@ -890,8 +889,8 @@ window.I18N = {
       "Sign out other devices": "Déconnecter les autres appareils",
       "an unknown device": "un appareil inconnu",
       "Loading…": "Chargement…",
+      "per year": "par an",
       "per month": "par mois",
-      "per student/month": "par élève/mois",
       "pick up where you left off": "reprendre où vous en étiez",
       "plan": "offre",
       "previous": "précédent",
@@ -1428,8 +1427,8 @@ window.I18N = {
       "Sign out other devices": "Disconnetti gli altri dispositivi",
       "an unknown device": "un dispositivo sconosciuto",
       "Loading…": "Caricamento…",
+      "per year": "all'anno",
       "per month": "al mese",
-      "per student/month": "per studente/mese",
       "pick up where you left off": "riprendi da dove eri rimasto",
       "plan": "piano",
       "previous": "precedente",

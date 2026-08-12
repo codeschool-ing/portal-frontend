@@ -434,8 +434,8 @@ window.I18N.pt.ui = {
   "Sign out other devices": "Sair dos outros dispositivos",
   "an unknown device": "um dispositivo desconhecido",
   "Loading…": "Carregando…",
+  "per year": "por ano",
   "per month": "por mês",
-  "per student/month": "por aluno/mês",
   "pick up where you left off": "continuar de onde parou",
   "plan": "plano",
   "prerequisites": "pré-requisitos",
@@ -537,30 +537,29 @@ window.I18N.pt.ui = {
 
 window.I18N.pt.plans = {
   "student": {
-    "name": "Estudante",
-    "summary": "Para experimentar a escola inteira antes de decidir.",
+    "name": "Grátis",
+    "summary": "O primeiro curso de cada trilha, para ver como a escola funciona.",
     "cycle": "para sempre"
   },
   "pro": {
-    "name": "Pro",
-    "summary": "O plano de quem está estudando para trabalhar com isto.",
+    "name": "Mensal",
+    "summary": "A escola inteira, mês a mês.",
     "cycle": "por mês"
   },
-  "team": {
-    "name": "Equipe",
-    "summary": "Para times e escolas, com acompanhamento de turma.",
-    "cycle": "por aluno/mês"
+  "annual": {
+    "name": "Anual",
+    "summary": "O mesmo, pago uma vez por ano — dois meses mais barato.",
+    "cycle": "por ano"
   }
 };
 
 window.I18N.pt.features = {
-  "catalog": "O catálogo inteiro: 86 cursos e 16 trilhas",
+  "entry": "O primeiro curso de cada trilha, completo",
+  "catalog": "Todos os 86 cursos e 16 trilhas",
   "track": "Uma trilha guiada, com mapa de progresso",
-  "exercises": "Exercícios e avaliações em todas as aulas",
+  "exercises": "Exercícios que se corrigem sozinhos, em todas as aulas",
   "exams": "Provas finais de curso e de trilha",
-  "certificate": "Certificados de curso e de trilha",
+  "certificate": "Certificados de curso e de trilha, com código de validação",
   "material": "Material de apoio para baixar",
-  "offline": "Aulas para assistir sem conexão",
-  "reports": "Relatórios de turma e exportação",
-  "invoicing": "Nota fiscal e cobrança por CNPJ"
+  "offline": "Aulas para ver sem conexão"
 };
