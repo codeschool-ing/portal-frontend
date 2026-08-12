@@ -25,8 +25,6 @@ window.FEATURES = {
   certificate: 'Course and track certificates',
   material: 'Supporting material to download',
   offline: 'Lessons to watch offline',
-  mentoring: 'Group mentoring, every week',
-  forum: 'A forum answered by instructors',
   reports: 'Class reports and export',
   invoicing: 'Invoicing and billing by company registration',
 };
@@ -47,7 +45,7 @@ window.PLANS = [
     price: 49,
     cycle: 'per month',
     featured: true,
-    includes: ['catalog', 'track', 'exercises', 'exams', 'certificate', 'material', 'offline', 'forum'],
+    includes: ['catalog', 'track', 'exercises', 'exams', 'certificate', 'material', 'offline'],
   },
   {
     id: 'team',
@@ -56,6 +54,6 @@ window.PLANS = [
     price: 39,
     cycle: 'per student/month',
     includes: ['catalog', 'track', 'exercises', 'exams', 'certificate', 'material', 'offline',
-      'forum', 'mentoring', 'reports', 'invoicing'],
+      'reports', 'invoicing'],
   },
 ];
