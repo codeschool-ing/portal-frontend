@@ -26,19 +26,14 @@
 window.I18N = {
   es: {
     plans: {
-      "student": {
-        "name": "Gratis",
+      "guest": {
+        "name": "Visitatore",
         "summary": "Il primo corso di ogni percorso, per vedere come funziona la scuola.",
         "cycle": "per sempre"
       },
-      "pro": {
-        "name": "Mensile",
-        "summary": "Tutta la scuola, mese per mese.",
-        "cycle": "al mese"
-      },
-      "annual": {
-        "name": "Annuale",
-        "summary": "Lo stesso, pagato una volta l'anno — due mesi in meno.",
+      "student": {
+        "name": "Studente",
+        "summary": "Tutta la scuola, per un anno.",
         "cycle": "all'anno"
       }
     },
