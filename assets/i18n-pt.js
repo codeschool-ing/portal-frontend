@@ -536,19 +536,14 @@ window.I18N.pt.ui = {
 };
 
 window.I18N.pt.plans = {
-  "student": {
-    "name": "Grátis",
+  "guest": {
+    "name": "Visitante",
     "summary": "O primeiro curso de cada trilha, para ver como a escola funciona.",
     "cycle": "para sempre"
   },
-  "pro": {
-    "name": "Mensal",
-    "summary": "A escola inteira, mês a mês.",
-    "cycle": "por mês"
-  },
-  "annual": {
-    "name": "Anual",
-    "summary": "O mesmo, pago uma vez por ano — dois meses mais barato.",
+  "student": {
+    "name": "Aluno",
+    "summary": "A escola inteira, por um ano.",
     "cycle": "por ano"
   }
 };

@@ -2,16 +2,20 @@
    Plans.
 
    THE MODEL, IN ONE LINE: the first course of every track is free, and
-   everything else is one product sold at two commitments.
+   everything else is one yearly subscription.
 
-   WHY THERE IS NO TIER LADDER. The obvious shape is three columns with more
-   features in each, and it was tried here — the third carried group mentoring
-   and an instructor-answered forum. Neither can exist: the school is
-   self-service and has nobody to hold a session or answer a thread. Once the
-   promises of staff are removed, what is left is a single product. So the
-   monthly and the annual plan include exactly the same keys, and the table's
-   two paid columns are deliberately identical: what differs is how long you
-   commit, not what you get.
+   WHY THERE IS NO TIER LADDER, AND NO MONTHLY. The obvious shape is three
+   columns with more features in each, and it was tried here — the third carried
+   group mentoring and an instructor-answered forum. Neither can exist: the
+   school is self-service and has nobody to hold a session or answer a thread.
+   Once the promises of staff are removed, what is left is one product.
+
+   The monthly option went for a different reason. A track's median is twelve
+   courses and around 720 hours — over a year of study — so billing it monthly
+   creates fourteen separate opportunities to cancel something the student has
+   not finished. One yearly commitment matches the length of the thing being
+   bought. It is sold in instalments so the ticket is not a barrier: the student
+   pays month by month, the school is committed to for a year.
 
    The other tempting axis — one track versus all of them — does not survive a
    school with no staff. Whoever buys one track will want to switch; letting
@@ -39,11 +43,12 @@
    authorise by, and the sentence the student reads comes from `FEATURES`. Two
    lists of text diverge the day one of them changes.
 
-   THE IDS ARE STORED DATA. `subscriptions.plan_id` in portal-backend holds these
-   strings, and `student` is that service's default for an account with no
-   subscription of its own. Renaming one orphans every row carrying it — which is
-   why the free plan is still `student` and the monthly one still `pro`, whatever
-   they are called on screen.
+   THE IDS ARE STORED DATA, AND THEY MATCH THE NAMES ON PURPOSE. `guest` is the
+   free plan and `student` the paid one, exactly as they read on screen. That
+   cost a rename in two places — migration 0013 in portal-backend and the
+   PLANS_MOVED map in app/state.js — and it was worth paying: `student` used to
+   be the id of the FREE plan, so once the paid plan took that NAME, any id that
+   disagreed would have meant the opposite of what a reader expects, forever.
    ========================================================================== */
 
 window.FEATURES = {
@@ -59,28 +64,20 @@ window.FEATURES = {
 
 window.PLANS = [
   {
-    id: 'student',
-    name: 'Free',
+    id: 'guest',
+    name: 'Guest',
     summary: 'The first course of every track, to see how the school works.',
     price: 0,
     cycle: 'forever',
     includes: ['entry', 'track', 'exercises'],
   },
   {
-    id: 'pro',
-    name: 'Monthly',
-    summary: 'The whole school, month by month.',
-    price: 49,
-    cycle: 'per month',
-    featured: true,
-    includes: ['entry', 'catalog', 'track', 'exercises', 'exams', 'certificate', 'material', 'offline'],
-  },
-  {
-    id: 'annual',
-    name: 'Annual',
-    summary: 'The same, paid once a year — two months cheaper.',
+    id: 'student',
+    name: 'Student',
+    summary: 'The whole school, for a year.',
     price: 490,
     cycle: 'per year',
+    featured: true,
     includes: ['entry', 'catalog', 'track', 'exercises', 'exams', 'certificate', 'material', 'offline'],
   },
 ];

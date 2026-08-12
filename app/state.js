@@ -34,6 +34,14 @@ const EMPTY = {
   exams: {},          // { 'course:javascript': { attempts, best, passed } }
   account: null,      // { planId, since } — fiction today, billing tomorrow
   last: null,         // { courseId, lessonIx, sectionId } — the "carry on from here"
+  /* Which generation of PLAN IDS this document speaks. It exists because that
+     one rename SWAPPED two values — `student` went from naming the free plan to
+     naming the paid one — so the map is not idempotent and must not run twice:
+     a second pass would read the `student` it just wrote and demote a paying
+     account to `guest`. Every other migration here is safe to re-run, which is
+     why this is the only stamp in the document. Fresh documents are born
+     current and never migrate. */
+  plans: 2,
 };
 
 /* ---------- the Portuguese → English migration ----------
@@ -207,6 +215,22 @@ function moveIds(doc) {
     const map = MOVED_SECTIONS[courseId] || {};
     out.last = { ...out.last, courseId, sectionId: map[out.last.sectionId] || out.last.sectionId };
   }
+  /* PLAN IDS MOVED, AND THE TWO SWAPPED NAMES. `student` used to be the FREE
+     plan; it is now the PAID one, and free is `guest`. `pro` and the retired
+     `team` were paid, so they land on `student`.
+
+     ONCE, AND ONLY ONCE — this is the one migration in this file that is not
+     safe to re-run. `pro` becomes `student` on the first pass; without the
+     stamp, the second pass would see that `student` and hand a paying account
+     the free plan. The same swap in portal-backend (migration 0013) is safe by
+     construction because goose runs it once; here the read happens on every
+     load, so the document has to remember. */
+  if (out.plans !== 2) {
+    const PLANS_RENAMED = { student: 'guest', pro: 'student', team: 'student' };
+    const to = out.account?.planId && PLANS_RENAMED[out.account.planId];
+    if (to) out.account = { ...out.account, planId: to };
+    out.plans = 2;
+  }
   if (out.enrollment) {
     const e = { ...out.enrollment };
     if (e.trackId) e.trackId = movedId(e.trackId);
@@ -232,7 +256,10 @@ export function migrate(raw) {
 
   const moved = renameKeys(out);
   /* Plan ids are stored, so their VALUES move too — a renamed id would silently
-     drop the student onto the first plan in the list. */
+     drop the student onto the first plan in the list. This is the FIRST of two
+     renames: it lands on the English ids of the time, and `moveIds` below then
+     carries them to today's (`student` → `guest`, `team` → `student`). Two
+     stages, because a browser that stopped at either one still has to arrive. */
   const PLANS_MOVED = { estudante: 'student', equipe: 'team' };
   if (moved.account?.planId && PLANS_MOVED[moved.account.planId]) {
     moved.account.planId = PLANS_MOVED[moved.account.planId];
@@ -562,7 +589,7 @@ export function answersGiven() {
    life, and every one of them becomes an `if` nobody will ever exercise. */
 export function studentAccount() {
   const c = state.account;
-  const planId = c?.planId || (window.PLANS?.[0]?.id ?? 'student');
+  const planId = c?.planId || (window.PLANS?.[0]?.id ?? 'guest');
   return { planId: planId, since: c?.since || null, email: state.session?.email || '' };
 }
 

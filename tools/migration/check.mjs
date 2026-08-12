@@ -107,8 +107,10 @@ ok('and the exam record with it',
   exam?.attempts === 1 && exam?.best === 80 && exam?.passed === true
     && exam?.lastPct === 80 && exam?.lastCorrect === 8 && exam?.lastTotal === 10,
   JSON.stringify(exam));
-ok('the account survived',
-  doc.account?.planId === 'pro' && doc.account?.since === '2026-01-01' && doc.account?.passwordAt === '2026-01-02',
+/* `pro` was the PAID plan and the paid plan is now `student`, so this is the
+   rename landing, not the value surviving untouched. */
+ok('the account survived, on the renamed paid plan',
+  doc.account?.planId === 'student' && doc.account?.since === '2026-01-01' && doc.account?.passwordAt === '2026-01-02',
   JSON.stringify(doc.account));
 ok('the resume pointer survived',
   doc.last?.courseId === 'javascript' && typeof doc.last?.lessonIx === 'number' && Boolean(doc.last?.sectionId),
@@ -133,9 +135,43 @@ await p.reload();
 await p.waitForFunction(() => location.hash.length > 1);
 await p.waitForTimeout(300);
 const twice = await p.evaluate((k) => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
+/* THE WHOLE DOCUMENT, not just the session. The plan rename swaps two values —
+   `pro` becomes `student` and `student` becomes `guest` — so running it twice
+   would read the `student` it just wrote and hand a paying account the free
+   plan. Comparing one field would have let exactly that through. */
 ok('a second load leaves the same document',
-  JSON.stringify(twice.session) === JSON.stringify(doc.session)
-  && !legacyKeys.some((k) => k in twice));
+  JSON.stringify(twice) === JSON.stringify(doc)
+  && !legacyKeys.some((k) => k in twice),
+  JSON.stringify(twice) === JSON.stringify(doc) ? '' : 'account now ' + JSON.stringify(twice.account));
+
+
+/* ---------- the other side of the swap ----------
+
+   The document above starts in Portuguese and arrives on the paid plan. The
+   dangerous one is a document that is ALREADY English and holds `student` —
+   which used to mean the FREE plan and now names the paid one. It has to land
+   on `guest`, and it has to stay there. */
+console.log('\n== a free account on the old id becomes a guest, once ==');
+const p2 = await b.newPage();
+p2.on('pageerror', (e) => { failures += 1; console.log('  PAGEERROR ' + e.message); });
+await p2.goto(BASE + PAGE);
+await p2.evaluate(([k, v]) => localStorage.setItem(k, JSON.stringify(v)), [KEY, {
+  session: { name: 'Ana', email: 'ana@codeschool.ing' },
+  account: { planId: 'student', since: '2026-02-02' },
+  enrollment: null, progress: {}, notes: {}, exams: {}, last: null,
+}]);
+await p2.reload();
+await p2.waitForFunction(() => location.hash.length > 1);
+await p2.evaluate(() => location.hash = '#/course/javascript/lesson/0/let-const');
+await p2.waitForTimeout(400);
+const free1 = await p2.evaluate((k) => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
+ok('the old free plan became guest', free1.account?.planId === 'guest', JSON.stringify(free1.account));
+
+await p2.reload();
+await p2.waitForFunction(() => location.hash.length > 1);
+await p2.waitForTimeout(300);
+const free2 = await p2.evaluate((k) => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
+ok('and a second load leaves it there', free2.account?.planId === 'guest', JSON.stringify(free2.account));
 
 await b.close();
 console.log(failures ? `\n${failures} FAILURE(S)` : '\neverything passed');
