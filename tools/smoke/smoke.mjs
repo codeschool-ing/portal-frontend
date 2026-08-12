@@ -1206,8 +1206,15 @@ await p.waitForTimeout(150);
 
 await p.goto(BASE + PAGE + '#/plan');
 await p.waitForSelector('.pl-table');
+// Derived from the page's own data rather than a fixed number: how many
+// features the plans offer is a business decision that moves, and a hardcoded
+// count turns every such decision into a failing test that says nothing.
+// One row per feature any plan includes, plus the row of switch buttons.
 const planRows = await p.locator('.pl-table tbody tr').count();
-ok('the table compares every feature', planRows >= 10, planRows + ' rows');
+const planFeatures = await p.evaluate(() =>
+  Object.keys(window.FEATURES).filter((k) => window.PLANS.some((pl) => pl.includes.includes(k))).length);
+ok('the table compares every feature', planRows === planFeatures + 1,
+  planRows + ' rows for ' + planFeatures + ' features');
 ok('the subscribed plan column is highlighted', (await p.locator('.pl-table th.on').count()) === 1);
 const planBefore = await p.locator('.pl-current-top h2').innerText();
 await p.locator('.pl-switch').first().click();
