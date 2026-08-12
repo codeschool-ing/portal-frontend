@@ -50,8 +50,6 @@ window.I18N = {
       "certificate": "Certificados de curso y de itinerario",
       "material": "Material de apoyo para descargar",
       "offline": "Clases para ver sin conexión",
-      "mentoring": "Mentoría en grupo, todas las semanas",
-      "forum": "Foro respondido por instructores",
       "reports": "Informes de grupo y exportación",
       "invoicing": "Factura y cobro por identificación fiscal"
     },
@@ -590,8 +588,6 @@ window.I18N = {
       "certificate": "Certificats de cours et de parcours",
       "material": "Matériel de soutien à télécharger",
       "offline": "Leçons à regarder hors connexion",
-      "mentoring": "Mentorat en groupe, chaque semaine",
-      "forum": "Un forum où répondent les formateurs",
       "reports": "Rapports de groupe et export",
       "invoicing": "Facturation et paiement au nom d’une société"
     },
@@ -1130,8 +1126,6 @@ window.I18N = {
       "certificate": "Certificati di corso e di percorso",
       "material": "Materiale di supporto da scaricare",
       "offline": "Lezioni da guardare senza connessione",
-      "mentoring": "Mentoring di gruppo, ogni settimana",
-      "forum": "Un forum a cui rispondono i docenti",
       "reports": "Report di classe ed esportazione",
       "invoicing": "Fattura e pagamento con partita IVA"
     },
