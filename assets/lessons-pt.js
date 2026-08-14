@@ -1135,7 +1135,7 @@ window.I18N.pt.lessons = {
         ]
       }
     },
-    "Functions, scope, closures and the value of this": {
+    "Functions, scope, closures and the value of `this`": {
       "closure": {
         "title": "Closure: a função que lembra",
         "body": [

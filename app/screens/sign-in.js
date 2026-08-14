@@ -18,7 +18,7 @@
 import * as api from '../api.js';
 import * as sync from '../sync.js';
 import { goTo } from '../routes.js';
-import { TRACKS_BY_FAMILY } from './common.js';
+
 import { esc } from '../text.js';
 
 export default async function signIn() {
@@ -30,10 +30,8 @@ export default async function signIn() {
   let phase = 'credentials';  // 'credentials' | 'mfa'
   let chosenTrack = null;     // captured for the skeleton, before the form can be redrawn
 
-  const trackOptions = TRACKS_BY_FAMILY().map(([family, list]) =>
-    '<optgroup label="' + txt('tracks by ' + family) + '">' +
-      list.map((t) => '<option value="' + esc(t.id) + '">' + esc(t.name) + '</option>').join('') +
-    '</optgroup>').join('');
+  const trackOptions = TRACKS.map((t) =>
+    '<option value="' + esc(t.id) + '">' + esc(t.name) + '</option>').join('');
 
   el.innerHTML =
     '<div class="signin-box">' +

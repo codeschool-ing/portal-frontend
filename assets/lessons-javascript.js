@@ -286,7 +286,7 @@ window.LESSONS = Object.assign(window.LESSONS || {}, {
     ],
 
     /* --------------------------------------------------------------- 04 */
-    'Functions, scope, closures and the value of this': [
+    'Functions, scope, closures and the value of `this`': [
       {
         id: 'closure',
         title: 'Closure: the function that remembers',

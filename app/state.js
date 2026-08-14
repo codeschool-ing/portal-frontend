@@ -231,6 +231,29 @@ function moveIds(doc) {
     if (to) out.account = { ...out.account, planId: to };
     out.plans = 2;
   }
+  /* THE TECHNOLOGY TRACKS ARE GONE, AND AN ENROLMENT CAN POINT AT ONE.
+     The showcase retired `python-tech`, `go-tech` and `sql-tech`: of their 30
+     course slots, 29 were already inside a career track and the thirtieth moved
+     into one, so the catalogue barely felt it. A student did.
+
+     `trackById` returns undefined for an id that no longer exists and
+     `studentTrack()` then returns null, which is the portal quietly deciding
+     the student is enrolled in nothing — no error, no explanation, and the
+     track screen empty.
+
+     THE ENROLMENT IS CLEARED, NOT REMAPPED. There is no honest destination:
+     Python's fan reached six careers, SQL's three, and picking one would move
+     somebody to a track they never chose. Nothing is lost by asking again —
+     progress, notes and exam scope are keyed by COURSE id, no course id was
+     retired, and every course of the three tracks still exists inside a career.
+     What the student loses is the answer to "which track", which is the one
+     thing they are the authority on. */
+  const RETIRED_TRACKS = new Set(['python-tech', 'go-tech', 'sql-tech']);
+  if (out.enrollment && RETIRED_TRACKS.has(out.enrollment.trackId)) {
+    const { trackId, choices, ...rest } = out.enrollment;
+    void trackId; void choices;   // the fork choices were keyed by that track
+    out.enrollment = Object.keys(rest).length ? rest : null;
+  }
   if (out.enrollment) {
     const e = { ...out.enrollment };
     if (e.trackId) e.trackId = movedId(e.trackId);

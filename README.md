@@ -2,7 +2,7 @@
 
 **Stage 2** of the project: the student area. Stage 1 is the vitrine
 ([`codeschool-ing.github.io`](https://github.com/codeschool-ing/codeschool-ing.github.io)),
-which presents 86 courses and 16 tracks and captures enrolment. This is where
+which presents 122 courses and 19 tracks and hands whoever is convinced to this portal. This is where
 whoever enrolled actually studies.
 
 No build and no dependencies, like the vitrine: plain HTML, CSS and ES modules.
@@ -159,7 +159,30 @@ The identity is the same school, so nearly everything crosses over:
 | `assets/i18n-runtime.js` | a copy, with one divergent line, **plus an English base** |
 | the dependency graph | extracted into `app/catalog.js` and `app/graph.js` |
 
-### The catalogue has diverged from the vitrine
+### Synced with the vitrine, and what the sync costs
+
+The catalogue, the four course dictionaries and `assets/base.css` are the
+vitrine's, copied. `base.css` is now **byte-identical** to its `assets/style.css`
+— the `.brand-nome` divergence both READMEs used to name is gone, this side
+renamed some time ago and nobody updated the note.
+
+**Three things to check on every sync**, all learned by the last one:
+
+| | |
+| --- | --- |
+| a retired track | a track id can disappear. `trackById` returns undefined and `studentTrack()` returns null, which is the portal quietly deciding a student is enrolled in nothing. `state.js` clears the enrolment instead, and `tools/migration/check.mjs` proves it while leaving progress alone |
+| a renamed topic | lessons and exercises join on **course + the topic's text**, not its index. One backtick added around `` `this` `` in the vitrine orphaned a written JavaScript lesson, and nothing threw — the lesson simply stopped appearing |
+| a rule scoped by hand | the vitrine's fixed-height course modal was written `.modal-box:not(.modal-narrow)`, which here means *every* modal. It is `:has(.modal-col-detail)` now, over there, so the stylesheet stays copyable |
+
+**A number written into a test is a number that goes stale on the next sync.**
+Four assertions in `tools/smoke/smoke.mjs` failed on this one for reasons that
+had nothing to do with what they check: a course count of 86, JavaScript's
+twelve lessons twice, and a denominator worked out by hand. They ask the
+catalogue now. The one that says the most is the denominator: it compares the
+count the rail shows against both the right total and the naive one that
+includes empty assessments, which is the rule it always meant to guard.
+
+### The catalogue is authored in English
 
 `assets/data.js` used to be byte-identical to the vitrine's, and the vitrine's
 README says so. **That is no longer true**, and this note exists so that whoever
@@ -171,8 +194,8 @@ field names (`name`, `summary`, `syllabus`, `topics`, `requires`,
 `assets/i18n-courses-pt.js` and is now the fifth translation, alongside Spanish,
 French and Italian.
 
-Nothing was translated by hand for this: all 86 course names, all 1,503 topic
-titles and all 16 tracks already had an English translation in
+Nothing was translated by hand for this: all the course names, all the topic
+titles and all the tracks already had an English translation in
 the vitrine's English catalogue dictionary. The move was an inversion — that
 file's values became the base, and the base became a translation. The English
 dictionary would have been an identity map afterwards, so it is gone.
@@ -511,10 +534,16 @@ there is a `DINAMICOS` list with eleven containers to skip. In a portal nearly
 all text is born in JavaScript, and that list would become the whole page. The
 mechanism is the same; what changes is the weight of each half.
 
-That is why the **only divergence** between the two copies of `i18n-runtime.js`
-is the `DINAMICOS` list, which moved out of the code and became
-`window.I18N_DYNAMIC`, defined in `index.html`. It exists so that there is no
-other divergence.
+The `DINAMICOS` list is where that shows: it moved out of the code and became
+`window.I18N_DYNAMIC`, defined in `index.html`.
+
+**It is no longer the only divergence, and the claim that it was has been
+retired.** The two files have grown apart on both sides and for good reasons:
+the vitrine's copy translates `TESTIMONIALS`, which the portal does not have,
+and this one translates lessons, exercises, plans and features, which the
+vitrine does not. What is still shared — the detection, the stored choice and
+its migration, and the rewrite-in-place of the catalogue objects — is worth
+keeping in step, and the rest is each page's own.
 
 **Interface and content are different things.** The interface translates into the
 five languages; an exercise statement and a lesson's text are database content,
@@ -664,7 +693,7 @@ and did not display.
 
 The magnifier and `⌘K` existed from day one and both led to the catalogue — a
 shortcut that promised search and delivered navigation. **It matters more here
-than on an ordinary site:** there are 86 courses and 1,503 lessons, and someone
+than on an ordinary site:** there are 122 courses and 2,402 lessons, and someone
 who remembers "that part about the DNS TTL" had no path there at all — not
 through the menu, not through the graph, not through the rail.
 

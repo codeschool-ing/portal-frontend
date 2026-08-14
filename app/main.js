@@ -18,7 +18,7 @@ import * as sync from './sync.js';
 import { isChoice } from './catalog.js';
 import { subscribe, now } from './state.js';
 import { buildRail, toggleLesson } from './rail.js';
-import { studentTrack, trackProgress, TRACKS_BY_FAMILY } from './screens/common.js';
+import { studentTrack, trackProgress } from './screens/common.js';
 import * as api from './api.js';
 import { esc } from './text.js';
 
@@ -144,10 +144,8 @@ function paintContext() {
       '</button>' +
       '<div class="ctx-menu" role="menu">' +
         '<a class="ctx-op ctx-map" href="#/track">' + txt('see the track map') + ' →</a>' +
-        TRACKS_BY_FAMILY().map(([family, list]) =>
-          '<span class="ctx-group">' + txt('tracks by ' + family) + '</span>' +
-          list.map((x) => '<button type="button" class="ctx-op' + (x.id === t.id ? ' on' : '') + '" ' +
-            'data-track="' + esc(x.id) + '">' + esc(x.name) + '</button>').join('')).join('') +
+        TRACKS.map((x) => '<button type="button" class="ctx-op' + (x.id === t.id ? ' on' : '') + '" ' +
+          'data-track="' + esc(x.id) + '">' + esc(x.name) + '</button>').join('') +
       '</div>' +
     '</div>';
 }

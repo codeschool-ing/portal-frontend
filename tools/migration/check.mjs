@@ -173,6 +173,50 @@ await p2.waitForTimeout(300);
 const free2 = await p2.evaluate((k) => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
 ok('and a second load leaves it there', free2.account?.planId === 'guest', JSON.stringify(free2.account));
 
+/* The showcase retired the three technology tracks. An enrolment pointing at
+   one of them is the failure with no symptom: `trackById` returns undefined,
+   `studentTrack()` returns null, and the portal shows a student enrolled in
+   nothing without saying why. The enrolment is cleared so they are asked again;
+   the progress, keyed by course id, has to survive untouched. */
+console.log('\n== an enrolment on a retired track is cleared, and progress survives ==');
+const p3 = await b.newPage();
+p3.on('pageerror', (e) => { failures += 1; console.log('  PAGEERROR ' + e.message); });
+await p3.goto(BASE + PAGE);
+await p3.evaluate(([k, v]) => localStorage.setItem(k, JSON.stringify(v)), [KEY, {
+  session: { name: 'Rui', email: 'rui@codeschool.ing' },
+  account: { planId: 'guest', since: '2026-03-03' },
+  enrollment: { trackId: 'python-tech', since: '2026-03-03', choices: { 'python-tech:3': 1 } },
+  progress: { python: { lessons: { 0: { sections: { intro: true } } } } },
+  notes: { python: { 0: { intro: 'o GIL' } } }, exams: {}, last: null,
+}]);
+await p3.reload();
+await p3.waitForFunction(() => location.hash.length > 1);
+// the document is only written back when something changes, so navigate first —
+// the same thing the plan case above does, and for the same reason
+await p3.evaluate(() => location.hash = '#/course/python/lesson/0/intro');
+await p3.waitForTimeout(400);
+const dead = await p3.evaluate((k) => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
+ok('the enrolment on python-tech is gone', !dead.enrollment || !dead.enrollment.trackId,
+   JSON.stringify(dead.enrollment));
+ok('the course progress is untouched',
+   dead.progress?.python?.lessons?.[0]?.sections?.intro === true, JSON.stringify(dead.progress));
+ok('and so is the note',
+   dead.notes?.python?.[0]?.intro === 'o GIL', JSON.stringify(dead.notes));
+
+/* A live track must not be touched by the same pass. */
+await p3.evaluate(([k, v]) => localStorage.setItem(k, JSON.stringify(v)), [KEY, {
+  session: { name: 'Rui', email: 'rui@codeschool.ing' },
+  account: { planId: 'guest', since: '2026-03-03' },
+  enrollment: { trackId: 'backend', since: '2026-03-03', choices: { 'backend:3': 2 } },
+  progress: {}, notes: {}, exams: {}, last: null,
+}]);
+await p3.reload();
+await p3.waitForFunction(() => location.hash.length > 1);
+await p3.evaluate(() => location.hash = '#/course/python/lesson/0/intro');
+await p3.waitForTimeout(400);
+const live = await p3.evaluate((k) => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
+ok('a live enrolment is left alone', live.enrollment?.trackId === 'backend', JSON.stringify(live.enrollment));
+
 await b.close();
 console.log(failures ? `\n${failures} FAILURE(S)` : '\neverything passed');
 process.exit(failures ? 1 : 0);
