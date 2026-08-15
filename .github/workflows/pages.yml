@@ -48,16 +48,24 @@ jobs:
       # rewritten, only for the artefact — the committed file keeps its empty
       # value. The grep fails the publish loudly if the tag ever moves or arrives
       # already filled, rather than shipping a portal pointed nowhere.
-      - name: Point the served portal at the API
+      #
+      # BOTH ENTRY POINTS, and that is what the loop is for: the console is a
+      # second application under admin/, with the same empty tag and the same
+      # need. Rewriting only the portal would publish a console pointed at
+      # nothing — which reads as a broken console rather than as a missed deploy
+      # step, and is therefore worse than failing here.
+      - name: Point the served pages at the API
         env:
           BACKEND: ${{ vars.PORTAL_BACKEND || 'https://api.codeschool.ing' }}
         run: |
           set -euo pipefail
           before='<meta name="backend" content="" />'
           after='<meta name="backend" content="'"$BACKEND"'" />'
-          grep -qF "$before" index.html
-          sed -i "s#$before#$after#" index.html
-          echo "backend -> $BACKEND"
+          for f in index.html admin/index.html; do
+            grep -qF "$before" "$f"
+            sed -i "s#$before#$after#" "$f"
+            echo "$f  backend -> $BACKEND"
+          done
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

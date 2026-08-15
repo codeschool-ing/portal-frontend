@@ -40,11 +40,32 @@ node tools/smoke/smoke.mjs      # the whole portal, in a browser
 node tools/examples/check.mjs   # the code examples really do run
 node tools/i18n/check.mjs       # nothing on screen is stuck in English
 node tools/snapshot/snapshot.js  # the backend's snapshot still builds
+node tools/admin-smoke/check.mjs # the console's shell, in a browser
 ```
 
-All four run in CI on every pull request — `.github/workflows/ci.yml`. They are
+All five run in CI on every pull request — `.github/workflows/ci.yml`. They are
 not `aleogr/pipeline`'s: the organisation's shared workflows are Go, and there
 is none here.
+
+## There is a second application here: the console
+
+`admin/` is the staff side. It is a shell today — seven routes, a rail, and a
+screen apiece that states what that screen is for and where each piece of it
+stands. **Nothing in it calls the API.**
+
+It lives in this repository rather than a third one for a specific reason:
+`assets/base.css` already exists twice byte for byte, and a console somewhere
+else would be a third copy. Under `admin/` it reuses the stylesheet, the router,
+`esc`, the CI job and the Pages deploy without duplicating any of them — and it
+is a folder, so moving it to its own host or its own repository later is a `git
+mv` and two relative paths.
+
+**It has no access control, and it says so on every screen.** The backend has no
+staff role — `accounts` carries no such column and no table does — so
+`admin/app/session.js` reports `staff: null`, meaning *the concept does not exist
+yet*, and a banner says it in words. The smoke suite asserts that banner is
+present. Which makes the rule that follows unambiguous: a screen that reads or
+writes real data cannot ship before the role check does. See `admin/README.md`.
 
 ## Feeding the backend
 
@@ -688,6 +709,7 @@ for it to exist empty than to be retrofitted.
 
 ```
 index.html                     the shell: bar, rail and <main>
+admin/                         the staff console — a second application; see admin/README.md
 assets/base.css                the vitrine's CSS — selectors now English, so it has diverged
 assets/portal.css              only what the vitrine did not have
 assets/catalog.js              catalogue, in English (mirrored server-side; see the snapshot tool)
