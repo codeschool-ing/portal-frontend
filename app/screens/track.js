@@ -9,7 +9,7 @@
 import { buildTrack, drawEdges, adjustGraphArrows } from '../graph.js';
 import { chooseOption, activeOption } from '../state.js';
 import { goTo } from '../routes.js';
-import { trackExam } from '../exams.js';
+import { trackExam, examReady } from '../exams.js';
 import { examCard } from './exam.js';
 import { studentTrack, trackProgress, empty } from './common.js';
 
@@ -28,12 +28,11 @@ export default async function track() {
      switching branches switches the courses and therefore the question bank. */
   const card = () => {
     const exam = trackExam(t, activeOption);
-    return exam.items.length
-      ? examCard({
-        key: exam.key, href: '#/track/exam', scope: 'track',
-        count: exam.items.length, progress: trackProgress(t).pct,
-      })
-      : '';
+    return examCard({
+      key: exam.key, href: '#/track/exam', scope: 'track',
+      count: exam.items.length, progress: trackProgress(t).pct,
+      ready: examReady(exam),
+    });
   };
   el.innerHTML = buildTrack(t) + card();
 

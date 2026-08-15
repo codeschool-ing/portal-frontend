@@ -491,6 +491,22 @@ lesson is done when all of its sections are. A record in the old format (one
 checkbox per lesson) is migrated on the first write, so whoever already had
 progress does not see it reset.
 
+**And the exam follows the same rule, one level up.** It did not, and that is
+what the reader saw: the exam card was rendered only when the draw came back with
+questions, so on Technical Leadership — five courses, none of them written yet —
+the *Track exam* section was simply not on the screen. Nothing said why, and
+nothing said it was coming. Five tracks were in that state, and 118 of the 122
+course pages. The card is now always there, dashed and reading *in preparation*,
+exactly like the assessment at the foot of a lesson.
+
+The other half of the same rule: **a paper too thin to be passed without being
+perfect is not offered either.** `statistics` has one written exercise and was
+advertising a one-question "final exam". `MIN_QUESTIONS` is derived from the pass
+mark rather than chosen — a paper of n questions scores in steps of 100/n, and at
+70% three questions means passing requires three out of three, which is not the
+exam the rules on the screen describe. The floor comes out at four. The exam
+screen applies the same test, so *coming soon* is never a doorway.
+
 ### The three written courses
 
 There is one file per course, as the pipeline does — `lessons-<course>.js` and

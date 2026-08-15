@@ -934,6 +934,60 @@ await p.waitForSelector('.wizard-exam');
 const trackQuestions = await p.locator('.wz-dot').count();
 ok('fifteen questions, from more than one course', trackQuestions === 15, trackQuestions + ' questions');
 
+/* THE CARD IS THERE EVEN WHEN THE EXAM IS NOT. The exercise bank is written
+   course by course — 118 of the 122 courses have none — and the card used to be
+   rendered only when the draw came back with questions, so on five whole tracks
+   the section was simply absent. Nothing said why, and nothing said it was
+   coming. The same rule the assessment at the foot of a lesson already follows.
+
+   Technical Leadership is the case that was reported: five courses, no
+   exercises, no card. `statistics` is the other half of the rule — it has ONE
+   exercise, and a one-question paper at a 70% pass mark is not a measurement,
+   so it is announced rather than offered too. */
+for (const [what, where, seed] of [
+  ['a track with no exercises', '#/track', 'tech-lead'],
+  ['a course with only one', '#/course/statistics', null],
+]) {
+  if (seed) {
+    await p.evaluate((tid) => {
+      const doc = JSON.parse(localStorage.getItem('codeschool-portal'));
+      doc.enrollment = { ...(doc.enrollment || {}), trackId: tid };
+      localStorage.setItem('codeschool-portal', JSON.stringify(doc));
+    }, seed);
+    await p.goto(BASE + PAGE + where);
+    await p.reload();
+  } else {
+    await p.goto(BASE + PAGE + where);
+  }
+  /* Not `waitForSelector`: the defect being guarded against is the card being
+     ABSENT, and waiting for an absent element fails as a 30-second timeout with
+     a message about a locator. Asking the question outright fails in a second
+     and says what is wrong. */
+  await p.waitForSelector('.view');
+  await p.waitForTimeout(400);
+  const card = await p.evaluate(() => {
+    const c = document.querySelector('.exam-card');
+    return c && { pending: c.classList.contains('pending'), link: c.querySelectorAll('a.btn').length };
+  });
+  ok(what + ' still shows the card', Boolean(card), card ? '' : 'no card on the screen');
+  ok('  and says it is being prepared', card?.pending === true);
+  ok('  without offering a way in', card?.link === 0);
+}
+// the screen behind it agrees with the card, so "coming soon" is not a doorway
+await p.goto(BASE + PAGE + '#/track/exam');
+await p.waitForSelector('.view-exam');
+ok('and the exam screen says the same', (await p.locator('.assessment-pending').count()) === 1);
+ok('with no paper to answer', (await p.locator('.wizard-exam').count()) === 0);
+// back to the track the rest of the suite signed in with
+await p.evaluate(() => {
+  const doc = JSON.parse(localStorage.getItem('codeschool-portal'));
+  doc.enrollment = { ...(doc.enrollment || {}), trackId: 'backend' };
+  localStorage.setItem('codeschool-portal', JSON.stringify(doc));
+});
+await p.goto(BASE + PAGE + '#/track');
+await p.reload();
+await p.waitForSelector('.exam-card');
+
 await p.goto(BASE + PAGE + '#/certificates');
 await p.waitForSelector('.cert');
 ok('there are certificate examples', (await p.locator('.cert-sample').count()) === 2);

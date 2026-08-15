@@ -45,6 +45,23 @@ export const PASS_MARK = 70;         // % correct needed to pass
 export const COURSE_QUESTIONS = 10;
 export const TRACK_QUESTIONS = 15;
 
+/* THE SMALLEST PAPER THAT IS STILL A MEASUREMENT — derived from the pass mark
+   rather than chosen. A paper of n questions only scores in steps of 100/n, so
+   below a certain n the pass mark can only be reached by a perfect paper: at
+   three questions 2 right is 67% and fails, so passing means 3 of 3. An exam
+   that demands perfection is not the exam the rules on the screen describe, and
+   a single question is not a measurement at all.
+
+   It matters because the exercise bank is written course by course: four of the
+   122 courses have one today, and one of those four has a single exercise —
+   which was being offered as a "final exam". */
+export const MIN_QUESTIONS = (() => {
+  let n = 1;
+  while (Math.ceil((PASS_MARK * n) / 100) >= n) n += 1;
+  return n;
+})();
+export const examReady = (exam) => exam.items.length >= MIN_QUESTIONS;
+
 /* Every exercise in a course, each one knowing which lesson it came from — the
    wizard stores the answer under `progress[course].lessons[ix]`, and an exam that
    pooled lessons without keeping the origin would file everything against the
