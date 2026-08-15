@@ -140,7 +140,7 @@ ok('arrival node', await p.locator('.node-outcome').isVisible());
 
 // no edge may pass through a card that is not one of its endpoints — the same
 // detector the vitrine uses, sampling points along each curve
-const collisions = await p.evaluate(() => {
+const crossings = () => p.evaluate(() => {
   const cont = document.querySelector('.track-graph');
   const base = cont.getBoundingClientRect();
   const boxes = [...cont.querySelectorAll('[data-node]')].map((el) => {
@@ -160,6 +160,7 @@ const collisions = await p.evaluate(() => {
   });
   return bad;
 });
+const collisions = await crossings();
 ok('no edge crosses a card', collisions === 0, collisions + ' collisions');
 
 /* THE CURSOR LIGHTS UP A COURSE'S EDGES — behaviour from the vitrine that had
@@ -197,6 +198,85 @@ ok('the cursor lights up the course edges', lit.on === lit.expected && lit.expec
 ok('and not the others', lit.onlyThisCourse);
 ok('a lit edge gets thicker', lit.thick > lit.thin, lit.thick + 'px vs ' + lit.thin + 'px');
 ok('and goes out when the cursor leaves', lit.after === 0);
+
+/* THE GRAPH ON THE WHOLE SCREEN. On this screen the graph gets 58vh, and it is
+   wider than it is tall — the button is worth more to it than any other control
+   here. It is the vitrine's feature; `base.css` already carried its styles and
+   the JS to drive it had been left behind, the same half-copy as the hover. */
+const wide = await p.evaluate(async () => {
+  const box = () => document.querySelector('.graph-box').getBoundingClientRect();
+  const before = box().width * box().height;
+  document.querySelector('.graph-full-toggle').click();
+  await new Promise((r) => setTimeout(r, 500));
+  const on = document.body.classList.contains('graph-full');
+  const after = box().width * box().height;
+  const label = document.querySelector('.graph-full-toggle').getAttribute('aria-label');
+  dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+  await new Promise((r) => setTimeout(r, 450));
+  return { on, grew: after / before, label, off: !document.body.classList.contains('graph-full') };
+});
+ok('the graph takes the whole screen', wide.on && wide.grew > 1.4, '×' + wide.grew.toFixed(2) + ' the area');
+ok('and the button then says how to get out',
+  /leave|sair|salir|quitter|uscire/i.test(wide.label || ''), wide.label);
+ok('Escape gives the screen back', wide.off);
+
+/* SWITCHING TRACK FROM THE BAR, WHILE STANDING ON THE GRAPH. `api.enrol()`
+   writes the new track and `goTo('/track')` asks for the screen — but assigning
+   the hash it already had fired no `hashchange`, so nothing re-rendered and the
+   old track stayed on the screen. The way out was to leave for another screen
+   and come back, which is not a way out: it is a workaround the student had to
+   find on their own. */
+const named = await p.evaluate(async () => {
+  const name = () => document.querySelector('.view-track .track-top h2')?.textContent;
+  const before = name();
+  document.querySelector('#nav-context .ctx').click();
+  document.querySelector('#nav-context .ctx-op[data-track="qa"]').click();
+  await new Promise((r) => setTimeout(r, 600));
+  return { before, after: name(), edges: document.querySelectorAll('.edge').length };
+});
+ok('the graph follows the track chosen in the bar',
+  Boolean(named.after) && named.after !== named.before, named.before + ' → ' + named.after);
+ok('and it is drawn, not left empty', named.edges > 5, named.edges + ' edges');
+
+/* AND THE ROUTING HOLDS ON A WINDOW TALLER THAN IT IS WIDE. `base.css`
+   transposes the graph there — levels stack, the cards inside one sit side by
+   side — and the router has to be told, because it draws in a single axis and
+   swaps the coordinates for the other. It was not told: the layout turned and
+   the edges did not, so on a narrow monitor EVERY track drew a tangle. Measured
+   before the fix: 6 of backend's 20 edges through a card, and 144 crossings
+   across seventeen tracks.
+
+   More than one track, because a router is only exercised by the shapes it is
+   given. */
+const tangled = [];
+await p.setViewportSize({ width: 900, height: 1000 });
+for (const id of ['backend', 'security', 'devops', 'data-science']) {
+  await p.evaluate((tid) => {
+    const doc = JSON.parse(localStorage.getItem('codeschool-portal'));
+    doc.enrollment = { ...(doc.enrollment || {}), trackId: tid };
+    localStorage.setItem('codeschool-portal', JSON.stringify(doc));
+  }, id);
+  /* a reload, and not a route change: the state module reads the document once,
+     at load, so writing it under a running page changes nothing on screen */
+  await p.goto(BASE + PAGE + '#/track');
+  await p.reload();
+  await p.waitForSelector('.track-graph');
+  await p.waitForTimeout(500);
+  const bad = await crossings();
+  if (bad) tangled.push(id + ': ' + bad + ' of ' + (await p.locator('.edge').count()));
+}
+ok('no edge crosses a card on a portrait window either',
+  tangled.length === 0, tangled.join(', ') || 'four tracks clean at 900×1000');
+// back to the window, and to the track, the rest of the suite was written for
+await p.setViewportSize({ width: 1440, height: 900 });
+await p.evaluate(() => {
+  const doc = JSON.parse(localStorage.getItem('codeschool-portal'));
+  doc.enrollment = { ...(doc.enrollment || {}), trackId: 'backend' };
+  localStorage.setItem('codeschool-portal', JSON.stringify(doc));
+});
+await p.goto(BASE + PAGE + '#/track');
+await p.reload();
+await p.waitForSelector('.track-graph');
 
 console.log('\n== 4. course and lesson ==');
 await p.goto(BASE + PAGE + '#/course/javascript');
