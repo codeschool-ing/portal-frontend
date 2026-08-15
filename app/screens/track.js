@@ -62,8 +62,9 @@ export default async function track() {
 
   /* ---------- the graph on the whole screen ----------
      On this screen the graph gets what is left after the heading, the numbers
-     and the exam card have taken theirs — around 58vh, with most of a long
-     track behind a sideways scroll. The button hands it the window instead.
+     and the exam card have taken theirs — around 400px on a 900px window, with
+     most of a long track behind a sideways scroll. The button hands it the
+     window instead.
 
      Not a second route and not the Fullscreen API: the same DOM moved to a
      fixed layer under the bar, so nothing is rebuilt, the language and the

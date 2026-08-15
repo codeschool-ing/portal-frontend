@@ -275,7 +275,8 @@ over a whole fork block when there was a clear gap beneath it, and the re-packin
 pass, which is why a sub-column could overflow its lane. All three arrived
 together with the port.
 
-**The graph can take the whole screen.** It gets 58vh here and is wider than it
+**The graph can take the whole screen.** It gets what the heading, the legend and
+the exam card leave it — around 400px on a 900px window — and it is wider than it
 is tall, so a button hands it the window: the screen becomes a fixed layer under
 the bar, the objective and the exam card stand down, and Escape gives it back.
 Not a second route and not the Fullscreen API — the same DOM moved, so nothing is
@@ -283,12 +284,29 @@ rebuilt and the language, the theme and the way out stay reachable. It can also
 be **taken hold of and dragged**, on both axes, because the arrows page one
 screenful at a time and that is the wrong unit for reading across the fold.
 
+**The screen fits the window instead of scrolling it.** The graph used to ask for
+58vh — a guess at what would be left over, and too much: the heading, the legend
+and the exam card took the rest and then some, so the screen had *two* scroll
+surfaces and the wheel did different things depending on where the pointer was
+(161px of page scroll at 912×930, and 53px even at 1440×900). It now takes what
+is actually left. Two things had to be right for that. `.view` carries
+`margin:0 auto`, and an auto margin cancels the stretch a column flex container
+would otherwise apply — without an explicit `width:100%` the screen sized itself
+to its widest child and ran 206px past the window sideways. And the floor is
+360px, which is not a taste: the tallest thing a level can hold is a fork block
+at ~334px, and squeezed below that the block overflows its lane, a card ends up
+outside it, and the corridor an edge detours through is gone — 16 edges crossed a
+card when 220px was tried. Under about 800px of window height the floor wins and
+the column scrolls again, which is the honest outcome: there is genuinely not
+room.
+
 The smoke suite reproduces the vitrine's collision detector — 120 points per
 curve, checking whether any of them falls inside a card that is not an endpoint
 of that edge. Inheriting the routing without inheriting the check would mean
 keeping the risk and losing the net. It runs it in a landscape window, on the
 whole screen, and at 900×1000 over four tracks — a router is only exercised by
-the shapes it is given. It also checks the highlight, and there is a
+the shapes it is given. It measures the two overflows too, on four window shapes
+and both axes. It also checks the highlight, and there is a
 measurement trap there: the line's thickness has a `transition`, and
 `getComputedStyle` mid-transition returns the intermediate value — measuring
 immediately reads 1.5px and fails a rule that is correct.
