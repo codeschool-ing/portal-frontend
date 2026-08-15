@@ -48,7 +48,7 @@ is none here.
 
 ## The staff console is a different repository
 
-`codeschool-ing/console-frontend`, served at **admin.codeschool.ing**. It started
+`codeschool-ing/console-frontend`, served at **console.codeschool.ing**. It started
 as a folder here and moved out for one narrow reason: GitHub Pages serves one
 custom domain per repository, `CNAME` holds exactly one, and this repository's is
 `app.codeschool.ing`.
