@@ -223,6 +223,20 @@ is a symmetry here: the vitrine's "Student area" link is described in that
 repository's README as a *placeholder for future functionality*. This repository
 is its destination.
 
+## The staff console is a different repository
+
+`codeschool-ing/console-frontend`, served at **admin.codeschool.ing**. It started
+as a folder here and moved out for one narrow reason: GitHub Pages serves one
+custom domain per repository, `CNAME` holds exactly one, and this repository's is
+`app.codeschool.ing`.
+
+Two things follow for whoever works here. **`assets/base.css` now has three
+copies** — the vitrine's `style.css`, this one, and the console's — so an edit
+goes to two other places, not one; the file's own header says so. And **the
+console has no backend of its own**: its endpoints belong in `portal-backend`
+behind a `RequireStaff`, and what it costs the API is one entry in
+`PORTAL_ALLOWED_ORIGINS`.
+
 The rail becomes a drawer at **1180px** and the graph becomes a list at **861px**
 — both cut points are the vitrine's, reused because they were measured there, not
 chosen.
