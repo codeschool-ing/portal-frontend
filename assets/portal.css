@@ -442,6 +442,52 @@ body.no-rail .rail{display:none}
    height — in the vitrine it came from the fullpage section, which does not
    exist here. */
 .view-track .graph-box{height:clamp(360px,58vh,640px)}
+
+/* ---------- THE TRACK SCREEN FILLS THE WINDOW INSTEAD OF SCROLLING IT ----------
+
+   58vh was a guess at what would be left over, and it was too much: the heading,
+   the objective, the legend and the exam card take the rest, and together they
+   went past the window. The screen then had TWO scroll surfaces — the graph
+   inside its box and the page around it — so the wheel did different things
+   depending on where the pointer was. Measured at 912×930, which is where it was
+   reported: the page scrolled 161px, and 53px even at 1440×900.
+
+   So the graph stops asking for a share of the window and takes what is actually
+   left. Everything above and below it is auto-sized, the box gets the remainder,
+   and the page has nothing to scroll. What is left over is not always enough,
+   and `min-height` is where that stops: below it the content column scrolls
+   again, which is right — a graph squeezed to nothing would be worse than a
+   scrollbar.
+
+   Below 861px none of this applies: there the graph is a vertical list and the
+   page is meant to scroll. And not while the e-mail nudge is up — it sits
+   between the bar and the grid, so the window is already short by its height and
+   this arithmetic would not know by how much. */
+@media (min-width:861px){
+  body:not(.banner-on) .content:has(.view-track){
+    height:calc(100dvh - 64px);   /* the bar is fixed and 64px */
+    padding-bottom:var(--pad-y);
+    display:flex;flex-direction:column;overflow:auto;
+  }
+  /* `width:100%` is not redundant: `.view` carries `margin:0 auto`, and an auto
+     margin cancels the stretch a column flex container would otherwise apply —
+     the screen then sized itself to its widest child and ran 206px past the
+     window sideways. The `max-width:1180px` above still caps it, and the auto
+     margin still centres it, on a wide monitor. */
+  .content:has(.view-track) .view-track{flex:1 1 auto;min-height:0;width:100%}
+  /* `height:auto` cancels the clamp above; the flex is what sizes it now. The
+     script may still shrink it further — `splitLevels` hugs the graph when it is
+     shorter than the room it was given, and that is the same feature the vitrine
+     has. What it cannot do any more is ask for more room than there is. */
+  /* 360px is the floor the clamp above already had, and it is not a taste: the
+     tallest thing a level can hold is a fork block, ~334px, and it has to fit
+     between the lane's own padding. Squeezed below that the block overflows the
+     lane, `align-items:center` centres the overflow, and a card ends up outside
+     it — where there is no room left for the corridor an edge detours through,
+     so the edge is drawn straight through the card. Tried at 220px: 16 edges
+     crossed a card at 1280×720. */
+  .view-track .graph-box{flex:1 1 auto;height:auto;min-height:360px}
+}
 .view-track .track-top{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-start}
 .view-track .track-top p{max-width:58ch;color:var(--paper-dim);font-size:.9rem}
 .view-track .track-summary{display:flex;gap:18px;flex-wrap:wrap}
@@ -505,7 +551,7 @@ body.graph-full .view-track .track-top h2{
 /* the objective is prose, and prose is not what the whole screen was asked for */
 body.graph-full .view-track .track-top p{display:none}
 body.graph-full .view-track .track-summary{gap:22px}
-/* the fixed 58vh is the very thing the button exists to undo */
+/* the graph stops sharing the screen and takes all of it */
 body.graph-full .view-track .graph-box{flex:1 1 auto;height:auto;min-height:0}
 body.graph-full .view-track .track-graph{padding-top:34px}
 body.graph-full .graph-full-toggle{top:6px;right:6px}

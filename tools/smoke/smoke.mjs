@@ -267,6 +267,37 @@ for (const id of ['backend', 'security', 'devops', 'data-science']) {
 }
 ok('no edge crosses a card on a portrait window either',
   tangled.length === 0, tangled.join(', ') || 'four tracks clean at 900×1000');
+
+/* AND THE SCREEN DOES NOT SCROLL THE PAGE. The graph used to ask for 58vh, a
+   guess at what would be left over, and the heading, the legend and the exam
+   card took the rest and then some: the screen had TWO scroll surfaces, so the
+   wheel did different things depending on where the pointer was. Reported at
+   912×930, where the page scrolled 161px — and it scrolled 53px at 1440×900 too.
+
+   Both axes: the fix makes the screen a flex column, and `.view`'s `margin:0
+   auto` cancels the stretch that would otherwise size it — which sent it 206px
+   past the window sideways before `width:100%` was added. */
+const spills = [];
+for (const size of [{ width: 1440, height: 900 }, { width: 912, height: 930 },
+  { width: 1920, height: 950 }, { width: 1000, height: 1100 }]) {
+  await p.setViewportSize(size);
+  await p.goto(BASE + PAGE + '#/track');
+  await p.reload();
+  await p.waitForSelector('.track-graph');
+  await p.waitForTimeout(550);
+  const over = await p.evaluate(() => {
+    const de = document.documentElement, c = document.querySelector('.content');
+    return {
+      down: Math.round(de.scrollHeight - de.clientHeight) + Math.round(c.scrollHeight - c.clientHeight),
+      across: Math.round(de.scrollWidth - de.clientWidth) + Math.round(c.scrollWidth - c.clientWidth),
+    };
+  });
+  if (over.down || over.across) {
+    spills.push(size.width + '×' + size.height + ': ' + over.down + 'px down, ' + over.across + 'px across');
+  }
+}
+ok('and the screen fits the window instead of scrolling it',
+  spills.length === 0, spills.join('; ') || 'four window shapes, both axes');
 // back to the window, and to the track, the rest of the suite was written for
 await p.setViewportSize({ width: 1440, height: 900 });
 await p.evaluate(() => {
