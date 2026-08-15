@@ -472,6 +472,48 @@ body.no-rail .rail{display:none}
 /* an edge whose prerequisite is already met lights up; the rest stays quiet */
 .edge-done .row{stroke:var(--phosphor);opacity:.55}
 
+/* ---------- THE GRAPH ON THE WHOLE SCREEN ----------
+   The vitrine's feature, and `base.css` already carries everything that belongs
+   to the button itself — the icon that swaps, `body.graph-full{overflow:hidden}`,
+   the cards spreading through the height. What does NOT carry over is the layer:
+   over there the graph lives in `.track-panel`, one of seven full-page sections,
+   and here it is a screen inside a rail-and-content grid. Those rules are
+   rewritten for `.view-track` below, and only those.
+
+   Under the bar and not over it: the 64px bar stays where it always is, so the
+   language, the theme and the way out keep working. The e-mail nudge, when it is
+   showing, goes behind the layer — it is a nudge, and Escape brings it back. */
+body.graph-full .view-track{
+  position:fixed;inset:64px 0 0 0;z-index:70;
+  margin:0;padding:12px clamp(16px,3vw,28px) 16px;
+  background:var(--ink);
+  display:flex;flex-direction:column;min-height:0;gap:0;
+  /* `.view` caps every screen at 1180px so prose does not run the width of a
+     monitor. The graph is not prose, and that cap is most of what it was
+     missing on a wide screen. */
+  max-width:none;
+}
+/* the heading gives up its height: one line, and the numbers beside it */
+body.graph-full .view-track .track-top{
+  margin-bottom:10px;align-items:center;flex-wrap:nowrap;gap:18px;
+  border-bottom:1px solid var(--wire);padding-bottom:10px;
+}
+body.graph-full .view-track .track-top>div:first-child{flex:1 1 auto;min-width:0}
+body.graph-full .view-track .track-top h2{
+  font-size:1.05rem;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+/* the objective is prose, and prose is not what the whole screen was asked for */
+body.graph-full .view-track .track-top p{display:none}
+body.graph-full .view-track .track-summary{gap:22px}
+/* the fixed 58vh is the very thing the button exists to undo */
+body.graph-full .view-track .graph-box{flex:1 1 auto;height:auto;min-height:0}
+body.graph-full .view-track .track-graph{padding-top:34px}
+body.graph-full .graph-full-toggle{top:6px;right:6px}
+/* whatever else the screen holds — today the track exam — stands down. The
+   legend stays: it is one line and it is how the colours are read. */
+body.graph-full .view-track>:not(.track-top):not(.graph-box):not(.graph-legend){display:none}
+body.graph-full .view-track .graph-legend{margin-top:10px}
+
 .graph-legend{display:flex;flex-wrap:wrap;gap:16px}
 .leg{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--paper-dim)}
 .leg-color{width:11px;height:11px;border-radius:2px;border:1px solid var(--wire);background:var(--ink)}

@@ -227,6 +227,16 @@ The rail becomes a drawer at **1180px** and the graph becomes a list at **861px*
 — both cut points are the vitrine's, reused because they were measured there, not
 chosen.
 
+**The track in the bar is a selector, and asking for the screen you are already
+on still renders it.** Assigning `location.hash` the value it already has fires
+no `hashchange`, so nothing re-runs — and the screen goes on showing what it was
+built from, which is not always what the state says any more. That is how
+choosing a track from the bar while standing on the graph left the old track on
+screen: the enrolment was written and the navigation was a no-op, so the only way
+to see the new one was to leave for another screen and come back. `goTo`
+re-dispatches instead, for every caller and not only that one — it is asked for a
+screen, and a screen built from stale state is the wrong screen.
+
 ## The graph became a progress map
 
 It is the project's best reuse, and it comes almost free: `requires` already is,
@@ -249,10 +259,36 @@ did not. Half a copy raises an error nowhere — it simply does not happen. Ther
 is a single listener, on the screen, and not one per card: the cards are rebuilt
 on every fork switch, and a per-card listener leaks on every rebuild.
 
+**On a window taller than it is wide the graph is transposed** — levels stack,
+the cards of a level sit side by side, and the edges are still drawn. `base.css`
+turns the layout with a media query; the router is told by reading that layout
+back, and it draws in a single axis either way: the boxes go in with `x` and `y`
+swapped and every point comes out swapped back, so "the lane above the cards" is
+the margin to their left, and not one line of the routing is written twice.
+
+That is what a copy costs when only half of it travels. The portal's router came
+from the vitrine before the transposition existed, so the layout turned and the
+edges did not: on a narrow monitor **every** track drew a tangle — 6 of
+back-end's 20 edges through a card, 144 crossings across seventeen tracks. The
+same copy also predated the corridor threading, which is why an edge would ride
+over a whole fork block when there was a clear gap beneath it, and the re-packing
+pass, which is why a sub-column could overflow its lane. All three arrived
+together with the port.
+
+**The graph can take the whole screen.** It gets 58vh here and is wider than it
+is tall, so a button hands it the window: the screen becomes a fixed layer under
+the bar, the objective and the exam card stand down, and Escape gives it back.
+Not a second route and not the Fullscreen API — the same DOM moved, so nothing is
+rebuilt and the language, the theme and the way out stay reachable. It can also
+be **taken hold of and dragged**, on both axes, because the arrows page one
+screenful at a time and that is the wrong unit for reading across the fold.
+
 The smoke suite reproduces the vitrine's collision detector — 120 points per
 curve, checking whether any of them falls inside a card that is not an endpoint
 of that edge. Inheriting the routing without inheriting the check would mean
-keeping the risk and losing the net. It also checks the highlight, and there is a
+keeping the risk and losing the net. It runs it in a landscape window, on the
+whole screen, and at 900×1000 over four tracks — a router is only exercised by
+the shapes it is given. It also checks the highlight, and there is a
 measurement trap there: the line's thickness has a `transition`, and
 `getComputedStyle` mid-transition returns the intermediate value — measuring
 immediately reads 1.5px and fails a rule that is correct.
