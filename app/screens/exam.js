@@ -17,7 +17,7 @@
 
 import { courseById } from '../catalog.js';
 import { courseProgress, activeOption, examResult, examAttempts, saveExam } from '../state.js';
-import { openCourseExam, openTrackExam, examScore, PASS_MARK } from '../exams.js';
+import { openCourseExam, openTrackExam, examScore, examReady, PASS_MARK } from '../exams.js';
 import * as api from '../api.js';
 import { buildAssessment } from '../exercises/index.js';
 import { studentTrack, trackProgress, bar, empty } from './common.js';
@@ -31,13 +31,16 @@ function build(exam, progress) {
   const el = document.createElement('div');
   el.className = 'view view-exam';
 
-  if (!exam.items.length) {
+  /* Not `!exam.items.length`: a paper too thin to be passed without perfection
+     is no more sittable than an empty one, and the screen has to agree with the
+     card that led here — otherwise "coming soon" would be a link to an exam. */
+  if (!examReady(exam)) {
     el.innerHTML =
       '<header class="view-head">' +
         '<h1>' + txt('Exam') + ' · ' + esc(exam.title) + '</h1>' +
       '</header>' +
       '<section class="block assessment-pending"><p class="mono dim">' +
-        txt('[exam in preparation — this course has no exercises produced yet]') +
+        txt('[exam in preparation — not enough exercises have been produced yet]') +
       '</p></section>';
     return el;
   }
@@ -178,33 +181,51 @@ const pending = (title) => {
   el.innerHTML =
     '<header class="view-head"><h1>' + txt('Exam') + ' · ' + esc(title) + '</h1></header>' +
     '<section class="block assessment-pending"><p class="mono dim">' +
-      txt('[exam in preparation — this course has no exercises produced yet]') +
+      txt('[exam in preparation — not enough exercises have been produced yet]') +
     '</p></section>';
   return el;
 };
 
 /* The card that announces the exam, at the end of the course page and of the
    track page. It is the same piece in both places because it is the same
-   promise. */
-export function examCard({ key, href, scope, count, progress }) {
+   promise.
+
+   IT IS ALWAYS THERE, whether the exam can be sat or not. It used to be rendered
+   only when the draw came back with questions, and the exercise bank is written
+   course by course: 118 of the 122 courses have none yet, so on five whole
+   tracks — Technical Leadership among them — the section was simply absent from
+   the screen. Nothing said why, and nothing said it was coming.
+
+   That is the rule `lessons.js` already states for the assessment at the foot of
+   every lesson: "an empty assessment says what is coming instead of vanishing…
+   publishing one at a time does not rearrange anyone's screen." The exam is the
+   same promise one level up, and it was the one place the rule was not applied.
+
+   `ready` false covers the empty bank and the paper too thin to measure
+   anything alike — see MIN_QUESTIONS. */
+export function examCard({ key, href, scope, count, progress, ready = true }) {
   const r = examResult(key);
-  const state = r?.passed ? 'passed' : (r ? 'attempted' : 'new');
+  const state = ready ? (r?.passed ? 'passed' : (r ? 'attempted' : 'new')) : 'pending';
   return '<section class="block exam-card ' + state + '">' +
     '<div class="exam-card-text">' +
       '<span class="exam-card-label mono">' +
         txt(scope === 'track' ? 'end of the track' : 'end of the course') + '</span>' +
       '<h2>' + txt(scope === 'track' ? 'Track exam' : 'Final exam') + '</h2>' +
-      '<p>' + count + ' ' + txt('questions drawn') + ' · ' + txt('minimum') + ' ' + PASS_MARK + '% · ' +
-        txt('result only at the end') + '</p>' +
-      (r
+      (ready
+        ? '<p>' + count + ' ' + txt('questions drawn') + ' · ' + txt('minimum') + ' ' + PASS_MARK + '% · ' +
+          txt('result only at the end') + '</p>'
+        : '<p>' + txt('in preparation — not enough exercises yet') + '</p>') +
+      (ready && r
         ? '<p class="exam-card-score' + (r.passed ? ' passed' : '') + '">' +
             (r.passed ? '✓ ' + txt('passed with') : txt('best score:')) + ' ' + r.best + '%</p>'
         : '') +
     '</div>' +
     '<div class="exam-card-action">' +
       (progress !== undefined ? bar(progress, progress + '%') : '') +
-      '<a class="btn btn-primary" href="' + href + '">' +
-        txt(r ? 'Redo the exam' : 'Take the exam') + ' →</a>' +
+      (ready
+        ? '<a class="btn btn-primary" href="' + href + '">' +
+          txt(r ? 'Redo the exam' : 'Take the exam') + ' →</a>'
+        : '<span class="exam-card-soon mono">' + txt('coming soon') + '</span>') +
     '</div>' +
   '</section>';
 }

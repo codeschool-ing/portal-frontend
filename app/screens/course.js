@@ -11,7 +11,7 @@ import { courseLessons, courseById, tracksWithCourse, unlockedBy } from '../cata
 import { lessonSections, courseMaterials } from '../lessons.js';
 import { courseProgress, lessonProgress, lessonDone } from '../state.js';
 import { courseState } from '../graph.js';
-import { courseExam } from '../exams.js';
+import { courseExam, examReady } from '../exams.js';
 import { examCard } from './exam.js';
 import { materialList } from '../materials.js';
 import { bar, empty, videoFrame, playsOnClick } from './common.js';
@@ -78,13 +78,12 @@ export default async function course({ id }) {
       '</section>' +
 
       /* The exam closes the lesson column, not the sidebar: it is the last step
-         of the course, and its place is after the last lesson. */
-      (exam.items.length
-        ? examCard({
-          key: exam.key, href: '#/course/' + esc(id) + '/exam', scope: 'course',
-          count: exam.items.length, progress: p.pct,
-        })
-        : '') +
+         of the course, and its place is after the last lesson. It is rendered
+         whether or not the exercises for it exist yet — see examCard. */
+      examCard({
+        key: exam.key, href: '#/course/' + esc(id) + '/exam', scope: 'course',
+        count: exam.items.length, progress: p.pct, ready: examReady(exam),
+      }) +
       '</div>' +
 
       '<aside class="course-side">' +
