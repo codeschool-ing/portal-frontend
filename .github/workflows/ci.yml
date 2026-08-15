@@ -117,6 +117,13 @@ jobs:
       - name: The whole portal, in a browser
         run: node tools/smoke/smoke.mjs
 
+      # The console is a second application in this repository, and its shell is
+      # the cheapest thing to break: a screen module that throws or a route that
+      # stops resolving fails no build and shows in no diff. It runs from the
+      # first commit, before there is a single real screen, on purpose.
+      - name: The console shell, in a browser
+        run: node tools/admin-smoke/check.mjs
+
       # Seeds a real browser with a pre-rename document and reloads: the storage
       # migrations only run once per visitor, so a broken one is invisible until
       # it has already reset somebody.
