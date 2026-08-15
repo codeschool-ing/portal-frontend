@@ -82,7 +82,15 @@ await p.waitForFunction(() => location.hash.length > 1);
 
 console.log('\n== 1. load and redirect ==');
 ok('landed on /sign-in with no session', p.url().includes('#/sign-in'), p.url());
-ok('catalogue loaded', await p.evaluate(() => typeof COURSES !== 'undefined' && COURSES.length === 86));
+/* Not a number: the catalogue is synced from the showcase and grows there. What
+   this has to prove is that it LOADED, and that the shape is the one the portal
+   reads — a course with an id and a topic list. A written-down 86 only proved
+   that nobody had synced lately. */
+ok('catalogue loaded', await p.evaluate(() =>
+  typeof COURSES !== 'undefined' && COURSES.length > 0 &&
+  COURSES.every((c) => c.id && Array.isArray(c.topics)) &&
+  typeof TRACKS !== 'undefined' && TRACKS.length > 0),
+  await p.evaluate(() => COURSES.length + ' courses, ' + TRACKS.length + ' tracks'));
 ok('sample exercises loaded', await p.evaluate(() => window.SAMPLE_EXERCISES?.length > 0));
 
 console.log('\n== 2. signing in ==');
@@ -193,9 +201,10 @@ ok('and goes out when the cursor leaves', lit.after === 0);
 console.log('\n== 4. course and lesson ==');
 await p.goto(BASE + PAGE + '#/course/javascript');
 await p.waitForSelector('.lesson-row');
+const topicCount = await p.evaluate(() => COURSES.find((c) => c.id === 'javascript').topics.length);
 const lessonCount = await p.locator('.lesson-row').count();
-ok('lesson = topic', lessonCount === 12, lessonCount + ' lessons');
-ok('the rail became a list of lessons', (await p.locator('.rail-lesson').count()) === 12);
+ok('lesson = topic', lessonCount === topicCount, lessonCount + ' lessons for ' + topicCount + ' topics');
+ok('the rail became a list of lessons', (await p.locator('.rail-lesson').count()) === topicCount);
 
 /* A lesson is split into sections and the assessment is the last one. A lesson
    with NO written sections yet has two: content and assessment. The course used
@@ -355,33 +364,59 @@ await p.waitForSelector('.wizard');
 // the wizard keeps only one question on screen; the marker row is what counts
 ok('the hosting assessment has 2 questions', (await p.locator('.wz-dot').count()) === 2);
 
-await p.goto(BASE + PAGE + '#/course/javascript/lesson/3/assessment');
+/* THE LESSON IS FOUND, NOT WRITTEN DOWN. It used to be `lesson/3`, and that
+   broke the day the showcase rewrote JavaScript's topic list: two topics went in
+   ahead of it, "Objects, arrays, spread and destructuring" slid from index 2 to
+   3, and index 3 stopped being an empty assessment. The test failed for a reason
+   that had nothing to do with what it checks.
+   A lesson index is a position in `topics`, and positions move. The first lesson
+   with no exercises is asked for instead. */
+const pending = await p.evaluate(() => {
+  const topics = COURSES.find((c) => c.id === 'javascript').topics;
+  const has = new Set((window.SAMPLE_EXERCISES || [])
+    .filter((e) => e.course === 'javascript').map((e) => e.topic));
+  return topics.findIndex((t) => !has.has(t));
+});
+ok('JavaScript has a lesson with no exercises to check this with', pending >= 0, String(pending));
+await p.goto(BASE + PAGE + '#/course/javascript/lesson/' + pending + '/assessment');
 await p.waitForSelector('.assessment-pending');
 ok('an assessment with no exercises shows as pending', true);
 /* moving on completes — EXCEPT on a pending assessment, which has nothing to
    complete */
 await p.click('.side-right');
 await p.waitForTimeout(300);
-await p.goto(BASE + PAGE + '#/course/javascript/lesson/3/assessment');
+await p.goto(BASE + PAGE + '#/course/javascript/lesson/' + pending + '/assessment');
 await p.waitForSelector('.step');
 ok('a pending assessment is not completed by moving on',
   (await p.locator('.step.step-assessment.done').count()) === 0);
 
-const denominators = await p.evaluate(() => {
-  const lessons = COURSES.find((c) => c.id === 'javascript').topics.length;
-  const count = document.querySelector('.rail-count').textContent;
-  return { lessons, count };
-});
-/* 12 JavaScript lessons. CONTENT sections: the first four were written
-   (4+3+2+2 = 11) and the other eight still fall into the one-section wrapper
-   (8). That makes 19. ASSESSMENTS: only the three lessons that have exercises
-   enter the denominator. 19 + 3 = 22.
+/* THE RULE, NOT THE NUMBER. This used to assert 22, worked out by hand from
+   twelve JavaScript topics; the showcase rewrote that course to 22 topics and
+   the arithmetic went with it. The comment already said the number moves as
+   content is written — so the test now computes both totals and checks the rail
+   shows the right one:
 
-   The number changes as more content is written, and that is the right
-   behaviour: the lesson really did gain more work inside it. What the test
-   guards is the RULE — without excluding the empty assessments the denominator
-   would be 31, and the course would never reach 100%. */
-ok('a pending assessment stays out of the denominator', /\b22\b/.test(denominators.count), denominators.count);
+     counted    a written lesson's sections, or one wrapper section for a lesson
+                with none, plus ONLY the assessments that have exercises;
+     naive      the same, plus every empty assessment — which is the bug: a
+                course carrying them can never reach 100%. */
+const denominators = await p.evaluate(() => {
+  const topics = COURSES.find((c) => c.id === 'javascript').topics;
+  const written = (window.LESSONS || {}).javascript || {};
+  const withExercises = new Set((window.SAMPLE_EXERCISES || [])
+    .filter((e) => e.course === 'javascript').map((e) => e.topic));
+  const content = topics.reduce((n, t) => n + (written[t]?.length || 1), 0);
+  const ready = topics.filter((t) => withExercises.has(t)).length;
+  return {
+    counted: content + ready,
+    naive: content + topics.length,
+    count: document.querySelector('.rail-count').textContent,
+  };
+});
+ok('a pending assessment stays out of the denominator',
+  new RegExp('\\b' + denominators.counted + '\\b').test(denominators.count) &&
+  denominators.counted !== denominators.naive,
+  denominators.count + ' — counted ' + denominators.counted + ', naive ' + denominators.naive);
 
 console.log('\n== 9. a practical course: code inside prose ==');
 await p.goto(BASE + PAGE + '#/course/html-css');

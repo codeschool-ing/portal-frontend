@@ -53,10 +53,6 @@ const ACCOUNTED = new Set([
   'p.cycle', 'plan?.cycle',       // plan billing cycles
   'r',                            // graph.js legend
   'STATE_LABEL[st]', 'GROUP_LABEL[g.group]', 'OP_NAME[ex.checkOperation]',
-  // A key BUILT from a value, which is the one shape that can produce a string
-  // no literal in the code ever spells. The families vocabulary below supplies
-  // both halves; getting this wrong is silent, so it is worth the entry.
-  "'tracks by ' + family",
 ]);
 
 /* The value positions of a txt() argument: what could actually be handed to
@@ -212,12 +208,6 @@ for (const file of jsFiles(path.join(ROOT, 'app'))) {
     if (!m) { unaccounted.push(`${file}: ${name} is registered here but no longer declared there`); continue; }
     for (const v of m[1].matchAll(/label:\s*'((?:\\.|[^'\\])*)'/g)) want(v[1], `${file} ${name}`);
   }
-  // `txt('tracks by ' + family)` — the key does not appear anywhere in the
-  // code, so it is built here from the same source the callers read.
-  for (const family of [...new Set(g.T ? g.T.map((t) => t.family) : [])]) {
-    want('tracks by ' + family, 'catalog.js (track family)');
-  }
-
   // `label:` and `cycle:` are the two field names whose values are handed to
   // txt() as data — a certificate kind, a password-strength verdict, a billing
   // cycle. Scanned across the whole app rather than in a list of files, so a

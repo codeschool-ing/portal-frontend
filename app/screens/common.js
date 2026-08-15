@@ -11,11 +11,6 @@ import { trackById, trackPath } from '../catalog.js';
 import { courseProgress, activeOption, now } from '../state.js';
 import { esc } from '../text.js';
 
-export const FAMILIES = ['career', 'technology'];
-
-export const TRACKS_BY_FAMILY = () =>
-  FAMILIES.map((f) => [f, TRACKS.filter((t) => (t.family || 'career') === f)]);
-
 /* The progress of a whole track, counted in SECTIONS and not in courses or
    lessons: a course with 48 topics and one with 11 are not worth the same, and a
    lesson can have one section or six. The section is the smallest unit of real

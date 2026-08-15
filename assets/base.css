@@ -150,13 +150,22 @@ html[data-theme="light"] .lang-op.on{background:rgba(43,82,201,.09)}
    yet, and the colour sets it apart from the real navigation instead of making it
    compete with it. */
 .nav-student{
-  display:flex;align-items:center;gap:7px;cursor:default;white-space:nowrap;flex:0 0 auto;
+  display:flex;align-items:center;gap:7px;cursor:pointer;white-space:nowrap;flex:0 0 auto;
   font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--amber);
   border:1px solid var(--amber);border-radius:2px;padding:6px 11px;
   transition:background .2s,color .2s;
 }
 .nav-student:hover{background:var(--amber);color:var(--ink)}
 .nav-student svg{width:15px;height:15px;flex:0 0 auto}
+/* "Beta" beside the wordmark: the whole site is still in development, and this
+   is the one label that says so on every screen. Amber, the site's own attention
+   colour, and small enough to inform without shouting. */
+.brand-beta{
+  font-family:'IBM Plex Mono',monospace;font-size:.56rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--amber);border:1px solid var(--amber);
+  padding:1px 5px;border-radius:2px;margin-left:8px;flex:0 0 auto;
+}
 .nav-soon{
   font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
   color:var(--amber);border:1px solid var(--amber);border-radius:2px;padding:1px 5px;
@@ -241,24 +250,12 @@ html[data-theme="light"] .lang-op.on{background:rgba(43,82,201,.09)}
 /* ---------- TRACKS ---------- */
 /* the picker grows with every new track: one line with arrows at the ends,
    instead of wrapping and leaving an orphan tab on a second line */
-/* Family switcher: "by career" and "by technology" are different questions
-   (which profession do I want / which tool do I want to master), and the 14 tabs
-   would not fit in a single row. It sits above the picker, discreetly. */
-/* Two rows of tabs, one per family, each with its own label and arrows. Since
-   there are only two families and they are not meant to grow, showing both at
-   once conveys more and costs less height than the switcher that was there. */
-.tabs-box{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex:0 0 auto}
-/* the last row opens the same breathing room the top of the track leaves for the
-   graph: the name+objective block ends up centred between the two */
-.tabs-box[data-family="technology"]{margin-bottom:18px}
-/* "TRACKS BY TECHNOLOGY" on a single line would eat 165px of the tabs. Letting
-   it wrap onto two lines costs the label the same ~100px of width, and the height
-   is already the tab button's — it pushes nothing. */
-.tabs-label{
-  font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--paper-dim);
-  flex:0 0 104px;line-height:1.3;
-}
+/* One row, with its arrows. There were two — one per family of track — each
+   with a label taking 104px off the width; the row got that back when the
+   technology family was retired. The bottom margin is the breathing room the top
+   of the track leaves for the graph, so the name+objective block ends up centred
+   between the two. */
+.tabs-box{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex:0 0 auto}
 .chips-box{display:flex;align-items:center;gap:8px;flex:1 1 auto;min-width:0}
 
 /* ---------- DROPDOWN MENU (mobile) ----------
@@ -288,6 +285,7 @@ html[data-theme="light"] .lang-op.on{background:rgba(43,82,201,.09)}
    options' colour it disappeared among them; here it becomes a band: accent
    colour, its own background and a hairline above separating it from the
    previous group. */
+/* kept for the catalogue's own dropdowns; the tracks list is flat */
 .drop-group{
   font-family:'IBM Plex Mono',monospace;font-size:.64rem;font-weight:600;
   letter-spacing:.14em;text-transform:uppercase;color:var(--amber);
@@ -352,6 +350,27 @@ html[data-theme="light"] .drop-op.on{background:rgba(43,82,201,.09)}
 .track-summary b{display:block;color:var(--phosphor);font-size:1.2rem;font-weight:700;font-family:'Space Grotesk',sans-serif}
 .track-summary i{display:block;font-style:normal;font-size:.68rem;color:var(--phosphor-dim);margin-top:2px}
 
+/* A track finished on the way inside another one. It sits between the heading and
+   the graph because it answers a question about the whole track, not about one
+   level of it — and it is the only line on this screen that hands the student
+   something before the end. It is drawn by the catalogue, never authored: the
+   line only exists for the two tracks that really are contained in another. */
+.track-milestones{
+  display:flex;align-items:center;gap:9px;flex:0 0 auto;
+  margin:-6px 0 16px;padding:8px 12px;
+  border:1px dashed var(--wire);border-radius:4px;
+  font-size:.8rem;line-height:1.4;color:var(--paper-dim);
+}
+.milestone-go{
+  background:none;border:0;padding:0;cursor:pointer;font:inherit;
+  color:var(--phosphor);font-weight:600;text-decoration:underline;
+  text-decoration-style:dotted;text-underline-offset:3px;
+}
+.milestone-go:hover{text-decoration-style:solid}
+.track-milestones i{font-style:normal;font-size:.72rem;color:var(--phosphor-dim)}
+.milestone-seal{display:flex;flex-shrink:0;color:var(--phosphor-dim)}
+.milestone-seal svg{width:17px;height:17px}
+
 /* ---------- THE TRACK GRAPH ----------
    Each column is a level: everything in the same column can be done at the same
    time, because nothing there depends on anything else there. The edges are drawn
@@ -364,6 +383,10 @@ html[data-theme="light"] .drop-op.on{background:rgba(43,82,201,.09)}
   background:var(--panel);border:1px solid var(--wire);color:var(--phosphor);
   font-size:1rem;line-height:1;display:grid;place-items:center;
   transition:border-color .2s,color .2s,opacity .2s;
+  /* the arrows answer to a held press as well as a click: without these, holding
+     one selects the glyph on a desktop and opens the callout menu on a phone */
+  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+  touch-action:manipulation;
 }
 .graph-arrow:hover:not(:disabled),.tabs-arrow:hover:not(:disabled){border-color:var(--phosphor)}
 .graph-arrow:disabled,.tabs-arrow:disabled{opacity:.25;cursor:default;color:var(--paper-dim)}
@@ -382,6 +405,10 @@ html[data-theme="light"] .drop-op.on{background:rgba(43,82,201,.09)}
   height:100%;
 }
 .track-graph::-webkit-scrollbar{display:none}
+/* it can be taken hold of and pulled — the cursor is the only thing that says so,
+   and it only says it when there is somewhere to go (`can-pan`, set in JS) */
+.track-graph.can-pan{cursor:grab}
+.track-graph.can-pan.is-dragging{cursor:grabbing;user-select:none;-webkit-user-select:none}
 /* fades the edge where there is still graph, as with the tabs */
 .track-graph.fade-right{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 26px),transparent)}
 .track-graph.fade-left{-webkit-mask-image:linear-gradient(to left,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(to left,#000 calc(100% - 26px),transparent)}
@@ -399,17 +426,20 @@ html[data-theme="light"] .drop-op.on{background:rgba(43,82,201,.09)}
 .edge:hover .tip,.edge.on .tip{r:4.5}
 /* the top and bottom lanes stay clear: that is where the edges that skip columns
    travel, instead of crossing the cards in between */
-.graph-levels{position:relative;display:flex;align-items:stretch;gap:48px;width:max-content;min-width:100%;height:100%;padding:20px 0}
+.graph-levels{position:relative;display:flex;align-items:stretch;gap:60px;width:max-content;min-width:100%;height:100%;padding:20px 0}
 /* a level with many courses breaks into sub-columns instead of stretching
    downwards: the graph grows horizontally, which is where the arrows are */
 /* A level is a band of sub-columns. How many, and what goes in each, is decided
    in the script after measuring the available height — neither flex-wrap nor
    multi-column expands the container's width in the column direction, and the
    cards ended up overlapping the neighbouring level. */
-.level{display:flex;align-items:center;gap:14px;flex:0 0 auto;height:100%}
-/* 16px, not 10: this corridor is where the lines that go around a card travel,
-   and at 10 they grazed the neighbours */
-.subcol{display:flex;flex-direction:column;gap:16px;justify-content:center;flex:0 0 auto}
+.level{display:flex;align-items:center;gap:20px;flex:0 0 auto;height:100%}
+/* 26px, and it was 10 once: this corridor is where the lines that go around a
+   card travel. At 10 they grazed the neighbours; 16 cleared them; 26 is legibility
+   rather than geometry — measured, the extra 10px buys almost nothing in the
+   routing and costs nothing on the screen, because the column re-packs and the
+   graph is the same width. */
+.subcol{display:flex;flex-direction:column;gap:26px;justify-content:center;flex:0 0 auto}
 /* inside a column the main axis is vertical: the card's 195px flex-basis would
    become HEIGHT. Here it goes back to being width, with natural height. */
 .subcol > .course-node{flex:0 0 auto;width:238px}
@@ -454,12 +484,88 @@ html[data-theme="light"] .outcome-seal{background:rgba(212,15,40,.07);box-shadow
   border-top:1px dashed var(--wire);margin-top:4px;padding-top:5px;line-height:1.35;
 }
 /* where the edges are drawn they already say this; the text is left for screen
-   readers only. The breakpoint follows the graph's (861px). */
+   readers only. The breakpoint follows the graph's — and the graph draws its
+   edges in both of the layouts that are not the phone's list. */
 @media (min-width:861px){
   .course-node .requires{
     position:absolute;width:1px;height:1px;padding:0;margin:-1px;
     overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
   }
+}
+
+/* ---------- THE GRAPH ON THE WHOLE SCREEN ----------
+   A button hands the graph the window: the panel becomes a fixed layer under
+   the nav, the objective steps aside, and the graph keeps its own size while
+   getting all the width and all the height there is. Escape closes it.
+   Below 900px there is nothing to do — the graph is already a vertical list. */
+.graph-box{position:relative}
+
+.graph-full-toggle{
+  position:absolute;top:-34px;right:0;z-index:3;
+  width:30px;height:30px;border-radius:4px;cursor:pointer;
+  background:var(--panel);border:1px solid var(--wire);color:var(--phosphor);
+  display:grid;place-items:center;
+  transition:border-color .2s,color .2s;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;
+}
+.graph-full-toggle:hover{border-color:var(--phosphor)}
+.graph-full-toggle svg{width:16px;height:16px}
+.graph-full-toggle .i-close{display:none}
+body.graph-full .graph-full-toggle .i-open{display:none}
+body.graph-full .graph-full-toggle .i-close{display:block}
+
+/* The objective sells the track and costs up to nine lines of fixed height,
+   which the graph pays for. Three lines and a link give it ~130px back on every
+   screen; the button hides itself where there is no fourth line. */
+.track-top p.goal{
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.track-top p.goal.open{-webkit-line-clamp:unset;overflow:visible}
+.goal-more{
+  background:none;border:0;padding:0;margin-top:4px;cursor:pointer;
+  font:inherit;font-size:.8rem;color:var(--phosphor);
+  text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;
+}
+
+body.graph-full{overflow:hidden}
+/* under the bar and not over it: the nav is 64px and stays where it always is,
+   so the language, the theme and the way out keep working */
+body.graph-full .track-panel{
+  position:fixed;inset:64px 0 0 0;z-index:70;
+  margin:0;padding:12px 18px 16px;
+  background:var(--ink);
+  display:flex;flex-direction:column;
+  max-width:none;width:100%;   /* the panel's 1300px cap is most of what the
+                                  graph was missing on a wide screen */
+}
+body.graph-full .track-top{
+  margin-bottom:10px;align-items:center;flex-wrap:nowrap;gap:18px;
+  border-bottom:1px solid var(--wire);padding-bottom:10px;
+}
+body.graph-full .track-top>div:first-child{max-width:none;flex:1 1 auto;min-width:0}
+body.graph-full .track-top h3{
+  font-size:1.05rem;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+/* the objective is prose and it is on the panel behind. The milestones are the
+   other tracks this one passes through, which is worth having in front of a
+   graph being read whole. */
+body.graph-full .track-top p.goal,
+body.graph-full .goal-more{display:none}
+body.graph-full .track-milestones{margin:0 0 8px}
+body.graph-full .track-summary{gap:22px}
+body.graph-full .graph-full-toggle{top:6px;right:6px}
+body.graph-full .track-graph{padding-top:34px}
+body.graph-full .graph-box{flex:1 1 auto;min-height:0}
+/* and the cards spread through the height instead of sitting in a band at the
+   top of it: one card to a level lands in the middle, two at a third and two
+   thirds, three at the quarters */
+body.graph-full .level{align-items:stretch}
+body.graph-full .subcol{justify-content:space-evenly}
+/* the dots point at screens, and in here there is one screen */
+body.graph-full .dots{display:none}
+
+@media (max-width:900px){
+  .graph-full-toggle{display:none}
 }
 
 /* ---------- A STEP WITH A FORK ----------
@@ -500,10 +606,54 @@ html[data-theme="light"] .fork{background:rgba(43,82,201,.045)}
     grid-template-areas:"top note" "courses courses";
     column-gap:18px;row-gap:10px;max-width:620px;
   }
+  /* The block widens with the number of courses in the chosen branch, instead
+     of dividing a fixed 620px among them: at four courses that gave 142px
+     cards next to the 238px ones outside the block, and the fork read as a
+     different, smaller kind of card. These widths keep each one at about 238px.
+     The graph gets wider when the Go branch is selected, which is the trade. */
+  .fork:has(.fork-courses > :nth-child(3)){max-width:770px}
+  .fork:has(.fork-courses > :nth-child(4)){max-width:1010px}
   .fork-top{grid-area:top}
   .fork-note{grid-area:note;font-size:.7rem;line-height:1.4;align-self:end}
   .fork-courses{grid-area:courses}
-  .fork-courses .course-node{flex:1 1 0;min-width:0}
+  /* the same 238px the cards outside the block start from */
+  .fork-courses .course-node{flex:1 1 238px;min-width:0}
+}
+
+/* ---------- A PORTRAIT MONITOR: THE GRAPH FLOWS DOWN ----------
+   1080×1920 is a desktop screen, so none of the phone rules apply to it — and
+   the landscape layout is wrong there in the other direction: the track marches
+   right, hides two thirds of itself behind a horizontal scroll and leaves most
+   of the height empty. Here the same graph is transposed. Levels stack, the
+   cards of a level sit side by side, the edges are still drawn (the router runs
+   in swapped coordinates, see script.js) and what runs out is height, which is
+   what the wheel is for. */
+@media (min-width:861px) and (orientation:portrait){
+  .graph-levels{
+    flex-direction:column;align-items:stretch;
+    width:auto;min-width:0;height:max-content;min-height:100%;
+    gap:60px;padding:20px 24px;
+  }
+  /* a level is a stack of rows, and a row is cards side by side */
+  .level{flex-direction:column;align-items:center;gap:20px;height:auto;width:100%}
+  .subcol{flex-direction:row;align-items:stretch;justify-content:center;gap:26px;width:auto;max-width:100%}
+  .track-graph{overflow-x:hidden;overflow-y:auto}
+  /* nothing to page sideways: the scroll is vertical and belongs to the wheel */
+  .graph-arrow{display:none}
+  .track-graph.fade-right,.track-graph.fade-left{-webkit-mask-image:none;mask-image:none}
+  .track-graph.fade-down{
+    -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent);
+    mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent);
+  }
+  /* The fork block stacks, like it does on a phone. Not for want of width: a
+     block 700px wide in a column of 238px cards is something every edge between
+     the levels above and below it has to travel around, and the detour was four
+     times the straight line. Stacked it is barely wider than a card, and the
+     edges pass beside it. */
+  .fork{display:flex;flex-direction:column;max-width:min(100%,420px)}
+  .fork-note{max-width:none;font-size:.74rem}
+  .fork-courses{flex-direction:column}
+  .fork-courses .course-node{max-width:none;flex:1 1 auto}
 }
 
 /* ---------- CATALOGUE ---------- */
@@ -513,9 +663,20 @@ html[data-theme="light"] .fork{background:rgba(43,82,201,.045)}
 .search input{
   width:100%;font-family:'IBM Plex Mono',monospace;font-size:.8rem;
   background:var(--panel);border:1px solid var(--wire);border-radius:2px;
-  color:var(--paper);padding:9px 12px 9px 32px;
+  color:var(--paper);padding:9px 30px 9px 32px;
 }
 .search input:focus{outline:none;border-color:var(--phosphor)}
+/* the browser's own clear button on type="search" would sit beside ours, in a
+   style this page does not control */
+.search input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+#search-clear{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  width:22px;height:22px;display:grid;place-items:center;
+  background:none;border:0;border-radius:2px;cursor:pointer;
+  color:var(--paper-dim);font-size:1.1rem;line-height:1;transition:color .2s;
+}
+#search-clear:hover{color:var(--amber)}
+#search-clear:focus-visible{outline:1px solid var(--phosphor);outline-offset:1px}
 .chips{display:flex;gap:7px;flex-wrap:nowrap;flex:1 1 auto;min-width:0;
   overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
 .chips::-webkit-scrollbar{display:none}
@@ -567,6 +728,14 @@ html[data-theme="light"] .fork{background:rgba(43,82,201,.045)}
    lists of different sizes; the button drops to the foot of each one because of
    `margin-top:auto`. */
 .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+/* Two cards, not three: stretched across a wide screen they read as two
+   billboards rather than a choice, so the row stops growing and centres. */
+.plans-two{max-width:720px;margin-inline:auto}
+/* The instalment line sits under the price and belongs to it — the yearly
+   figure is the commitment, this is what actually leaves the account each
+   month, and hiding it is what makes R$ 490 look like a barrier. */
+.plan-instalments{font-family:'IBM Plex Mono',monospace;font-size:.72rem;
+  color:var(--phosphor-dim);margin:-6px 0 10px}
 .plan{
   position:relative;display:flex;flex-direction:column;
   background:var(--panel);border:1px solid var(--wire);border-radius:4px;
@@ -733,6 +902,10 @@ a.channel:hover{border-color:var(--phosphor-dim);transform:translateY(-2px)}
   margin-top:24px;padding-top:16px;border-top:1px solid var(--wire);
   font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--paper-dim);
 }
+.foot-wip{
+  margin-top:24px;text-align:center;
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;line-height:1.5;color:var(--amber);
+}
 .foot-links{display:flex;gap:16px}
 .foot-links a{color:var(--phosphor-dim);transition:color .2s}
 .foot-links a:hover{color:var(--phosphor)}
@@ -890,7 +1063,22 @@ html.modal-open .screen{overflow:hidden}
 .modal-col-intro{margin-bottom:20px}
 
 @media (min-width:1024px){
+  /* ONE HEIGHT FOR EVERY COURSE. Opening one course after another used to
+     resize the panel each time — 550px for `react-ts`, 766px for `first-job` —
+     and the eye reads that as the page jumping. 800px is what the tallest left
+     column needs — 741px of content plus the 94px the header and the body's own
+     padding take — with the frame allowed to squeeze a little; 94vh is what a
+     laptop can give, and there `fitModal` squeezes harder.
+     The body is what stretches into it. */
   .modal-box:not(.modal-narrow){width:min(1080px,94vw)}
+  /* The fixed height belongs to the COURSE modal and to nothing else. `:not(
+     .modal-narrow)` was the wrong hook: this stylesheet is also the portal's
+     `base.css`, where every modal is a plain `.modal-box`, and the height would
+     have pinned a certificate and a confirmation dialog to 800px each. `:has()`
+     names the thing itself — the box holding the two-column course body — and
+     the fork block already uses it a few hundred lines up. */
+  .modal-box:has(.modal-col-detail){height:min(800px,94vh);max-height:94vh}
+  .modal-box:has(.modal-col-detail) .modal-body{flex:1 1 auto}
   /* THE BODY DOES NOT SCROLL. It takes the height the box allows and the two
      columns split that height; what scrolls is the topic list, inside
      itself. A fixed ceiling on the list was not enough: with 48 topics it
@@ -903,9 +1091,22 @@ html.modal-open .screen{overflow:hidden}
   }
   .modal-col{min-height:0;display:flex;flex-direction:column}
   .modal-col-intro{margin-bottom:0;overflow-y:auto}
-  /* the button sits centred under the video, which fills the whole column */
-  .modal-col-intro .modal-actions{padding-top:8px;justify-content:center}
-  .modal-video{max-width:none;margin-inline:0}
+  /* THE TWO COLUMNS DO NOT HOLD THE SAME AMOUNT, AND NO SPLIT MAKES THEM.
+     The left is a video, a sentence and a button — near enough the same height
+     for every course. The right runs from 419px to 650px depending on how many
+     blocks of chips the course earns: `javascript` is in six tracks and opens
+     the way to six courses, and left 191px of the left column empty; `react-ts`
+     and `kubernetes` fill both sides exactly. Moving a block across balances
+     those two and unbalances these, which is trading one gap for another.
+     So the slack is not removed, it is put somewhere it reads as deliberate:
+     the button drops to the floor of the column, level with the bottom of the
+     right one, and the space lands above it instead of below everything. */
+  .modal-col-intro .modal-actions{padding-top:8px;justify-content:center;margin-top:auto}
+  /* The frame keeps its 16:9. As a flex item in a column that now also carries
+     the syllabus it was being squeezed to 3:1 on a 768px screen — a letterbox
+     strip where a video should be. It does not shrink; `fitVideo` decides its
+     height deliberately, and what gives instead is the column, which scrolls. */
+  .modal-video{max-width:none;margin-inline:0;flex-shrink:0}
   .modal-body:not(.subscribe-body) h3{font-size:1.55rem}
 
   /* The topic list scrolls inside itself, and its ceiling is measured in JS
@@ -918,8 +1119,12 @@ html.modal-open .screen{overflow:hidden}
      Scrolling on the column is the safety net for when not even the list at
      its minimum makes the rest fit. */
   .modal-col-detail{overflow-y:auto}
+  /* `fitModal` gives the list an explicit height — exactly what the blocks
+     under it leave — so the panel ends flush with the column instead of the
+     column ending early or scrolling. Inside it, the list scrolls. */
+  .modal-syllabus ul{overflow-y:auto;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--wire) transparent}
   .modal-topics ul{
-    overflow-y:auto;
+    overflow-y:auto;box-sizing:border-box;
     scrollbar-width:thin;scrollbar-color:var(--wire) transparent;
   }
   .modal-col ::-webkit-scrollbar,
@@ -999,10 +1204,13 @@ html.modal-open .screen{overflow:hidden}
   .search{width:100%}
 }
 
-/* Below this the bar only fits the essentials. The student area is a placeholder
-   for future functionality: it is the first to go, before the burger menu. */
+/* Below this the bar only fits the essentials, so the student area drops its
+   label and rides as an icon — but it STAYS. It is the portal's front door now,
+   not the placeholder it once was, and a phone is exactly where a student
+   reaches for it. */
 @media(max-width:620px){
-  .nav-student{display:none}
+  .nav-student{padding:6px 9px}
+  .nav-student span:not(.nav-soon){display:none}
   .brand{font-size:.95rem}
 }
 

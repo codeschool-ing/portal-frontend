@@ -11,7 +11,7 @@
 import * as api from '../api.js';
 import { reset, now, currentPlan, studentAccount } from '../state.js';
 import { goTo } from '../routes.js';
-import { TRACKS_BY_FAMILY, studentTrack, trackProgress } from './common.js';
+import { studentTrack, trackProgress } from './common.js';
 import { esc } from '../text.js';
 
 /* The e-mail rule is deliberately LOOSE: "there is an at sign, a dot after it,
@@ -112,11 +112,9 @@ export default async function account() {
   const backend = api.configured();
   void now;
 
-  const options = TRACKS_BY_FAMILY().map(([family, list]) =>
-    '<optgroup label="' + txt('tracks by ' + family) + '">' +
-      list.map((x) => '<option value="' + esc(x.id) + '"' + (t && x.id === t.id ? ' selected' : '') + '>' +
-        esc(x.name) + '</option>').join('') +
-    '</optgroup>').join('');
+  const options = TRACKS.map((x) =>
+    '<option value="' + esc(x.id) + '"' + (t && x.id === t.id ? ' selected' : '') + '>' +
+      esc(x.name) + '</option>').join('');
 
   el.innerHTML =
     '<header class="view-head">' +
