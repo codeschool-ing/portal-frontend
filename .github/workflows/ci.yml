@@ -122,3 +122,9 @@ jobs:
       # it has already reset somebody.
       - name: A returning student's data survives the renames
         run: node tools/migration/check.mjs
+
+      # Every suite above runs with no backend, where localStorage IS the
+      # session and the two can never disagree. This one answers the API itself,
+      # which is the only way to reach the four ways they can.
+      - name: The browser's memory and the server's agree
+        run: node tools/session/check.mjs

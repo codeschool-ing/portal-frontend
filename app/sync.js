@@ -132,11 +132,24 @@ export function start() {
 export async function adopt() {
   if (!configured()) return null;
 
-  const local = state.exportLocal();
-  const report = await request('POST', '/api/progress/import', local);
+  const report = await request('POST', '/api/progress/import', state.exportLocal());
+  await pull();
+  return report;
+}
+
+/* The read half of `adopt`, on its own.
+
+   A restored session needs it and must NOT have the other half: importing is
+   for a browser that has history the account does not, and a browser being
+   handed back an account it was not signed into has nothing to give — at best
+   it sends an empty document, at worst somebody else's. Reading is the whole
+   job there. */
+export async function pull() {
+  if (!configured()) return null;
+
   const snapshot = await request('GET', '/api/progress');
   state.replaceWith(snapshot);
-  return report;
+  return snapshot;
 }
 
 /* ---------- session ----------
