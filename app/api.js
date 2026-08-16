@@ -65,6 +65,11 @@ export async function completeMfa(code) {
 async function afterSignIn(account) {
   state.change((e) => { e.session = { name: account.name, email: account.email }; });
   await sync.adopt();
+  /* The track and the forks, offered where the account has none. It is the same
+     move `adopt` makes for progress and it is a separate call because it is a
+     separate endpoint — the import carries sections and notes, and a track is
+     neither. */
+  await sync.adoptEnrollment();
   /* And the exams, which `adopt` does not carry: the progress import is about
      sections and notes, and an exam result is neither — it is computed from
      attempts the server holds, and this browser's copy is a cache of that. A
@@ -151,6 +156,11 @@ export async function restoreSession() {
 
   state.change((e) => { e.session = { name: server.name, email: server.email }; });
   await sync.pull();
+  /* The track comes back with the progress. Without this the restored student
+     lands on a portal that asks them to choose one again — which is most of the
+     bug this whole path exists to fix, and the half a progress snapshot cannot
+     carry because it does not mention tracks. */
+  await sync.pullEnrollment();
   await refreshExams();
   await refreshVerified();
   return switched ? 'switched' : 'restored';
@@ -180,6 +190,9 @@ export async function register({ name, email, password }) {
   const account = await sync.register(name, email, password);
   state.change((e) => { e.session = { name: account.name, email: account.email }; });
   await sync.adopt();
+  /* A fresh account has no track, so this is purely the offer half: whatever
+     this browser had picked before there was an account to attach it to. */
+  await sync.adoptEnrollment();
   // Fresh accounts are unverified, so this is the first place the nudge appears.
   await refreshVerified();
   return state.now().session;
@@ -287,16 +300,65 @@ export const mfaConfirm = (code) => sync.mfaConfirm(code);
 // Turn it off; the server re-checks the password.
 export const mfaDisable = (password) => sync.mfaDisable(password);
 
-/* ---------- enrolment ---------- */
+/* ---------- enrolment ----------
+
+   THE READ IS LOCAL AND STAYS LOCAL. Every screen that draws the graph asks for
+   it, so a fetch here would put a round trip in front of a render. The browser's
+   copy is kept in step by the writes below and reconciled at boot by
+   `restoreSession` — the same arrangement progress has, and for the same
+   reason.
+
+   THE WRITES GO LOCAL FIRST AND SERVER SECOND, which is this project's rule for
+   every write (see the note on `onWrite` in state.js): a student choosing a
+   track watches the graph redraw, and putting a network round trip in front of
+   that would make the school feel slow to say yes. The push is swallowed on
+   failure exactly like the progress pushes, because the routes are idempotent
+   and the next boot reconciles — the one difference is that the server's answer
+   carries `since`, which is the server's to know, so it is merged back when it
+   lands. */
 
 export const enrolment = () => echo(state.now().enrollment);
 
 export function enrol(trackId) {
   state.change((e) => {
-    e.enrollment = { trackId: trackId, choices: e.enrollment?.choices || {} };
+    e.enrollment = {
+      trackId: trackId,
+      since: e.enrollment?.since || null,
+      choices: e.enrollment?.choices || {},
+    };
   });
+  if (sync.configured()) {
+    sync.enrol(trackId)
+      .then((server) => {
+        /* `since` answers how long this student has been studying here, which
+           only the server knows — and which a change of track does not reset. */
+        if (server?.since) {
+          state.change((e) => { if (e.enrollment) e.enrollment.since = server.since; });
+        }
+      })
+      .catch(pushFailed('enrol'));
+  }
   return echo(state.now().enrollment);
 }
+
+/* Settling one fork. It went straight to state.js from the track screen until
+   the server learned about forks; routing it through here is what the rest of
+   the writes already do, and it is now the only place that knows a fork has two
+   places to be written. */
+export function chooseOption(trackId, index, option) {
+  state.chooseOption(trackId, index, option);
+  if (sync.configured()) {
+    sync.chooseOption(trackId, index, option).catch(pushFailed('choose option'));
+  }
+}
+
+/* Swallowed on purpose, and for the reason sync.js gives for the progress
+   pushes: the local copy is already written, the routes are idempotent, and the
+   next boot reads the server's answer back. An alert here would interrupt a
+   student about something that fixes itself. */
+const pushFailed = (what) => (e) => {
+  if (typeof console !== 'undefined') console.debug('sync', what, e.message);
+};
 
 /* ---------- progress ---------- */
 

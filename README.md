@@ -97,6 +97,29 @@ keeps its history.
 smoke suite runs with no backend, where localStorage *is* the session and they
 can never differ.
 
+### The track is the server's now too
+
+`enrollment` — which track, and which side of each fork — was the last thing that
+lived only in this browser. It meant a student who changed device or cleared
+their site data **lost their track and had to choose again**, and restoring a
+session put them straight back on that screen. `GET/PUT /api/enrollment` and
+`PUT /api/enrollment/choices/{trackId}/{index}` are `internal/progress`'s.
+
+Two rules govern it, and both are borrowed rather than invented:
+
+- **Local first, server second**, like every write in `sync.js`. Choosing a track
+  redraws the graph now and the push follows; a failure is swallowed, because the
+  routes are idempotent and the next boot reconciles. The one thing awaited from
+  the answer is `since`, which only the server can know.
+- **The first login fills gaps and never overwrites** — the note import's rule.
+  A browser used before there was an account to attach it to holds an *offer*;
+  an account used elsewhere holds the *record*. Where they disagree the account
+  wins, per item: the track and each fork are decided separately.
+
+`app/screens/track.js` calls `api.chooseOption` rather than `state.chooseOption`,
+which it did until the forks had a second place to be written. It was the last
+screen writing straight to storage.
+
 ### Sizes and navigation
 
 The rail becomes a drawer at **1180px** and the graph becomes a list at **861px**
