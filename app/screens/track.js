@@ -7,7 +7,12 @@
    ========================================================================== */
 
 import { buildTrack, drawEdges, adjustGraphArrows } from '../graph.js';
-import { chooseOption, activeOption } from '../state.js';
+/* The read is state's and the write is api's, which is the split every other
+   screen already uses. Both were `state.chooseOption` until the server learned
+   about forks; a screen writing straight to the browser now reaches only one of
+   the two places the choice has to land. */
+import { activeOption } from '../state.js';
+import * as api from '../api.js';
 import { goTo } from '../routes.js';
 import { trackExam, examReady } from '../exams.js';
 import { examCard } from './exam.js';
@@ -45,7 +50,7 @@ export default async function track() {
     // choice changes the path and therefore the levels
     const tab = e.target.closest('.fork-tab');
     if (tab) {
-      chooseOption(t.id, Number(tab.dataset.fork), Number(tab.dataset.option));
+      api.chooseOption(t.id, Number(tab.dataset.fork), Number(tab.dataset.option));
       el.innerHTML = buildTrack(t) + card();
       drawEdges(el, t);
       return;

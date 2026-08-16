@@ -152,6 +152,58 @@ export async function pull() {
   return snapshot;
 }
 
+/* ---------- enrollment ----------
+
+   The track and the forks, which lived only in this browser until the server
+   learned them. `GET` answers `null` for a student who has chosen nothing —
+   that is a state, not a missing page. */
+
+export const enrollment = () => request('GET', '/api/enrollment');
+export const enrol = (trackId) => request('PUT', '/api/enrollment', { trackId });
+export const chooseOption = (trackId, index, option) =>
+  request('PUT', '/api/enrollment/choices/' + encodeURIComponent(trackId) + '/' + index,
+    { option });
+
+/* The read half, into this browser. */
+export async function pullEnrollment() {
+  if (!configured()) return null;
+
+  const e = await request('GET', '/api/enrollment');
+  state.replaceEnrollment(e);
+  return e;
+}
+
+/* The first login's half, and it FILLS GAPS AND NEVER OVERWRITES — the rule the
+   note import already follows, for the same reason. This browser may have been
+   used for months before there was an account to attach it to, so what it holds
+   is an offer; the account may already have been used somewhere else, and what
+   it holds is the record. When the two disagree the account wins, and the offer
+   is only taken where the account has nothing.
+
+   Then it reads back, so the browser ends up holding the server's answer either
+   way. */
+export async function adoptEnrollment() {
+  if (!configured()) return null;
+
+  const local = state.now().enrollment;
+  if (!local) return pullEnrollment();
+
+  const server = await request('GET', '/api/enrollment');
+
+  if (local.trackId && !server?.trackId) {
+    await enrol(local.trackId);
+  }
+  for (const [key, option] of Object.entries(local.choices || {})) {
+    if (server?.choices && key in server.choices) continue;
+    /* The key is "<trackId>:<stepIx>" and a track id can contain a hyphen but
+       never a colon, so the LAST colon is the separator. */
+    const cut = key.lastIndexOf(':');
+    if (cut < 0) continue;
+    await chooseOption(key.slice(0, cut), key.slice(cut + 1), option);
+  }
+  return pullEnrollment();
+}
+
 /* ---------- session ----------
 
    Identity's routes, and the shapes it answers with. The portal's own sign-in

@@ -406,6 +406,25 @@ export function replaceWith(snapshot) {
   });
 }
 
+/* The enrolment the server holds, replacing whatever this browser had.
+   Deliberately outside `replaceWith`: that one is fed by the progress snapshot,
+   which does not carry a track, and a function that quietly reset the enrolment
+   from a document that never mentioned it would be the exact bug its own
+   comment warns about one paragraph up.
+
+   `null` in means null out — a student who has chosen nothing is a state, and
+   an empty object here would be a track that renders as missing while
+   `enrollment` reads as present. */
+export function replaceEnrollment(e) {
+  const choices = { ...(e?.choices || {}) };
+  const has = Boolean(e && (e.trackId || Object.keys(choices).length));
+  change(() => {
+    state.enrollment = has
+      ? { trackId: e.trackId || null, since: e.since || null, choices }
+      : null;
+  });
+}
+
 /* ---------- reads ----------
    They live here, and not in the screens, because more than one screen asks the
    same question and two computations of the same number diverge on the day one
