@@ -328,13 +328,40 @@ saveBase();     // stores the English source strings of COURSES/TRACKS
 mapTexts();       // walks the text nodes of the static skeleton
 applyLanguage();  // applies content + texts + selector, and rebuilds the screen
 
+/* ---------- who does the SERVER say this is? ----------
+
+   `state.session` is this browser's memory and the cookie is the session
+   itself, and they can disagree — see `api.restoreSession`, which is where all
+   of that reasoning lives. What is decided HERE is only when to wait for the
+   answer, and that is a question about the first paint:
+
+     with a session already stored, the portal draws immediately, as it always
+     has. Asking the server costs a round trip that nobody should watch, so the
+     answer arrives late and acts only if it disagrees;
+
+     with none, there is nothing to draw but the sign-in screen — so waiting
+     costs no paint at all, and NOT waiting costs the returning student a
+     sign-in form that flashes up and vanishes, which reads as a broken page.
+
+   With no backend there is nobody to ask and this resolves to `kept` at once,
+   which is what keeps the offline bundle and every local run unchanged. */
+const restoring = api.restoreSession();
+
+if (sync.configured() && !now().session) {
+  content.innerHTML = '<div class="view"><p class="empty">' + txt('checking…') + '</p></div>';
+  await restoring;
+}
+
 paintAccount();
 paintVerifyBanner();
 booted = true;
 start();
 
-/* Reconcile the verified flag with the server for a returning session, so a
-   student who confirmed in another tab does not keep seeing the nudge. Fire and
-   forget: it repaints through the state subscription when it lands, and does
-   nothing when there is no backend or no session. */
-api.refreshVerified();
+restoring.then((outcome) => {
+  /* The screen on the page was chosen from what the browser remembered, and the
+     server has just contradicted it: re-run the router so the guard at the top
+     of this file sends a signed-out student to sign-in, and so a switched
+     account's screen is rebuilt from ITS data rather than the previous one's.
+     `kept`, `restored` and `unknown` all leave the routing as it stands. */
+  if (outcome === 'signed-out' || outcome === 'switched') dispatch();
+});

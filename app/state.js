@@ -330,9 +330,22 @@ export function change(fn) {
   save();
 }
 
-export function reset() {
+/* Empties this browser and TELLS NOBODY. It is what `reset` does minus the one
+   thing that makes `reset` dangerous here: the erase that travels to the server.
+
+   The case it exists for is a handover — the server says the signed-in account
+   is somebody other than the one this document belongs to, so the document has
+   to go, and it has to go without deleting the progress of the account that is
+   leaving. Calling `reset` there would sign one student in by erasing another's
+   history. */
+export function forget() {
   state = structuredClone(EMPTY);
   save();
+}
+
+/* Erasure, the student's own: the local copy AND the server's. */
+export function reset() {
+  forget();
   onWrite({ kind: 'erase' });
 }
 

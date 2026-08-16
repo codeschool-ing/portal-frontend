@@ -40,11 +40,13 @@ node tools/smoke/smoke.mjs      # the whole portal, in a browser
 node tools/examples/check.mjs   # the code examples really do run
 node tools/i18n/check.mjs       # nothing on screen is stuck in English
 node tools/snapshot/snapshot.js  # the backend's snapshot still builds
+node tools/migration/check.mjs  # a returning student's data survives the renames
+node tools/session/check.mjs    # the browser's memory and the server's agree
 ```
 
-All four run in CI on every pull request — `.github/workflows/ci.yml`. They are
-not `aleogr/pipeline`'s: the organisation's shared workflows are Go, and there
-is none here.
+All of them run in CI on every pull request — `.github/workflows/ci.yml`. They
+are not `aleogr/pipeline`'s: the organisation's shared workflows are Go, and
+there is none here.
 
 ## The staff console is a different repository
 
@@ -59,6 +61,43 @@ goes to two other places, not one; the file's own header says so. And **the
 console has no backend of its own**: its endpoints belong in `portal-backend`
 behind a `RequireStaff`, and what it costs the API is one entry in
 `PORTAL_ALLOWED_ORIGINS`.
+
+### The cookie is the session; this browser only remembers one
+
+The console is what made it visible, but it was never only about the console.
+`state.session` lives in localStorage, which is **per origin**, and the session
+cookie is issued for the whole of `codeschool.ing`. So the two can disagree, in
+both directions, and until `api.restoreSession` existed the portal never asked:
+
+- **signed in on the console, then opening the portal** — the cookie is there and
+  valid, and the portal sent the student to sign in again;
+- **signed out somewhere else**, or the session expired or was revoked from
+  another device — the portal went on drawing a signed-in page whose every
+  request came back `401`. Nothing said so, and nothing saved.
+
+The second is the expensive one: the first is a nuisance, the second loses work
+in silence. And neither needs a console — a browser that keeps cookies and drops
+localStorage, or a student clearing site data, produces both.
+
+**The server's answer outranks the browser's memory, except when there is no
+answer.** A request that fails changes nothing: a blip must not sign anyone out,
+and offline the local copy is the only truth there is.
+
+Two details are load-bearing. **The wait is conditional**: with a session already
+stored the portal draws immediately as it always did and the answer acts late,
+only if it disagrees; with none there is nothing to draw but the sign-in screen,
+so waiting costs no paint — and *not* waiting costs a sign-in form that flashes
+up and vanishes, which reads as a broken page. And **a different account is a
+handover, not a merge**: the track, the plan and the resume pointer belong to
+whoever was signed in before, so `state.forget()` empties this browser — without
+the erase that `reset()` sends to the server, because the account that is leaving
+keeps its history.
+
+`tools/session/check.mjs` answers the API itself to reach all four outcomes; the
+smoke suite runs with no backend, where localStorage *is* the session and they
+can never differ.
+
+### Sizes and navigation
 
 The rail becomes a drawer at **1180px** and the graph becomes a list at **861px**
 — both cut points are the vitrine's, reused because they were measured there, not
@@ -550,6 +589,8 @@ app/screens/*.js               one per screen
 app/exercises/*.js             one per type, plus the wrapper and the grading
 tools/smoke/                   the smoke suite
 tools/i18n/                    every string on screen has all four translations
+tools/migration/               a pre-rename document still opens
+tools/session/                 the cookie and localStorage, when they disagree
 tools/version/                 reads or sets the released version
 tools/bundle/                  generates the single HTML file
 ```

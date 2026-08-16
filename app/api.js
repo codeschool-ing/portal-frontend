@@ -75,6 +75,87 @@ async function afterSignIn(account) {
   return state.now().session;
 }
 
+/* ---------- what the SERVER thinks, at boot ----------
+
+   THE COOKIE IS THE SESSION; THIS BROWSER ONLY REMEMBERS ONE. `state.session`
+   lives in localStorage, which is per-origin, while the session cookie is
+   issued for the whole of codeschool.ing — so the two can disagree, in both
+   directions, and until this existed the portal never asked:
+
+     signed in at console.codeschool.ing and then opening the portal — the
+     cookie is there and valid, and the portal sent the student to sign in
+     again;
+
+     signed out somewhere else, or the session expired or was revoked from
+     another device — the portal went on drawing a signed-in page whose every
+     request came back 401. Nothing said so, and nothing saved.
+
+   The second is the expensive one. The first is a nuisance; the second loses
+   work in silence. Neither is only about the console: a browser that keeps
+   cookies and drops localStorage, or a student clearing site data, produces
+   exactly the same two.
+
+   SO THE SERVER'S ANSWER OUTRANKS THE BROWSER'S MEMORY — except when there is
+   no answer. A request that fails changes nothing: a network blip must not sign
+   a student out, and offline the local copy is the only truth there is.
+
+   It reports what it did, because the caller has to route on it:
+
+     kept        the two already agreed, or there is nobody either way
+     restored    the browser had no session and the server had one
+     switched    they had DIFFERENT accounts — the local document belonged to
+                 somebody else and was dropped rather than merged
+     signed-out  the browser thought it was signed in and the server disagrees
+     unknown     the API did not answer */
+export async function restoreSession() {
+  if (!sync.configured()) return 'kept';
+
+  let answer;
+  try {
+    answer = await sync.session();
+  } catch {
+    return 'unknown';
+  }
+
+  const local = state.now().session;
+  /* `GET /api/session` answers 200 with a body of `null` for a caller carrying
+     no session — it is a read, not a refusal. */
+  const server = answer && answer.email ? answer : null;
+
+  if (!server) {
+    if (!local) return 'kept';
+    state.change((e) => { e.session = null; });
+    return 'signed-out';
+  }
+
+  /* Addresses are `citext` on the server, so they compare without case here
+     too — otherwise a student who once typed theirs in capitals would look like
+     a different account and lose their document to the handover below. */
+  const same = Boolean(local && local.email)
+    && local.email.toLowerCase() === server.email.toLowerCase();
+
+  if (same) {
+    // The name can have been changed on another device; keep it in step.
+    state.change((e) => { e.session = { ...e.session, name: server.name, email: server.email }; });
+    await refreshVerified();
+    return 'kept';
+  }
+
+  /* A DIFFERENT ACCOUNT. Everything in this browser — the track, the plan, the
+     resume pointer — belongs to whoever was signed in before, and pulling the
+     new account's progress on top of it would leave the rest behind under
+     somebody else's name. `forget` empties it WITHOUT telling the server, so
+     the account that is leaving keeps its history. */
+  const switched = Boolean(local);
+  if (switched) state.forget();
+
+  state.change((e) => { e.session = { name: server.name, email: server.email }; });
+  await sync.pull();
+  await refreshExams();
+  await refreshVerified();
+  return switched ? 'switched' : 'restored';
+}
+
 /* The verified-address flag, for the "confirm your e-mail" nudge. It is not in
    the sign-in or register reply — those carry name and e-mail only — so it comes
    from /api/account, the one place identity exposes emailVerified. Error-swallowing
