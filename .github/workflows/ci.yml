@@ -82,7 +82,13 @@ jobs:
 
   Browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # 30 and not 20. The suites need about eight minutes together; the rest was
+    # always the browser install, and 20 left so little room that a slow mirror
+    # cut the run off mid-setup. If this cap is ever reached again with the
+    # cache warm, the answer is the official Playwright container image, which
+    # carries the browser and its libraries — and would need python3 added to
+    # it, because bundle.py and the two http.server processes below are python.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -92,10 +98,41 @@ jobs:
 
       # Chromium only. The suites drive one browser and pulling three would
       # treble the slowest step of this workflow for nothing.
-      - name: Install Playwright and Chromium
+      #
+      # `--with-deps` IS GONE, AND THAT IS WHERE THE TIME WENT. It runs
+      # `apt-get update` and an install on every single run, and when the
+      # runner's Ubuntu mirror is slow — which happens, and did — that step
+      # alone took 16 minutes. The job cap is below, and it killed the run
+      # before one suite had started: a network hiccup arriving as "CI failed"
+      # with nothing to read.
+      #
+      # It is not needed here. The ubuntu-latest image already carries the
+      # libraries Chromium wants; it ships Chrome and Firefox preinstalled.
+      # A bare container would be a different answer — see the note on the cap.
+      #
+      # THE DOWNLOAD IS CACHED, keyed by the version npm resolves rather than a
+      # fixed string: `playwright` is deliberately unpinned here, so a constant
+      # key would hand a stale browser to a newer library and fail in ways that
+      # look like the suites' fault.
+      - name: Install the Playwright library
+        env:
+          # Without this the postinstall fetches browsers before the cache is
+          # restored, which is the download the cache exists to avoid.
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
         run: |
           npm install --no-save playwright
-          npx playwright install --with-deps chromium
+          echo "PLAYWRIGHT_VERSION=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_ENV"
+
+      - name: Restore Chromium
+        id: chromium
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: ms-playwright-${{ runner.os }}-${{ env.PLAYWRIGHT_VERSION }}-chromium
+
+      - name: Download Chromium
+        if: steps.chromium.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
 
       # The suites fetch the page over HTTP because that is how a student gets
       # it; the ports are the ones the suites default to.
