@@ -59,6 +59,9 @@ const api = {
   /* Every write the page made, so the offer half of the first login can be
      checked by what it SENT and not only by what it ended up holding. */
   wrote: [],
+  // Reads, whole URL. `wrote` keeps only writes, and the language the portal
+  // asks for travels in the query string of a GET.
+  read: [],
   down: false,
 };
 
@@ -91,6 +94,8 @@ await p.route('**/api/**', async (route) => {
     route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(value) });
 
   if (req.method() !== 'GET') api.wrote.push(req.method() + ' ' + path + ' ' + (req.postData() || ''));
+  // Every read, with its query: the lesson routes carry the language there.
+  if (req.method() === 'GET') api.read.push(req.url());
 
   if (path === '/api/session' && req.method() === 'POST') {
     return json({ name: 'Ana', email: 'ana@codeschool.ing' });
@@ -317,6 +322,65 @@ ok('the account\'s track was NOT replaced',
 ok('and the browser now holds the account\'s',
   (await document_())?.enrollment?.trackId === 'data-platform',
   JSON.stringify((await document_())?.enrollment));
+
+/* ==========================================================================
+   THE LANGUAGE THE PORTAL ASKS THE SERVER FOR
+
+   This is the one thing the other suites cannot see, and it reached production
+   before anything caught it: the interface was Portuguese and the lessons came
+   back in English.
+
+   The server translates the lessons now, so the portal has to NAME a language
+   on every read. It used to take it from localStorage — which the i18n runtime
+   writes only when somebody picks a language in the menu. A visitor whose
+   browser is Portuguese gets Portuguese by DETECTION, with nothing stored, so
+   the portal asked for English and drew it inside a Portuguese page.
+
+   Nothing failed: the server answered exactly what it was asked. Which is why
+   the check has to be on the REQUEST, not on the response.
+   ========================================================================== */
+console.log('\n== the language travels with the lesson reads ==');
+
+{
+  // A browser that speaks Portuguese and has never chosen a language — the
+  // exact state the bug needed, and the one every first visit is in.
+  const ptCtx = await b.newContext({ locale: 'pt-BR', viewport: { width: 1440, height: 900 } });
+  const pt = await ptCtx.newPage();
+  await pt.route(/fonts\.(googleapis|gstatic)\.com/, (r) =>
+    r.fulfill({ status: 200, contentType: 'text/css', body: '' }).catch(() => {}));
+  await pt.route((url) => url.pathname.endsWith(PAGE), async (route) => {
+    const res = await route.fetch();
+    const body = (await res.text())
+      .replace('<meta name="backend" content="" />',
+        '<meta name="backend" content="same-origin" />');
+    await route.fulfill({ response: res, body, contentType: 'text/html' });
+  });
+
+  const asked = [];
+  await pt.route('**/api/**', async (route) => {
+    const url = route.request().url();
+    if (url.includes('/api/lessons')) asked.push(url);
+    await route.fulfill({ status: 200, contentType: 'application/json',
+      body: JSON.stringify({ courses: [], lang: 'pt' }) });
+  });
+
+  await pt.goto(BASE + PAGE);
+  await pt.waitForFunction(() => location.hash.length > 1);
+  await pt.waitForTimeout(600);
+
+  ok('the page settled on Portuguese by detection, with nothing stored',
+    (await pt.evaluate(() => document.documentElement.lang)) === 'pt-BR'
+      && (await pt.evaluate(() => localStorage.getItem('codeschool-language'))) === null);
+
+  ok('THE STRUCTURE WAS ASKED FOR IN PORTUGUESE',
+    asked.some((u) => /\/api\/lessons\?.*lang=pt(&|$)/.test(u)),
+    asked.join(' | ') || 'nothing was asked');
+
+  ok('and never in English',
+    !asked.some((u) => /lang=en(&|$)/.test(u)), asked.join(' | '));
+
+  await ptCtx.close();
+}
 
 console.log('\n== JavaScript errors ==');
 ok('none', errors.length === 0, errors.join(' | ') || 'none');

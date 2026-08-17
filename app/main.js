@@ -46,7 +46,23 @@ globalThis.isChoice = isChoice;                  // used by applyContent()
    it, the first screen would be built twice — once by the language, once by
    `start()`. */
 let booted = false;
-globalThis.redrawAll = () => (booted ? dispatch() : null);
+/* THE LANGUAGE SWITCH REACHES THE LESSONS THROUGH HERE, and this is the only
+   place it can: the runtime's `applyLanguage()` calls `redrawAll` after
+   switching, and offers no other hook.
+
+   It matters because the SERVER translates the lessons now. The runtime still
+   swaps every interface string and every catalogue field in place, as it always
+   did — but the prose in the store came from an HTTP call that named a
+   language, and redrawing would put the old language's paragraphs back on
+   screen. `languageChanged()` drops the store when it moved; the structure is
+   re-read here and the screens re-ask for the course they are showing. */
+globalThis.redrawAll = () => {
+  if (!booted) return null;
+  if (api.languageChanged()) {
+    api.loadLessonStructure().then(dispatch);
+  }
+  return dispatch();
+};
 
 /* ---------- routes ---------- */
 /* Before any screen renders: the write hook has to be in place for the first

@@ -78,7 +78,25 @@ export function lessonExercises(courseId, key, { minimum = 'structure' } = {}) {
    rule below turns that into one placeholder section. A screen painted before
    its fetch lands is provisional rather than broken, and repaints when it
    arrives. */
-const remote = { structure: null, courses: new Map() };
+const remote = { structure: null, courses: new Map(), lang: null };
+
+/* The store holds ONE language at a time, and dropping it is how a language
+   change reaches the lessons.
+
+   It has to, because the server does the translating now. Before, the client
+   held every language at once and swapped fields in place; a cache keyed by
+   course alone was right then and is wrong now — switching to Portuguese would
+   redraw the same English paragraphs, because the course was already "loaded".
+
+   Returns whether anything was dropped, so the caller knows to re-read the
+   structure as well: its section titles are translated too. */
+export function forLanguage(lang) {
+  if (remote.lang === lang) return false;
+  remote.lang = lang;
+  remote.structure = null;
+  remote.courses.clear();
+  return true;
+}
 
 /* The shape of every course, with no prose in it. It is not behind the paywall
    — see the server's Routes — because the portal needs it before it can draw a
