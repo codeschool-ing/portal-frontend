@@ -57,7 +57,13 @@ function loadBrowserGlobals() {
     'materials.js',
     'plans.js',
     ...assets.filter((f) => f.startsWith('i18n-courses-')),
-    ...assets.filter((f) => f.startsWith('lessons-') && f !== 'lessons-pt.js'),
+    /* `lessons-pt.js` IS LOADED NOW, where it used to be filtered out beside
+       the exercises' dictionary. It was excluded while nothing read it — the
+       snapshot carried the source language and no section content at all. Now
+       the sections travel with their translations, and this file is where the
+       Portuguese ones are. It writes to `window.I18N.pt.lessons` and never to
+       `window.LESSONS`, so the English source it is read against is untouched. */
+    ...assets.filter((f) => f.startsWith('lessons-')),
     ...assets.filter((f) => f.startsWith('exercises-') && f !== 'exercises-pt.js'),
   ];
   for (const f of scripts) {
@@ -93,6 +99,31 @@ function courseTranslations(id) {
   for (const lang of LANGUAGES) {
     const t = window.I18N[lang]?.courses?.[id];
     if (t?.name) out[lang] = { title: t.name };
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
+/* A SECTION'S OWN TRANSLATIONS, keyed by course, topic title and section id —
+   which is exactly how assets/lessons-pt.js is authored, so this reads the
+   dictionary at the grain it was written at and re-derives nothing.
+
+   `body` is replaced WHOLE and never merged, which is the rule that file states
+   at the top of itself: a paragraph list translated halfway would read as two
+   languages inside one section.
+
+   It ships as a JSON STRING because the server keeps every translation in one
+   text column — `content_translations` is deliberately not a column per
+   language per field — and a body is an array. The server parses it back, and
+   falls back to the English when it is not valid JSON. */
+function sectionTranslations(courseId, topic, sectionId) {
+  const out = {};
+  for (const lang of LANGUAGES) {
+    const t = window.I18N[lang]?.lessons?.[courseId]?.[topic]?.[sectionId];
+    if (!t) continue;
+    const fields = {};
+    if (t.title) fields.title = t.title;
+    if (t.body) fields.body = JSON.stringify(t.body);
+    if (Object.keys(fields).length) out[lang] = fields;
   }
   return Object.keys(out).length ? out : undefined;
 }
@@ -144,6 +175,22 @@ const courses = COURSES.map((c) => ({
         countable: s.type === 'assessment'
           ? lessonExercises(c.id, topic).length > 0
           : true,
+        /* THE LESSON ITSELF, which this file did not carry until the free plan
+           needed a server that could refuse it. `assets/lessons-*.js` stays the
+           place it is authored; what changed is that GitHub Pages no longer
+           serves it to the browser, so this is the only way it reaches a
+           student.
+
+           `body` is the authored array, untouched: paragraphs, `{code, text}`
+           blocks and nested lists. Undefined for a section nobody has written,
+           which is most of the catalogue — the server stores NULL for it and
+           tells that apart from an empty array, which would be one somebody
+           emptied. */
+        title: s.title,
+        body: s.body ?? undefined,
+        video: s.video || undefined,
+        duration: s.duration || undefined,
+        translations: sectionTranslations(c.id, topic, s.id),
       })),
     };
   }),

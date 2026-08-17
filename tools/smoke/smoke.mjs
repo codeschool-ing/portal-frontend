@@ -26,7 +26,7 @@
    ========================================================================== */
 
 import { chromium } from 'playwright';
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 
 const BASE = process.env.PORTAL || 'http://127.0.0.1:8899';
@@ -61,6 +61,44 @@ const p = await ctx.newPage();
    The suite's layout assertions already tolerate that face. */
 await p.route(/fonts\.(googleapis|gstatic)\.com/, (route) =>
   route.fulfill({ status: 200, contentType: 'text/css', body: '' }).catch(() => {}));
+
+/* THE LESSON CONTENT, which index.html stopped loading.
+
+   It used to arrive with the page, and everything below that renders prose, a
+   video frame, a rail of sections or a progress denominator read it out of
+   `window.LESSONS`. The served site does not carry it any more: GitHub Pages
+   was handing every word of every course to anybody who asked, and the prose
+   comes from `GET /api/lessons/{courseId}` now, which the plan gates.
+
+   THIS SUITE RUNS WITHOUT A BACKEND, which is what lets it test the portal as a
+   static page — so it injects the content the way the OFFLINE BUNDLE carries
+   it. That is not a fiction invented for the test: it is one of the two real
+   configurations, the one a subscriber downloads, and the only one in which
+   these screens have content and no server to ask.
+
+   WHAT IT THEREFORE DOES NOT COVER is the fetch path and the paywall. Those are
+   the server's, and they are tested there — cmd/api/plan_test.go for which
+   courses a plan reaches, internal/catalog/http_test.go for what each of the
+   two routes carries. Restating that here would be a second answer to the same
+   question, free to agree with itself while disagreeing with the server. */
+const LESSON_SOURCES = await Promise.all(
+  readdirSync(new URL('../../assets', import.meta.url))
+    .filter((n) => n.startsWith('lessons-'))
+    // The Portuguese dictionary first, then the English source it falls back
+    // to, which is the order index.html used to load them in.
+    .sort((a, b) => (a === 'lessons-pt.js' ? -1 : b === 'lessons-pt.js' ? 1 : a.localeCompare(b)))
+    .map((f) => readFile(new URL('../../assets/' + f, import.meta.url), 'utf8')),
+);
+
+/* ON EVERY CONTEXT, not on the first page. This suite launches two more
+   browsers further down — one for the sign-in handover, one for the copy rules
+   — and both render lessons. A page-scoped injection would leave those with no
+   content and fail thirty blocks away from the cause. */
+async function withLessons(context) {
+  for (const src of LESSON_SOURCES) await context.addInitScript(src);
+  return context;
+}
+await withLessons(ctx);
 
 p.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
 p.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
@@ -1645,7 +1683,8 @@ await b2.close();
    tell a blocked copy from a copy that quietly wrote an empty string. */
 console.log('\n== 25. one door out, and it is the code button ==');
 const b3 = await chromium.launch(CHROME ? { executablePath: CHROME } : {});
-const c3 = await b3.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
+const c3 = await withLessons(
+  await b3.newContext({ permissions: ['clipboard-read', 'clipboard-write'] }));
 const p3 = await c3.newPage();
 await p3.goto(BASE + PAGE + '#/sign-in');
 await p3.fill('#e-name', 'Alexandre'); await p3.selectOption('#e-track', 'backend');
@@ -1777,7 +1816,7 @@ console.log('\n== 27. the exam pool is not in the page ==');
    and this is the same claim from the other side: the page, in a browser, with
    the globals it really ended up with. */
 const b5 = await chromium.launch(CHROME ? { executablePath: CHROME } : {});
-const p5 = await (await b5.newContext()).newPage();
+const p5 = await (await withLessons(await b5.newContext())).newPage();
 await p5.goto(BASE + PAGE, { waitUntil: 'networkidle' });
 const pool = await p5.evaluate(() => ({
   examGlobal: typeof window.EXAM_POOL,

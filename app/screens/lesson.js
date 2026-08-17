@@ -62,12 +62,55 @@ function neighbours(courseId, ix, pos) {
   return { previous, next };
 }
 
+/* What a course outside the plan looks like.
+
+   IT NAMES THE COURSE AND WHAT THE SUBSCRIPTION OPENS, and it does not scold.
+   Nobody arriving here did anything wrong: they followed a link to a course
+   their plan does not carry, which is the ordinary state of 114 of the 122.
+
+   IT DOES NOT SAY "UPGRADE" AND LINK NOWHERE. There is no payment page yet — a
+   subscription is a member of staff pressing a button — so it says how it
+   actually happens rather than inventing a flow that does not exist. The day a
+   provider is wired in, this is the one place to change. */
+function locked(course) {
+  const el = document.createElement('div');
+  el.className = 'view view-locked';
+  el.innerHTML =
+    '<header class="view-head">' +
+      '<a class="back mono" href="#/catalog">← ' + esc(txt('Catalog')) + '</a>' +
+      '<h1>' + esc(course.name) + '</h1>' +
+    '</header>' +
+    '<section class="block">' +
+      '<p class="empty-line mono">[' + esc(txt('part of the subscription')) + ']</p>' +
+      '<p class="empty-note">' +
+        esc(txt('The first course of every track is free, in full. This one is part of ' +
+          'the subscription, which opens every course, the final exams, the ' +
+          'certificates and the material to download.')) +
+      '</p>' +
+      '<p class="empty-note">' +
+        esc(txt('Write to us and we will open it for your account.')) +
+      '</p>' +
+    '</section>';
+  return el;
+}
+
 export default async function lesson({ id, ix, sec }) {
   const c = courseById(id);
   const lessons = courseLessons(id);
   const n = Number(ix);
   const a = lessons[n];
   if (!c || !a) return { title: txt('Lesson'), el: empty(txt('Lesson not found.')) };
+
+  /* The prose, which no longer ships with the page. It is awaited here and not
+     at boot because it is one course's content, it is what the subscription
+     sells, and the server refuses it for a course this plan does not include.
+
+     A REFUSAL IS NOT AN ERROR. It is the paywall working, and what a student
+     should meet is the offer rather than a failure — so it gets its own screen,
+     instead of falling through to a lesson drawn with no words in it. */
+  if (await api.loadCourseContent(id) === 'locked') {
+    return { title: c.name, el: locked(c) };
+  }
 
   const sections = lessonSections(id, a.key);
   const pos = Math.max(0, sections.findIndex((s) => s.id === sec));

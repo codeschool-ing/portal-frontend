@@ -352,6 +352,18 @@ if (sync.configured() && !now().session) {
   await restoring;
 }
 
+/* The shape of every course, which used to arrive in four `<script>` tags.
+
+   IT IS NOT AWAITED. Every screen that reads a section already copes with a
+   course that has nothing written — 119 of 122 do — so a first paint without
+   this is provisional rather than broken, and the redraw puts the real shape up
+   when it lands. Waiting would put a round trip in front of the first screen in
+   order to correct a rail that is about to be correct anyway.
+
+   With no backend it returns at once and `window.LESSONS` still answers, which
+   is what leaves the offline bundle exactly as it was. */
+api.loadLessonStructure().then(() => { if (booted) redrawAll(); });
+
 paintAccount();
 paintVerifyBanner();
 booted = true;

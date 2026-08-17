@@ -49,8 +49,84 @@ export function lessonExercises(courseId, key, { minimum = 'structure' } = {}) {
   );
 }
 
+/* ---------- where the content comes from ----------
+
+   `window.LESSONS` WAS THE ONLY SOURCE, loaded by four `<script>` tags in
+   index.html, and that is what made the free plan unenforceable: GitHub Pages
+   served every word of every course to anybody who asked, so the server could
+   refuse to record progress on a paid course while publishing it. It also gave
+   away "lessons to watch offline", which the pricing page sells.
+
+   There are two sources now, and the bundle is the second one:
+
+     the API      `GET /api/lessons` for the shape of every course, and
+                  `GET /api/lessons/{courseId}` for one course's prose — the
+                  request the paywall refuses;
+     the bundle   `window.LESSONS`, still authored in assets/lessons-*.js and
+                  still loaded by the OFFLINE build, which is a subscriber's
+                  download rather than a public page.
+
+   THE READERS BELOW STAY SYNCHRONOUS. About twenty call sites read sections to
+   draw a rail, a step chip or a progress denominator, and a third of them are
+   inside `state.js` where a percentage is computed. Making them async would
+   have been a refactor of the whole portal in service of one fetch. The content
+   lands in this store first — `putStructure`, `putCourse` — and everything
+   reads it the way it always did.
+
+   A COURSE NOT YET LOADED LOOKS LIKE A COURSE NOT YET WRITTEN, which is a state
+   this portal has handled since the first day: 119 of 122 have nothing, and the
+   rule below turns that into one placeholder section. A screen painted before
+   its fetch lands is provisional rather than broken, and repaints when it
+   arrives. */
+const remote = { structure: null, courses: new Map() };
+
+/* The shape of every course, with no prose in it. It is not behind the paywall
+   — see the server's Routes — because the portal needs it before it can draw a
+   single progress bar: a percentage has a denominator, and the track map draws
+   one per course. */
+export function putStructure(courses) {
+  remote.structure = new Map();
+  for (const c of courses || []) remote.structure.set(c.courseId, c.lessons || []);
+}
+
+// One course's lessons WITH their prose, as the gated route answers them.
+export function putCourse(courseId, lessons) {
+  remote.courses.set(courseId, lessons || []);
+}
+
+/* Whether a course's prose has been asked for and answered. A screen asks
+   before choosing between a spinner and a lock; it is not the same question as
+   "does this course have content", which only the answer settles. */
+export const courseLoaded = (courseId) => remote.courses.has(courseId);
+
+/* The written sections of one lesson, from whichever source has them.
+
+   THE ORDER IS DELIBERATE. A course whose prose has been fetched wins: it is
+   the only source carrying bodies. The structure is next — it has the ids and
+   the titles, so a rail is drawn correctly for a course nobody has opened.
+   `window.LESSONS` is last and is normally absent; it exists in the offline
+   build, where there is no server to ask.
+
+   THE ASSESSMENT IS DROPPED HERE and re-appended below. The server stores it
+   as a section like any other, because the snapshot exported it that way, but
+   whether it counts depends on exercises this module already has an answer
+   about — so keeping the rule in one place means taking the server's copy out
+   rather than trusting two of them to agree. */
+function writtenSections(courseId, key) {
+  const ix = courseLessons(courseId).findIndex((a) => a.key === key);
+
+  for (const source of [remote.courses.get(courseId), remote.structure?.get(courseId)]) {
+    if (!source) continue;
+    const lesson = source.find((l) => l.lessonIx === ix);
+    /* A lesson the source knows and has nothing for is not the same as one it
+       has never heard of. Only the second falls through to the next source. */
+    if (lesson) return (lesson.sections || []).filter((s) => s.kind !== 'assessment');
+  }
+  return window.LESSONS?.[courseId]?.[key];
+}
+
 export function lessonSections(courseId, key) {
-  const written = window.LESSONS?.[courseId]?.[key];
+  const written = writtenSections(courseId, key);
 
   const sections = written?.length
     ? written.map((s) => ({ ...s, type: 'content' }))

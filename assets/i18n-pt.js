@@ -557,6 +557,9 @@ window.I18N.pt.features = {
   "track": "Uma trilha guiada, com mapa de progresso",
   "exercises": "Exercícios que se corrigem sozinhos, em todas as aulas",
   "exams": "Provas finais de curso e de trilha",
+  "part of the subscription": "faz parte da assinatura",
+  "The first course of every track is free, in full. This one is part of the subscription, which opens every course, the final exams, the certificates and the material to download.": "O primeiro curso de cada trilha é gratuito, por inteiro. Este faz parte da assinatura, que abre todos os cursos, as provas finais, os certificados e o material para baixar.",
+  "Write to us and we will open it for your account.": "Escreva para a gente que abrimos para a sua conta.",
   "certificate": "Certificados de curso e de trilha, com código de validação",
   "material": "Material de apoio para baixar",
   "offline": "Aulas para ver sem conexão"
