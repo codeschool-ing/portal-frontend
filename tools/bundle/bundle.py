@@ -72,6 +72,22 @@ RE_IMPORT = re.compile(
 )
 RE_BARE_IMPORT = re.compile(r"^import\s+['\"][^'\"]+['\"];?\s*$", re.MULTILINE)
 RE_REEXPORT = re.compile(r"^export\s+(\*|\{)", re.MULTILINE)
+# Top-level `await` in a DEPENDENCY, which the registry cannot represent: its
+# exports are read synchronously by whoever imports it, and an async IIFE would
+# hand them back a promise. The ENTRY is exempt — nothing imports it, so it is
+# wrapped in an async IIFE instead, which is what a real module already does.
+#
+# THIS IS A HEURISTIC AND IT MISSED THE ONE CASE THAT MATTERED. It anchors at
+# column 0, and app/main.js's `await` sits indented inside a top-level `if` — so
+# the build did not stop, and shipped a bundle that threw "Unexpected reserved
+# word" before the first paint. Widening it to `^\s*await` is not the fix: that
+# matches every `await` inside every async function, which is most of them.
+#
+# Telling those apart needs a JavaScript parser, and this tool has python3 and
+# no dependencies on purpose. So the guard stays cheap and best-effort, and the
+# REAL check is that CI now opens the bundle it built — see tools/bundle/
+# boot.mjs. A dependency that slips past this line produces a bundle that does
+# not boot, and that is caught by loading it rather than by reading it.
 RE_TOP_AWAIT = re.compile(r"^await\s", re.MULTILINE)
 
 
@@ -96,14 +112,15 @@ def dependencies(rel, src):
     return [resolve(rel, m.group('path')) for m in RE_IMPORT.finditer(src)]
 
 
-def transform(rel, src):
+def transform(rel, src, is_entry=False):
     """Returns (body_without_import_export, exported_names, default_name)."""
     if RE_REEXPORT.search(src):
         die('re-export (`export *` / `export {}`) in ' + rel + ': not supported')
     if RE_BARE_IMPORT.search(src):
         die('import with no clause in ' + rel + ': not supported')
-    if RE_TOP_AWAIT.search(src):
-        die('top-level `await` in ' + rel + ': flattening removes the module context')
+    if RE_TOP_AWAIT.search(src) and not is_entry:
+        die('top-level `await` in ' + rel + ': its exports are read synchronously, '
+            'so flattening cannot represent it (only the entry may)')
 
     def swap_import(m):
         target = resolve(rel, m.group('path'))
@@ -177,13 +194,22 @@ def join_modules(entry):
     parts = ["/* ES modules flattened by tools/bundle/bundle.py */",
              "const __M = {};"]
     for rel, src in order:
-        body, exported, default = transform(rel, src)
+        is_entry = rel == entry
+        body, exported, default = transform(rel, src, is_entry)
         fields = ['%s: %s' % (n, n) for n in exported]
         if default:
             fields.append('default: %s' % default)
+
+        # THE ENTRY IS ASYNC AND NOTHING ELSE IS. Post-order puts it last and
+        # nothing imports it, so no one is waiting on its exports — where a
+        # dependency wrapped this way would hand its importers a promise instead
+        # of its functions. app/main.js awaits the session restore before the
+        # first paint, and a real ES module is allowed to; this keeps the
+        # flattened copy behaving the same way instead of refusing to parse.
+        opener = '(async function () {' if is_entry else '(function () {'
         parts.append(
-            "__M['%s'] = (function () {\n'use strict';\n%s\nreturn {%s};\n})();"
-            % (rel, body.strip(), ', '.join(fields))
+            "__M['%s'] = %s\n'use strict';\n%s\nreturn {%s};\n})();"
+            % (rel, opener, body.strip(), ', '.join(fields))
         )
     return '\n\n'.join(parts), len(order)
 
