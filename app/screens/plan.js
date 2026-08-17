@@ -24,6 +24,29 @@ const price = (p) => (p.price === 0
   ? txt('free')
   : 'R$ ' + p.price + '<span class="pl-cycle">' + txt(p.cycle) + '</span>');
 
+/* The catalogue's real size, dropped into an already-translated sentence.
+
+   THE SIZE USED TO BE TYPED INTO THE SENTENCE, and it went stale: this card
+   said 86 courses and 16 tracks long after the catalogue passed 122 and 19 —
+   the school underselling itself by a third on the one screen where somebody
+   decides whether to pay. The numbers live in COURSES and TRACKS, and now they
+   are read from there.
+
+   The placeholders survive translation because they are part of the KEY: each
+   dictionary carries `{courses}` and `{tracks}` in its own word order, which a
+   sentence cut into fragments could not do — French needs "Les 122 cours et les
+   19 parcours", and a translator handed "All", "courses and", "tracks" has
+   nowhere to put the second "les".
+
+   IT RUNS AFTER THE TRANSLATION AND NOT AROUND IT, deliberately. Wrapping the
+   lookup in a helper would hide `features[k]` from `tools/i18n/check.mjs`,
+   which follows translation arguments statically and already knows that
+   expression; it would have had to be taught a new one for no gain. Translate,
+   then fill in the numbers. */
+const withCounts = (s) => s
+  .replace('{courses}', COURSES.length)
+  .replace('{tracks}', TRACKS.length);
+
 const CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" ' +
   'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.5 3.5L13 5"/></svg>';
 const DASH = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" ' +
@@ -85,7 +108,7 @@ export default async function plan() {
             '</th>').join('') +
           '</tr></thead>' +
           '<tbody>' +
-            keys.map((k) => '<tr><th scope="row">' + txt(features[k]) + '</th>' +
+            keys.map((k) => '<tr><th scope="row">' + withCounts(txt(features[k])) + '</th>' +
               plans.map((p) => {
                 const has = p.includes.includes(k);
                 return '<td class="' + (has ? 'yes' : 'no') + (p.id === current.id ? ' on' : '') + '">' +

@@ -53,7 +53,7 @@
 
 window.FEATURES = {
   entry: 'The first course of every track, in full',
-  catalog: 'All 86 courses and 16 tracks',
+  catalog: 'All {courses} courses and {tracks} tracks',
   track: 'A guided track with a progress map',
   exercises: 'Exercises that mark themselves, in every lesson',
   exams: 'Final course and track exams',

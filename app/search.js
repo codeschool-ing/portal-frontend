@@ -5,8 +5,10 @@
    led to the catalogue — a shortcut that promised search and delivered
    navigation. This module is what was missing for them to stop lying.
 
-   WHY IT MATTERS MORE HERE THAN ON AN ORDINARY SITE: there are 86 courses and
-   1,503 lessons. The catalogue's field searches courses, and nothing else.
+   WHY IT MATTERS MORE HERE THAN ON AN ORDINARY SITE: the catalogue is well
+   past a hundred courses and a thousand lessons — the exact counts live in
+   COURSES, which is the point: no comment here can stay true about them. The
+   catalogue's field searches courses, and nothing else.
    Someone who remembers "that part about the DNS TTL" has no route to it at all
    — not through the menu, not through the graph, not through the rail.
 
