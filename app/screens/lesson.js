@@ -32,7 +32,7 @@ import { lessonSections, sectionMaterials } from '../lessons.js';
 import { materialList } from '../materials.js';
 import { sectionDone, visitSection, noteFor, saveNote } from '../state.js';
 import { buildAssessment } from '../exercises/index.js';
-import { empty, videoFrame, playsOnClick } from './common.js';
+import { empty, videoFrame, playsOnClick, subscribeInvite } from './common.js';
 import { esc, prose } from '../text.js';
 
 const ARROW = (d) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
@@ -64,14 +64,13 @@ function neighbours(courseId, ix, pos) {
 
 /* What a course outside the plan looks like.
 
-   IT NAMES THE COURSE AND WHAT THE SUBSCRIPTION OPENS, and it does not scold.
-   Nobody arriving here did anything wrong: they followed a link to a course
-   their plan does not carry, which is the ordinary state of 114 of the 122.
+   IT IS AN INVITATION AND NOT A REFUSAL. This is the highest-intent moment the
+   portal has — somebody wanted this course enough to click it — and it used to
+   answer with a grey box and a sentence. The offer lives in
+   `subscribeInvite`, shared with the plan screen so the two cannot drift.
 
-   IT DOES NOT SAY "UPGRADE" AND LINK NOWHERE. There is no payment page yet — a
-   subscription is a member of staff pressing a button — so it says how it
-   actually happens rather than inventing a flow that does not exist. The day a
-   provider is wired in, this is the one place to change. */
+   It names the course in the mail it opens, which is the most useful thing this
+   screen can collect while there is nothing to click. */
 function locked(course) {
   const el = document.createElement('div');
   el.className = 'view view-locked';
@@ -80,22 +79,7 @@ function locked(course) {
       '<a class="back mono" href="#/catalog">← ' + esc(txt('Catalog')) + '</a>' +
       '<h1>' + esc(course.name) + '</h1>' +
     '</header>' +
-    '<section class="block">' +
-      '<p class="empty-line mono">[' + esc(txt('part of the subscription')) + ']</p>' +
-      /* ONE STRING LITERAL, however long the line. `tools/i18n/check.mjs` reads
-         the source rather than running it, so two joined fragments are a call
-         it cannot follow — and a call it cannot follow is a string nobody can
-         prove is translated. Staying under 100 columns is worth less than that.
-
-         Do not put an example of the broken form in this comment either: the
-         check scans the file as text and will read it as a real call. */
-      '<p class="empty-note">' +
-        esc(txt('The first course of every track is free, in full. This one is part of the subscription, which opens every course, the final exams, the certificates and the material to download.')) +
-      '</p>' +
-      '<p class="empty-note">' +
-        esc(txt('Write to us and we will open it for your account.')) +
-      '</p>' +
-    '</section>';
+    subscribeInvite(course.name);
   return el;
 }
 

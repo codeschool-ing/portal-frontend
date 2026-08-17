@@ -16,9 +16,9 @@
    consequence — somebody would believe they had paid.
    ========================================================================== */
 
-import { currentPlan, studentAccount, changePlan } from '../state.js';
-import { dispatch } from '../routes.js';
+import { currentPlan, studentAccount } from '../state.js';
 import { esc } from '../text.js';
+import { subscribeHref, withCounts } from './common.js';
 
 const price = (p) => (p.price === 0
   ? txt('free')
@@ -32,20 +32,10 @@ const price = (p) => (p.price === 0
    decides whether to pay. The numbers live in COURSES and TRACKS, and now they
    are read from there.
 
-   The placeholders survive translation because they are part of the KEY: each
-   dictionary carries `{courses}` and `{tracks}` in its own word order, which a
-   sentence cut into fragments could not do — French needs "Les 122 cours et les
-   19 parcours", and a translator handed "All", "courses and", "tracks" has
-   nowhere to put the second "les".
+   The counts in `{courses}` / `{tracks}` are filled by `withCounts`, which
+   moved to ./common.js when the subscription invitation started needing the
+   same feature sentences. */
 
-   IT RUNS AFTER THE TRANSLATION AND NOT AROUND IT, deliberately. Wrapping the
-   lookup in a helper would hide `features[k]` from `tools/i18n/check.mjs`,
-   which follows translation arguments statically and already knows that
-   expression; it would have had to be taught a new one for no gain. Translate,
-   then fill in the numbers. */
-const withCounts = (s) => s
-  .replace('{courses}', COURSES.length)
-  .replace('{tracks}', TRACKS.length);
 
 const CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" ' +
   'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.5 3.5L13 5"/></svg>';
@@ -121,26 +111,34 @@ export default async function plan() {
               plans.map((p) => '<td' + (p.id === current.id ? ' class="on"' : '') + '>' +
                 (p.id === current.id
                   ? '<span class="pl-already mono">' + txt('your plan') + '</span>'
-                  : '<button type="button" class="btn ' + (p.price > current.price ? 'btn-primary' : 'btn-ghost') +
-                    ' pl-switch" data-plan="' + esc(p.id) + '">' +
-                    txt(p.price > current.price ? 'Upgrade' : 'Switch to this one') + '</button>') +
+                  /* THE BUTTON WROTE localStorage AND NOTHING ELSE, which was
+                     harmless make-believe until the server started enforcing
+                     the plan. After that it produced a student who believed
+                     they had paid and went on being refused every paid course,
+                     with nothing on screen explaining the contradiction.
+                     It asks for the subscription now, the same way the locked
+                     course does. Going DOWN a plan is not offered at all:
+                     nobody has ever asked to be given less, and cancelling is
+                     a conversation rather than a button. */
+                  : (p.price > current.price
+                    ? '<a class="btn btn-primary" href="' + subscribeHref('') + '">'
+                      + esc(txt('Ask for the subscription')) + '</a>'
+                    : '<span class="pl-already mono">' + txt('free') + '</span>')) +
               '</td>').join('') +
             '</tr>' +
           '</tbody>' +
         '</table>' +
       '</div>' +
+      /* THIS PARAGRAPH SAID THE OPPOSITE, and it was right when it was
+         written: nothing was locked, because locking needs a server and a lock
+         kept in the browser is theatre. The server exists now and the lock is
+         real, so the sentence had to go rather than be softened — a screen that
+         tells a student their plan changes nothing is worse than one that says
+         nothing at all. */
       '<p class="account-note mono dim">' +
-        txt('No portal content is locked by plan today — locking requires a server, and with the state in the browser any lock would be theatre.') +
+        txt('The first course of every track is free, in full. Everything past it is the subscription.') +
       '</p>' +
     '</section>';
-
-  el.addEventListener('click', (e) => {
-    const b = e.target.closest('.pl-switch');
-    if (!b) return;
-    changePlan(b.dataset.plan);
-    // rebuild the screen so the table and the header agree with the new plan
-    dispatch();
-  });
 
   return { title: txt('My plan'), el };
 }

@@ -1476,13 +1476,28 @@ ok('the plan card counts the catalogue it actually ships',
 ok('and no placeholder reached the screen',
   !/\{courses\}|\{tracks\}/.test(planCatalogue), planCatalogue);
 
-const planBefore = await p.locator('.pl-current-top h2').innerText();
-await p.locator('.pl-switch').first().click();
-await p.waitForTimeout(300);
-const planAfter = await p.locator('.pl-current-top h2').innerText();
-ok('the upgrade switches the plan', planAfter !== planBefore, planBefore + ' → ' + planAfter);
-ok('the plan survives the reload', await p.evaluate(() =>
-  Boolean(JSON.parse(localStorage.getItem('codeschool-portal')).account?.planId)));
+/* THE UPGRADE BUTTON USED TO SWITCH THE PLAN IN THIS BROWSER, and this block
+   asserted that it did. It was make-believe with nothing behind it, which was
+   fine while nothing read the plan — and became a lie the moment the server
+   started enforcing it: a student who clicked it believed they had paid and
+   went on being refused every paid course, with nothing on screen to explain
+   the contradiction.
+
+   What is asserted now is that no such button exists, and that the screen asks
+   for the subscription through the one route that works today. The plan moves
+   at the server, in the console, with an audit entry — never here. */
+ok('NO BUTTON CHANGES THE PLAN IN THIS BROWSER',
+  (await p.locator('.pl-switch').count()) === 0);
+ok('the paying plan is offered instead',
+  (await p.locator('.pl-action-row a.btn-primary').count()) === 1);
+const planAsk = await p.locator('.pl-action-row a.btn-primary').getAttribute('href');
+ok('and the offer is an address a person answers',
+  /^mailto:contact@codeschool\.ing\?subject=/.test(planAsk || ''), planAsk);
+ok('the plan is NOT written to this browser by looking at the screen',
+  await p.evaluate(() => {
+    const doc = JSON.parse(localStorage.getItem('codeschool-portal') || '{}');
+    return !doc.account || doc.account.planId === undefined || doc.account.planId === 'guest';
+  }));
 
 await p.goto(BASE + PAGE + '#/account');
 await p.waitForSelector('#f-email');
