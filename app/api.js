@@ -23,6 +23,7 @@ import {
   putStructure,
   putCourse,
   courseLoaded,
+  forLanguage,
 } from './lessons.js';
 import { gradeLocally, NEEDS_SERVER } from './exercises/grade.js';
 
@@ -68,22 +69,28 @@ export async function completeMfa(code) {
 
 /* Which language to ask the server for.
 
-   READ FROM THE STORED KEY rather than from the i18n runtime, which keeps
-   `LANG` to itself and exposes no getter. `assets/i18n-runtime.js` is shared
-   verbatim with the showcase and the console — the console's CI fails on drift
-   — so adding an export to it to serve one fetch here would be a change to
-   three repositories. The key is the same one that file writes, and it is
-   already part of this portal's contract with the browser.
+   FROM `<html lang>`, which the i18n runtime writes on every language change —
+   see buildLanguagePicker in assets/i18n-runtime.js. It is the only place that
+   file publishes the active language outside itself, and reading it costs
+   nothing.
 
-   Anything unrecognised, and an empty store, mean English: it is the source
-   language, and the server treats an unknown code the same way. */
+   IT USED TO READ localStorage AND THAT WAS WRONG. The runtime stores a
+   language only when somebody CHOOSES one in the picker; when it detects the
+   browser's instead, it uses it and writes nothing. So a first-time visitor
+   reading in Portuguese had an empty store, this asked the server for English,
+   and the portal drew a Portuguese interface around an English lesson. Nothing
+   failed and nothing logged — the server answered exactly what it was asked.
+
+   That did not exist before the lessons moved: the client did the translating,
+   so browser detection reached them without anybody passing a language along.
+
+   `pt-BR` is the html tag for `pt`; the others are the code itself, so the
+   part before the hyphen is the code in every case. */
 function currentLanguage() {
-  try {
-    return localStorage.getItem('codeschool-language') || 'en';
-  } catch (e) {
-    return 'en'; // private mode
-  }
+  const tag = (document.documentElement.lang || 'en').toLowerCase();
+  return tag.split('-')[0];
 }
+
 
 /* ---------- the lessons, which used to be four script tags ----------
 
@@ -101,6 +108,7 @@ function currentLanguage() {
    rather than a public page. */
 export async function loadLessonStructure() {
   if (!sync.configured()) return;
+  forLanguage(currentLanguage());
   try {
     const answer = await sync.request('GET',
       '/api/lessons?lang=' + encodeURIComponent(currentLanguage()));
@@ -122,6 +130,7 @@ export async function loadLessonStructure() {
    is being offered something rather than told that something broke. */
 export async function loadCourseContent(courseId) {
   if (!sync.configured()) return 'offline';
+  forLanguage(currentLanguage());
   if (courseLoaded(courseId)) return 'ready';
   try {
     const answer = await sync.request('GET',
@@ -141,6 +150,14 @@ export async function loadCourseContent(courseId) {
     if (typeof console !== 'undefined') console.debug('lesson content', courseId, e.message);
     return 'failed';
   }
+}
+
+/* languageChanged reports whether the language moved since the store was
+   filled, dropping it when it did. main.js asks on every redraw, which is the
+   signal a language switch produces — the runtime's applyLanguage calls
+   redrawAll, and there is no other hook to hang this on. */
+export function languageChanged() {
+  return forLanguage(currentLanguage());
 }
 
 /* The tail both sign-in paths share: adopt the browser's history into the
