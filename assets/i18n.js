@@ -6,8 +6,8 @@
    to the key, which is already the string to show. Portuguese used to hold that
    role and now sits in assets/i18n-pt.js, one translation among the others.
 
-   The catalogue — names, summaries, syllabus, topics and prerequisites of the
-   86 courses — is split into assets/i18n-courses-*.js: it is more text than
+   The catalogue — names, summaries, syllabus, topics and prerequisites of
+   every course — is split into assets/i18n-courses-*.js: it is more text than
    everything else on the site put together. The lesson and exercise content has
    its own files too, and today only Portuguese has them: the other three fall
    back to the English source, which is what a missing translation should do.
@@ -27,25 +27,25 @@ window.I18N = {
   es: {
     plans: {
       "guest": {
-        "name": "Visitatore",
-        "summary": "Il primo corso di ogni percorso, per vedere come funziona la scuola.",
-        "cycle": "per sempre"
+        "name": "Visitante",
+        "summary": "El primer curso de cada itinerario, para ver cómo funciona la escuela.",
+        "cycle": "para siempre"
       },
       "student": {
-        "name": "Studente",
-        "summary": "Tutta la scuola, per un anno.",
-        "cycle": "all'anno"
+        "name": "Alumno",
+        "summary": "La escuela entera, por un año.",
+        "cycle": "/año"
       }
     },
     features: {
-      "entry": "Il primo corso di ogni percorso, per intero",
-      "catalog": "Tutti gli 86 corsi e i 16 percorsi",
-      "track": "Un percorso guidato, con mappa dei progressi",
-      "exercises": "Esercizi che si correggono da soli, in ogni lezione",
-      "exams": "Esami finali di corso e di percorso",
-      "certificate": "Certificati di corso e di percorso, con codice di validazione",
-      "material": "Materiale di supporto da scaricare",
-      "offline": "Lezioni da guardare offline"
+      "entry": "El primer curso de cada itinerario, completo",
+      "catalog": "Los {courses} cursos y los {tracks} itinerarios",
+      "track": "Itinerario guiado con mapa de progreso",
+      "exercises": "Ejercicios que se corrigen solos, en todas las clases",
+      "exams": "Exámenes finales de curso y de itinerario",
+      "certificate": "Certificados de curso y de itinerario, con código de validación",
+      "material": "Material de apoyo para descargar",
+      "offline": "Clases para ver sin conexión"
     },
     ui: {
       "Two-factor authentication": "Autenticación en dos factores",
@@ -578,7 +578,7 @@ window.I18N = {
       }
     },
     features: {
-      "catalog": "Tout le catalogue : 86 cours et 16 parcours",
+      "catalog": "Tout le catalogue : {courses} cours et {tracks} parcours",
       "track": "Un parcours guidé, avec carte de progression",
       "exercises": "Exercices et évaluations à chaque leçon",
       "exams": "Examens finaux de cours et de parcours",
@@ -1119,7 +1119,7 @@ window.I18N = {
       }
     },
     features: {
-      "catalog": "Tutto il catalogo: 86 corsi e 16 percorsi",
+      "catalog": "Tutto il catalogo: {courses} corsi e {tracks} percorsi",
       "track": "Un percorso guidato, con mappa dei progressi",
       "exercises": "Esercizi e valutazioni in ogni lezione",
       "exams": "Esami finali di corso e di percorso",

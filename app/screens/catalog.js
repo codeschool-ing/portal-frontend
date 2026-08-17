@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Catalogue — the 86 courses, with a search field and a category filter.
+   Catalogue — every course, with a search field and a category filter.
 
    The categories are not a fixed list: they come out of `dados.js` itself, as on
    the vitrine. A new course with a new category shows up in the filter on its

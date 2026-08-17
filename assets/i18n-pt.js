@@ -227,7 +227,7 @@ window.I18N.pt.ui = {
   "The ones you got wrong": "Os que você errou",
   "The plan for someone studying to work with this.": "O plano de quem está estudando para trabalhar com isto.",
   "The types that need execution are not checked yet, so they stay out of the rate.": "Os tipos que precisam de execução ainda não são conferidos, e por isso não entram na taxa.",
-  "The whole catalog: 86 courses and 16 tracks": "Catálogo inteiro: 86 cursos e 16 trilhas",
+  "The whole catalog: {courses} courses and {tracks} tracks": "Catálogo inteiro: {courses} cursos e {tracks} trilhas",
   "There is nothing wrong to redo.": "Não há nada errado para refazer.",
   "This exercise declares no recomputation — nobody checked the answer key.": "Este exercício não declara recálculo — o gabarito não foi conferido por ninguém.",
   "To try the whole school before deciding.": "Para experimentar a escola inteira antes de decidir.",
@@ -553,7 +553,7 @@ window.I18N.pt.plans = {
 
 window.I18N.pt.features = {
   "entry": "O primeiro curso de cada trilha, completo",
-  "catalog": "Todos os 86 cursos e 16 trilhas",
+  "catalog": "Todos os {courses} cursos e {tracks} trilhas",
   "track": "Uma trilha guiada, com mapa de progresso",
   "exercises": "Exercícios que se corrigem sozinhos, em todas as aulas",
   "exams": "Provas finais de curso e de trilha",

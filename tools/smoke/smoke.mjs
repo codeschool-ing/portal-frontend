@@ -1416,6 +1416,28 @@ const planFeatures = await p.evaluate(() =>
 ok('the table compares every feature', planRows === planFeatures + 1,
   planRows + ' rows for ' + planFeatures + ' features');
 ok('the subscribed plan column is highlighted', (await p.locator('.pl-table th.on').count()) === 1);
+
+/* THE CATALOGUE'S SIZE, CHECKED AGAINST THE CATALOGUE. This card said "86
+   courses and 16 tracks" long after the catalogue passed 122 and 19 — the
+   school underselling itself by a third on the one screen where somebody
+   decides whether to pay, because a number had been typed into a sentence and
+   nothing ever compared it with the file sitting next to it.
+
+   Compared against COURSES.length and not against 122, deliberately: a fixed
+   number here would be the same mistake one level up. */
+const planCatalogue = await p.evaluate(() => {
+  const want = [String(COURSES.length), String(TRACKS.length)];
+  const row = [...document.querySelectorAll('.pl-table tbody th[scope="row"]')]
+    .find((th) => want.every((n) => th.textContent.includes(n)));
+  return row ? row.textContent : '(no row names both counts)';
+});
+ok('the plan card counts the catalogue it actually ships',
+  !/^\(no row/.test(planCatalogue), planCatalogue);
+/* A placeholder still on screen means the substitution never ran, which is what
+   a whole-sentence key looks like when nobody fills it in. */
+ok('and no placeholder reached the screen',
+  !/\{courses\}|\{tracks\}/.test(planCatalogue), planCatalogue);
+
 const planBefore = await p.locator('.pl-current-top h2').innerText();
 await p.locator('.pl-switch').first().click();
 await p.waitForTimeout(300);
