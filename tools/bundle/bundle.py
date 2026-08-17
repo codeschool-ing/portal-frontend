@@ -204,6 +204,41 @@ for sheet in re.findall(r'<link rel="stylesheet" href="(assets/[^"]+)" />', html
         '<style>\n' + read(sheet) + '\n</style>',
     )
 
+# THE LESSON CONTENT, which index.html no longer loads.
+#
+# It used to arrive with everything else, because the served page carried it and
+# this tool inlines what the page references. The page does not any more: GitHub
+# Pages was handing every word of every course to anybody who asked, and the
+# prose now comes from `GET /api/lessons/{courseId}`, which the plan gates.
+#
+# THIS FILE IS THE EXCEPTION, on purpose. The pricing page sells "lessons to
+# watch offline" under the subscription, and an offline copy with no lessons in
+# it is not the thing being sold — it is the shell of it. So the bundle reaches
+# past index.html and inlines the content directly.
+#
+# WHAT THAT MAKES THIS OUTPUT. `portal-student.html` is a subscriber's download
+# now, not something to publish: it carries content the served site withholds.
+# It must not be committed to a Pages branch or linked publicly, and the route
+# that hands it to a paying student is the piece still to build.
+#
+# Injected BEFORE the loop below, so the content is inlined in the same pass and
+# in the order the page would have loaded it: the Portuguese dictionary first,
+# then the English source it falls back to.
+lesson_assets = ['assets/lessons-pt.js'] + sorted(
+    'assets/' + p.name for p in (ROOT / 'assets').glob('lessons-*.js')
+    if p.name != 'lessons-pt.js'
+)
+missing = [a for a in lesson_assets if not (ROOT / a).exists()]
+if missing:
+    die('lesson content missing: ' + ', '.join(missing))
+anchor = '<script src="assets/exercises-sample.js"></script>'
+if anchor not in html:
+    die('could not find ' + anchor + ' in index.html to inject the lessons before')
+html = html.replace(
+    anchor,
+    ''.join('<script src="' + a + '"></script>\n' for a in lesson_assets) + anchor,
+)
+
 # classic scripts, in the same order index.html loads them
 for tag in re.findall(r'<script src="(assets/[^"]+)"></script>', html):
     body = read(tag).replace('</script>', '<\\/script>')   # would break the inlined block

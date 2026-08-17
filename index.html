@@ -128,7 +128,6 @@ try{if(localStorage.getItem('codeschool-theme')==='light')document.documentEleme
 <script src="assets/i18n.js"></script>
 <script src="assets/i18n-pt.js"></script>
 <script src="assets/i18n-courses-pt.js"></script>
-<script src="assets/lessons-pt.js"></script>
 <script src="assets/exercises-pt.js"></script>
 <script src="assets/i18n-courses-es.js"></script>
 <script src="assets/i18n-courses-fr.js"></script>
@@ -136,9 +135,19 @@ try{if(localStorage.getItem('codeschool-theme')==='light')document.documentEleme
 <script src="assets/i18n-runtime.js"></script>
 <script src="assets/plans.js"></script>
 <script src="assets/materials.js"></script>
-<script src="assets/lessons-web-fundamentals.js"></script>
-<script src="assets/lessons-html-css.js"></script>
-<script src="assets/lessons-javascript.js"></script>
+<!-- THE LESSON CONTENT IS NOT HERE ANY MORE, and its absence is the point.
+
+     `assets/lessons-*.js` and `assets/lessons-pt.js` used to be loaded right
+     here, which meant GitHub Pages served every word of every course to anybody
+     who opened the file — while the server refused to record progress on those
+     same courses. The paywall was real for everything except the thing being
+     sold, and "lessons to watch offline", which the pricing page charges for,
+     was already published to everyone.
+
+     The prose comes from `GET /api/lessons/{courseId}` now, which the plan
+     gates. The files stay in assets/ because that is where the content is
+     AUTHORED — tools/snapshot reads them, and tools/bundle inlines them into
+     the offline copy, which is a subscriber's download rather than a page. -->
 <script src="assets/exercises-sample.js"></script>
 <script src="assets/exercises-web-fundamentals.js"></script>
 <script src="assets/exercises-html-css.js"></script>

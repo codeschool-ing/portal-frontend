@@ -17,7 +17,13 @@ import {
   courseById,
   trackById,
 } from './catalog.js';
-import { lessonExercises as fetchExercises, lessonSections } from './lessons.js';
+import {
+  lessonExercises as fetchExercises,
+  lessonSections,
+  putStructure,
+  putCourse,
+  courseLoaded,
+} from './lessons.js';
 import { gradeLocally, NEEDS_SERVER } from './exercises/grade.js';
 
 const echo = (v) => Promise.resolve(v);
@@ -58,6 +64,83 @@ export async function signIn({ name, email, password }) {
 export async function completeMfa(code) {
   const account = await sync.signInMfa(code);
   return afterSignIn(account);
+}
+
+/* Which language to ask the server for.
+
+   READ FROM THE STORED KEY rather than from the i18n runtime, which keeps
+   `LANG` to itself and exposes no getter. `assets/i18n-runtime.js` is shared
+   verbatim with the showcase and the console — the console's CI fails on drift
+   — so adding an export to it to serve one fetch here would be a change to
+   three repositories. The key is the same one that file writes, and it is
+   already part of this portal's contract with the browser.
+
+   Anything unrecognised, and an empty store, mean English: it is the source
+   language, and the server treats an unknown code the same way. */
+function currentLanguage() {
+  try {
+    return localStorage.getItem('codeschool-language') || 'en';
+  } catch (e) {
+    return 'en'; // private mode
+  }
+}
+
+/* ---------- the lessons, which used to be four script tags ----------
+
+   They were `window.LESSONS`, shipped by index.html and served to anybody by
+   GitHub Pages — see the note in app/lessons.js for why that left the free plan
+   unenforceable. They come from the server now, in two pieces that are not the
+   same kind of thing.
+
+   THE STRUCTURE IS NOT SOLD, and it is read once for every course at a time.
+   The portal needs it before it draws anything with a percentage in it, so it
+   belongs to boot rather than to a screen.
+
+   With no backend configured neither of these runs and `window.LESSONS` is
+   still there — that is the offline bundle, which is a subscriber's download
+   rather than a public page. */
+export async function loadLessonStructure() {
+  if (!sync.configured()) return;
+  try {
+    const answer = await sync.request('GET',
+      '/api/lessons?lang=' + encodeURIComponent(currentLanguage()));
+    putStructure(answer && answer.courses);
+  } catch (e) {
+    /* Not fatal, and not shown. Without the structure every course looks
+       unwritten — a state the portal draws correctly, since 119 of them are —
+       and the alternative is an error screen over a portal that still works for
+       everything except the shape of a rail. */
+    if (typeof console !== 'undefined') console.debug('lesson structure', e.message);
+  }
+}
+
+/* One course's prose, which IS what the subscription sells.
+
+   It ANSWERS WHAT HAPPENED rather than throwing, because the caller is a screen
+   with three different things to draw: the lesson, a lock, or a failure. A
+   `plan_required` is not an error — it is the paywall working, and the student
+   is being offered something rather than told that something broke. */
+export async function loadCourseContent(courseId) {
+  if (!sync.configured()) return 'offline';
+  if (courseLoaded(courseId)) return 'ready';
+  try {
+    const answer = await sync.request('GET',
+      '/api/lessons/' + encodeURIComponent(courseId)
+      + '?lang=' + encodeURIComponent(currentLanguage()));
+    putCourse(courseId, answer && answer.courses && answer.courses[0] && answer.courses[0].lessons);
+    return 'ready';
+  } catch (e) {
+    if (e.code === 'plan_required') return 'locked';
+    /* A course with nothing written answers 404, and that is not a failure: it
+       is the ordinary state of 119 of them. Cached as empty so the screen stops
+       asking on every repaint. */
+    if (e.status === 404) {
+      putCourse(courseId, []);
+      return 'ready';
+    }
+    if (typeof console !== 'undefined') console.debug('lesson content', courseId, e.message);
+    return 'failed';
+  }
 }
 
 /* The tail both sign-in paths share: adopt the browser's history into the
