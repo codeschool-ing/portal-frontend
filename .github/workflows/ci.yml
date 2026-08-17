@@ -109,6 +109,19 @@ jobs:
             sleep 1
           done
 
+      # THE BUNDLE IS OPENED, not merely built. The Checks job builds it and
+      # uploads it, and until now nothing ever loaded the result — so a bundle
+      # that threw before its first paint passed every run, which is exactly
+      # what happened when app/main.js gained a top-level `await`.
+      #
+      # Built again here rather than carried between jobs: it is a python script
+      # over files already checked out, and the artifact plumbing would cost
+      # more to read than the two seconds it saves.
+      - name: The single-file portal opens
+        run: |
+          python3 tools/bundle/bundle.py
+          node tools/bundle/boot.mjs
+
       # The `example` blocks are executable programs with their output written
       # beside them. This runs them and compares.
       - name: The code examples really do run
