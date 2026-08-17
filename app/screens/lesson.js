@@ -82,10 +82,15 @@ function locked(course) {
     '</header>' +
     '<section class="block">' +
       '<p class="empty-line mono">[' + esc(txt('part of the subscription')) + ']</p>' +
+      /* ONE STRING LITERAL, however long the line. `tools/i18n/check.mjs` reads
+         the source rather than running it, so two joined fragments are a call
+         it cannot follow — and a call it cannot follow is a string nobody can
+         prove is translated. Staying under 100 columns is worth less than that.
+
+         Do not put an example of the broken form in this comment either: the
+         check scans the file as text and will read it as a real call. */
       '<p class="empty-note">' +
-        esc(txt('The first course of every track is free, in full. This one is part of ' +
-          'the subscription, which opens every course, the final exams, the ' +
-          'certificates and the material to download.')) +
+        esc(txt('The first course of every track is free, in full. This one is part of the subscription, which opens every course, the final exams, the certificates and the material to download.')) +
       '</p>' +
       '<p class="empty-note">' +
         esc(txt('Write to us and we will open it for your account.')) +
