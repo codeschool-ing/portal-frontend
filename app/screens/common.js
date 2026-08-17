@@ -98,3 +98,93 @@ export function playsOnClick(el, title) {
     thumb.replaceWith(frame);
   });
 }
+
+/* ==========================================================================
+   THE SUBSCRIPTION INVITATION
+
+   One block, used in the two places a student meets the paywall: the course
+   they tried to open, and the plan screen. One place so the offer cannot say
+   two different things, and so the day a payment provider arrives there is one
+   button to change rather than two.
+
+   THE ACTION IS AN E-MAIL, AND THAT IS NOT A PLACEHOLDER. There is no payment
+   provider and no checkout; an "Assinar agora" that led nowhere would be the
+   same lie as the button this replaces, only better dressed. A subscription is
+   opened by a person today — see the console's record screen — so the invitation
+   asks that person, and says so.
+
+   IT NAMES THE COURSE in the subject, so whoever reads the mail knows what
+   made somebody want to pay. That is the most useful thing this screen can
+   collect while there is nothing to click.
+
+   THE BENEFITS ARE NOT WRITTEN HERE. `window.FEATURES` already carries them,
+   translated into all five languages, and `window.PLANS` says which belong to
+   which plan. Re-typing them would be a second copy to keep in step with the
+   pricing page — and the pricing page is the one that sells.
+   ========================================================================== */
+
+
+/* The plans' feature sentences carry counts, and this fills them in.
+
+The placeholders survive translation because they are part of the KEY: each
+   dictionary carries `{courses}` and `{tracks}` in its own word order, which a
+   sentence cut into fragments could not do — French needs "Les 122 cours et les
+   19 parcours", and a translator handed "All", "courses and", "tracks" has
+   nowhere to put the second "les".
+
+   IT RUNS AFTER THE TRANSLATION AND NOT AROUND IT, deliberately. Wrapping the
+   lookup in a helper would hide `features[k]` from `tools/i18n/check.mjs`,
+   which follows translation arguments statically and already knows that
+   expression; it would have had to be taught a new one for no gain. Translate,
+   then fill in the numbers. */
+export const withCounts = (s) => s
+  .replace('{courses}', COURSES.length)
+  .replace('{tracks}', TRACKS.length);
+
+const CONTACT = 'contact@codeschool.ing';
+
+/* The address, with the course already in the subject and the body. `mailto:`
+   wants every part percent-encoded, including the spaces. */
+export function subscribeHref(courseName) {
+  const subject = txt('I would like the subscription')
+    + (courseName ? ' — ' + courseName : '');
+  const body = courseName
+    ? txt('I would like the subscription') + ': ' + courseName
+    : txt('I would like the subscription');
+  return 'mailto:' + CONTACT
+    + '?subject=' + encodeURIComponent(subject)
+    + '&body=' + encodeURIComponent(body);
+}
+
+// The paying plan, or nothing when no plan is configured — the offline bundle
+// and a local run both reach here with an empty window.PLANS.
+const paidPlan = () => (window.PLANS || []).find((p) => p.id === 'student');
+
+/* The block itself. `courseName` is optional: on the plan screen there is no
+   course to name, and the invitation still stands. */
+export function subscribeInvite(courseName) {
+  const plan = paidPlan();
+  const opens = (plan?.includes || [])
+    .map((k) => (window.FEATURES || {})[k])
+    .map((t) => (t ? withCounts(t) : t))
+    .filter(Boolean);
+
+  return '<section class="block invite">' +
+    '<p class="invite-tag mono">' + esc(txt('part of the subscription')) + '</p>' +
+    /* ONE STRING LITERAL. tools/i18n/check.mjs reads the source rather than
+       running it, so joined fragments are a call it cannot follow. */
+    '<p class="invite-lead">' + esc(txt('The first course of every track is free, in full. This one is part of the subscription, which opens every course, the final exams, the certificates and the material to download.')) + '</p>' +
+    (opens.length
+      ? '<ul class="invite-opens">'
+        + opens.map((s) => '<li>' + esc(s) + '</li>').join('')
+        + '</ul>'
+      : '') +
+    (plan
+      ? '<p class="invite-price"><strong>R$ ' + esc(String(plan.price)) + '</strong>'
+        + '<span class="invite-cycle dim">' + esc(txt(plan?.cycle)) + '</span></p>'
+      : '') +
+    '<a class="btn btn-primary invite-cta" href="' + subscribeHref(courseName) + '">'
+      + esc(txt('Ask for the subscription')) + '</a>' +
+    '<p class="invite-note dim">' + esc(txt('Write to us and we will open it for your account.')) + '</p>' +
+  '</section>';
+}
