@@ -308,7 +308,6 @@ export async function restoreSession() {
   if (same) {
     // The name can have been changed on another device; keep it in step.
     state.change((e) => { e.session = { ...e.session, name: server.name, email: server.email }; });
-    await refreshVerified();
 
     /* AND SO CAN THE PROGRESS. Until this was here, the same account open in
        two places never reconciled: a section finished in one window was
@@ -327,11 +326,28 @@ export async function restoreSession() {
        on every page load would cost a busy student hundreds of round trips to
        discover it had nothing to say. `sync.js` keeps one flag for exactly
        this fork, set when a push fails and cleared when an import succeeds. */
-    if (sync.hasUnsent()) await sync.adopt();
-    else await sync.pull();
-    /* The exams are the same kind of cache and were stale for the same reason:
-       a course passed on another device offered itself to be taken again. */
-    await refreshExams();
+    /* ALL AT ONCE, BECAUSE THE STUDENT IS LOOKING AT STALE NUMBERS UNTIL THEY
+       FINISH. Nothing here depends on anything else here — the account, the
+       progress and the exams are three separate caches of three separate
+       answers, and the only thing they all needed was the session above. In
+       series this was four round trips deep before the screen was redrawn, and
+       it showed: a visible pause on every load, longer while a Cloud Run
+       instance was waking up. Two deep now.
+
+       `allSettled` and not `all`: these are refreshes of things the browser
+       already has a usable copy of, so one that fails should cost its own
+       value and nothing else. With `all`, a failed exam read would reject this
+       function, `restoring` would never resolve, and the redraw below would
+       never happen — the page would sit on old numbers because a request that
+       had nothing to do with them went wrong. */
+    await Promise.allSettled([
+      refreshVerified(),
+      sync.hasUnsent() ? sync.adopt() : sync.pull(),
+      /* The exams are the same kind of cache and were stale for the same
+         reason: a course passed on another device offered itself to be taken
+         again. */
+      refreshExams(),
+    ]);
     return 'kept';
   }
 

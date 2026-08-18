@@ -70,6 +70,8 @@ const api = {
      structure that never lands turns every written course into a placeholder
      one: the portal keeps working and every number in it is wrong. */
   structureFailures: 0,
+  // Makes GET /api/exams fail, so that one refresh can be seen to fail alone.
+  examsDown: false,
 };
 
 /* One course with a shape the client cannot invent. Its placeholder rule gives
@@ -145,7 +147,12 @@ await p.route('**/api/**', async (route) => {
     if (!api.session) return json({ error: { code: 'unauthorized', message: 'sign in first' } }, 401);
     return json({ planId: 'guest', since: null, email: api.session.email, emailVerified: true });
   }
-  if (path === '/api/exams') return json({ exams: [] });
+  /* `examsDown` is for the one case that needs a refresh to fail on its own
+     without the others noticing — see the end of case 7. */
+  if (path === '/api/exams') {
+    if (api.examsDown) return json({ error: { code: 'internal', message: 'no exams today' } }, 500);
+    return json({ exams: [] });
+  }
 
   /* The structure. It answers for real here — see `structureFailures` for why
      that is worth saying about a stub.
@@ -596,6 +603,34 @@ console.log('\n== 7. a kept session reconciles with the server ==');
   ok('and the flag is cleared once it has been',
     (await document_())?.unsent === undefined,
     JSON.stringify((await document_())?.unsent));
+
+  /* ONE READ FAILING MUST NOT COST THE OTHERS. The three refreshes run
+     together, and they are refreshes of things the browser already holds — so
+     `allSettled` rather than `all`, or a failed exam read would reject the
+     restore, leave `restoring` unresolved and leave the page on the old
+     numbers because of a request that had nothing to do with them. */
+  api.examsDown = true;
+  await boot({
+    stored: ANA,
+    session: ANA.session,
+    progress: {
+      progress: { javascript: { lessons: { 0: { sections: ['let-const', 'arrow'] } } } },
+      notes: [], resume: null,
+    },
+  });
+  /* The progress lands either way — `all` does not cancel what is already in
+     flight — so that is not the assertion. What `all` costs is the RESTORE:
+     the rejection escapes restoreSession, `restoring` never resolves, the
+     redraw below it never runs, and the student keeps looking at the old
+     numbers because a request about exams went wrong. It surfaces as an
+     unhandled rejection, which is why this reads the error list. */
+  ok('a failing exam read still leaves the progress reconciled',
+    (await finished('javascript')).includes('arrow'),
+    (await finished('javascript')).join(',') || 'nothing');
+  ok('AND DOES NOT TAKE THE RESTORE DOWN WITH IT',
+    !errors.some((e) => /no exams today/.test(e)),
+    errors.join(' | ') || 'no unhandled rejection');
+  api.examsDown = false;
 }
 
 console.log('\n== JavaScript errors ==');
