@@ -84,13 +84,30 @@ export async function request(method, path, body) {
    already are: marking a section, visiting one and saving a note are the three
    things a student does that the server keeps. */
 
+/* A WRITE THAT DID NOT LAND, remembered as one flag in the document.
+
+   The reason it exists is the next reload. Reading the server back on a kept
+   session ends in `replaceWith`, which would erase anything this browser holds
+   and the server does not — and a write whose push failed is exactly that. The
+   import is what protects it, and the import is expensive: the server checks
+   every section against the mirror, two queries each, so running it on every
+   page load costs a student hundreds of round trips for nothing.
+
+   One boolean buys the difference. A browser that knows it has unsent work
+   imports; every other reload just reads. */
+export const hasUnsent = () => Boolean(state.now().unsent);
+const markUnsent = () => state.change((e) => { e.unsent = true; });
+const clearUnsent = () => { if (hasUnsent()) state.change((e) => { delete e.unsent; }); };
+
 const push = (method, path, body) => {
   if (!configured()) return;
   request(method, path, body).catch((e) => {
-    /* Swallowed on purpose, and this is the one place in the portal where that
-       is right. The local copy is already written, the routes are idempotent,
-       and the next sign-in's import replays whatever was missed. An alert here
-       would interrupt a student mid-lesson about something that fixes itself. */
+    /* Still not shown, and that part was right: the local copy is already
+       written and an alert would interrupt a student mid-lesson. What was
+       missing is that nothing REMEMBERED it, so "the next sign-in replays it"
+       was true and could be months away — and a reload in between would have
+       thrown it away. */
+    markUnsent();
     if (typeof console !== 'undefined') console.debug('sync', method, path, e.message);
   });
 };
@@ -134,16 +151,27 @@ export async function adopt() {
 
   const report = await request('POST', '/api/progress/import', state.exportLocal());
   await pull();
+  /* Everything this browser had is now on the server, so whatever was unsent
+     is sent. Cleared after the pull rather than after the import: if the pull
+     throws, the document on screen is still the local one and the flag still
+     describes it. */
+  clearUnsent();
   return report;
 }
 
 /* The read half of `adopt`, on its own.
 
-   A restored session needs it and must NOT have the other half: importing is
-   for a browser that has history the account does not, and a browser being
-   handed back an account it was not signed into has nothing to give — at best
-   it sends an empty document, at worst somebody else's. Reading is the whole
-   job there. */
+   A SWITCHED or RESTORED session needs it and must NOT have the other half:
+   importing is for a browser that has history the account does not, and a
+   browser being handed back an account it was not signed into has nothing to
+   give — at best it sends an empty document, at worst somebody else's. Reading
+   is the whole job there.
+
+   A KEPT session is the opposite case and takes the whole of `adopt`: that
+   browser WAS signed into this account, so what it holds belongs here and can
+   include a write whose push was lost. Reading alone ends in `replaceWith`,
+   which would throw that away — a reload losing work is worse than the
+   staleness it was meant to cure. */
 export async function pull() {
   if (!configured()) return null;
 

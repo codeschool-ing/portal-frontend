@@ -309,6 +309,29 @@ export async function restoreSession() {
     // The name can have been changed on another device; keep it in step.
     state.change((e) => { e.session = { ...e.session, name: server.name, email: server.email }; });
     await refreshVerified();
+
+    /* AND SO CAN THE PROGRESS. Until this was here, the same account open in
+       two places never reconciled: a section finished in one window was
+       invisible in the other through any number of reloads, because a kept
+       session read nothing back. Signing out and in again fixed it, which is a
+       strange thing to have to know.
+
+       READING ALONE, NORMALLY. `pull` is one small GET and it ends in
+       `replaceWith` — which is safe precisely when the server already has
+       everything this browser does, and that is the ordinary case.
+
+       IT IS NOT SAFE WHEN A WRITE WAS LOST, and then `replaceWith` would erase
+       a finished section rather than merely fail to learn one. `adopt` imports
+       first and is the answer there — but it is the expensive half: the server
+       checks every section against the mirror, two queries each, so importing
+       on every page load would cost a busy student hundreds of round trips to
+       discover it had nothing to say. `sync.js` keeps one flag for exactly
+       this fork, set when a push fails and cleared when an import succeeds. */
+    if (sync.hasUnsent()) await sync.adopt();
+    else await sync.pull();
+    /* The exams are the same kind of cache and were stale for the same reason:
+       a course passed on another device offered itself to be taken again. */
+    await refreshExams();
     return 'kept';
   }
 

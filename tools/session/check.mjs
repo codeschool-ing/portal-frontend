@@ -532,6 +532,72 @@ console.log('\n== 5. the lesson structure ==');
     'sectionCount = ' + afterSignIn.sections + ', placeholder is 25');
 }
 
+/* ==========================================================================
+   THE SAME ACCOUNT IN TWO PLACES.
+
+   A kept session used to mean "the browser and the server already agree, there
+   is nothing to do" — and it read nothing back. So a section finished on one
+   device stayed invisible on the other through any number of reloads, and the
+   only thing that fixed it was signing out and in again, because that is the
+   path that pulls.
+
+   Both halves are asserted, and the second is the one worth having: reading
+   back must not cost a write that never reached the server. A reload that
+   loses work would be a worse bug than the staleness it cures.
+   ========================================================================== */
+console.log('\n== 7. a kept session reconciles with the server ==');
+{
+  const finished = (course) => p.evaluate(async (c) => {
+    const s = await import('/app/state.js');
+    const done = s.now().progress?.[c]?.lessons?.[0]?.sections || {};
+    return Object.keys(done).filter((k) => done[k]).sort();
+  }, course);
+
+  /* The other window has been busy: the server holds a section this browser
+     has never heard of. */
+  await boot({
+    stored: ANA,
+    session: ANA.session,
+    /* The server's shape, which is not the browser's: `sections` is a list of
+       ids there and a map here — see replaceWith. */
+    progress: {
+      progress: { javascript: { lessons: { 0: { sections: ['let-const', 'arrow'] } } } },
+      notes: [], resume: null,
+    },
+  });
+  ok('A RELOAD SEES WHAT THE OTHER WINDOW DID',
+    (await finished('javascript')).includes('arrow'),
+    (await finished('javascript')).join(',') || 'nothing');
+
+  /* And it did NOT import to find that out. The server validates every section
+     against the mirror, two queries each, so an import on every page load is
+     hundreds of round trips spent discovering this browser had nothing to
+     say. */
+  ok('and paid one read for it, not an import',
+    !api.wrote.some((w) => w.startsWith('POST /api/progress/import')),
+    api.wrote.join(' | ') || 'nothing was written');
+
+  /* And the other direction: this browser finished something the server never
+     recorded, which is what a lost fire-and-forget write leaves behind. `unsent`
+     is the flag sync.js sets when a push fails — the document remembers, so the
+     reload knows to import instead of reading over itself. */
+  await boot({
+    stored: {
+      ...ANA,
+      unsent: true,
+      progress: { javascript: { lessons: { 0: { sections: { intro: true }, exercises: {} } } } },
+    },
+    session: ANA.session,
+    progress: { progress: {}, notes: [], resume: null },
+  });
+  ok('A LOST WRITE IS SENT UP RATHER THAN ERASED',
+    api.wrote.some((w) => w.startsWith('POST /api/progress/import') && w.includes('intro')),
+    api.wrote.join(' | ') || 'nothing was sent');
+  ok('and the flag is cleared once it has been',
+    (await document_())?.unsent === undefined,
+    JSON.stringify((await document_())?.unsent));
+}
+
 console.log('\n== JavaScript errors ==');
 ok('none', errors.length === 0, errors.join(' | ') || 'none');
 

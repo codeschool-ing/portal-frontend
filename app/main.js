@@ -390,6 +390,14 @@ restoring.then((outcome) => {
      server has just contradicted it: re-run the router so the guard at the top
      of this file sends a signed-out student to sign-in, and so a switched
      account's screen is rebuilt from ITS data rather than the previous one's.
-     `kept`, `restored` and `unknown` all leave the routing as it stands. */
-  if (outcome === 'signed-out' || outcome === 'switched') dispatch();
+     `restored` and `unknown` leave the routing as it stands.
+
+     `KEPT` REDRAWS TOO, AND THAT IS NEW. It used to mean "the two already
+     agreed, nothing to do", and it no longer does: a kept session now
+     reconciles progress and exams with the server, so by the time this
+     resolves the numbers on the screen can be out of date — which is exactly
+     what the same account open in two windows looked like. The route does not
+     change; the screen is rebuilt from the same store, which is what a
+     language switch already does several times a session. */
+  if (outcome === 'signed-out' || outcome === 'switched' || outcome === 'kept') dispatch();
 });
