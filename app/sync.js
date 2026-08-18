@@ -141,11 +141,41 @@ export function start() {
   });
 }
 
+/* WHAT THE SERVER REFUSED TO PLACE, said out loud.
+
+   The import answers with the places it could not find in the catalogue —
+   `javascript/1/content` and the like — because the server validates every one
+   against the mirror rather than writing whatever it is handed. `adopt` has
+   always returned that report faithfully, and all three of its callers threw
+   it away, so a record could be refused, then dropped from this browser by the
+   `replaceWith` below, and nothing anywhere would have mentioned it.
+
+   That is not hypothetical: it is how a section finished on a screen drawn
+   from placeholders disappears. The completion is written against the
+   placeholder's section id, the mirror has no such id for a course that really
+   does have content, and the row goes nowhere. Reading this would have said so
+   on the first reload instead of leaving it to be inferred from a denominator.
+
+   A warning and not an error: nothing is broken, the portal is working exactly
+   as designed, and what is lost is one record rather than the session. It
+   still has to be legible, so it names them — capped, because a stale document
+   against a moved catalogue can produce a great many and a console flooded
+   with them says less than ten of them do. */
+const announceSkipped = (report) => {
+  const skipped = report && report.skipped;
+  if (!skipped || !skipped.length || typeof console === 'undefined') return;
+  const shown = skipped.slice(0, 10).join(', ');
+  console.warn('the server could not place ' + skipped.length
+    + ' of this browser\'s records, and they are gone from it now: '
+    + shown + (skipped.length > 10 ? ', and ' + (skipped.length - 10) + ' more' : ''));
+};
+
 /* ---------- the first login ----------
 
    Import, then read, then replace. Returning what the import reported rather
    than swallowing it: `skipped` is the number worth seeing, and a caller that
-   wants to say "12 sections could not be placed" needs it. */
+   wants to say "12 sections could not be placed" needs it. Nobody says it on
+   screen yet — `announceSkipped` above is the floor, not the ceiling. */
 export async function adopt() {
   if (!configured()) return null;
 
@@ -156,6 +186,7 @@ export async function adopt() {
      throws, the document on screen is still the local one and the flag still
      describes it. */
   clearUnsent();
+  announceSkipped(report);
   return report;
 }
 
