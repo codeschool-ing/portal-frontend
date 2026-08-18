@@ -1617,6 +1617,44 @@ ok('the root declares the dark scheme', scheme.root === 'dark', scheme.root);
 ok('the rail really does scroll', scheme.scrolls);
 ok('and its scrollbar has a declared colour', scheme.rail !== 'auto', scheme.rail);
 
+/* ONE NAVIGATION SURFACE AT A TIME.
+
+   Below 1180px the rail is a drawer over the page, and the bar above it stays
+   reachable on purpose — the veil starts at 64px. Both could therefore be open
+   at once, and they did not merely coexist: the bar is `position:fixed;
+   z-index:100`, so it is a stacking context and a menu inside it cannot rise
+   above the drawer's 110 whatever its own z-index says. The track names came
+   out sliced down their left edge.
+
+   The enforcement was half-written. Any click outside a bar menu closed it, so
+   opening the drawer already put the pickers away; nothing went the other way.
+   Both directions are asserted, because the half that worked is the half that
+   can be broken by someone fixing the other. */
+await p.setViewportSize({ width: 900, height: 1000 });
+await p.waitForTimeout(250);
+
+const menus = async () => p.evaluate(() => ({
+  rail: document.body.classList.contains('rail-open'),
+  track: !!document.querySelector('#nav-context .ctx-box.is-open'),
+}));
+
+await p.click('#rail-btn');
+ok('the drawer opens', (await menus()).rail);
+
+await p.click('#nav-context .ctx');
+const afterTrack = await menus();
+ok('OPENING THE TRACK PICKER PUTS THE DRAWER AWAY', afterTrack.track && !afterTrack.rail,
+  JSON.stringify(afterTrack));
+
+await p.click('#rail-btn');
+const afterRail = await menus();
+ok('and opening the drawer puts the picker away', afterRail.rail && !afterRail.track,
+  JSON.stringify(afterRail));
+
+await p.click('#rail-btn');
+await p.setViewportSize({ width: 1440, height: 900 });
+await p.waitForTimeout(250);
+
 /* No scrollable container may be left with the system colour. The test sweeps
    all of them, instead of checking a hand-written list that goes stale. */
 const noColour = await p.evaluate(() => {
