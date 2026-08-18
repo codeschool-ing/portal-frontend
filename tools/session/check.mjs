@@ -63,6 +63,32 @@ const api = {
   // asks for travels in the query string of a GET.
   read: [],
   down: false,
+  /* How many times GET /api/lessons should fail before it answers. The route
+     had no case here at all until now — it fell through to the 404 at the
+     bottom of the handler — so no run of this suite had ever seen it SUCCEED,
+     and the client's silent catch made that indistinguishable from working. A
+     structure that never lands turns every written course into a placeholder
+     one: the portal keeps working and every number in it is wrong. */
+  structureFailures: 0,
+};
+
+/* One course with a shape the client cannot invent. Its placeholder rule gives
+   a lesson exactly ONE section, so three of them is proof the answer was read
+   rather than guessed. */
+const STRUCTURE = {
+  lang: 'en',
+  courses: [{
+    courseId: 'javascript',
+    lessons: [{
+      lessonIx: 0,
+      title: 'ES6+ syntax',
+      sections: [
+        { id: 'intro', title: 'Intro', kind: 'content', countable: true },
+        { id: 'let-const', title: 'let and const', kind: 'content', countable: true },
+        { id: 'arrow', title: 'Arrow functions', kind: 'content', countable: true },
+      ],
+    }],
+  }],
 };
 
 const b = await chromium.launch(CHROME ? { executablePath: CHROME } : {});
@@ -71,9 +97,17 @@ const p = await ctx.newPage();
 
 await p.route(/fonts\.(googleapis|gstatic)\.com/, (r) =>
   r.fulfill({ status: 200, contentType: 'text/css', body: '' }).catch(() => {}));
+/* The structure's own failure is DELIBERATE noise: case 5 below makes the
+   route fail and then asserts that the portal said so. Kept in its own list so
+   that the "no JavaScript errors" check at the end still means what it says. */
+const structureErrors = [];
 p.on('console', (m) => {
   if (m.type() !== 'error') return;
   if (/Failed to load resource/.test(m.text())) return;
+  if (/lesson structure could not be read/.test(m.text())) {
+    structureErrors.push(m.text());
+    return;
+  }
   errors.push('console: ' + m.text());
 });
 p.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
@@ -110,6 +144,16 @@ await p.route('**/api/**', async (route) => {
   }
   if (path === '/api/exams') return json({ exams: [] });
 
+  /* The structure. It answers for real here — see `structureFailures` for why
+     that is worth saying about a stub. */
+  if (path === '/api/lessons') {
+    if (api.structureFailures > 0) {
+      api.structureFailures -= 1;
+      return json({ error: { code: 'internal', message: 'not this time' } }, 500);
+    }
+    return json(STRUCTURE);
+  }
+
   if (path === '/api/enrollment' && req.method() === 'PUT') {
     const { trackId } = JSON.parse(req.postData() || '{}');
     api.enrollment = {
@@ -141,12 +185,15 @@ await p.route('**/api/**', async (route) => {
    only the hash does not reload, which would leave every assertion below
    reading the state of the load before it. `/__seed__` is a 404 from the static
    server: same origin, so it has this origin's localStorage, and no portal. */
-async function boot({ stored, session, progress, enrollment, down, at = '#/dashboard' }) {
+async function boot({
+  stored, session, progress, enrollment, down, structureFailures = 0, at = '#/dashboard',
+}) {
   api.session = session || null;
   api.progress = progress || { progress: {}, notes: [], resume: null };
   api.enrollment = enrollment || null;
   api.wrote = [];
   api.down = !!down;
+  api.structureFailures = structureFailures;
 
   await p.goto(BASE + '/__seed__', { waitUntil: 'domcontentloaded' });
   await p.evaluate(([k, doc]) => {
@@ -380,6 +427,65 @@ console.log('\n== the language travels with the lesson reads ==');
     !asked.some((u) => /lang=en(&|$)/.test(u)), asked.join(' | '));
 
   await ptCtx.close();
+}
+
+/* ==========================================================================
+   THE STRUCTURE REACHES THE STORE.
+
+   Everything above this point could pass with GET /api/lessons answering 404
+   forever, because that is what the stub used to do and because the client
+   swallows the failure by design. What it costs is invisible on screen and
+   wrong in every number: a course whose sections did not arrive is drawn the
+   way an unwritten course is drawn — one placeholder section per lesson — so
+   the denominators shrink, and a student's completed sections stop being
+   counted, because the portal no longer knows those section ids exist.
+
+   Asserted through `sectionCount`, which is the denominator itself rather than
+   a proxy for it. Three content sections plus an assessment with no exercises,
+   which does not count: three.
+   ========================================================================== */
+console.log('\n== 5. the lesson structure ==');
+{
+  const count = () => p.evaluate(async () => {
+    const L = await import('/app/lessons.js');
+    const C = await import('/app/catalog.js');
+    return {
+      sections: L.sectionCount('javascript'),
+      loaded: L.structureLoaded(),
+      first: L.lessonSections('javascript', C.courseLessons('javascript')[0].key).map((s) => s.id),
+    };
+  });
+
+  await boot({ stored: ANA, session: ANA.session });
+  const landed = await count();
+  ok('THE STRUCTURE IS IN THE STORE AFTER BOOT', landed.loaded);
+  /* 25 is what this course counts when nothing arrives: one placeholder section
+     for each of its 22 lessons, plus the three assessments that have exercises.
+     The stub writes three sections into the first lesson and leaves the rest
+     alone, so a structure that landed reads 27 and one that did not reads 25.
+     Two apart, and the gap is the whole bug. */
+  ok('and the denominator counts them, instead of the placeholder',
+    landed.sections === 27, 'sectionCount = ' + landed.sections + ', placeholder is 25');
+  ok('the sections are the ones the server named',
+    landed.first.join(',') === 'intro,let-const,arrow,assessment', landed.first.join(','));
+
+  /* THE RETRY. This is the heaviest read the portal makes and it is fired at
+     boot beside five others, when the instance serving them may still be
+     starting. One failure used to cost every denominator on the page until the
+     next full load. */
+  await boot({ stored: ANA, session: ANA.session, structureFailures: 1 });
+  const retried = await count();
+  ok('ONE FAILURE AT BOOT IS RETRIED, NOT ABSORBED',
+    retried.loaded && retried.sections === 27, 'sectionCount = ' + retried.sections);
+
+  /* And when it really is gone, the portal still works — that half was right
+     and is what the silence was protecting. It is the SILENCE that was wrong. */
+  await boot({ stored: ANA, session: ANA.session, structureFailures: 9 });
+  const gone = await count();
+  ok('a structure that never arrives leaves a portal that still draws',
+    !gone.loaded && gone.sections > 0, 'sectionCount = ' + gone.sections);
+  ok('and says so as an error, where somebody looks',
+    structureErrors.length > 0, structureErrors.join(' | ') || 'nothing was logged');
 }
 
 console.log('\n== JavaScript errors ==');
