@@ -171,6 +171,7 @@ $('#nav-context').addEventListener('click', async (e) => {
   if (e.target.closest('.ctx')) {
     const opened = box.classList.toggle('is-open');
     box.querySelector('.ctx').setAttribute('aria-expanded', String(opened));
+    if (opened) closeRail();
     return;
   }
   const op = e.target.closest('.ctx-op[data-track]');
@@ -198,6 +199,7 @@ $('#account').addEventListener('click', async (e) => {
     const c = $('#account');
     const opened = c.classList.toggle('is-open');
     c.querySelector('.account-btn').setAttribute('aria-expanded', String(opened));
+    if (opened) closeRail();
   } else if (e.target.closest('#account-signout')) {
     // Same as the account screen's button: end the session, land on sign-in.
     $('#account').classList.remove('is-open');
@@ -255,6 +257,7 @@ $('#lang').addEventListener('click', (e) => {
   const c = $('#lang');
   const opened = c.classList.toggle('is-open');
   c.querySelector('.lang-btn').setAttribute('aria-expanded', String(opened));
+  if (opened) closeRail();
 });
 
 document.addEventListener('click', (e) => {
@@ -275,7 +278,26 @@ $('#theme-btn').addEventListener('click', () => {
   applyTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
 });
 
-/* ---------- the rail as a drawer, on a narrow screen ---------- */
+/* ---------- the rail as a drawer, on a narrow screen ----------
+
+   ONE NAVIGATION SURFACE AT A TIME, and the enforcement was half-written. Any
+   click outside a bar menu closes it, so opening the drawer already closed the
+   track picker, the account menu and the language picker. Nothing went the
+   other way: opening one of those left the drawer standing, and the two then
+   overlapped.
+
+   Overlapped, not merely coexisted. The bar is `position:fixed; z-index:100`,
+   which makes it a stacking context, so a menu inside it cannot rise above the
+   drawer's 110 however large its own z-index is — the track names came out
+   sliced down their left edge by the drawer sitting on top of them.
+
+   FIXED BY THE INTERACTION AND NOT THE PAINT ORDER, for two reasons. The bar's
+   z-index lives in base.css, which is a copy shared with the vitrine and the
+   staff console, so raising it there is a change in three repositories to
+   settle an argument in one. And the veil deliberately starts at 64px, leaving
+   the bar reachable while the drawer is open — that is a decision, and the
+   answer to "you can still use the bar" is that using it puts the drawer away,
+   not that the two share the screen. */
 const closeRail = () => {
   document.body.classList.remove('rail-open');
   $('#rail-btn').setAttribute('aria-expanded', 'false');
