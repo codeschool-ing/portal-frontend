@@ -107,6 +107,12 @@ export function putStructure(courses) {
   for (const c of courses || []) remote.structure.set(c.courseId, c.lessons || []);
 }
 
+/* Whether the structure arrived. The screens never ask — they are built to
+   draw a course that has nothing written, because most of the catalogue was —
+   which is exactly why nothing on screen tells "not written" apart from "not
+   fetched", and why a suite needs something that does. */
+export const structureLoaded = () => Boolean(remote.structure && remote.structure.size);
+
 // One course's lessons WITH their prose, as the gated route answers them.
 export function putCourse(courseId, lessons) {
   remote.courses.set(courseId, lessons || []);

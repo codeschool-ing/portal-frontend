@@ -24,6 +24,7 @@ import {
   putCourse,
   courseLoaded,
   forLanguage,
+  structureLoaded as structureIsLoaded,
 } from './lessons.js';
 import { gradeLocally, NEEDS_SERVER } from './exercises/grade.js';
 
@@ -106,19 +107,53 @@ function currentLanguage() {
    With no backend configured neither of these runs and `window.LESSONS` is
    still there — that is the offline bundle, which is a subscriber's download
    rather than a public page. */
+/* Whether the structure is in the store. Not for the screens — they cope with
+   its absence by design — but for the suites, which otherwise cannot tell a
+   course that arrived empty from one that never arrived. */
+export const structureLoaded = () => structureIsLoaded();
+
 export async function loadLessonStructure() {
   if (!sync.configured()) return;
   forLanguage(currentLanguage());
-  try {
-    const answer = await sync.request('GET',
-      '/api/lessons?lang=' + encodeURIComponent(currentLanguage()));
-    putStructure(answer && answer.courses);
-  } catch (e) {
-    /* Not fatal, and not shown. Without the structure every course looks
-       unwritten — a state the portal draws correctly, since 119 of them are —
-       and the alternative is an error screen over a portal that still works for
-       everything except the shape of a rail. */
-    if (typeof console !== 'undefined') console.debug('lesson structure', e.message);
+
+  /* TWICE, AND THE SECOND TIME IS NOT DECORATION. This is the heaviest read
+     the portal makes — every lesson and every section of 122 courses, with a
+     translation lookup over all of them — and it is fired at boot alongside
+     five other requests, at the moment a Cloud Run instance may still be
+     starting. A single failure here costs every denominator on the screen
+     until the next full load, which can be days.
+
+     The rest of the portal does not need this: the reads are small, and the
+     writes are idempotent and recovered by the next sign-in's import. This one
+     has no second chance built in anywhere else, so it gets one here. */
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const answer = await sync.request('GET',
+        '/api/lessons?lang=' + encodeURIComponent(currentLanguage()));
+      putStructure(answer && answer.courses);
+      return;
+    } catch (e) {
+      /* NOT FATAL, AND NO LONGER SILENT. It used to be `console.debug`, on the
+         argument that a portal without the structure still draws correctly —
+         which was true when 119 of 122 courses had nothing written and the
+         placeholder was the honest picture.
+
+         It stopped being true when the content moved to the server. Now a
+         failure here shows a real course as an unwritten one: every progress
+         bar reads against a denominator of one section per lesson, and a
+         student's completed sections do not count, because the portal does not
+         know those sections exist. It looks like a working portal with the
+         wrong numbers in it — which is the kind of failure that has to arrive
+         as an error, in the place somebody looks first. */
+      if (attempt === 0) {
+        await new Promise((r) => setTimeout(r, 400));
+        continue;
+      }
+      if (typeof console !== 'undefined') {
+        console.error('the lesson structure could not be read — every progress '
+          + 'denominator on this page is a placeholder: ' + e.message);
+      }
+    }
   }
 }
 
