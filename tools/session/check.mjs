@@ -72,6 +72,11 @@ const api = {
   structureFailures: 0,
   // Makes GET /api/exams fail, so that one refresh can be seen to fail alone.
   examsDown: false,
+  /* What POST /api/progress/import answers it could not place. The server
+     validates every record against the mirror and names what it refused; until
+     now the stub always said nothing had been refused, and all three callers
+     of adopt() threw the report away regardless. */
+  skipped: undefined,
 };
 
 /* One course with a shape the client cannot invent. Its placeholder rule gives
@@ -103,7 +108,11 @@ await p.route(/fonts\.(googleapis|gstatic)\.com/, (r) =>
    route fail and then asserts that the portal said so. Kept in its own list so
    that the "no JavaScript errors" check at the end still means what it says. */
 const structureErrors = [];
+/* Warnings are not errors and must not fail the run, but one of them is
+   asserted below, so it is collected rather than ignored. */
+const warnings = [];
 p.on('console', (m) => {
+  if (m.type() === 'warning') { warnings.push(m.text()); return; }
   if (m.type() !== 'error') return;
   if (/Failed to load resource/.test(m.text())) return;
   if (/lesson structure could not be read/.test(m.text())) {
@@ -141,7 +150,7 @@ await p.route('**/api/**', async (route) => {
   }
   if (path === '/api/session') return json(api.session);
   if (path === '/api/progress' && req.method() === 'POST') return json({ skipped: 0 });
-  if (path === '/api/progress/import') return json({ skipped: 0 });
+  if (path === '/api/progress/import') return json({ skipped: api.skipped });
   if (path === '/api/progress') return json(api.progress);
   if (path === '/api/account') {
     if (!api.session) return json({ error: { code: 'unauthorized', message: 'sign in first' } }, 401);
@@ -205,7 +214,8 @@ await p.route('**/api/**', async (route) => {
    reading the state of the load before it. `/__seed__` is a 404 from the static
    server: same origin, so it has this origin's localStorage, and no portal. */
 async function boot({
-  stored, session, progress, enrollment, down, structureFailures = 0, at = '#/dashboard',
+  stored, session, progress, enrollment, down,
+  structureFailures = 0, skipped = undefined, at = '#/dashboard',
 }) {
   api.session = session || null;
   api.progress = progress || { progress: {}, notes: [], resume: null };
@@ -213,6 +223,7 @@ async function boot({
   api.wrote = [];
   api.down = !!down;
   api.structureFailures = structureFailures;
+  api.skipped = skipped;
 
   await p.goto(BASE + '/__seed__', { waitUntil: 'domcontentloaded' });
   await p.evaluate(([k, doc]) => {
@@ -631,6 +642,27 @@ console.log('\n== 7. a kept session reconciles with the server ==');
     !errors.some((e) => /no exams today/.test(e)),
     errors.join(' | ') || 'no unhandled rejection');
   api.examsDown = false;
+
+  /* WHAT THE SERVER REFUSED TO PLACE. The import names it, `adopt` returns it,
+     and all three of its callers threw the report away — so a record could be
+     refused, then dropped from this browser by the `replaceWith` that follows,
+     and nothing anywhere would have mentioned it. It is exactly how a section
+     finished on a placeholder screen disappears. */
+  warnings.length = 0;
+  await boot({
+    stored: { ...ANA, unsent: true },
+    session: ANA.session,
+    skipped: ['javascript/0/content', 'javascript/3/intro'],
+  });
+  ok('WHAT THE IMPORT REFUSED IS SAID OUT LOUD, BY NAME',
+    warnings.some((w) => /could not place 2 /.test(w) && w.includes('javascript/0/content')),
+    warnings.join(' | ') || 'nothing was said');
+
+  warnings.length = 0;
+  await boot({ stored: { ...ANA, unsent: true }, session: ANA.session });
+  ok('and an import that refused nothing stays quiet',
+    !warnings.some((w) => w.includes('could not place')),
+    warnings.join(' | ') || 'nothing was said');
 }
 
 console.log('\n== JavaScript errors ==');
