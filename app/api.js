@@ -133,6 +133,16 @@ export async function loadLessonStructure() {
       putStructure(answer && answer.courses);
       return;
     } catch (e) {
+      /* A 401 IS NOT A FAILURE HERE, IT IS "NOT SIGNED IN YET".
+
+         This route is behind the session like everything else, and boot runs
+         it before the sign-in screen has been used. Retrying would ask twice
+         for the same refusal and shouting would put a red line on an ordinary
+         signed-out visit — the alarm nobody keeps listening to. `afterSignIn`
+         asks again the moment there is a session, which is the answer to this
+         one. Every other status is a real failure and is treated as one. */
+      if (e.status === 401) return;
+
       /* NOT FATAL, AND NO LONGER SILENT. It used to be `console.debug`, on the
          argument that a portal without the structure still draws correctly —
          which was true when 119 of 122 courses had nothing written and the
@@ -212,6 +222,27 @@ async function afterSignIn(account) {
      passed offering to be taken for the first time. */
   await refreshExams();
   await refreshVerified();
+
+  /* AND THE LESSON STRUCTURE, WHICH BOOT ASKED FOR AND WAS REFUSED.
+
+     `GET /api/lessons` is not behind the plan, but it IS behind the session —
+     it answers 401 to a caller with no cookie, like everything else here. A
+     private window lands on the sign-in screen, so the boot call in main.js
+     runs before there is a session and is turned away; and because the portal
+     is a single page, arriving at the dashboard afterwards is not a new page
+     load, so nothing ever asked again.
+
+     What that looked like: a signed-in student with the whole catalogue drawn
+     as though nothing in it had been written. Every denominator a placeholder,
+     and the sections they had already finished not counted, because the portal
+     did not know those ids existed. A reload fixed it, which is why it looked
+     intermittent for as long as it did.
+
+     Guarded because this also runs for a student who signed in on a page that
+     already had it — the structure is the catalogue, not the account, and it
+     does not change with who is looking. */
+  if (!structureIsLoaded()) await loadLessonStructure();
+
   return state.now().session;
 }
 

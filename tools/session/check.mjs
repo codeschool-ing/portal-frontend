@@ -132,7 +132,10 @@ await p.route('**/api/**', async (route) => {
   if (req.method() === 'GET') api.read.push(req.url());
 
   if (path === '/api/session' && req.method() === 'POST') {
-    return json({ name: 'Ana', email: 'ana@codeschool.ing' });
+    // Signing in opens a session HERE too, so that the routes which answer 401
+    // without one start answering. /api/lessons is the one that matters.
+    api.session = { name: 'Ana', email: 'ana@codeschool.ing' };
+    return json(api.session);
   }
   if (path === '/api/session') return json(api.session);
   if (path === '/api/progress' && req.method() === 'POST') return json({ skipped: 0 });
@@ -145,8 +148,17 @@ await p.route('**/api/**', async (route) => {
   if (path === '/api/exams') return json({ exams: [] });
 
   /* The structure. It answers for real here — see `structureFailures` for why
-     that is worth saying about a stub. */
+     that is worth saying about a stub.
+
+     AND IT IS BEHIND THE SESSION, exactly as the live route is. Not behind the
+     plan — the portal needs it to draw a denominator for a guest too — but a
+     caller with no cookie gets 401, and modelling that is the whole of case 6
+     below. A stub that answered it to anybody hid the bug in production for as
+     long as it existed. */
   if (path === '/api/lessons') {
+    if (!api.session) {
+      return json({ error: { code: 'unauthorized', message: 'sign in first' } }, 401);
+    }
     if (api.structureFailures > 0) {
       api.structureFailures -= 1;
       return json({ error: { code: 'internal', message: 'not this time' } }, 500);
@@ -486,6 +498,38 @@ console.log('\n== 5. the lesson structure ==');
     !gone.loaded && gone.sections > 0, 'sectionCount = ' + gone.sections);
   ok('and says so as an error, where somebody looks',
     structureErrors.length > 0, structureErrors.join(' | ') || 'nothing was logged');
+
+  /* ------------------------------------------------------------------------
+     THE PRIVATE WINDOW. This is the case that reached production.
+
+     A student opening the portal in a fresh window lands signed out, so the
+     boot call in main.js asks for the structure with no cookie and is refused
+     — correctly, this route is behind the session. Then they sign in, and
+     because the portal is one page, arriving at the dashboard is not a new
+     page load: nothing asked again. The result was a signed-in student with
+     the entire catalogue drawn as though none of it had been written, every
+     denominator a placeholder and their finished sections uncounted, until
+     they happened to press reload.
+
+     Signing in through the screen and not through the API, because what broke
+     was the sequence and a direct call would skip it. */
+  structureErrors.length = 0;
+  await boot({ stored: null, session: null, at: '#/sign-in' });
+
+  const beforeSignIn = await count();
+  ok('signed out, the structure is refused and the portal says nothing',
+    !beforeSignIn.loaded && structureErrors.length === 0,
+    'a 401 before sign-in is not a failure, and must not cry wolf');
+
+  await p.fill('#e-email', 'ana@codeschool.ing');
+  await p.fill('#e-password', 'a passphrase worth typing');
+  await p.click('#form-signin button[type="submit"]');
+  await p.waitForTimeout(900);
+
+  const afterSignIn = await count();
+  ok('SIGNING IN ASKS AGAIN, WITHOUT A RELOAD',
+    afterSignIn.loaded && afterSignIn.sections === 27,
+    'sectionCount = ' + afterSignIn.sections + ', placeholder is 25');
 }
 
 console.log('\n== JavaScript errors ==');
